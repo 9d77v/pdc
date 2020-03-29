@@ -1,0 +1,77 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Media {
+  id: ID!
+  title: String!  
+  desc: String!
+  pubDate: Int!
+  cover: String!
+  episodes: [Episode!]!
+  characters: [Character!]!
+  staffs: [Staff!]!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type Character{
+    characterName: String!
+    originalName: String!
+}
+
+type Staff{
+  Job: String!
+  Persons: [String!]!
+}
+
+type Episode {
+  id: ID!
+  mediaID: ID!
+  order: Int!
+  title: String!
+  desc: String!
+  cover: String!
+  url: String!
+  subtitle: String!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type Query {
+  listMedia: [Media!]!
+}
+
+input NewCharacter{
+    characterName: String!
+    originalName: String! 
+}
+
+input NewStaff{
+  job: String!
+  persons: [String!]!
+}
+
+input NewMedia {
+  title: String!  
+  desc: String!
+  pubDate: Int!
+  cover: String!
+  characters: [NewCharacter!]!
+  staffs: [NewStaff!]!
+}
+
+input NewEpisode{
+  mediaID: ID!
+  order: Int!
+  title: String!
+  desc: String!
+  cover: String!
+  url: String!
+  subtitle: String!
+}
+
+type Mutation {
+  createMedia(input: NewMedia!): ID!
+  createEpisode(input:NewEpisode!): ID!
+}
