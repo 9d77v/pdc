@@ -6,31 +6,55 @@ import (
 	"log"
 	"strings"
 
+	"git.9d77v.me/9d77v/pdc/utils"
 	"github.com/9d77v/go-lib/clients/config"
 	"github.com/jinzhu/gorm"
+	minio "github.com/minio/minio-go/v6"
 
 	//postgres driver
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
+//环境变量
+var (
+	DEBUG = utils.GetEnvBool("DEBUG", true)
+
+	DBHost     = utils.GetEnvStr("POSTGRES_HOST", "127.0.0.1")
+	DBPort     = utils.GetEnvInt("POSTGRES_PORT", 5432)
+	DBUser     = utils.GetEnvStr("POSTGRES_USER", "postgres")
+	DBPassword = utils.GetEnvStr("POSTGRES_PASSWORD", "123456")
+	DBName     = utils.GetEnvStr("POSTGRES_NAME", "pdc")
+
+	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "127.0.0.1:9500")
+	MinioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
+	MinioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
+	MinioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
+)
+
 var (
 	//Gorm global  orm
 	Gorm *gorm.DB
+	//MinioClient S3 OSS
+	MinioClient *minio.Client
 )
 
 func init() {
+	initDB()
+	initMinio()
+}
+
+func initDB() {
 	dbConfig := &config.DBConfig{
 		Driver:       "postgres",
-		Host:         "192.168.1.234",
-		Port:         5432,
-		User:         "postgres",
-		Password:     "123456",
-		Name:         "pdc",
+		Host:         DBHost,
+		Port:         uint(DBPort),
+		User:         DBUser,
+		Password:     DBPassword,
+		Name:         DBName,
 		MaxIdleConns: 10,
 		MaxOpenConns: 100,
-		EnableLog:    true,
+		EnableLog:    DEBUG,
 	}
-	dbConfig.Driver = "postgres"
 	var err error
 	Gorm, err = NewClient(dbConfig)
 	if err != nil {
@@ -41,6 +65,20 @@ func init() {
 		&Media{},
 		&Episode{},
 	)
+}
+
+func initMinio() {
+	endpoint := MinioAddress
+	accessKeyID := MinioAccessKeyID
+	secretAccessKey := MinioSecretAccessKey
+	useSSL := MinioUseSSL
+
+	var err error
+	MinioClient, err = minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 }
 
 //NewClient gorm client

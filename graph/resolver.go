@@ -1,5 +1,7 @@
 package graph
 
+import "git.9d77v.me/9d77v/pdc/services"
+
 //go:generate go run github.com/99designs/gqlgen
 // This file will not be regenerated automatically.
 //
@@ -7,3 +9,5 @@ package graph
 
 //Resolver ..
 type Resolver struct{}
+
+var mediaService = services.MediaService{}

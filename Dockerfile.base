@@ -1,0 +1,10 @@
+FROM 9d77v/go:1.13.1
+
+WORKDIR /app
+COPY go.mod /app
+COPY go.sum /app
+
+RUN cd /app \
+    && go mod download \
+    && rm -rf /app
+

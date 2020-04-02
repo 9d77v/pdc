@@ -1,0 +1,32 @@
+version: '3.6'
+
+services:
+  minio:
+    image: 9d77v/minio:arm64.2020-01-30
+    restart: always
+    # volumes:
+    #   - ./minio/data:/data
+    ports:
+      - 9000:9000
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    env_file:
+        - pdc.env    
+    command: minio server /data
+    container_name: minio
+  postgres:
+    image: postgres:12.1-alpine
+    restart: always
+    user: root
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: postgres
+    env_file:
+        - pdc.env 
+    ports:
+      - 5432:5432
+    # volumes:
+    #   - ./postgres/data:/var/lib/postgresql/data
+    container_name: postgres

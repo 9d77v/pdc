@@ -8,16 +8,16 @@ type Character struct {
 }
 
 type Episode struct {
-	ID        int64  `json:"id"`
-	MediaID   int64  `json:"mediaID"`
-	Order     int64  `json:"order"`
-	Title     string `json:"title"`
-	Desc      string `json:"desc"`
-	Cover     string `json:"cover"`
-	URL       string `json:"url"`
-	Subtitle  string `json:"subtitle"`
-	CreatedAt int64  `json:"createdAt"`
-	UpdatedAt int64  `json:"updatedAt"`
+	ID        int64       `json:"id"`
+	MediaID   int64       `json:"mediaID"`
+	Order     string      `json:"order"`
+	Title     string      `json:"title"`
+	Desc      string      `json:"desc"`
+	Cover     string      `json:"cover"`
+	URL       string      `json:"url"`
+	Subtitles []*Subtitle `json:"subtitles"`
+	CreatedAt int64       `json:"createdAt"`
+	UpdatedAt int64       `json:"updatedAt"`
 }
 
 type Media struct {
@@ -39,20 +39,20 @@ type NewCharacter struct {
 }
 
 type NewEpisode struct {
-	MediaID  int64  `json:"mediaID"`
-	Order    int64  `json:"order"`
-	Title    string `json:"title"`
-	Desc     string `json:"desc"`
-	Cover    string `json:"cover"`
-	URL      string `json:"url"`
-	Subtitle string `json:"subtitle"`
+	MediaID   int64          `json:"mediaID"`
+	Order     string         `json:"order"`
+	Title     string         `json:"title"`
+	Desc      *string        `json:"desc"`
+	Cover     *string        `json:"cover"`
+	URL       string         `json:"url"`
+	Subtitles []*NewSubtitle `json:"subtitles"`
 }
 
 type NewMedia struct {
 	Title      string          `json:"title"`
-	Desc       string          `json:"desc"`
-	PubDate    int64           `json:"pubDate"`
-	Cover      string          `json:"cover"`
+	Desc       *string         `json:"desc"`
+	PubDate    *int64          `json:"pubDate"`
+	Cover      *string         `json:"cover"`
 	Characters []*NewCharacter `json:"characters"`
 	Staffs     []*NewStaff     `json:"staffs"`
 }
@@ -62,7 +62,17 @@ type NewStaff struct {
 	Persons []string `json:"persons"`
 }
 
+type NewSubtitle struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
 type Staff struct {
 	Job     string   `json:"Job"`
 	Persons []string `json:"Persons"`
+}
+
+type Subtitle struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }

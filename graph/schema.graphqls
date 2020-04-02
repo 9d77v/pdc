@@ -25,21 +25,27 @@ type Staff{
   Persons: [String!]!
 }
 
+type Subtitle{
+  name:String!
+  url:String!
+}
+
 type Episode {
   id: ID!
   mediaID: ID!
-  order: Int!
+  order: String!
   title: String!
   desc: String!
   cover: String!
   url: String!
-  subtitle: String!
+  subtitles:  [Subtitle!]!
   createdAt: Int!
   updatedAt: Int!
 }
 
 type Query {
   listMedia: [Media!]!
+  presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
 input NewCharacter{
@@ -54,21 +60,26 @@ input NewStaff{
 
 input NewMedia {
   title: String!  
-  desc: String!
-  pubDate: Int!
-  cover: String!
-  characters: [NewCharacter!]!
-  staffs: [NewStaff!]!
+  desc: String
+  pubDate: Int
+  cover: String
+  characters: [NewCharacter!]
+  staffs: [NewStaff!]
+}
+
+input NewSubtitle{
+  name:String!
+  url:String!
 }
 
 input NewEpisode{
   mediaID: ID!
-  order: Int!
+  order: String!
   title: String!
-  desc: String!
-  cover: String!
+  desc: String
+  cover: String
   url: String!
-  subtitle: String!
+  subtitles: [NewSubtitle!]
 }
 
 type Mutation {

@@ -1,0 +1,48 @@
+#!/bin/sh
+app='pdc'
+version="0.0.1"
+sudo=""
+if command -v sudo >/dev/null 2>&1; then
+    sudo="sudo"
+fi
+
+RunInDocker(){
+    os=`uname`
+    case $os in
+        Darwin|Linux)
+            LOCALHOST=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|tr -d "addr:" | sort -r | head -1`     
+            ;;
+        *)
+            LOCALHOST=`ipconfig | grep -a IPv4 | grep -a 192 | awk '{print $NF}'`
+            ;;
+    esac
+    workPath="//go/src/github.com/9d77v/$1"
+        $sudo docker run -it --rm --name $1 \
+        -v  /$PWD:$workPath -w $workPath --privileged \
+        -e LOCALHOST="$LOCALHOST" \
+        9d77v/go:1.11.2
+    return
+}
+
+case $1 in 
+    gen)
+        go generate ./...
+        ;;
+    dev)
+        go run server.go
+        ;;
+    ui)
+        cd ui
+        yarn start
+        ;;
+    base)
+        $sudo docker build -t 9d77v/pdc-base:$version -f Dockerfile.base .
+        $sudo docker push 9d77v/pdc-base:$version
+       ;;
+    deploy)
+        IMAGE_TAG=`git log --pretty=format:"%an_%ad_%h" -1 --date=short`
+        $sudo docker build -t 9d77v/pdc:$IMAGE_TAG .
+        # $sudo docker push 9d77v/pdc:$IMAGE_TAG
+        ;;
+esac  
+
