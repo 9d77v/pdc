@@ -10,9 +10,7 @@ services:
       - 9000:9000
     environment:
       MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio123
-    env_file:
-        - pdc.env    
+      MINIO_SECRET_KEY: minio123 
     command: minio server /data
     container_name: minio
   postgres:
@@ -23,10 +21,16 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: postgres
-    env_file:
-        - pdc.env 
     ports:
       - 5432:5432
     # volumes:
     #   - ./postgres/data:/var/lib/postgresql/data
     container_name: postgres
+  pdc:
+    image: 9d77v/pdc:9d77v_2020-04-02_cb5fb17
+    restart: always
+    ports: 
+      - 8080:8080
+    env_file:
+      - pdc.env
+    container_name: pdc

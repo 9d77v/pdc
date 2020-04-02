@@ -42,7 +42,7 @@ case $1 in
     deploy)
         IMAGE_TAG=`git log --pretty=format:"%an_%ad_%h" -1 --date=short`
         $sudo docker build -t 9d77v/pdc:$IMAGE_TAG .
-        # $sudo docker push 9d77v/pdc:$IMAGE_TAG
+        $sudo docker push 9d77v/pdc:$IMAGE_TAG
         ;;
 esac  
 
