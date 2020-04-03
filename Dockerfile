@@ -3,7 +3,7 @@ COPY . /app
 
 ENV APP_NAME=pdc
 RUN cd /app \
-    && go build -o $APP_NAME -ldflags "-s -w" \
+    && GOARCH=arm64 go build -o $APP_NAME -ldflags "-s -w" \
     && upx -9 $APP_NAME
 
 FROM scratch
