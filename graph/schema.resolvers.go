@@ -10,20 +10,20 @@ import (
 	"git.9d77v.me/9d77v/pdc/graph/model"
 )
 
-func (r *mutationResolver) CreateMedia(ctx context.Context, input model.NewMedia) (int64, error) {
-	return mediaService.CreateMedia(input)
+func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (int64, error) {
+	return videoService.CreateVideo(input)
 }
 
 func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpisode) (int64, error) {
-	return mediaService.CreateEpisode(input)
+	return videoService.CreateEpisode(input)
 }
 
-func (r *queryResolver) ListMedia(ctx context.Context) ([]*model.Media, error) {
-	return mediaService.ListMedia()
+func (r *queryResolver) ListVideo(ctx context.Context) ([]*model.Video, error) {
+	return videoService.ListVideo()
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
-	return mediaService.PresignedURL(bucketName, objectName)
+	return commonService.PresignedURL(bucketName, objectName)
 }
 
 // Mutation returns generated.MutationResolver implementation.

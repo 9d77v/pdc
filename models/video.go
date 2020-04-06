@@ -7,8 +7,8 @@ import (
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
-//Media 媒体文件
-type Media struct {
+//Video 视频文件
+type Video struct {
 	gorm.Model
 	Title      string `gorm:"size:50"`
 	Desc       string `gorm:"size:5000"`

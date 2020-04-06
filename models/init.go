@@ -25,7 +25,7 @@ var (
 	DBPassword = utils.GetEnvStr("POSTGRES_PASSWORD", "123456")
 	DBName     = utils.GetEnvStr("POSTGRES_NAME", "pdc")
 
-	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "127.0.0.1:9500")
+	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "127.0.0.1:9000")
 	MinioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	MinioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
 	MinioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
@@ -62,7 +62,7 @@ func initDB() {
 	}
 	log.Println(Gorm, err)
 	Gorm.AutoMigrate(
-		&Media{},
+		&Video{},
 		&Episode{},
 	)
 }
@@ -79,6 +79,30 @@ func initMinio() {
 		log.Fatalln(err)
 	}
 
+	preCreatedBuckets := []string{"image", "video"}
+	location := "us-east-1"
+	for _, bucketName := range preCreatedBuckets {
+		err = MinioClient.MakeBucket(bucketName, location)
+		if err != nil {
+			exists, errBucketExists := MinioClient.BucketExists(bucketName)
+			if errBucketExists == nil && exists {
+				log.Printf("We already own %s\n", bucketName)
+			} else {
+				log.Fatalln(err)
+			}
+		} else {
+			log.Printf("Successfully created %s\n", bucketName)
+		}
+		//mc  policy  set  download  minio/mybucket
+		policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS": 
+		["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource": 
+		["arn:aws:s3:::` + bucketName + `"]},{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
+		["s3:GetObject"],"Resource":["arn:aws:s3:::` + bucketName + `/*"]}]}`
+		err := MinioClient.SetBucketPolicy(bucketName, policy)
+		if err != nil {
+			log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
+		}
+	}
 }
 
 //NewClient gorm client

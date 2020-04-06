@@ -2,7 +2,7 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Media {
+type Video {
   id: ID!
   title: String!  
   desc: String!
@@ -32,8 +32,8 @@ type Subtitle{
 
 type Episode {
   id: ID!
-  mediaID: ID!
-  order: String!
+  videoID: ID!
+  num: Float!
   title: String!
   desc: String!
   cover: String!
@@ -44,7 +44,7 @@ type Episode {
 }
 
 type Query {
-  listMedia: [Media!]!
+  listVideo: [Video!]!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
@@ -58,7 +58,7 @@ input NewStaff{
   persons: [String!]!
 }
 
-input NewMedia {
+input NewVideo {
   title: String!  
   desc: String
   pubDate: Int
@@ -73,16 +73,16 @@ input NewSubtitle{
 }
 
 input NewEpisode{
-  mediaID: ID!
-  order: String!
-  title: String!
+  videoID: ID!
+  num: Float!
+  title: String
   desc: String
   cover: String
   url: String!
-  subtitles: [NewSubtitle!]
+  subtitles:  [NewSubtitle!]
 }
 
 type Mutation {
-  createMedia(input: NewMedia!): ID!
-  createEpisode(input:NewEpisode!): ID!
+  createVideo(input: NewVideo!): ID!
+  createEpisode(input:NewEpisode!):ID!
 }

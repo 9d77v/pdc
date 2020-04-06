@@ -5,13 +5,13 @@ interface Values {
     description: string;
 }
 
-interface MediaCreateFormProps {
+interface VideoCreateFormProps {
     visible: boolean;
     onCreate: (values: Values) => void;
     onCancel: () => void;
 }
 
-export const MediaCreateForm: React.FC<MediaCreateFormProps> = ({
+export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,

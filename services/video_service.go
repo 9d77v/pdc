@@ -4,17 +4,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/9d77v/go-lib/ptrs"
+
 	"git.9d77v.me/9d77v/pdc/graph/model"
 	"git.9d77v.me/9d77v/pdc/models"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
-//MediaService ..
-type MediaService struct {
+//VideoService ..
+type VideoService struct {
 }
 
-//CreateMedia ..
-func (s MediaService) CreateMedia(input model.NewMedia) (int64, error) {
+//CreateVideo ..
+func (s VideoService) CreateVideo(input model.NewVideo) (int64, error) {
 	cs := make(postgres.Hstore, len(input.Characters))
 	for _, v := range input.Characters {
 		cs[v.CharacterName] = &v.OriginalName
@@ -24,23 +26,11 @@ func (s MediaService) CreateMedia(input model.NewMedia) (int64, error) {
 		staffs := strings.Join(v.Persons, ",")
 		ss[v.Job] = &staffs
 	}
-	desc := ""
-	if input.Desc != nil {
-		desc = *input.Desc
-	}
-	var pubdate int64
-	if input.PubDate != nil {
-		pubdate = *input.PubDate
-	}
-	cover := ""
-	if input.Cover != nil {
-		cover = *input.Cover
-	}
-	m := &models.Media{
+	m := &models.Video{
 		Title:      input.Title,
-		Desc:       desc,
-		PubDate:    time.Unix(pubdate, 0),
-		Cover:      cover,
+		Desc:       ptrs.String(input.Desc),
+		PubDate:    time.Unix(ptrs.Int64(input.PubDate), 0),
+		Cover:      ptrs.String(input.Cover),
 		Characters: cs,
 		Staffs:     ss,
 	}
@@ -49,36 +39,29 @@ func (s MediaService) CreateMedia(input model.NewMedia) (int64, error) {
 }
 
 //CreateEpisode ..
-func (s MediaService) CreateEpisode(input model.NewEpisode) (int64, error) {
-	desc := ""
-	if input.Desc != nil {
-		desc = *input.Desc
-	}
+func (s VideoService) CreateEpisode(input model.NewEpisode) (int64, error) {
 	cs := make(postgres.Hstore, len(input.Subtitles))
 	for _, v := range input.Subtitles {
 		cs[v.Name] = &v.URL
 	}
-	cover := ""
-	if input.Cover != nil {
-		cover = *input.Cover
-	}
 	e := &models.Episode{
-		Order:     input.Order,
-		MediaID:   input.MediaID,
-		Title:     input.Title,
-		Desc:      desc,
-		Cover:     cover,
+		Num:       input.Num,
+		VideoID:   input.VideoID,
+		Title:     ptrs.String(input.Title),
+		Desc:      ptrs.String(input.Desc),
+		Cover:     ptrs.String(input.Cover),
 		URL:       input.URL,
 		Subtitles: cs,
 	}
 	err := models.Gorm.Create(e).Error
 	return int64(e.ID), err
+
 }
 
-//ListMedia ..
-func (s MediaService) ListMedia() ([]*model.Media, error) {
-	result := make([]*model.Media, 0)
-	data := make([]*models.Media, 0)
+//ListVideo ..
+func (s VideoService) ListVideo() ([]*model.Video, error) {
+	result := make([]*model.Video, 0)
+	data := make([]*models.Video, 0)
 	err := models.Gorm.Preload("Episodes").Find(&data).Error
 	if err != nil {
 		return result, err
@@ -95,7 +78,7 @@ func (s MediaService) ListMedia() ([]*model.Media, error) {
 			}
 			es = append(es, &model.Episode{
 				ID:        int64(e.ID),
-				Order:     e.Order,
+				Num:       e.Num,
 				Title:     e.Title,
 				Desc:      e.Desc,
 				Cover:     e.Cover,
@@ -119,7 +102,7 @@ func (s MediaService) ListMedia() ([]*model.Media, error) {
 				Persons: strings.Split(*v, ","),
 			})
 		}
-		r := &model.Media{
+		r := &model.Video{
 			ID:         int64(m.ID),
 			Title:      m.Title,
 			Desc:       m.Desc,
@@ -135,13 +118,4 @@ func (s MediaService) ListMedia() ([]*model.Media, error) {
 	}
 
 	return result, nil
-}
-
-//PresignedURL ..
-func (s MediaService) PresignedURL(bucketName, objectName string) (string, error) {
-	u, err := models.MinioClient.PresignedPutObject(bucketName, objectName, 12*time.Hour)
-	if err != nil {
-		return "", err
-	}
-	return u.String(), nil
 }

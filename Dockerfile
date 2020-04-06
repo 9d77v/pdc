@@ -8,8 +8,8 @@ RUN cd /app \
 
 FROM scratch
 ENV APP_NAME=pdc
-COPY --from=0  /app/$APP_NAME /app/$APP_NAME
+COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
 COPY ./ui/build /app/ui/build
 
 WORKDIR /app
-CMD [ "./pdc" ]
+CMD [ "pdc" ]

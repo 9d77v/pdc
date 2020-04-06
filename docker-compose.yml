@@ -4,8 +4,8 @@ services:
   minio:
     image: 9d77v/minio:arm64.2020-01-30
     restart: always
-    # volumes:
-    #   - ./minio/data:/data
+    volumes:
+      - ./minio/data:/data
     ports:
       - 9000:9000
     environment:
@@ -23,8 +23,8 @@ services:
       POSTGRES_DB: postgres
     ports:
       - 5432:5432
-    # volumes:
-    #   - ./postgres/data:/var/lib/postgresql/data
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
     container_name: postgres
   pdc:
     image: 9d77v/pdc:9d77v_2020-04-04_053c3b4

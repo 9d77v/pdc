@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
-const LIST_MEDIA = gql`
+const LIST_VIDEO = gql`
 {
-   listMedia{
+   listVideo{
        id
        title
        desc
@@ -10,7 +10,7 @@ const LIST_MEDIA = gql`
        pubDate
        episodes{
         id
-       order
+       num
        title
        desc
        cover
@@ -28,9 +28,9 @@ const LIST_MEDIA = gql`
 }
 `;
 
-const ADD_MEDIA = gql`
-mutation createMedia($input:NewMedia!){
-   createMedia(input:$input)
+const ADD_VIDEO = gql`
+mutation createVideo($input:NewVideo!){
+   createVideo(input:$input)
 }
 `
 
@@ -40,4 +40,28 @@ mutation createEpisode($input:NewEpisode!){
 }
 `
 
-export { LIST_MEDIA, ADD_MEDIA, ADD_EPISODE }
+//getUploadURL 获取minio上传地址
+const getUploadURL = async (bucketName: String, fileName: String) => {
+   const myHeaders = new Headers();
+   myHeaders.append("Content-Type", "application/json");
+
+   const graphql = JSON.stringify({
+      query: ` query presignedUrl($bucketName: String!,$objectName:String!) {
+\n    presignedUrl(bucketName: $bucketName, objectName: $objectName)
+\n  }`,
+      variables: {
+         "bucketName": bucketName,
+         "objectName": fileName
+      }
+   })
+   const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: graphql,
+      redirect: 'follow' as const
+   };
+   const data = await fetch("/api", requestOptions)
+   return data.json()
+}
+
+export { LIST_VIDEO, ADD_VIDEO, ADD_EPISODE, getUploadURL }

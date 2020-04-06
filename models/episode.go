@@ -8,8 +8,8 @@ import (
 //Episode 分集
 type Episode struct {
 	gorm.Model
-	MediaID   int64
-	Order     string `gorm:"size:10"`
+	VideoID   int64
+	Num       float64
 	Title     string `gorm:"size:50"`
 	Desc      string `gorm:"size:5000"`
 	Cover     string `gorm:"size:200"`

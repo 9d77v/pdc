@@ -10,4 +10,7 @@ import "git.9d77v.me/9d77v/pdc/services"
 //Resolver ..
 type Resolver struct{}
 
-var mediaService = services.MediaService{}
+var (
+	videoService  = services.VideoService{}
+	commonService = services.CommonService{}
+)

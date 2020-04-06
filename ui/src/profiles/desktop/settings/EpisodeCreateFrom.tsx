@@ -1,5 +1,6 @@
 import { Modal, Form, Input, InputNumber } from 'antd';
-import React from 'react'
+import React, { useState } from 'react'
+import { SingleUploader } from '../../components/Uploader';
 interface Values {
     title: string;
     description: string;
@@ -17,6 +18,8 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     onCancel,
 }) => {
     const [form] = Form.useForm();
+    const [url, setUrl] = useState('')
+
     return (
         <Modal
             visible={visible}
@@ -25,6 +28,9 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
             cancelText="取消"
             onCancel={onCancel}
             onOk={() => {
+                form.setFieldsValue({
+                    "url": url
+                })
                 form
                     .validateFields()
                     .then((values: any) => {
@@ -34,6 +40,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info);
                     });
+                setUrl('')
             }}
         >
             <Form
@@ -45,29 +52,29 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                 <Form.Item
                     name="title"
                     label="标题"
-                    rules={[{ required: true, message: '请输入标题!' }]}
                 >
                     <Input />
+                </Form.Item>
+                <Form.Item name="num" label="集数"
+                    rules={[{ required: true, message: '请输入集数!' }]}
+                >
+                    <InputNumber />
                 </Form.Item>
                 <Form.Item name="desc" label="简介">
                     <Input type="textarea" />
                 </Form.Item>
                 <Form.Item
-                    name="order"
-                    label="第几话"
-                    rules={[{ required: true, message: '请输入第几话!' }]}
-                >
-                    <InputNumber min={0} max={50} />
-                </Form.Item>
-                <Form.Item
                     name="url"
-                    label="视频地址"
-                    rules={[{ required: true, message: '请输入视频地址!' }]}
+                    label="上传视频"
+                    rules={[{ required: true, message: '请上传视频!' }]}
                 >
-                    <Input />
+                    <SingleUploader
+                        bucketName="video"
+                        validFileTypes={["video/mp4"]}
+                        setURL={setUrl}
+                    />
                 </Form.Item>
-
             </Form>
-        </Modal>
+        </Modal >
     );
 };
