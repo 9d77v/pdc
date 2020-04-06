@@ -79,7 +79,7 @@ func initMinio() {
 		log.Fatalln(err)
 	}
 
-	preCreatedBuckets := []string{"image", "video"}
+	preCreatedBuckets := []string{"image", "video", "vtt"}
 	location := "us-east-1"
 	for _, bucketName := range preCreatedBuckets {
 		err = MinioClient.MakeBucket(bucketName, location)

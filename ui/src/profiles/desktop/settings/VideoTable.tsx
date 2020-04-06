@@ -19,7 +19,7 @@ function EpisodeTable(record: any) {
         { title: '封面', dataIndex: 'cover', key: 'cover' },
         {
             title: '视频地址', dataIndex: 'url', key: 'url', width: 490,
-            render: (value: string) => {
+            render: (value: string, record: any) => {
                 return (
                     <VideoPlayer
                         episodeID={record.id}
@@ -84,6 +84,7 @@ export default function VideoTable() {
                     "title": values.title,
                     "desc": values.desc,
                     "url": values.url,
+                    "subtitles": values.subtitles
                 }
             }
         });

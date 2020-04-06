@@ -38,6 +38,7 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
         onError: (error: any) => {
             message.error(`文件上传失败.`);
             setURL('')
+            setFileList([])
         },
         onChange(info: any) {
             const { status } = info.file;
@@ -79,8 +80,9 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
         }: any) {
             axios
                 .put(action, file, {
-                    withCredentials,
-                    headers,
+                    withCredentials, headers: {
+                        'Content-Type': validFileTypes[0]
+                    },
                     onUploadProgress: ({ total, loaded }) => {
                         onProgress({ percent: Math.round(loaded / total * 100).toFixed(2) }, file);
                     },
@@ -98,7 +100,7 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
     };
     return (
         <Upload.Dragger {...props}>
-            <p className="ant-upload-hint">点击或拖拽上传mp4文件</p>
+            <p className="ant-upload-hint">点击或拖拽上传{validFileTypes[0]}文件</p>
         </Upload.Dragger>
     )
 }
