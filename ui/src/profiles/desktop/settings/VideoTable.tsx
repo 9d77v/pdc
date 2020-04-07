@@ -96,7 +96,7 @@ export default function VideoTable() {
     for (const v of mediaData) {
         const episodeData = v.episodes
         if (episodeData.length > 1) {
-            mediaMap.set(v.id, episodeData.pop().num + 1)
+            mediaMap.set(v.id, episodeData[episodeData.length - 1].num + 1)
         } else {
             mediaMap.set(v.id, 1)
         }
@@ -112,8 +112,8 @@ export default function VideoTable() {
         { title: '简介', dataIndex: 'desc', key: 'desc' },
         { title: '封面', dataIndex: 'cover', key: 'cover' },
         {
-            title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            title: '总话数', dataIndex: 'total_num', key: 'total_num',
+            render: (value: number, record: any) => record.episodes.length
         },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',

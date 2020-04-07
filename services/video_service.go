@@ -8,6 +8,7 @@ import (
 
 	"git.9d77v.me/9d77v/pdc/graph/model"
 	"git.9d77v.me/9d77v/pdc/models"
+	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
@@ -62,7 +63,9 @@ func (s VideoService) CreateEpisode(input model.NewEpisode) (int64, error) {
 func (s VideoService) ListVideo() ([]*model.Video, error) {
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
-	err := models.Gorm.Preload("Episodes").Find(&data).Error
+	err := models.Gorm.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
+		return models.Gorm.Order("episode.num ASC").Order("episode.id ASC")
+	}).Find(&data).Error
 	if err != nil {
 		return result, err
 	}

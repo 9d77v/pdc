@@ -152,7 +152,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     <Form.Item
                         name="url"
                         label="上传视频"
-                        rules={[{ required: true, message: '请上传视频!' }]}
+                    // rules={[{ required: true, message: '请上传视频!' }]}
                     >
                         <SingleUploader
                             bucketName="video"
