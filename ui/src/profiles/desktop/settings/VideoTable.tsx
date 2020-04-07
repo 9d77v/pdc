@@ -13,12 +13,12 @@ function EpisodeTable(record: any) {
     const episodeData = record === undefined ? [] : record.episodes
     const columns = [
         { title: 'EpisodeID', dataIndex: 'id', key: 'id' },
-        { title: '序号', dataIndex: 'num', key: 'num' },
+        { title: '话', dataIndex: 'num', key: 'num' },
         { title: '标题', dataIndex: 'title', key: 'title' },
         { title: '简介', dataIndex: 'desc', key: 'desc' },
         { title: '封面', dataIndex: 'cover', key: 'cover' },
         {
-            title: '视频地址', dataIndex: 'url', key: 'url', width: 490,
+            title: '视频', dataIndex: 'url', key: 'url', width: 490,
             render: (value: string, record: any) => {
                 return (
                     <VideoPlayer
@@ -31,7 +31,6 @@ function EpisodeTable(record: any) {
                 )
             }
         },
-        { title: '字幕地址', dataIndex: 'subtitle', key: 'subtitle', ellipsis: true },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
@@ -93,6 +92,20 @@ export default function VideoTable() {
     };
 
     const mediaData = data === undefined ? [] : data.listVideo
+    const mediaMap = new Map<number, number>()
+    for (const v of mediaData) {
+        const episodeData = v.episodes
+        if (episodeData.length > 1) {
+            mediaMap.set(v.id, episodeData.pop().num + 1)
+        } else {
+            mediaMap.set(v.id, 1)
+        }
+    }
+    let num = 1
+    if (currentVideoID > 0) {
+        const i = mediaMap.get(currentVideoID)
+        num = i === undefined ? 1 : i
+    }
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: '标题', dataIndex: 'title', key: 'title' },
@@ -142,6 +155,7 @@ export default function VideoTable() {
                 onCancel={() => {
                     setEpisodeVisible(false);
                 }}
+                num={num}
             />
             <Table
                 loading={loading}

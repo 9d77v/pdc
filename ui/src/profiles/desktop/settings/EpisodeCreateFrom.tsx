@@ -1,4 +1,4 @@
-import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd';
+import { Modal, Form, Input, InputNumber, Button, Typography, Radio } from 'antd';
 import React, { useState, useRef, useEffect } from 'react'
 import { SingleUploader } from '../../components/Uploader';
 interface Values {
@@ -10,6 +10,7 @@ interface EpisodeCreateFormProps {
     visible: boolean;
     onCreate: (values: Values) => void;
     onCancel: () => void;
+    num: number,
 }
 
 interface ModalFormProps {
@@ -50,9 +51,12 @@ const ModalSubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
 
     return (
         <Modal title="新增字幕" visible={visible} onOk={onOk} onCancel={onCancel}>
-            <Form form={form} layout="vertical" name="subtitleForm">
-                <Form.Item name="name" label="名称" rules={[{ required: true }]}>
-                    <Input />
+            <Form form={form} layout="vertical" name="subtitleForm" initialValues={{ name: "简体中文" }}>
+                <Form.Item name="name" label="标签" rules={[{ required: true }]}>
+                    <Radio.Group buttonStyle="solid">
+                        <Radio.Button value="简体中文">简体中文</Radio.Button>
+                        <Radio.Button value="中日双语">中日双语</Radio.Button>
+                    </Radio.Group>
                 </Form.Item>
                 <Form.Item name="url" label="地址" rules={[{ required: true }]}>
                     <SingleUploader
@@ -70,6 +74,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
+    num
 }) => {
     const [form] = Form.useForm();
     const [url, setUrl] = useState('')
@@ -128,7 +133,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     layout="vertical"
                     name="basicForm"
                     onFinish={onFinish}
-                    initialValues={{ modifier: 'public' }}
+                    initialValues={{ num: num }}
                 >
                     <Form.Item
                         name="title"
@@ -136,8 +141,8 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     >
                         <Input />
                     </Form.Item>
-                    <Form.Item name="num" label="集数"
-                        rules={[{ required: true, message: '请输入集数!' }]}
+                    <Form.Item name="num" label="话"
+                        rules={[{ required: true, message: '请输入话数!' }]}
                     >
                         <InputNumber />
                     </Form.Item>
