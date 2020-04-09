@@ -78,7 +78,6 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
 }) => {
     const [form] = Form.useForm();
     const [url, setUrl] = useState('')
-
     const [subtitleVisible, setSubtitleVisible] = useState(false);
 
     const showSubtitleModal = () => {
@@ -93,6 +92,19 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
         console.log('Finish:', values);
     };
 
+    useEffect(() => {
+        if (num !== form.getFieldValue("num")) {
+            form.setFieldsValue({
+                "num": num
+            })
+        }
+    }, [num, form])
+
+    const layout = {
+        labelCol: { span: 4 },
+        wrapperCol: { span: 16 },
+    }
+
     return (
         <Modal
             visible={visible}
@@ -100,6 +112,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
             okText="确定"
             cancelText="取消"
             onCancel={onCancel}
+            getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
                     "url": url
@@ -121,6 +134,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
             <Form.Provider
                 onFormFinish={(name, { values, forms }) => {
                     if (name === 'subtitleForm') {
+                        console.log("finish")
                         const { basicForm } = forms;
                         const subtitles = basicForm.getFieldValue('subtitles') || [];
                         basicForm.setFieldsValue({ subtitles: [...subtitles, values] });
@@ -129,8 +143,9 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                 }}
             >
                 <Form
+                    {...layout}
                     form={form}
-                    layout="vertical"
+                    layout="horizontal"
                     name="basicForm"
                     onFinish={onFinish}
                     initialValues={{ num: num }}
@@ -152,7 +167,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     <Form.Item
                         name="url"
                         label="上传视频"
-                    // rules={[{ required: true, message: '请上传视频!' }]}
+                        rules={[{ required: true, message: '请上传视频!' }]}
                     >
                         <SingleUploader
                             bucketName="video"
@@ -185,6 +200,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     <Button htmlType="button" style={{ margin: '0 8px' }} onClick={showSubtitleModal}>
                         添加字幕
                 </Button>
+
                 </Form>
                 <ModalSubtitleForm visible={subtitleVisible} onCancel={hideSubtitleModal} />
             </Form.Provider>

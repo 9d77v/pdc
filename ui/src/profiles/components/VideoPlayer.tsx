@@ -50,7 +50,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     return (
         <div data-vjs-player style={{ width, height }}>
-            <video id={videoID} ref={(node: any) => setVideoNode(node)} controls preload="auto" className="video-js"
+            <video id={videoID} ref={(node: any) => setVideoNode(node)} controls className="video-js"
                 data-setup='{ "playbackRates": [0.5, 1, 1.5, 2,4,8,16],"loopbutton": true,"language":"zh"  }'
             />
         </div>

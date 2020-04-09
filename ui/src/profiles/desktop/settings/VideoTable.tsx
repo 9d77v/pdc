@@ -8,7 +8,6 @@ import { EpisodeCreateForm } from './EpisodeCreateFrom';
 import moment from 'moment';
 import { VideoPlayer } from '../../components/VideoPlayer';
 
-
 function EpisodeTable(record: any) {
     const episodeData = record === undefined ? [] : record.episodes
     const columns = [
@@ -42,7 +41,10 @@ function EpisodeTable(record: any) {
         {
             title: '操作',
             dataIndex: 'operation',
-            key: 'operation'
+            key: 'operation',
+            // render: (record: any) => <Button onClick={() => {
+            //     setEpisodeVisible(true)
+            // }}>修改分集</Button>
         },
     ];
     return <Table
@@ -59,6 +61,9 @@ export default function VideoTable() {
     const [addVideo] = useMutation(ADD_VIDEO);
     const [addEpisode] = useMutation(ADD_EPISODE)
     const { loading, error, data, refetch } = useQuery(LIST_VIDEO);
+    const [num, setNum] = useState(1);
+
+
     if (error) return <div>Error! ${error}</div>;
 
     const onVideoCreate = async (values: any) => {
@@ -87,25 +92,27 @@ export default function VideoTable() {
                 }
             }
         });
-        setEpisodeVisible(false);
-        await refetch()
-    };
+    }
 
     const mediaData = data === undefined ? [] : data.listVideo
-    const mediaMap = new Map<number, number>()
-    for (const v of mediaData) {
-        const episodeData = v.episodes
-        if (episodeData.length > 1) {
-            mediaMap.set(v.id, episodeData[episodeData.length - 1].num + 1)
-        } else {
-            mediaMap.set(v.id, 1)
+    const getNum = (currentVideoID: number) => {
+        const mediaMap = new Map<number, number>()
+        for (const v of mediaData) {
+            const episodeData = v.episodes
+            if (episodeData.length > 0) {
+                mediaMap.set(v.id, episodeData[episodeData.length - 1].num + 1)
+            } else {
+                mediaMap.set(v.id, 1)
+            }
         }
+        let num = 1
+        if (currentVideoID > 0) {
+            const i = mediaMap.get(currentVideoID)
+            num = i === undefined ? 1 : i
+        }
+        return num
     }
-    let num = 1
-    if (currentVideoID > 0) {
-        const i = mediaMap.get(currentVideoID)
-        num = i === undefined ? 1 : i
-    }
+
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: '标题', dataIndex: 'title', key: 'title' },
@@ -126,6 +133,7 @@ export default function VideoTable() {
         {
             title: '操作', key: 'operation', render: (record: any) => <Button onClick={() => {
                 setCurrentVideoID(record.id)
+                setNum(getNum(record.id))
                 setEpisodeVisible(true)
             }}>新增分集</Button>
         },
