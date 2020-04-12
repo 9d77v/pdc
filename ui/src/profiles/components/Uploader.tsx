@@ -3,6 +3,9 @@ import React, { useState } from 'react'
 import { getUploadURL } from "../../stores/videostore";
 import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
+import crypto from 'crypto'
+import { getVttFromFile, getType } from '../../utils/subtitle';
+
 interface UploaderProps {
     bucketName: string
     validFileTypes: string[]
@@ -22,10 +25,31 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
         accept: validFileTypes.join(","),
         fileList: fileList,
         beforeUpload: (file: File) => {
-            return new Promise<void>(async (resolve, reject) => {
-                const data = await getUploadURL(bucketName, file.name);
+            return new Promise<void>(async (resolve) => {
+                const fileType = getType(file)
+                let fileName = file.name
+                if (fileType === "ass" || fileType === "srt") {
+                    const vttText = await getVttFromFile(file);
+                    const hash = crypto.createHash('sha256');
+                    hash.update(vttText);
+                    fileName = `${hash.digest('hex')}.vtt`
+                }
+                const data = await getUploadURL(bucketName, fileName);
                 setAction(data.data.presignedUrl)
                 resolve();
+            });
+        },
+        transformFile(file: File) {
+            return new Promise<File>(async (resolve) => {
+                const fileType = getType(file)
+                if (fileType === "ass" || fileType === "srt") {
+                    const vttText = await getVttFromFile(file);
+                    const blob = new Blob([vttText], {
+                        type: 'text/vtt',
+                    })
+                    file = new File([blob], file.name, { type: 'text/vtt', lastModified: Date.now() });
+                }
+                resolve(file)
             });
         },
         onSuccess: (response: any, file: any) => {

@@ -1,16 +1,17 @@
 import { Modal, Form, Input, InputNumber, Button, Typography, Radio } from 'antd';
 import React, { useState, useRef, useEffect } from 'react'
 import { SingleUploader } from '../../components/Uploader';
-interface Values {
-    title: string;
-    description: string;
+interface IEpisode {
+    title?: string;
+    description?: string;
+    num: number,
 }
 
-interface EpisodeCreateFormProps {
+interface EpisodeUpdateFormProps {
     visible: boolean;
-    onCreate: (values: Values) => void;
+    onUpdate: (values: IEpisode) => void;
     onCancel: () => void;
-    num: number,
+    values: IEpisode,
 }
 
 interface ModalFormProps {
@@ -58,10 +59,10 @@ const ModalSubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
                         <Radio.Button value="中日双语">中日双语</Radio.Button>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item name="url" label="字幕（支持上传ass,srt转vtt格式）" rules={[{ required: true }]}>
+                <Form.Item name="url" label="地址" rules={[{ required: true }]}>
                     <SingleUploader
                         bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass", "text/srt"]}
+                        validFileTypes={["text/vtt"]}
                         setURL={setUrl}
                     />
                 </Form.Item>
@@ -70,14 +71,15 @@ const ModalSubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
     );
 };
 
-export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
+export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
     visible,
-    onCreate,
+    onUpdate,
     onCancel,
-    num
+    values
 }) => {
     const [form] = Form.useForm();
     const [url, setUrl] = useState('')
+
     const [subtitleVisible, setSubtitleVisible] = useState(false);
 
     const showSubtitleModal = () => {
@@ -92,19 +94,6 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
         console.log('Finish:', values);
     };
 
-    useEffect(() => {
-        if (num !== form.getFieldValue("num")) {
-            form.setFieldsValue({
-                "num": num
-            })
-        }
-    }, [num, form])
-
-    const layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 16 },
-    }
-
     return (
         <Modal
             visible={visible}
@@ -112,7 +101,6 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
             okText="确定"
             cancelText="取消"
             onCancel={onCancel}
-            getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
                     "url": url
@@ -122,7 +110,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     .then((values: any) => {
                         const subtitles = form.getFieldValue('subtitles') || [];
                         values.subtitles = subtitles
-                        onCreate(values);
+                        onUpdate(values);
                         form.resetFields();
                     })
                     .catch(info => {
@@ -142,12 +130,11 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                 }}
             >
                 <Form
-                    {...layout}
                     form={form}
-                    layout="horizontal"
+                    layout="vertical"
                     name="basicForm"
                     onFinish={onFinish}
-                    initialValues={{ num: num }}
+                    initialValues={{ num: values.num, title: values.title }}
                 >
                     <Form.Item
                         name="title"
@@ -199,7 +186,6 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     <Button htmlType="button" style={{ margin: '0 8px' }} onClick={showSubtitleModal}>
                         添加字幕
                 </Button>
-
                 </Form>
                 <ModalSubtitleForm visible={subtitleVisible} onCancel={hideSubtitleModal} />
             </Form.Provider>

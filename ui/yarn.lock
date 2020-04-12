@@ -1449,11 +1449,6 @@
   resolved "https://registry.npm.taobao.org/@types/color-name/download/@types/color-name-1.1.1.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fcolor-name%2Fdownload%2F%40types%2Fcolor-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha1-HBJhu+qhCoBVu8XYq4S3sq/IRqA=
 
-"@types/crypto-js@^3.1.44":
-  version "3.1.44"
-  resolved "https://registry.npm.taobao.org/@types/crypto-js/download/@types/crypto-js-3.1.44.tgz#3ad6f046b8c248866b9e5726ce8a1c09f73db9e0"
-  integrity sha1-OtbwRrjCSIZrnlcmzoocCfc9ueA=
-
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
   resolved "https://registry.npm.taobao.org/@types/eslint-visitor-keys/download/@types/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
@@ -3510,11 +3505,6 @@ crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
-
-crypto-js@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npm.taobao.org/crypto-js/download/crypto-js-4.0.0.tgz?cache=0&sync_timestamp=1581509173139&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fcrypto-js%2Fdownload%2Fcrypto-js-4.0.0.tgz#2904ab2677a9d042856a2ea2ef80de92e4a36dcc"
-  integrity sha1-KQSrJnep0EKFai6i74DekuSjbcw=
 
 css-animation@1.x, css-animation@^1.3.2, css-animation@^1.5.0:
   version "1.6.1"
