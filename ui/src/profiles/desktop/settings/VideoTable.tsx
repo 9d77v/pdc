@@ -96,6 +96,8 @@ export default function VideoTable() {
                 }
             }
         });
+        setEpisodeVisible(false);
+        await refetch()
     }
 
     const mediaData = data === undefined ? [] : data.listVideo
