@@ -1,5 +1,9 @@
-import { Modal, Form, Input } from 'antd';
-import React from 'react'
+import { Modal, Form, Input, Switch, DatePicker } from 'antd';
+import React, { useState } from 'react'
+import { SingleUploader } from '../../components/Uploader';
+
+const { TextArea } = Input;
+
 interface Values {
     title: string;
     description: string;
@@ -17,6 +21,11 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
     onCancel,
 }) => {
     const [form] = Form.useForm();
+    const [url, setUrl] = useState("")
+    const layout = {
+        labelCol: { span: 4 },
+        wrapperCol: { span: 16 },
+    }
     return (
         <Modal
             visible={visible}
@@ -24,7 +33,11 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
             okText="确定"
             cancelText="取消"
             onCancel={onCancel}
+            getContainer={false}
             onOk={() => {
+                form.setFieldsValue({
+                    "cover": url
+                })
                 form
                     .validateFields()
                     .then((values: any) => {
@@ -37,10 +50,11 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
             }}
         >
             <Form
+                {...layout}
                 form={form}
-                layout="vertical"
+                layout="horizontal"
                 name="form_in_modal"
-                initialValues={{ modifier: 'public' }}
+                initialValues={{ isShow: true }}
             >
                 <Form.Item
                     name="title"
@@ -50,7 +64,20 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     <Input />
                 </Form.Item>
                 <Form.Item name="desc" label="简介">
-                    <Input type="textarea" />
+                    <TextArea rows={4} />
+                </Form.Item>
+                <Form.Item name="cover" label="封面">
+                    <SingleUploader
+                        bucketName="image"
+                        validFileTypes={["image/jpeg", "image/png", "image/webp"]}
+                        setURL={setUrl}
+                    />
+                </Form.Item>
+                <Form.Item name="pubDate" label="上映时间">
+                    <DatePicker />
+                </Form.Item>
+                <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
+                    <Switch />
                 </Form.Item>
             </Form>
         </Modal>

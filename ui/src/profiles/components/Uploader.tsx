@@ -5,7 +5,7 @@ import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
 interface UploaderProps {
     bucketName: string
-    validFileTypes: [string]
+    validFileTypes: string[]
     setURL: (e: any) => any
 }
 
@@ -14,13 +14,12 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
-
     const props = {
         name: 'file',
         multiple: false,
         method: "PUT" as const,
         action: action,
-        accept: validFileTypes[0],
+        accept: validFileTypes.join(","),
         fileList: fileList,
         beforeUpload: (file: File) => {
             return new Promise<void>(async (resolve, reject) => {
@@ -81,7 +80,7 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
             axios
                 .put(action, file, {
                     withCredentials, headers: {
-                        'Content-Type': validFileTypes[0]
+                        'Content-Type': validFileTypes.join(",")
                     },
                     onUploadProgress: ({ total, loaded }) => {
                         onProgress({ percent: Math.round(loaded / total * 100).toFixed(2) }, file);
@@ -100,7 +99,7 @@ const SingleUploader: React.FC<UploaderProps> = ({ bucketName, validFileTypes, s
     };
     return (
         <Upload.Dragger {...props}>
-            <p className="ant-upload-hint">点击或拖拽上传{validFileTypes[0]}文件</p>
+            <p className="ant-upload-hint">点击或拖拽上传{validFileTypes.join(",")}文件</p>
         </Upload.Dragger>
     )
 }

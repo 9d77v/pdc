@@ -1,22 +1,22 @@
 # pdc
 Personal Data Center.
 
-# Prerequisites
-Make sure you have a 64-bit system of Raspberry Pi.
-
-You'll also need to install docker.
-
 # Quickstart
 ```
 git clone git@github.com:9d77v/pdc.git
 cd pdc
+
+#amd64 machine
 docker-compose up -d
+
+#arm64 machine
+docker-compose up -d -f docker-compose.arm64.yml
 ```
 homepage http://localhost:8080
 
-docs http://192.168.1.234:8080/docs
+docs http://localhost:8080/docs
 
-# Develop
+# Develop reference
 gqlgen https://gqlgen.com/
 
 gorm https://gorm.io/zh_CN/docs/index.html

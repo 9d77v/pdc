@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/lib/pq"
 )
 
 //Video 视频文件
@@ -17,4 +18,6 @@ type Video struct {
 	Episodes   []*Episode
 	Characters postgres.Hstore
 	Staffs     postgres.Hstore
+	Tags       pq.StringArray `gorm:"type:varchar(10)[]"`
+	IsShow     bool
 }

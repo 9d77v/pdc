@@ -8,6 +8,7 @@ const LIST_VIDEO = gql`
        desc
        cover
        pubDate
+       isShow
        episodes{
         id
        num

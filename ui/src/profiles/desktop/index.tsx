@@ -55,8 +55,8 @@ export default function DesktopIndex() {
                             minHeight: 280,
                         }}
                     >
-
                         <VideoTable />
+                        <div className="clear"></div>
                     </Content>
                 </Layout>
             </Layout>

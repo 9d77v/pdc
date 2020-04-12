@@ -34,6 +34,8 @@ func (s VideoService) CreateVideo(input model.NewVideo) (int64, error) {
 		Cover:      ptrs.String(input.Cover),
 		Characters: cs,
 		Staffs:     ss,
+		Tags:       input.Tags,
+		IsShow:     input.IsShow,
 	}
 	err := models.Gorm.Create(m).Error
 	return int64(m.ID), err
@@ -114,6 +116,8 @@ func (s VideoService) ListVideo() ([]*model.Video, error) {
 			Cover:      m.Cover,
 			Characters: cArr,
 			Staffs:     sArr,
+			Tags:       m.Tags,
+			IsShow:     m.IsShow,
 			CreatedAt:  m.CreatedAt.Unix(),
 			UpdatedAt:  m.UpdatedAt.Unix(),
 		}

@@ -72,6 +72,10 @@ export default function VideoTable() {
                 "input": {
                     "title": values.title,
                     "desc": values.desc,
+                    "cover": values.cover,
+                    "pubDate": values.pubDate ? values.pubDate.unix() : 0,
+                    // "tags": values.tags,
+                    "isShow": values.isShow,
                 }
             }
         });
@@ -116,11 +120,23 @@ export default function VideoTable() {
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: '标题', dataIndex: 'title', key: 'title' },
-        { title: '简介', dataIndex: 'desc', key: 'desc' },
-        { title: '封面', dataIndex: 'cover', key: 'cover' },
+        { title: '简介', dataIndex: 'desc', key: 'desc', width: 400 },
         {
-            title: '总话数', dataIndex: 'total_num', key: 'total_num',
+            title: '封面', dataIndex: 'cover', key: 'cover',
+            render: (value: string) => <img src={value} width={160} height={210} alt={"图片不存在"} />
+        },
+        {
+            title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',
+            render: (value: number) => moment(value * 1000).format("YYYY年MM月DD日")
+        },
+        {
+            title: '总话数', dataIndex: 'total', key: 'total',
             render: (value: number, record: any) => record.episodes.length
+        }, {
+            title: '是否显示', dataIndex: 'isShow', key: 'isShow',
+            render: (value: Boolean, record: any) => (
+                value ? "是" : "否"
+            )
         },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
@@ -131,11 +147,13 @@ export default function VideoTable() {
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
-            title: '操作', key: 'operation', render: (record: any) => <Button onClick={() => {
-                setCurrentVideoID(record.id)
-                setNum(getNum(record.id))
-                setEpisodeVisible(true)
-            }}>新增分集</Button>
+            title: '操作', key: 'operation', render: (record: any) =>
+                <span> <Button onClick={() => {
+                    setCurrentVideoID(record.id)
+                    setNum(getNum(record.id))
+                    setEpisodeVisible(true)
+                }}>新增分集</Button>
+                </span>
         },
     ];
 

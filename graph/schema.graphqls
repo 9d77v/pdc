@@ -11,6 +11,8 @@ type Video {
   episodes: [Episode!]!
   characters: [Character!]!
   staffs: [Staff!]!
+  tags: [String!]
+  isShow: Boolean!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -65,6 +67,8 @@ input NewVideo {
   cover: String
   characters: [NewCharacter!]
   staffs: [NewStaff!]
+  tags: [String!]
+  isShow: Boolean!
 }
 
 input NewSubtitle{

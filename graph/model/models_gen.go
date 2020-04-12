@@ -52,6 +52,8 @@ type NewVideo struct {
 	Cover      *string         `json:"cover"`
 	Characters []*NewCharacter `json:"characters"`
 	Staffs     []*NewStaff     `json:"staffs"`
+	Tags       []string        `json:"tags"`
+	IsShow     bool            `json:"isShow"`
 }
 
 type Staff struct {
@@ -73,6 +75,8 @@ type Video struct {
 	Episodes   []*Episode   `json:"episodes"`
 	Characters []*Character `json:"characters"`
 	Staffs     []*Staff     `json:"staffs"`
+	Tags       []string     `json:"tags"`
+	IsShow     bool         `json:"isShow"`
 	CreatedAt  int64        `json:"createdAt"`
 	UpdatedAt  int64        `json:"updatedAt"`
 }

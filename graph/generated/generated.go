@@ -88,8 +88,10 @@ type ComplexityRoot struct {
 		Desc       func(childComplexity int) int
 		Episodes   func(childComplexity int) int
 		ID         func(childComplexity int) int
+		IsShow     func(childComplexity int) int
 		PubDate    func(childComplexity int) int
 		Staffs     func(childComplexity int) int
+		Tags       func(childComplexity int) int
 		Title      func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
 	}
@@ -316,6 +318,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.ID(childComplexity), true
 
+	case "Video.isShow":
+		if e.complexity.Video.IsShow == nil {
+			break
+		}
+
+		return e.complexity.Video.IsShow(childComplexity), true
+
 	case "Video.pubDate":
 		if e.complexity.Video.PubDate == nil {
 			break
@@ -329,6 +338,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.Staffs(childComplexity), true
+
+	case "Video.tags":
+		if e.complexity.Video.Tags == nil {
+			break
+		}
+
+		return e.complexity.Video.Tags(childComplexity), true
 
 	case "Video.title":
 		if e.complexity.Video.Title == nil {
@@ -421,6 +437,8 @@ type Video {
   episodes: [Episode!]!
   characters: [Character!]!
   staffs: [Staff!]!
+  tags: [String!]
+  isShow: Boolean!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -475,6 +493,8 @@ input NewVideo {
   cover: String
   characters: [NewCharacter!]
   staffs: [NewStaff!]
+  tags: [String!]
+  isShow: Boolean!
 }
 
 input NewSubtitle{
@@ -1643,6 +1663,71 @@ func (ec *executionContext) _Video_staffs(ctx context.Context, field graphql.Col
 	res := resTmp.([]*model.Staff)
 	fc.Result = res
 	return ec.marshalNStaff2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaffᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Video_tags(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Video",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Tags, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Video_isShow(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Video",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsShow, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Video_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
@@ -2936,6 +3021,18 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "tags":
+			var err error
+			it.Tags, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isShow":
+			var err error
+			it.IsShow, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -3260,6 +3357,13 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "staffs":
 			out.Values[i] = ec._Video_staffs(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tags":
+			out.Values[i] = ec._Video_tags(ctx, field, obj)
+		case "isShow":
+			out.Values[i] = ec._Video_isShow(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4265,6 +4369,38 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
