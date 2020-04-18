@@ -1,6 +1,7 @@
 import { Table, Button } from 'antd';
 import React, { useState } from 'react'
-import { LIST_VIDEO, ADD_VIDEO, ADD_EPISODE } from '../../../stores/videostore';
+
+import { LIST_VIDEO, ADD_VIDEO, ADD_EPISODE } from '../../../gqls/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateFrom';
 import { useMutation } from '@apollo/react-hooks';
@@ -54,16 +55,21 @@ function EpisodeTable(record: any) {
         pagination={false} />;
 }
 
+
 export default function VideoTable() {
     const [visible, setVisible] = useState(false);
     const [currentVideoID, setCurrentVideoID] = useState(0);
     const [episodeVisible, setEpisodeVisible] = useState(false);
     const [addVideo] = useMutation(ADD_VIDEO);
     const [addEpisode] = useMutation(ADD_EPISODE)
-    const { loading, error, data, refetch } = useQuery(LIST_VIDEO);
+    const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
+        {
+            variables: {
+                page: 1,
+                pageSize: 10
+            }
+        });
     const [num, setNum] = useState(1);
-
-
     if (error) return <div>Error! ${error}</div>;
 
     const onVideoCreate = async (values: any) => {
@@ -100,10 +106,29 @@ export default function VideoTable() {
         await refetch()
     }
 
-    const mediaData = data === undefined ? [] : data.listVideo
+    const onChange = (page: number) => {
+        fetchMore({
+            variables: {
+                page: page
+            },
+            updateQuery: (previousResult, { fetchMoreResult }) => {
+                const newEdges = fetchMoreResult ? fetchMoreResult.Videos.edges : [];
+                const totalCount = fetchMoreResult ? fetchMoreResult.Videos.totalCount : 0;
+                return newEdges.length
+                    ? {
+                        Videos: {
+                            __typename: previousResult.Videos.__typename,
+                            edges: newEdges,
+                            totalCount
+                        }
+                    }
+                    : previousResult;
+            }
+        })
+    }
     const getNum = (currentVideoID: number) => {
         const mediaMap = new Map<number, number>()
-        for (const v of mediaData) {
+        for (const v of data ? data.Videos.edges : []) {
             const episodeData = v.episodes
             if (episodeData.length > 0) {
                 mediaMap.set(v.id, episodeData[episodeData.length - 1].num + 1)
@@ -158,7 +183,6 @@ export default function VideoTable() {
                 </span>
         },
     ];
-
     return (
         <div>
             <Button
@@ -195,7 +219,15 @@ export default function VideoTable() {
                         return EpisodeTable(record)
                     }
                 }}
-                dataSource={mediaData}
+                pagination={{
+                    pageSize: 10,
+                    onChange: onChange,
+                    total: data ? data.Videos.totalCount : 0,
+                    // current: current,
+                    locale: 'zh_CN',
+                    showQuickJumper: true,
+                }}
+                dataSource={data ? data.Videos.edges : []}
             />
         </div>
 

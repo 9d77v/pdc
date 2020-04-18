@@ -37,7 +37,29 @@ func (s VideoService) CreateVideo(input model.NewVideo) (int64, error) {
 		Tags:       input.Tags,
 		IsShow:     input.IsShow,
 	}
-	err := models.Gorm.Create(m).Error
+	tx := models.Gorm.Begin()
+	err := tx.Create(m).Error
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	for i, url := range input.VideoURLs {
+		e := &models.Episode{
+			Num:     float64(i + 1),
+			VideoID: int64(m.ID),
+			URL:     url,
+		}
+		if len(input.Subtitles) > 0 {
+			cs := make(postgres.Hstore, len(input.Subtitles))
+			cs["default"] = &input.Subtitles[i]
+		}
+		err := models.Gorm.Create(e).Error
+		if err != nil {
+			tx.Rollback()
+			return 0, err
+		}
+	}
+	tx.Commit()
 	return int64(m.ID), err
 }
 
@@ -62,14 +84,20 @@ func (s VideoService) CreateEpisode(input model.NewEpisode) (int64, error) {
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo() ([]*model.Video, error) {
+func (s VideoService) ListVideo(offset, limit int64) (int64, []*model.Video, error) {
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
 	err := models.Gorm.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 		return models.Gorm.Order("episode.num ASC").Order("episode.id ASC")
-	}).Find(&data).Error
+
+	}).Offset(offset).Limit(limit).Find(&data).Error
 	if err != nil {
-		return result, err
+		return 0, result, err
+	}
+	var total int64 = 0
+	err = models.Gorm.Model(new(models.Video)).Count(&total).Error
+	if err != nil {
+		return 0, result, err
 	}
 	for _, m := range data {
 		es := make([]*model.Episode, 0, len(m.Episodes))
@@ -124,5 +152,5 @@ func (s VideoService) ListVideo() ([]*model.Video, error) {
 		result = append(result, r)
 	}
 
-	return result, nil
+	return total, result, nil
 }

@@ -67,8 +67,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		ListVideo    func(childComplexity int) int
 		PresignedURL func(childComplexity int, bucketName string, objectName string) int
+		Videos       func(childComplexity int, page *int64, pageSize *int64) int
 	}
 
 	Staff struct {
@@ -95,6 +95,11 @@ type ComplexityRoot struct {
 		Title      func(childComplexity int) int
 		UpdatedAt  func(childComplexity int) int
 	}
+
+	VideoConnection struct {
+		Edges      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
@@ -102,7 +107,7 @@ type MutationResolver interface {
 	CreateEpisode(ctx context.Context, input model.NewEpisode) (int64, error)
 }
 type QueryResolver interface {
-	ListVideo(ctx context.Context) ([]*model.Video, error)
+	Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error)
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
 }
 
@@ -229,13 +234,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateVideo(childComplexity, args["input"].(model.NewVideo)), true
 
-	case "Query.listVideo":
-		if e.complexity.Query.ListVideo == nil {
-			break
-		}
-
-		return e.complexity.Query.ListVideo(childComplexity), true
-
 	case "Query.presignedUrl":
 		if e.complexity.Query.PresignedURL == nil {
 			break
@@ -247,6 +245,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.PresignedURL(childComplexity, args["bucketName"].(string), args["objectName"].(string)), true
+
+	case "Query.Videos":
+		if e.complexity.Query.Videos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_Videos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Videos(childComplexity, args["page"].(*int64), args["pageSize"].(*int64)), true
 
 	case "Staff.Job":
 		if e.complexity.Staff.Job == nil {
@@ -360,6 +370,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.UpdatedAt(childComplexity), true
 
+	case "VideoConnection.edges":
+		if e.complexity.VideoConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.VideoConnection.Edges(childComplexity), true
+
+	case "VideoConnection.totalCount":
+		if e.complexity.VideoConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.VideoConnection.TotalCount(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -471,8 +495,13 @@ type Episode {
   updatedAt: Int!
 }
 
+type VideoConnection {
+  totalCount: Int!
+  edges:[Video!]!
+}
+
 type Query {
-  listVideo: [Video!]!
+  Videos(page: Int, pageSize: Int):VideoConnection!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
@@ -495,6 +524,8 @@ input NewVideo {
   staffs: [NewStaff!]
   tags: [String!]
   isShow: Boolean!
+  videoURLs:[String!]
+  subtitles:[String!]
 }
 
 input NewSubtitle{
@@ -548,6 +579,28 @@ func (ec *executionContext) field_Mutation_createVideo_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_Videos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int64
+	if tmp, ok := rawArgs["page"]; ok {
+		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg0
+	var arg1 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg1
 	return args, nil
 }
 
@@ -1113,7 +1166,7 @@ func (ec *executionContext) _Mutation_createEpisode(ctx context.Context, field g
 	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_listVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_Videos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1128,9 +1181,16 @@ func (ec *executionContext) _Query_listVideo(ctx context.Context, field graphql.
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_Videos_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ListVideo(rctx)
+		return ec.resolvers.Query().Videos(rctx, args["page"].(*int64), args["pageSize"].(*int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1142,9 +1202,9 @@ func (ec *executionContext) _Query_listVideo(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Video)
+	res := resTmp.(*model.VideoConnection)
 	fc.Result = res
-	return ec.marshalNVideo2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
+	return ec.marshalNVideoConnection2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_presignedUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1796,6 +1856,74 @@ func (ec *executionContext) _Video_updatedAt(ctx context.Context, field graphql.
 	res := resTmp.(int64)
 	fc.Result = res
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _VideoConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.VideoConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _VideoConnection_edges(ctx context.Context, field graphql.CollectedField, obj *model.VideoConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3033,6 +3161,18 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "videoURLs":
+			var err error
+			it.VideoURLs, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subtitles":
+			var err error
+			it.Subtitles, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -3202,7 +3342,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "listVideo":
+		case "Videos":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3210,7 +3350,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_listVideo(ctx, field)
+				res = ec._Query_Videos(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3374,6 +3514,38 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "updatedAt":
 			out.Values[i] = ec._Video_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var videoConnectionImplementors = []string{"VideoConnection"}
+
+func (ec *executionContext) _VideoConnection(ctx context.Context, sel ast.SelectionSet, obj *model.VideoConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, videoConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VideoConnection")
+		case "totalCount":
+			out.Values[i] = ec._VideoConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._VideoConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4029,6 +4201,20 @@ func (ec *executionContext) marshalNVideo2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgr
 		return graphql.Null
 	}
 	return ec._Video(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNVideoConnection2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoConnection(ctx context.Context, sel ast.SelectionSet, v model.VideoConnection) graphql.Marshaler {
+	return ec._VideoConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNVideoConnection2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoConnection(ctx context.Context, sel ast.SelectionSet, v *model.VideoConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._VideoConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

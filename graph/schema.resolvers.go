@@ -5,12 +5,17 @@ package graph
 
 import (
 	"context"
+	"errors"
 
 	"git.9d77v.me/9d77v/pdc/graph/generated"
 	"git.9d77v.me/9d77v/pdc/graph/model"
+	"github.com/9d77v/go-lib/ptrs"
 )
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (int64, error) {
+	if len(input.VideoURLs) > 0 && len(input.Subtitles) > 0 && len(input.VideoURLs) != len(input.Subtitles) {
+		return 0, errors.New("视频与字幕数量不一致")
+	}
 	return videoService.CreateVideo(input)
 }
 
@@ -18,8 +23,24 @@ func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpi
 	return videoService.CreateEpisode(input)
 }
 
-func (r *queryResolver) ListVideo(ctx context.Context) ([]*model.Video, error) {
-	return videoService.ListVideo()
+func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error) {
+	o := ptrs.Int64(page)
+	l := ptrs.Int64(pageSize)
+	if o < 1 {
+		o = 1
+	}
+	if l < 1 {
+		l = 1
+	}
+	if l > 100 {
+		l = 100
+	}
+	o = (o - 1) * l
+	con := new(model.VideoConnection)
+	total, data, err := videoService.ListVideo(o, l)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {

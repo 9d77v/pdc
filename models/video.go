@@ -14,7 +14,7 @@ type Video struct {
 	Title      string `gorm:"size:50"`
 	Desc       string `gorm:"size:5000"`
 	PubDate    time.Time
-	Cover      string `gorm:"size:200"`
+	Cover      string `gorm:"size:500"`
 	Episodes   []*Episode
 	Characters postgres.Hstore
 	Staffs     postgres.Hstore

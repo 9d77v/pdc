@@ -45,8 +45,13 @@ type Episode {
   updatedAt: Int!
 }
 
+type VideoConnection {
+  totalCount: Int!
+  edges:[Video!]!
+}
+
 type Query {
-  listVideo: [Video!]!
+  Videos(page: Int, pageSize: Int):VideoConnection!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
@@ -69,6 +74,8 @@ input NewVideo {
   staffs: [NewStaff!]
   tags: [String!]
   isShow: Boolean!
+  videoURLs:[String!]
+  subtitles:[String!]
 }
 
 input NewSubtitle{

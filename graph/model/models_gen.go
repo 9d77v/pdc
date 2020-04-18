@@ -54,6 +54,8 @@ type NewVideo struct {
 	Staffs     []*NewStaff     `json:"staffs"`
 	Tags       []string        `json:"tags"`
 	IsShow     bool            `json:"isShow"`
+	VideoURLs  []string        `json:"videoURLs"`
+	Subtitles  []string        `json:"subtitles"`
 }
 
 type Staff struct {
@@ -79,4 +81,9 @@ type Video struct {
 	IsShow     bool         `json:"isShow"`
 	CreatedAt  int64        `json:"createdAt"`
 	UpdatedAt  int64        `json:"updatedAt"`
+}
+
+type VideoConnection struct {
+	TotalCount int64    `json:"totalCount"`
+	Edges      []*Video `json:"edges"`
 }
