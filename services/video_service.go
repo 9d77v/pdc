@@ -51,7 +51,8 @@ func (s VideoService) CreateVideo(input model.NewVideo) (int64, error) {
 		}
 		if len(input.Subtitles) > 0 {
 			cs := make(postgres.Hstore, len(input.Subtitles))
-			cs["default"] = &input.Subtitles[i]
+			cs["简体中文"] = &input.Subtitles[i]
+			e.Subtitles = cs
 		}
 		err := models.Gorm.Create(e).Error
 		if err != nil {
@@ -90,7 +91,7 @@ func (s VideoService) ListVideo(offset, limit int64) (int64, []*model.Video, err
 	err := models.Gorm.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 		return models.Gorm.Order("episode.num ASC").Order("episode.id ASC")
 
-	}).Offset(offset).Limit(limit).Find(&data).Error
+	}).Offset(offset).Limit(limit).Order("id DESC").Find(&data).Error
 	if err != nil {
 		return 0, result, err
 	}

@@ -82,6 +82,8 @@ export default function VideoTable() {
                     "pubDate": values.pubDate ? values.pubDate.unix() : 0,
                     // "tags": values.tags,
                     "isShow": values.isShow,
+                    "videoURLs": values.videoURLs,
+                    "subtitles": values.subtitles
                 }
             }
         });
@@ -150,7 +152,7 @@ export default function VideoTable() {
         { title: '简介', dataIndex: 'desc', key: 'desc', width: 400 },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
-            render: (value: string) => <img src={value} width={160} height={210} alt={"图片不存在"} />
+            render: (value: string) => value === "" ? "" : <img src={value} width={160} height={210} alt={"图片不存在"} />
         },
         {
             title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',
@@ -223,7 +225,6 @@ export default function VideoTable() {
                     pageSize: 10,
                     onChange: onChange,
                     total: data ? data.Videos.totalCount : 0,
-                    // current: current,
                     locale: 'zh_CN',
                     showQuickJumper: true,
                 }}

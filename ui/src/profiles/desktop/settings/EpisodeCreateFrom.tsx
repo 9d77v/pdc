@@ -1,6 +1,6 @@
 import { Modal, Form, Input, InputNumber, Button, Typography, Radio } from 'antd';
 import React, { useState, useRef, useEffect } from 'react'
-import { SingleUploader } from '../../components/Uploader';
+import { Uploader } from '../../components/Uploader';
 interface Values {
     title: string;
     description: string;
@@ -50,7 +50,14 @@ const ModalSubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
     };
 
     return (
-        <Modal title="新增字幕" visible={visible} onOk={onOk} onCancel={onCancel}>
+        <Modal title="新增字幕" visible={visible} onOk={onOk}
+            onCancel={
+                () => {
+                    onCancel()
+                    form.resetFields()
+                    setUrl('')
+                }
+            }        >
             <Form form={form} layout="vertical" name="subtitleForm" initialValues={{ name: "简体中文" }}>
                 <Form.Item name="name" label="标签" rules={[{ required: true }]}>
                     <Radio.Group buttonStyle="solid">
@@ -59,7 +66,8 @@ const ModalSubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
                     </Radio.Group>
                 </Form.Item>
                 <Form.Item name="url" label="字幕（支持上传ass,srt转vtt格式）" rules={[{ required: true }]}>
-                    <SingleUploader
+                    <Uploader
+                        fileLimit={1}
                         bucketName="vtt"
                         validFileTypes={["text/vtt", "text/ass", "text/srt"]}
                         setURL={setUrl}
@@ -111,7 +119,13 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
             title="新增分集"
             okText="确定"
             cancelText="取消"
-            onCancel={onCancel}
+            onCancel={
+                () => {
+                    onCancel()
+                    form.resetFields()
+                    setUrl('')
+                }
+            }
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
@@ -168,7 +182,8 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                         label="上传视频"
                         rules={[{ required: true, message: '请上传视频!' }]}
                     >
-                        <SingleUploader
+                        <Uploader
+                            fileLimit={1}
                             bucketName="video"
                             validFileTypes={["video/mp4"]}
                             setURL={setUrl}

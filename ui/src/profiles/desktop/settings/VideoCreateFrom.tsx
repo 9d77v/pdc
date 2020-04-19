@@ -1,6 +1,6 @@
 import { Modal, Form, Input, Switch, DatePicker } from 'antd';
 import React, { useState } from 'react'
-import { SingleUploader } from '../../components/Uploader';
+import { Uploader } from '../../components/Uploader';
 
 const { TextArea } = Input;
 
@@ -22,6 +22,8 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
 }) => {
     const [form] = Form.useForm();
     const [url, setUrl] = useState("")
+    const [videoURLs, setVideoURLs] = useState([])
+    const [subtitles, setSubtitles] = useState([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
@@ -32,11 +34,21 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
             title="新增视频"
             okText="确定"
             cancelText="取消"
-            onCancel={onCancel}
+            onCancel={
+                () => {
+                    onCancel()
+                    form.resetFields()
+                    setUrl('')
+                    setVideoURLs([])
+                    setSubtitles([])
+                }
+            }
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
-                    "cover": url
+                    "cover": url,
+                    "videoURLs": videoURLs,
+                    "subtitles": subtitles
                 })
                 form
                     .validateFields()
@@ -47,6 +59,9 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info);
                     });
+                setUrl('')
+                setVideoURLs([])
+                setSubtitles([])
             }}
         >
             <Form
@@ -67,7 +82,8 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     <TextArea rows={4} />
                 </Form.Item>
                 <Form.Item name="cover" label="封面">
-                    <SingleUploader
+                    <Uploader
+                        fileLimit={1}
                         bucketName="image"
                         validFileTypes={["image/jpeg", "image/png", "image/webp"]}
                         setURL={setUrl}
@@ -78,6 +94,22 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 </Form.Item>
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />
+                </Form.Item>
+                <Form.Item name="videoURLs" label="视频列表">
+                    <Uploader
+                        fileLimit={0}
+                        bucketName="video"
+                        validFileTypes={["video/mp4"]}
+                        setURL={setVideoURLs}
+                    />
+                </Form.Item>
+                <Form.Item name="subtitles" label="字幕列表">
+                    <Uploader
+                        fileLimit={0}
+                        bucketName="vtt"
+                        validFileTypes={["text/vtt", "text/ass", "text/srt"]}
+                        setURL={setSubtitles}
+                    />
                 </Form.Item>
             </Form>
         </Modal>
