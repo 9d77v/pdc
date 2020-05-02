@@ -1,23 +1,26 @@
 import { Table, Button } from 'antd';
 import React, { useState } from 'react'
 
-import { LIST_VIDEO, ADD_VIDEO, ADD_EPISODE } from '../../../gqls/video.gql';
+import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../gqls/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateFrom';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateFrom';
 import moment from 'moment';
 import { VideoPlayer } from '../../components/VideoPlayer';
-
-function EpisodeTable(record: any) {
-    const episodeData = record === undefined ? [] : record.episodes
+import { VideoUpdateForm } from './VideoUpdateFrom';
+import { EpisodeUpdateForm } from './EpisodeUpdateFrom';
+function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
+    const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
     const columns = [
         { title: 'EpisodeID', dataIndex: 'id', key: 'id' },
         { title: '话', dataIndex: 'num', key: 'num' },
         { title: '标题', dataIndex: 'title', key: 'title' },
         { title: '简介', dataIndex: 'desc', key: 'desc' },
-        { title: '封面', dataIndex: 'cover', key: 'cover' },
         {
+            title: '封面', dataIndex: 'cover', key: 'cover',
+            render: (value: string) => value === "" ? "" : <img src={value} width={160} height={210} alt={"图片不存在"} />
+        }, {
             title: '视频', dataIndex: 'url', key: 'url', width: 490,
             render: (value: string, record: any) => {
                 return (
@@ -43,16 +46,31 @@ function EpisodeTable(record: any) {
             title: '操作',
             dataIndex: 'operation',
             key: 'operation',
-            // render: (record: any) => <Button onClick={() => {
-            //     setEpisodeVisible(true)
-            // }}>修改分集</Button>
+            render: (text: any, record: any) => <span>
+                <Button
+                    onClick={() => {
+                        setUpdateEpisodeData({
+                            id: record.id,
+                            num: record.num,
+                            title: record.title,
+                            desc: record.desc,
+                            cover: record.cover,
+                            url: record.url,
+                            subtitles: record.subtitles,
+                        })
+                        setUpdateEpisodeVisible(true)
+                    }}>编辑分集</Button>
+            </span>
         },
     ];
-    return <Table
-        rowKey={record => record.id}
-        columns={columns}
-        dataSource={episodeData}
-        pagination={false} />;
+
+    return <div>
+        <Table
+            rowKey={record => record.id}
+            columns={columns}
+            dataSource={episodeData}
+            pagination={false} />
+    </div>
 }
 
 
@@ -60,8 +78,29 @@ export default function VideoTable() {
     const [visible, setVisible] = useState(false);
     const [currentVideoID, setCurrentVideoID] = useState(0);
     const [episodeVisible, setEpisodeVisible] = useState(false);
+    const [updateVideoVisible, setUpdateVideoVisible] = useState(false)
+    const [updateVideoData, setUpdateVideoData] = useState({
+        title: "",
+        desc: "",
+        cover: "",
+        pubDate: 0,
+        // tags: values.tags,
+        isShow: false,
+    })
+    const [updateEpisodeVisible, setUpdateEpisodeVisible] = useState(false)
+    const [updateEpisodeData, setUpdateEpisodeData] = useState({
+        id: 0,
+        num: 0,
+        title: "",
+        desc: "",
+        cover: "",
+        url: "",
+        subtitles: [],
+    })
     const [addVideo] = useMutation(ADD_VIDEO);
+    const [updateVideo] = useMutation(UPDATE_VIDEO)
     const [addEpisode] = useMutation(ADD_EPISODE)
+    const [updateEpisode] = useMutation(UPDATE_EPISODE)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
             variables: {
@@ -91,6 +130,24 @@ export default function VideoTable() {
         await refetch()
     };
 
+    const onVideoUpdate = async (values: any) => {
+        await updateVideo({
+            variables: {
+                "input": {
+                    "id": currentVideoID,
+                    "title": values.title,
+                    "desc": values.desc,
+                    "cover": values.cover,
+                    "pubDate": values.pubDate ? values.pubDate.unix() : 0,
+                    // "tags": values.tags,
+                    "isShow": values.isShow,
+                }
+            }
+        });
+        setUpdateVideoVisible(false);
+        await refetch()
+    };
+
     const onEpisodeCreate = async (values: any) => {
         await addEpisode({
             variables: {
@@ -107,6 +164,24 @@ export default function VideoTable() {
         setEpisodeVisible(false);
         await refetch()
     }
+
+    const onEpisodeUpdate = async (values: any) => {
+        await updateEpisode({
+            variables: {
+                "input": {
+                    "id": values.id,
+                    "num": values.num,
+                    "title": values.title,
+                    "desc": values.desc,
+                    "cover": values.cover,
+                    "url": values.url,
+                    "subtitles": values.subtitles
+                }
+            }
+        });
+        setUpdateEpisodeVisible(false);
+        await refetch()
+    };
 
     const onChange = (page: number) => {
         fetchMore({
@@ -176,12 +251,26 @@ export default function VideoTable() {
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
-            title: '操作', key: 'operation', render: (record: any) =>
-                <span> <Button onClick={() => {
-                    setCurrentVideoID(record.id)
-                    setNum(getNum(record.id))
-                    setEpisodeVisible(true)
-                }}>新增分集</Button>
+            title: '操作', key: 'operation', render: (value: any, record: any) =>
+                <span><Button
+                    onClick={() => {
+                        setCurrentVideoID(record.id)
+                        setUpdateVideoData({
+                            title: record.title,
+                            desc: record.desc,
+                            cover: record.cover,
+                            pubDate: record.pubDate,
+                            // tags: values.tags,
+                            isShow: record.isShow,
+                        })
+                        setUpdateVideoVisible(true)
+                    }}>编辑视频</Button>
+                    <Button type="dashed"
+                        onClick={() => {
+                            setCurrentVideoID(record.id)
+                            setNum(getNum(record.id))
+                            setEpisodeVisible(true)
+                        }}>新增分集</Button>
                 </span>
         },
     ];
@@ -203,6 +292,14 @@ export default function VideoTable() {
                     setVisible(false);
                 }}
             />
+            <VideoUpdateForm
+                visible={updateVideoVisible}
+                data={updateVideoData}
+                onUpdate={onVideoUpdate}
+                onCancel={() => {
+                    setUpdateVideoVisible(false);
+                }}
+            />
             <EpisodeCreateForm
                 visible={episodeVisible}
                 onCreate={onEpisodeCreate}
@@ -211,6 +308,14 @@ export default function VideoTable() {
                 }}
                 num={num}
             />
+            <EpisodeUpdateForm
+                visible={updateEpisodeVisible}
+                data={updateEpisodeData}
+                onUpdate={onEpisodeUpdate}
+                onCancel={() => {
+                    setUpdateEpisodeVisible(false);
+                }}
+            />
             <Table
                 loading={loading}
                 rowKey={record => record.id}
@@ -218,7 +323,7 @@ export default function VideoTable() {
                 columns={columns}
                 expandable={{
                     expandedRowRender: (record: any) => {
-                        return EpisodeTable(record)
+                        return EpisodeTable(record, setUpdateEpisodeData, setUpdateEpisodeVisible)
                     }
                 }}
                 pagination={{

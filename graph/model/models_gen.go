@@ -45,6 +45,28 @@ type NewSubtitle struct {
 	URL  string `json:"url"`
 }
 
+type NewUpdateEpisode struct {
+	ID        int64          `json:"id"`
+	Num       *float64       `json:"num"`
+	Title     *string        `json:"title"`
+	Desc      *string        `json:"desc"`
+	Cover     *string        `json:"cover"`
+	URL       string         `json:"url"`
+	Subtitles []*NewSubtitle `json:"subtitles"`
+}
+
+type NewUpdateVideo struct {
+	ID         int64           `json:"id"`
+	Title      *string         `json:"title"`
+	Desc       *string         `json:"desc"`
+	PubDate    *int64          `json:"pubDate"`
+	Cover      *string         `json:"cover"`
+	Characters []*NewCharacter `json:"characters"`
+	Staffs     []*NewStaff     `json:"staffs"`
+	Tags       []string        `json:"tags"`
+	IsShow     *bool           `json:"isShow"`
+}
+
 type NewVideo struct {
 	Title      string          `json:"title"`
 	Desc       *string         `json:"desc"`

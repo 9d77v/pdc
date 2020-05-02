@@ -5,6 +5,7 @@ import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
 import crypto from 'crypto'
 import { getVttFromFile, getType } from '../../utils/subtitle';
+import { getTextFromFile } from '../../utils/file';
 
 interface UploaderProps {
     fileLimit: number
@@ -12,6 +13,7 @@ interface UploaderProps {
     validFileTypes: string[]
     setURL: (e: any) => any
 }
+
 
 export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTypes, setURL }) => {
     const [action, setAction] = useState('');
@@ -23,27 +25,48 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
     if (fileLimit !== 1) {
         isMulti = true
     }
+    const getAccept = (validFileTypes: string[]) => {
+        let acceptFileTypes: string[] = []
+        for (let validFileType of validFileTypes) {
+            if (validFileType) {
+                const t = validFileType.split("/")[1]
+                acceptFileTypes.push(validFileType)
+                acceptFileTypes.push("." + t)
+            }
+        }
+        return acceptFileTypes.join(',')
+    }
+    const accept = getAccept(validFileTypes)
     const props = {
         name: 'file',
         multiple: isMulti,
         method: "PUT" as const,
         action: action,
-        accept: validFileTypes.join(","),
+        accept: accept,
         fileList: fileList,
         showUploadList: {
+            showPreviewIcon: true,
             showDownloadIcon: true,
-            downloadIcon: 'download ',
+            // downloadIcon: 'download ',
             showRemoveIcon: true,
         },
         beforeUpload: (file: File) => {
             return new Promise<void>(async (resolve) => {
-                const fileType = getType(file)
+                let fileType = getType(file)
                 let fileName = file.name
+                let fileString = ""
                 if (fileType === "ass" || fileType === "srt") {
-                    const vttText = await getVttFromFile(file);
+                    fileString = await getVttFromFile(file)
+                } else if (validFileTypes[0].indexOf("image") !== -1) {
+                    fileString = await getTextFromFile(file)
+                }
+                if (fileString !== "") {
                     const hash = crypto.createHash('sha256');
-                    hash.update(vttText);
-                    fileName = `${hash.digest('hex')}.vtt`
+                    hash.update(fileString);
+                    if (fileType === "ass") {
+                        fileType = "vtt"
+                    }
+                    fileName = `${hash.digest('hex')}.${fileType}`
                 }
                 const data = await getUploadURL(bucketName, fileName);
                 setAction(data.data.presignedUrl)

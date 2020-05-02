@@ -19,11 +19,12 @@ import (
 var (
 	DEBUG = utils.GetEnvBool("DEBUG", true)
 
-	DBHost     = utils.GetEnvStr("POSTGRES_HOST", "127.0.0.1")
-	DBPort     = utils.GetEnvInt("POSTGRES_PORT", 5432)
-	DBUser     = utils.GetEnvStr("POSTGRES_USER", "postgres")
-	DBPassword = utils.GetEnvStr("POSTGRES_PASSWORD", "123456")
-	DBName     = utils.GetEnvStr("POSTGRES_NAME", "pdc")
+	DBHost     = utils.GetEnvStr("DB_HOST", "127.0.0.1")
+	DBPort     = utils.GetEnvInt("DB_PORT", 5432)
+	DBUser     = utils.GetEnvStr("DB_USER", "postgres")
+	DBPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
+	DBName     = utils.GetEnvStr("DB_NAME", "pdc")
+	DBPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
 
 	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "127.0.0.1:9000")
 	MinioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
@@ -135,6 +136,12 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	//设置表名称的前缀
+	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
+		return fmt.Sprintf("%s_%s", DBPrefix, defaultTableName)
+	}
+
 	db.SingularTable(true)
 	db.LogMode(config.EnableLog)
 	useHstoreSQL := fmt.Sprintf("CREATE EXTENSION hstore;")

@@ -64,6 +64,8 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateEpisode func(childComplexity int, input model.NewEpisode) int
 		CreateVideo   func(childComplexity int, input model.NewVideo) int
+		UpdateEpisode func(childComplexity int, input *model.NewUpdateEpisode) int
+		UpdateVideo   func(childComplexity int, input *model.NewUpdateVideo) int
 	}
 
 	Query struct {
@@ -103,8 +105,10 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateVideo(ctx context.Context, input model.NewVideo) (int64, error)
-	CreateEpisode(ctx context.Context, input model.NewEpisode) (int64, error)
+	CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error)
+	CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error)
+	UpdateVideo(ctx context.Context, input *model.NewUpdateVideo) (*model.Video, error)
+	UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error)
 }
 type QueryResolver interface {
 	Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error)
@@ -233,6 +237,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateVideo(childComplexity, args["input"].(model.NewVideo)), true
+
+	case "Mutation.updateEpisode":
+		if e.complexity.Mutation.UpdateEpisode == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateEpisode_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateEpisode(childComplexity, args["input"].(*model.NewUpdateEpisode)), true
+
+	case "Mutation.updateVideo":
+		if e.complexity.Mutation.UpdateVideo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateVideo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateVideo(childComplexity, args["input"].(*model.NewUpdateVideo)), true
 
 	case "Query.presignedUrl":
 		if e.complexity.Query.PresignedURL == nil {
@@ -543,9 +571,33 @@ input NewEpisode{
   subtitles:  [NewSubtitle!]
 }
 
+input NewUpdateVideo{
+  id:ID!
+  title: String
+  desc: String
+  pubDate: Int
+  cover: String
+  characters: [NewCharacter!]
+  staffs: [NewStaff!]
+  tags: [String!]
+  isShow: Boolean 
+}
+
+input NewUpdateEpisode{
+  id:ID!
+  num: Float
+  title: String
+  desc: String
+  cover: String
+  url: String!
+  subtitles:  [NewSubtitle!]  
+}
+
 type Mutation {
-  createVideo(input: NewVideo!): ID!
-  createEpisode(input:NewEpisode!):ID!
+  createVideo(input: NewVideo!): Video!
+  createEpisode(input:NewEpisode!):Episode!
+  updateVideo(input:NewUpdateVideo):Video!
+  updateEpisode(input:NewUpdateEpisode):Episode!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -574,6 +626,34 @@ func (ec *executionContext) field_Mutation_createVideo_args(ctx context.Context,
 	var arg0 model.NewVideo
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewVideo2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewVideo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateEpisode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NewUpdateEpisode
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalONewUpdateEpisode2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NewUpdateVideo
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalONewUpdateVideo2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateVideo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1120,9 +1200,9 @@ func (ec *executionContext) _Mutation_createVideo(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int64)
+	res := resTmp.(*model.Video)
 	fc.Result = res
-	return ec.marshalNID2int64(ctx, field.Selections, res)
+	return ec.marshalNVideo2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createEpisode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1161,9 +1241,91 @@ func (ec *executionContext) _Mutation_createEpisode(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int64)
+	res := resTmp.(*model.Episode)
 	fc.Result = res
-	return ec.marshalNID2int64(ctx, field.Selections, res)
+	return ec.marshalNEpisode2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateVideo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateVideo(rctx, args["input"].(*model.NewUpdateVideo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateEpisode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateEpisode_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateEpisode(rctx, args["input"].(*model.NewUpdateEpisode))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Episode)
+	fc.Result = res
+	return ec.marshalNEpisode2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_Videos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3107,6 +3269,126 @@ func (ec *executionContext) unmarshalInputNewSubtitle(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, obj interface{}) (model.NewUpdateEpisode, error) {
+	var it model.NewUpdateEpisode
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "num":
+			var err error
+			it.Num, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cover":
+			var err error
+			it.Cover, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "url":
+			var err error
+			it.URL, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subtitles":
+			var err error
+			it.Subtitles, err = ec.unmarshalONewSubtitle2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitleᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUpdateVideo(ctx context.Context, obj interface{}) (model.NewUpdateVideo, error) {
+	var it model.NewUpdateVideo
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pubDate":
+			var err error
+			it.PubDate, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cover":
+			var err error
+			it.Cover, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characters":
+			var err error
+			it.Characters, err = ec.unmarshalONewCharacter2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacterᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "staffs":
+			var err error
+			it.Staffs, err = ec.unmarshalONewStaff2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaffᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tags":
+			var err error
+			it.Tags, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isShow":
+			var err error
+			it.IsShow, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj interface{}) (model.NewVideo, error) {
 	var it model.NewVideo
 	var asMap = obj.(map[string]interface{})
@@ -3313,6 +3595,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createEpisode":
 			out.Values[i] = ec._Mutation_createEpisode(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateVideo":
+			out.Values[i] = ec._Mutation_updateVideo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateEpisode":
+			out.Values[i] = ec._Mutation_updateEpisode(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4466,6 +4758,29 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
 }
 
+func (ec *executionContext) unmarshalOFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	return graphql.UnmarshalFloat(v)
+}
+
+func (ec *executionContext) marshalOFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	return graphql.MarshalFloat(v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOFloat2float64(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOFloat2float64(ctx, sel, *v)
+}
+
 func (ec *executionContext) unmarshalOInt2int64(ctx context.Context, v interface{}) (int64, error) {
 	return graphql.UnmarshalInt64(v)
 }
@@ -4547,6 +4862,30 @@ func (ec *executionContext) unmarshalONewSubtitle2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77v
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalONewUpdateEpisode2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {
+	return ec.unmarshalInputNewUpdateEpisode(ctx, v)
+}
+
+func (ec *executionContext) unmarshalONewUpdateEpisode2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (*model.NewUpdateEpisode, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONewUpdateEpisode2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) unmarshalONewUpdateVideo2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateVideo(ctx context.Context, v interface{}) (model.NewUpdateVideo, error) {
+	return ec.unmarshalInputNewUpdateVideo(ctx, v)
+}
+
+func (ec *executionContext) unmarshalONewUpdateVideo2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateVideo(ctx context.Context, v interface{}) (*model.NewUpdateVideo, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONewUpdateVideo2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateVideo(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

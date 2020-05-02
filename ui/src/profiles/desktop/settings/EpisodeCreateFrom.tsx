@@ -1,82 +1,18 @@
-import { Modal, Form, Input, InputNumber, Button, Typography, Radio } from 'antd';
-import React, { useState, useRef, useEffect } from 'react'
-import { Uploader } from '../../components/Uploader';
-interface Values {
-    title: string;
-    description: string;
-}
+import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Uploader } from '../../components/Uploader'
+import { SubtitleForm } from './SubtitleForm'
+import {
+    DeleteOutlined
+} from '@ant-design/icons';
+
 
 interface EpisodeCreateFormProps {
-    visible: boolean;
-    onCreate: (values: Values) => void;
-    onCancel: () => void;
+    visible: boolean
+    onCreate: (values: any) => void
+    onCancel: () => void
     num: number,
 }
-
-interface ModalFormProps {
-    visible: boolean;
-    onCancel: () => void;
-}
-
-// reset form fields when modal is form, closed
-const useResetFormOnCloseModal = ({ form, visible }: any) => {
-    const prevVisibleRef = useRef();
-    useEffect(() => {
-        prevVisibleRef.current = visible;
-    }, [visible]);
-    const prevVisible = prevVisibleRef.current;
-
-    useEffect(() => {
-        if (!visible && prevVisible) {
-            form.resetFields();
-        }
-    }, [form, prevVisible, visible]);
-};
-
-const ModalSubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
-    const [form] = Form.useForm();
-
-    const [url, setUrl] = useState("")
-    useResetFormOnCloseModal({
-        form,
-        visible,
-    });
-
-    const onOk = () => {
-        form.setFieldsValue({
-            "url": url
-        })
-        form.submit();
-    };
-
-    return (
-        <Modal title="新增字幕" visible={visible} onOk={onOk}
-            onCancel={
-                () => {
-                    onCancel()
-                    form.resetFields()
-                    setUrl('')
-                }
-            }        >
-            <Form form={form} layout="vertical" name="subtitleForm" initialValues={{ name: "简体中文" }}>
-                <Form.Item name="name" label="标签" rules={[{ required: true }]}>
-                    <Radio.Group buttonStyle="solid">
-                        <Radio.Button value="简体中文">简体中文</Radio.Button>
-                        <Radio.Button value="中日双语">中日双语</Radio.Button>
-                    </Radio.Group>
-                </Form.Item>
-                <Form.Item name="url" label="字幕（支持上传ass,srt转vtt格式）" rules={[{ required: true }]}>
-                    <Uploader
-                        fileLimit={1}
-                        bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass", "text/srt"]}
-                        setURL={setUrl}
-                    />
-                </Form.Item>
-            </Form>
-        </Modal>
-    );
-};
 
 export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     visible,
@@ -84,21 +20,22 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     onCancel,
     num
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [url, setUrl] = useState('')
-    const [subtitleVisible, setSubtitleVisible] = useState(false);
+    const [coverUrl, setCoverUrl] = useState('')
+    const [subtitleVisible, setSubtitleVisible] = useState(false)
 
     const showSubtitleModal = () => {
-        setSubtitleVisible(true);
-    };
+        setSubtitleVisible(true)
+    }
 
     const hideSubtitleModal = () => {
-        setSubtitleVisible(false);
-    };
+        setSubtitleVisible(false)
+    }
 
     const onFinish = (values: any) => {
-        console.log('Finish:', values);
-    };
+        console.log('Finish:', values)
+    }
 
     useEffect(() => {
         if (num !== form.getFieldValue("num")) {
@@ -113,6 +50,15 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
         wrapperCol: { span: 16 },
     }
 
+    const removeSubtitle = (name: string) => {
+        const subtitles = form.getFieldValue('subtitles') || []
+        for (const i in subtitles) {
+            if (subtitles[i].name === name) {
+                subtitles.splice(i, 1)
+            }
+        }
+        form.setFieldsValue({ subtitles: [...subtitles] })
+    }
     return (
         <Modal
             visible={visible}
@@ -124,34 +70,37 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     onCancel()
                     form.resetFields()
                     setUrl('')
+                    setCoverUrl('')
                 }
             }
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
-                    "url": url
+                    "url": url,
+                    'coverUrl': coverUrl
                 })
                 form
                     .validateFields()
                     .then((values: any) => {
-                        const subtitles = form.getFieldValue('subtitles') || [];
+                        const subtitles = form.getFieldValue('subtitles') || []
                         values.subtitles = subtitles
-                        onCreate(values);
-                        form.resetFields();
+                        onCreate(values)
+                        form.resetFields()
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setUrl('')
+                setCoverUrl('')
             }}
         >
             <Form.Provider
                 onFormFinish={(name, { values, forms }) => {
                     if (name === 'subtitleForm') {
-                        const { basicForm } = forms;
-                        const subtitles = basicForm.getFieldValue('subtitles') || [];
-                        basicForm.setFieldsValue({ subtitles: [...subtitles, values] });
-                        setSubtitleVisible(false);
+                        const { episodeCreateForm } = forms
+                        const subtitles = episodeCreateForm.getFieldValue('subtitles') || []
+                        episodeCreateForm.setFieldsValue({ subtitles: [...subtitles, values] })
+                        setSubtitleVisible(false)
                     }
                 }}
             >
@@ -159,7 +108,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     {...layout}
                     form={form}
                     layout="horizontal"
-                    name="basicForm"
+                    name="episodeCreateForm"
                     onFinish={onFinish}
                     initialValues={{ num: num }}
                 >
@@ -176,6 +125,14 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     </Form.Item>
                     <Form.Item name="desc" label="简介">
                         <Input type="textarea" />
+                    </Form.Item>
+                    <Form.Item name="cover" label="封面">
+                        <Uploader
+                            fileLimit={1}
+                            bucketName="image"
+                            validFileTypes={["image/jpeg", "image/png", "image/webp"]}
+                            setURL={setCoverUrl}
+                        />
                     </Form.Item>
                     <Form.Item
                         name="url"
@@ -194,12 +151,12 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                         shouldUpdate={(prevValues, curValues) => prevValues.subtitles !== curValues.subtitles}
                     >
                         {({ getFieldValue }) => {
-                            const subtitles = getFieldValue('subtitles') || [];
+                            const subtitles = getFieldValue('subtitles') || []
                             return subtitles.length ? (
                                 <ul>
                                     {subtitles.map((subtitle: any, index: number) => (
                                         <li key={index}>
-                                            {subtitle.name} - {subtitle.url}
+                                            {subtitle.name} - {subtitle.url}<Button onClick={() => removeSubtitle(subtitle.name)} icon={<DeleteOutlined />} type="link" danger></Button>
                                         </li>
                                     ))}
                                 </ul>
@@ -207,7 +164,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                                     <Typography.Text className="ant-form-text" type="secondary">
                                         暂无字幕
                                     </Typography.Text>
-                                );
+                                )
                         }}
                     </Form.Item>
 
@@ -216,8 +173,8 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                 </Button>
 
                 </Form>
-                <ModalSubtitleForm visible={subtitleVisible} onCancel={hideSubtitleModal} />
+                <SubtitleForm visible={subtitleVisible} onCancel={hideSubtitleModal} />
             </Form.Provider>
         </Modal >
-    );
-};
+    )
+}

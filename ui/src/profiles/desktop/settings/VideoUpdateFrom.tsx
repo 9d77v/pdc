@@ -1,6 +1,7 @@
-import { Modal, Form, Input, Switch, DatePicker, message } from 'antd';
-import React, { useState } from 'react'
+import { Modal, Form, Input, Switch, DatePicker } from 'antd';
+import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../components/Uploader';
+import moment from 'moment';
 
 const { TextArea } = Input;
 
@@ -9,29 +10,48 @@ interface Values {
     description: string;
 }
 
-interface VideoCreateFormProps {
+interface UpdateVideoProps {
+    title: string,
+    desc: string,
+    cover: string,
+    pubDate: number,
+    // tags: values.tags,
+    isShow: boolean,
+}
+interface VideoUpdateFormProps {
     visible: boolean;
-    onCreate: (values: Values) => void;
+    data: UpdateVideoProps,
+    onUpdate: (values: Values) => void;
     onCancel: () => void;
 }
 
-export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
+export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
     visible,
-    onCreate,
+    data,
+    onUpdate,
     onCancel,
 }) => {
     const [form] = Form.useForm();
     const [url, setUrl] = useState("")
-    const [videoURLs, setVideoURLs] = useState([])
-    const [subtitles, setSubtitles] = useState([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
+    useEffect(() => {
+        form.setFieldsValue({
+            "cover": data.cover,
+            "title": data.title,
+            "desc": data.desc,
+            "pubDate": moment(data.pubDate * 1000),
+            "isShow": data.isShow
+        })
+        setUrl(data.cover)
+    }, [form, data]);
+
     return (
         <Modal
             visible={visible}
-            title="新增视频"
+            title="编辑视频"
             okText="确定"
             cancelText="取消"
             onCancel={
@@ -39,41 +59,30 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     onCancel()
                     form.resetFields()
                     setUrl('')
-                    setVideoURLs([])
-                    setSubtitles([])
                 }
             }
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
                     "cover": url,
-                    "videoURLs": videoURLs,
-                    "subtitles": subtitles
                 })
-                if (subtitles.length > 0 && videoURLs.length !== subtitles.length) {
-                    message.error(`视频数量与字幕数量不一致,视频数量：${videoURLs.length},字幕数量：${subtitles.length}`);
-                    return
-                }
                 form
                     .validateFields()
                     .then((values: any) => {
                         form.resetFields();
-                        onCreate(values);
+                        onUpdate(values);
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info);
                     });
                 setUrl('')
-                setVideoURLs([])
-                setSubtitles([])
             }}
         >
             <Form
                 {...layout}
                 form={form}
                 layout="horizontal"
-                name="videoCreateForm"
-                initialValues={{ isShow: true }}
+                name="videoUpdateForm"
             >
                 <Form.Item
                     name="title"
@@ -98,22 +107,6 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 </Form.Item>
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />
-                </Form.Item>
-                <Form.Item name="videoURLs" label="视频列表">
-                    <Uploader
-                        fileLimit={0}
-                        bucketName="video"
-                        validFileTypes={["video/mp4"]}
-                        setURL={setVideoURLs}
-                    />
-                </Form.Item>
-                <Form.Item name="subtitles" label="字幕列表">
-                    <Uploader
-                        fileLimit={0}
-                        bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass"]}
-                        setURL={setSubtitles}
-                    />
                 </Form.Item>
             </Form>
         </Modal>

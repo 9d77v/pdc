@@ -12,15 +12,23 @@ import (
 	"github.com/9d77v/go-lib/ptrs"
 )
 
-func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (int64, error) {
+func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
 	if len(input.VideoURLs) > 0 && len(input.Subtitles) > 0 && len(input.VideoURLs) != len(input.Subtitles) {
-		return 0, errors.New("视频与字幕数量不一致")
+		return nil, errors.New("视频与字幕数量不一致")
 	}
 	return videoService.CreateVideo(input)
 }
 
-func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpisode) (int64, error) {
+func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error) {
 	return videoService.CreateEpisode(input)
+}
+
+func (r *mutationResolver) UpdateVideo(ctx context.Context, input *model.NewUpdateVideo) (*model.Video, error) {
+	return videoService.UpdateVideo(input)
+}
+
+func (r *mutationResolver) UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error) {
+	return videoService.UpdateEpisode(input)
 }
 
 func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error) {

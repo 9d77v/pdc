@@ -93,7 +93,31 @@ input NewEpisode{
   subtitles:  [NewSubtitle!]
 }
 
+input NewUpdateVideo{
+  id:ID!
+  title: String
+  desc: String
+  pubDate: Int
+  cover: String
+  characters: [NewCharacter!]
+  staffs: [NewStaff!]
+  tags: [String!]
+  isShow: Boolean 
+}
+
+input NewUpdateEpisode{
+  id:ID!
+  num: Float
+  title: String
+  desc: String
+  cover: String
+  url: String!
+  subtitles:  [NewSubtitle!]  
+}
+
 type Mutation {
-  createVideo(input: NewVideo!): ID!
-  createEpisode(input:NewEpisode!):ID!
+  createVideo(input: NewVideo!): Video!
+  createEpisode(input:NewEpisode!):Episode!
+  updateVideo(input:NewUpdateVideo):Video!
+  updateEpisode(input:NewUpdateEpisode):Episode!
 }
