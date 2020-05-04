@@ -13,7 +13,7 @@ export default function DesktopIndex() {
     return (
         <Layout>
             <Header className="header">
-                <div style={{ fontSize: 32, color: "white", textAlign: "left" }}></div>
+                <div style={{ fontSize: 32, color: "white", textAlign: "left" }}>个人数据中心</div>
             </Header>
             <Layout style={{
                 overflow: 'auto',
