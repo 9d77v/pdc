@@ -77,7 +77,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
             onOk={() => {
                 form.setFieldsValue({
                     "url": url,
-                    'coverUrl': coverUrl
+                    'cover': coverUrl
                 })
                 form
                     .validateFields()

@@ -38,7 +38,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         if (videoNode) {
             setPlayer(videojs(videoNode, props, () => {
                 if (player !== undefined) {
-                    if (player.textTracks.length === 0) {
+                    if (player.remoteTextTracks().length === 0) {
                         for (const item of subtitles || []) {
                             player.addRemoteTextTrack({
                                 "kind": "subtitles",
