@@ -1,5 +1,5 @@
 import { message, Upload } from 'antd';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { getUploadURL } from "../../gqls/upload.gql";
 import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
@@ -19,8 +19,8 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
-    const defultFileURLs: string[] = []
-    const [fileURLs, setFileURLs] = useState(defultFileURLs)
+    const emptyFile: UploadFile = { uid: "", size: 0, name: "", type: "" }
+    const [succeedFile, setSucceedFile] = useState(emptyFile)
     let isMulti = false
     if (fileLimit !== 1) {
         isMulti = true
@@ -37,6 +37,37 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
         return acceptFileTypes.join(',')
     }
     const accept = getAccept(validFileTypes)
+
+    const sortFile = (a: UploadFile, b: UploadFile) => {
+        return parseInt(a.uid.split("-").pop() || '') - parseInt(b.uid.split("-").pop() || '')
+    }
+    useEffect(() => {
+        let all_done = true
+        for (let file of fileList) {
+            if (file.uid === succeedFile.uid && file.status === 'uploading') {
+                file.status = 'done'
+            }
+            if (file.status !== 'done') {
+                all_done = false
+            }
+        }
+        if (all_done) {
+            let fileURLs: string[] = []
+            for (let tmpFile of fileList) {
+                let obj: any = tmpFile.originFileObj
+                fileURLs.push(obj.url)
+            }
+            if (fileLimit === 1) {
+                if (fileURLs.length === 1) {
+                    setURL(fileURLs[0])
+                } else {
+                    setURL("")
+                }
+            } else {
+                setURL(fileURLs)
+            }
+        }
+    }, [fileList, succeedFile, setURL, fileLimit]);
     const props = {
         name: 'file',
         multiple: isMulti,
@@ -86,20 +117,17 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
                 resolve(file)
             });
         },
-        onSuccess: async (response: any, file: UploadFile) => {
+        onSuccess: (response: any, file: UploadFile) => {
             message.success(`${file.name} 文件上传成功.`);
             const index = action.indexOf("?")
             if (fileLimit === 1) {
                 setURL(action.substring(0, index))
                 setFileList([file])
             } else {
-                const tempFileURLs = [...fileURLs, action.substring(0, index)]
-                setURL(tempFileURLs)
-                setFileURLs(tempFileURLs)
                 file.status = 'done';
                 file.response = response;
-                const tmpFileList = [...fileList, file]
-                setFileList(tmpFileList)
+                file.url = action.substring(0, index)
+                setSucceedFile(file)
             }
         },
         onError: (error: any) => {
@@ -117,26 +145,15 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
             if (fileLimit > 0) {
                 tmpFileList = tmpFileList.slice(-fileLimit);
             }
+            tmpFileList.sort(sortFile)
             setFileList(tmpFileList)
-            let fileURLS: string[] = []
-            tmpFileList = tmpFileList.map(file => {
-                if (file.xhr) {
-                    const url = file.xhr.responseURL
-                    const index = url.indexOf("?")
-                    file.url = url.substring(0, index)
-                    fileURLS.push(file.url ? file.url.toString() : "")
-                }
-                return file;
-            });
-            if (status !== 'uploading') {
-            }
             if (status === 'done') {
                 message.success(`${info.file.name} 文件上传成功s.`);
             } else if (status === 'error') {
                 message.error(`${info.file.name} 文件上传失败s.`);
             }
         },
-        async customRequest({
+        customRequest({
             action,
             data,
             file,
@@ -147,7 +164,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
             onSuccess,
             withCredentials,
         }: any) {
-            await axios
+            axios
                 .put(action, file, {
                     withCredentials, headers: {
                         'Content-Type': validFileTypes.join(",")
