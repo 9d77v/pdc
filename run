@@ -40,9 +40,9 @@ case $1 in
         $sudo docker push 9d77v/pdc-base:$version
        ;;
     deploy)
-        # cd ui 
-        # yarn build
-        # cd ..
+        cd ui 
+        yarn build
+        cd ..
         IMAGE_TAG=`git log --pretty=format:"%ad_%h" -1 --date=short`
         $sudo docker build -t 9d77v/pdc:$IMAGE_TAG .
         $sudo docker push 9d77v/pdc:$IMAGE_TAG
