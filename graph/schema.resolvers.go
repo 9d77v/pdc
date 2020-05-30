@@ -45,7 +45,7 @@ func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64
 	}
 	o = (o - 1) * l
 	con := new(model.VideoConnection)
-	total, data, err := videoService.ListVideo(o, l)
+	total, data, err := videoService.ListVideo(ctx, o, l)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

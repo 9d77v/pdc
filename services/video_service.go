@@ -1,12 +1,14 @@
 package services
 
 import (
+	"context"
 	"strings"
 	"time"
 
 	"git.9d77v.me/9d77v/pdc/dtos"
 	"git.9d77v.me/9d77v/pdc/graph/model"
 	"git.9d77v.me/9d77v/pdc/models"
+	"git.9d77v.me/9d77v/pdc/utils"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -133,20 +135,31 @@ func (s VideoService) UpdateEpisode(input *model.NewUpdateEpisode) (*model.Episo
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(offset, limit int64) (int64, []*model.Video, error) {
+func (s VideoService) ListVideo(ctx context.Context, offset, limit int64) (int64, []*model.Video, error) {
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
-	err := models.Gorm.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
-		return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
-
-	}).Offset(offset).Limit(limit).Order("id DESC").Find(&data).Error
-	if err != nil {
-		return 0, result, err
+	filedMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	if filedMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, []string{"episodes"}))
+		if edgeFieldMap["episodes"] {
+			err = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
+				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
+			}).Offset(offset).Limit(limit).Order("id DESC").Find(&data).Error
+		} else {
+			err = builder.Offset(offset).Limit(limit).Order("id DESC").Find(&data).Error
+		}
+		if err != nil {
+			return 0, result, err
+		}
 	}
-	var total int64 = 0
-	err = models.Gorm.Model(&models.Video{}).Count(&total).Error
-	if err != nil {
-		return 0, result, err
+	var total int64
+	if filedMap["totalCount"] {
+		err = models.Gorm.Model(&models.Video{}).Count(&total).Error
+		if err != nil {
+			return 0, result, err
+		}
 	}
 	for _, m := range data {
 		r := dtos.ToVideoDto(m)
