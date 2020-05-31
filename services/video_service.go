@@ -54,10 +54,8 @@ func (s VideoService) CreateVideo(input model.NewVideo) (*model.Video, error) {
 		cs := make(postgres.Hstore, len(input.VideoURLs))
 
 		if input.Subtitles != nil && len(input.Subtitles.Urls) > 0 {
-			for _, v := range input.Subtitles.Urls {
-				cs[input.Subtitles.Name] = &v
-				e.Subtitles = cs
-			}
+			cs[input.Subtitles.Name] = &input.Subtitles.Urls[i]
+			e.Subtitles = cs
 		}
 		err := models.Gorm.Create(e).Error
 		if err != nil {
