@@ -1,5 +1,5 @@
-import { Table, Button } from 'antd';
-import React, { useState } from 'react'
+import { Table, Button, message } from 'antd';
+import React, { useState, useEffect } from 'react'
 
 import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../gqls/video.gql';
 import { useQuery } from '@apollo/react-hooks';
@@ -109,9 +109,21 @@ export default function VideoTable() {
             }
         });
     const [num, setNum] = useState(1);
-    if (error) return <div>Error! ${error}</div>;
+
+    useEffect(() => {
+        if (error) {
+            message.error("接口请求失败！")
+        }
+    }, [error])
 
     const onVideoCreate = async (values: any) => {
+        let subtitles = undefined
+        if (values.subtitles && values.subtitles.length > 0) {
+            subtitles = {
+                "name": values.subtitle_lang,
+                "urls": values.subtitles
+            }
+        }
         await addVideo({
             variables: {
                 "input": {
@@ -122,7 +134,7 @@ export default function VideoTable() {
                     // "tags": values.tags,
                     "isShow": values.isShow,
                     "videoURLs": values.videoURLs,
-                    "subtitles": values.subtitles
+                    "subtitles": subtitles
                 }
             }
         });

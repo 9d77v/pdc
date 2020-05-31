@@ -65,6 +65,11 @@ input NewStaff{
   persons: [String!]!
 }
 
+input NewSubtitles{
+  name:String!
+  urls:[String!]!
+}
+
 input NewVideo {
   title: String!  
   desc: String
@@ -75,7 +80,7 @@ input NewVideo {
   tags: [String!]
   isShow: Boolean!
   videoURLs:[String!]
-  subtitles:[String!]
+  subtitles:NewSubtitles
 }
 
 input NewSubtitle{

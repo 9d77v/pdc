@@ -45,6 +45,11 @@ type NewSubtitle struct {
 	URL  string `json:"url"`
 }
 
+type NewSubtitles struct {
+	Name string   `json:"name"`
+	Urls []string `json:"urls"`
+}
+
 type NewUpdateEpisode struct {
 	ID        int64          `json:"id"`
 	Num       *float64       `json:"num"`
@@ -77,7 +82,7 @@ type NewVideo struct {
 	Tags       []string        `json:"tags"`
 	IsShow     bool            `json:"isShow"`
 	VideoURLs  []string        `json:"videoURLs"`
-	Subtitles  []string        `json:"subtitles"`
+	Subtitles  *NewSubtitles   `json:"subtitles"`
 }
 
 type Staff struct {

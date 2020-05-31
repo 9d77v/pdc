@@ -13,7 +13,7 @@ import (
 )
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
-	if len(input.VideoURLs) > 0 && len(input.Subtitles) > 0 && len(input.VideoURLs) != len(input.Subtitles) {
+	if len(input.VideoURLs) > 0 && input.Subtitles != nil && len(input.Subtitles.Urls) > 0 && len(input.VideoURLs) != len(input.Subtitles.Urls) {
 		return nil, errors.New("视频与字幕数量不一致")
 	}
 	return videoService.CreateVideo(input)

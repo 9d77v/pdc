@@ -543,6 +543,11 @@ input NewStaff{
   persons: [String!]!
 }
 
+input NewSubtitles{
+  name:String!
+  urls:[String!]!
+}
+
 input NewVideo {
   title: String!  
   desc: String
@@ -553,7 +558,7 @@ input NewVideo {
   tags: [String!]
   isShow: Boolean!
   videoURLs:[String!]
-  subtitles:[String!]
+  subtitles:NewSubtitles
 }
 
 input NewSubtitle{
@@ -3269,6 +3274,30 @@ func (ec *executionContext) unmarshalInputNewSubtitle(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewSubtitles(ctx context.Context, obj interface{}) (model.NewSubtitles, error) {
+	var it model.NewSubtitles
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "urls":
+			var err error
+			it.Urls, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, obj interface{}) (model.NewUpdateEpisode, error) {
 	var it model.NewUpdateEpisode
 	var asMap = obj.(map[string]interface{})
@@ -3451,7 +3480,7 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 			}
 		case "subtitles":
 			var err error
-			it.Subtitles, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4862,6 +4891,18 @@ func (ec *executionContext) unmarshalONewSubtitle2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77v
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) unmarshalONewSubtitles2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx context.Context, v interface{}) (model.NewSubtitles, error) {
+	return ec.unmarshalInputNewSubtitles(ctx, v)
+}
+
+func (ec *executionContext) unmarshalONewSubtitles2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx context.Context, v interface{}) (*model.NewSubtitles, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONewSubtitles2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+	return &res, err
 }
 
 func (ec *executionContext) unmarshalONewUpdateEpisode2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {

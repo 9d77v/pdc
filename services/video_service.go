@@ -51,10 +51,13 @@ func (s VideoService) CreateVideo(input model.NewVideo) (*model.Video, error) {
 			VideoID: int64(m.ID),
 			URL:     url,
 		}
-		if len(input.Subtitles) > 0 {
-			cs := make(postgres.Hstore, len(input.Subtitles))
-			cs["简体中文"] = &input.Subtitles[i]
-			e.Subtitles = cs
+		cs := make(postgres.Hstore, len(input.VideoURLs))
+
+		if input.Subtitles != nil && len(input.Subtitles.Urls) > 0 {
+			for _, v := range input.Subtitles.Urls {
+				cs[input.Subtitles.Name] = &v
+				e.Subtitles = cs
+			}
 		}
 		err := models.Gorm.Create(e).Error
 		if err != nil {
@@ -142,7 +145,7 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64) (int64
 	var err error
 	if filedMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, []string{"episodes"}))
+		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, []string{"episodes", "__typename"}))
 		if edgeFieldMap["episodes"] {
 			err = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
