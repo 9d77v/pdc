@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
 
 import "video.js/dist/video-js.css"
+import "./VideoPlayer.less"
+
 export interface SubtitleProps {
     name: string
     url: string
@@ -32,38 +34,36 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             src: url,
             type: 'video/mp4',
         }],
+        controls: true,
+        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+        loop: true
     };
 
     useEffect(() => {
-        if (videoNode) {
-            setPlayer(videojs(videoNode, props, () => {
-                if (player !== undefined) {
-                    if (player.remoteTextTracks().length === 0) {
-                        for (const item of subtitles || []) {
-                            player.addRemoteTextTrack({
-                                "kind": "subtitles",
-                                "src": item.url,
-                                "label": item.name,
-                                "default": true
-                            }, false)
-                        }
-                    }
+        if (videoNode && !player) {
+            let tmpPlayer = videojs(videoNode, props, () => {
+                for (const item of subtitles || []) {
+                    tmpPlayer.addRemoteTextTrack({
+                        "kind": "subtitles",
+                        "src": item.url,
+                        "label": item.name,
+                        "default": true
+                    }, false)
                 }
-            }))
+            })
+            setPlayer(tmpPlayer)
         }
-    }, [videoNode, props, player, subtitles]);
+        if (videoNode && player) {
+            player.src(url)
+        }
+    }, [videoNode, props, player, url, subtitles]);
 
-    useEffect(() => {
-        if (videoNode) {
-            if (player !== undefined) {
-                player.src(url)
-            }
-        }
-    }, [videoNode, player, url]);
     return (
-        <div data-vjs-player style={{ width, height }}>
-            <video id={videoID} ref={(node: any) => setVideoNode(node)} controls className="video-js"
-                data-setup='{ "playbackRates": [0.5, 1, 1.5, 2,4,8,16],"loopbutton": true,"language":"zh"  }'
+        <div data-vjs-player style={{ width, height }} >
+            <video id={videoID}
+                ref={(node: any) => setVideoNode(node)}
+                className="video-js vjs-big-play-centered"
+                crossOrigin="anonymous"
             />
         </div>
     )

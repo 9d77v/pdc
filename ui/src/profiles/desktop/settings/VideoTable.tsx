@@ -195,7 +195,7 @@ export default function VideoTable() {
         await refetch()
     };
 
-    const onChange = (page: number) => {
+    const onChange = async (page: number) => {
         fetchMore({
             variables: {
                 page: page
@@ -344,6 +344,7 @@ export default function VideoTable() {
                     total: data ? data.Videos.totalCount : 0,
                     locale: 'zh_CN',
                     showQuickJumper: true,
+                    hideOnSinglePage: true
                 }}
                 dataSource={data ? data.Videos.edges : []}
             />
