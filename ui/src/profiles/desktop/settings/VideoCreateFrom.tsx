@@ -1,6 +1,6 @@
 import { Modal, Form, Input, Switch, DatePicker, message, Radio } from 'antd';
 import React, { useState } from 'react'
-import { Uploader } from '../../components/Uploader';
+import { Uploader } from '../../../components/Uploader';
 
 const { TextArea } = Input;
 

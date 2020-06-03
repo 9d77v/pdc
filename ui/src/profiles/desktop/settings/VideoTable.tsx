@@ -1,13 +1,13 @@
 import { Table, Button, message } from 'antd';
 import React, { useState, useEffect } from 'react'
 
-import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../gqls/video.gql';
+import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateFrom';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateFrom';
 import moment from 'moment';
-import { VideoPlayer } from '../../components/VideoPlayer';
+import { VideoPlayer } from '../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateFrom';
 import { EpisodeUpdateForm } from './EpisodeUpdateFrom';
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {

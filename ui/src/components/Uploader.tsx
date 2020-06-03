@@ -1,11 +1,11 @@
 import { message, Upload } from 'antd';
 import React, { useState, useEffect } from 'react'
-import { getUploadURL } from "../../gqls/upload.gql";
+import { getUploadURL } from "../consts/upload.gql";
 import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
 import crypto from 'crypto'
-import { getVttFromFile, getType } from '../../utils/subtitle';
-import { getTextFromFile } from '../../utils/file';
+import { getVttFromFile, getType } from '../utils/subtitle';
+import { getTextFromFile } from '../utils/file';
 
 interface UploaderProps {
     fileLimit: number
