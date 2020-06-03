@@ -10,6 +10,7 @@ import moment from 'moment';
 import { VideoPlayer } from '../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateFrom';
 import { EpisodeUpdateForm } from './EpisodeUpdateFrom';
+import { Img } from '../../../components/Img';
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
     const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
     const columns = [
@@ -19,7 +20,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
         { title: '简介', dataIndex: 'desc', key: 'desc' },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
-            render: (value: string) => value === "" ? "" : <img src={value} width={160} height={210} alt={"图片不存在"} />
+            render: (value: string) => <Img src={value} />
         }, {
             title: '视频', dataIndex: 'url', key: 'url', width: 490,
             render: (value: string, record: any) => {
@@ -239,7 +240,7 @@ export default function VideoTable() {
         { title: '简介', dataIndex: 'desc', key: 'desc', width: 400 },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
-            render: (value: string) => value === "" ? "" : <img src={value} width={160} height={210} alt={"图片不存在"} />
+            render: (value: string) => <Img src={value} />
         },
         {
             title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',

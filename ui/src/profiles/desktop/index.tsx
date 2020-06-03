@@ -7,9 +7,10 @@ import {
     Switch,
     Route
 } from "react-router-dom";
-import { AppHeader } from '../../components/AppHeader';
-import { AppSlider } from '../../components/AppSlider';
-import { AppNavigator } from '../../components/AppNavigator';
+import { AppHeader } from './common/AppHeader';
+import { AppSlider } from './common/AppSlider';
+import { AppNavigator } from './common/AppNavigator';
+import { VideoPage } from './media/VideoPage';
 const { Content } = Layout;
 
 export default function DesktopIndex() {
@@ -39,6 +40,9 @@ export default function DesktopIndex() {
                                 </Route>
                                 <Route path="/settings/videos">
                                     <VideoTable />
+                                </Route>
+                                <Route path="/media/videos">
+                                    <VideoPage />
                                 </Route>
                             </Switch>
                         </Content>

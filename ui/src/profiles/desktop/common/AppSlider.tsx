@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SettingOutlined } from '@ant-design/icons';
+import { SettingOutlined, PlaySquareOutlined } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -10,6 +10,10 @@ const locationMap = new Map<string, any>([
     ["/settings/videos", {
         "defaultOpenKeys": ["settings"],
         "defaultSelectedKeys": ['settings-videos']
+    }],
+    ["/media/videos", {
+        "defaultOpenKeys": ["media"],
+        "defaultSelectedKeys": ['media-videos']
     }]
 ])
 export const AppSlider = () => {
@@ -25,6 +29,19 @@ export const AppSlider = () => {
                 defaultOpenKeys={config["defaultOpenKeys"]}
                 style={{ height: '100%', borderRight: 0 }}
             >
+                <SubMenu
+                    key="media"
+                    title={
+                        <span>
+                            <PlaySquareOutlined />
+                            <span>媒体库</span>
+                        </span>
+                    }
+                >
+                    <Menu.Item key="media-videos">
+                        <Link to="/media/videos">视频</Link>
+                    </Menu.Item>
+                </SubMenu>
                 <SubMenu
                     key="settings"
                     title={

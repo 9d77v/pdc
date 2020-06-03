@@ -63,4 +63,19 @@ const LIST_VIDEO = gql`
   }
 `;
 
-export { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE }
+const LIST_VIDEO_CARD = gql`
+ query Videos( $page: Int, $pageSize: Int) {
+   Videos(page: $page, pageSize: $pageSize){
+       edges{
+            id
+            title
+            cover
+            episodes{
+              id
+            }
+       }
+   }
+  }
+`;
+
+export { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE, LIST_VIDEO_CARD }
