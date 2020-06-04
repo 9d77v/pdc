@@ -121,7 +121,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     <Uploader
                         fileLimit={0}
                         bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass"]}
+                        validFileTypes={["text/vtt", "text/ass", 'text/srt']}
                         setURL={setSubtitles}
                     />
                 </Form.Item>

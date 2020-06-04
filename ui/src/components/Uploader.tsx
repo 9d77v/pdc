@@ -94,7 +94,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
                 if (fileString !== "") {
                     const hash = crypto.createHash('sha256');
                     hash.update(fileString);
-                    if (fileType === "ass") {
+                    if (fileType === "ass" || fileType === "srt") {
                         fileType = "vtt"
                     }
                     fileName = `${hash.digest('hex')}.${fileType}`
