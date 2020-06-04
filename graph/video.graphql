@@ -1,7 +1,3 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
 type Video {
   id: ID!
   title: String!  
@@ -50,11 +46,6 @@ type VideoConnection {
   edges:[Video!]!
 }
 
-type Query {
-  Videos(page: Int, pageSize: Int):VideoConnection!
-  presignedUrl(bucketName:String!,objectName:String!):String!
-}
-
 input NewCharacter{
     characterName: String!
     originalName: String! 
@@ -63,6 +54,11 @@ input NewCharacter{
 input NewStaff{
   job: String!
   persons: [String!]!
+}
+
+input NewSubtitles{
+  name:String!
+  urls:[String!]!
 }
 
 input NewVideo {
@@ -75,7 +71,7 @@ input NewVideo {
   tags: [String!]
   isShow: Boolean!
   videoURLs:[String!]
-  subtitles:[String!]
+  subtitles:NewSubtitles
 }
 
 input NewSubtitle{
@@ -113,11 +109,4 @@ input NewUpdateEpisode{
   cover: String
   url: String!
   subtitles:  [NewSubtitle!]  
-}
-
-type Mutation {
-  createVideo(input: NewVideo!): Video!
-  createEpisode(input:NewEpisode!):Episode!
-  updateVideo(input:NewUpdateVideo):Video!
-  updateEpisode(input:NewUpdateEpisode):Episode!
 }

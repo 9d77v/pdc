@@ -13,7 +13,7 @@ import (
 )
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
-	if len(input.VideoURLs) > 0 && len(input.Subtitles) > 0 && len(input.VideoURLs) != len(input.Subtitles) {
+	if len(input.VideoURLs) > 0 && input.Subtitles != nil && len(input.Subtitles.Urls) > 0 && len(input.VideoURLs) != len(input.Subtitles.Urls) {
 		return nil, errors.New("视频与字幕数量不一致")
 	}
 	return videoService.CreateVideo(input)
@@ -31,21 +31,24 @@ func (r *mutationResolver) UpdateEpisode(ctx context.Context, input *model.NewUp
 	return videoService.UpdateEpisode(input)
 }
 
-func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
 	o := ptrs.Int64(page)
 	l := ptrs.Int64(pageSize)
 	if o < 1 {
 		o = 1
 	}
-	if l < 1 {
-		l = 1
+	if l == 0 {
+		l = 10
+	}
+	if l < 0 {
+		l = -1
 	}
 	if l > 100 {
 		l = 100
 	}
 	o = (o - 1) * l
 	con := new(model.VideoConnection)
-	total, data, err := videoService.ListVideo(ctx, o, l)
+	total, data, err := videoService.ListVideo(ctx, o, l, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

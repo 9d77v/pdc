@@ -1,6 +1,6 @@
-import { Modal, Form, Input, Switch, DatePicker, message } from 'antd';
+import { Modal, Form, Input, Switch, DatePicker, message, Radio } from 'antd';
 import React, { useState } from 'react'
-import { Uploader } from '../../components/Uploader';
+import { Uploader } from '../../../components/Uploader';
 
 const { TextArea } = Input;
 
@@ -73,7 +73,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 form={form}
                 layout="horizontal"
                 name="videoCreateForm"
-                initialValues={{ isShow: true }}
+                initialValues={{ isShow: true, subtitle_lang: "简体中文" }}
             >
                 <Form.Item
                     name="title"
@@ -99,7 +99,11 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />
                 </Form.Item>
-                <Form.Item name="videoURLs" label="视频列表">
+                <Form.Item
+                    name="videoURLs"
+                    label="视频列表"
+                    rules={[{ required: true, message: '请上传视频!' }]}
+                >
                     <Uploader
                         fileLimit={0}
                         bucketName="video"
@@ -107,11 +111,17 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                         setURL={setVideoURLs}
                     />
                 </Form.Item>
+                <Form.Item name="subtitle_lang" label="字幕语言">
+                    <Radio.Group buttonStyle="solid">
+                        <Radio.Button value="简体中文">简体中文</Radio.Button>
+                        <Radio.Button value="中日双语">中日双语</Radio.Button>
+                    </Radio.Group>
+                </Form.Item>
                 <Form.Item name="subtitles" label="字幕列表">
                     <Uploader
                         fileLimit={0}
                         bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass"]}
+                        validFileTypes={["text/vtt", "text/ass", 'text/srt']}
                         setURL={setSubtitles}
                     />
                 </Form.Item>

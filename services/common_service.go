@@ -12,7 +12,7 @@ type CommonService struct {
 
 //PresignedURL ..
 func (s CommonService) PresignedURL(bucketName, objectName string) (string, error) {
-	u, err := models.MinioClient.PresignedPutObject(bucketName, objectName, 10*time.Minute)
+	u, err := models.MinioClient.PresignedPutObject(bucketName, objectName, 1*time.Hour)
 	if err != nil {
 		return "", err
 	}

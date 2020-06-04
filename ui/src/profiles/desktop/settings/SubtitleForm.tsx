@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Modal, Form, Radio } from 'antd'
-import { Uploader } from '../../components/Uploader'
+import { Uploader } from '../../../components/Uploader'
 
 interface ModalFormProps {
     visible: boolean
@@ -54,11 +54,11 @@ export const SubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) =>
                         <Radio.Button value="中日双语">中日双语</Radio.Button>
                     </Radio.Group>
                 </Form.Item>
-                <Form.Item name="url" label="字幕（支持上传ass转vtt格式）" rules={[{ required: true }]}>
+                <Form.Item name="url" label="字幕（支持上传ass或srt转vtt格式）" rules={[{ required: true }]}>
                     <Uploader
                         fileLimit={1}
                         bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass"]}
+                        validFileTypes={["text/vtt", "text/ass", 'text/srt']}
                         setURL={setUrl}
                     />
                 </Form.Item>

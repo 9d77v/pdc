@@ -70,7 +70,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		PresignedURL func(childComplexity int, bucketName string, objectName string) int
-		Videos       func(childComplexity int, page *int64, pageSize *int64) int
+		Videos       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 	}
 
 	Staff struct {
@@ -111,7 +111,7 @@ type MutationResolver interface {
 	UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error)
 }
 type QueryResolver interface {
-	Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error)
+	Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
 }
 
@@ -284,7 +284,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Videos(childComplexity, args["page"].(*int64), args["pageSize"].(*int64)), true
+		return e.complexity.Query.Videos(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Staff.Job":
 		if e.complexity.Staff.Job == nil {
@@ -476,11 +476,28 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "graph/schema.graphqls", Input: `# GraphQL schema example
+	&ast.Source{Name: "graph/common.graphql", Input: `
+input Sort{
+    field: String!
+    isAsc: Boolean! 
+}
+`, BuiltIn: false},
+	&ast.Source{Name: "graph/schema.graphql", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
 
-type Video {
+type Query {
+  Videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  presignedUrl(bucketName:String!,objectName:String!):String!
+}
+
+type Mutation {
+  createVideo(input: NewVideo!): Video!
+  createEpisode(input:NewEpisode!):Episode!
+  updateVideo(input:NewUpdateVideo):Video!
+  updateEpisode(input:NewUpdateEpisode):Episode!
+}`, BuiltIn: false},
+	&ast.Source{Name: "graph/video.graphql", Input: `type Video {
   id: ID!
   title: String!  
   desc: String!
@@ -528,11 +545,6 @@ type VideoConnection {
   edges:[Video!]!
 }
 
-type Query {
-  Videos(page: Int, pageSize: Int):VideoConnection!
-  presignedUrl(bucketName:String!,objectName:String!):String!
-}
-
 input NewCharacter{
     characterName: String!
     originalName: String! 
@@ -541,6 +553,11 @@ input NewCharacter{
 input NewStaff{
   job: String!
   persons: [String!]!
+}
+
+input NewSubtitles{
+  name:String!
+  urls:[String!]!
 }
 
 input NewVideo {
@@ -553,7 +570,7 @@ input NewVideo {
   tags: [String!]
   isShow: Boolean!
   videoURLs:[String!]
-  subtitles:[String!]
+  subtitles:NewSubtitles
 }
 
 input NewSubtitle{
@@ -591,13 +608,6 @@ input NewUpdateEpisode{
   cover: String
   url: String!
   subtitles:  [NewSubtitle!]  
-}
-
-type Mutation {
-  createVideo(input: NewVideo!): Video!
-  createEpisode(input:NewEpisode!):Episode!
-  updateVideo(input:NewUpdateVideo):Video!
-  updateEpisode(input:NewUpdateEpisode):Episode!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -681,6 +691,22 @@ func (ec *executionContext) field_Query_Videos_args(ctx context.Context, rawArgs
 		}
 	}
 	args["pageSize"] = arg1
+	var arg2 []int64
+	if tmp, ok := rawArgs["ids"]; ok {
+		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg2
+	var arg3 []*model.Sort
+	if tmp, ok := rawArgs["sorts"]; ok {
+		arg3, err = ec.unmarshalOSort2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sorts"] = arg3
 	return args, nil
 }
 
@@ -1352,7 +1378,7 @@ func (ec *executionContext) _Query_Videos(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Videos(rctx, args["page"].(*int64), args["pageSize"].(*int64))
+		return ec.resolvers.Query().Videos(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3269,6 +3295,30 @@ func (ec *executionContext) unmarshalInputNewSubtitle(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewSubtitles(ctx context.Context, obj interface{}) (model.NewSubtitles, error) {
+	var it model.NewSubtitles
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "urls":
+			var err error
+			it.Urls, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, obj interface{}) (model.NewUpdateEpisode, error) {
 	var it model.NewUpdateEpisode
 	var asMap = obj.(map[string]interface{})
@@ -3451,7 +3501,31 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 			}
 		case "subtitles":
 			var err error
-			it.Subtitles, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputSort(ctx context.Context, obj interface{}) (model.Sort, error) {
+	var it model.Sort
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "field":
+			var err error
+			it.Field, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isAsc":
+			var err error
+			it.IsAsc, err = ec.unmarshalNBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4299,6 +4373,18 @@ func (ec *executionContext) unmarshalNNewVideo2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋ
 	return ec.unmarshalInputNewVideo(ctx, v)
 }
 
+func (ec *executionContext) unmarshalNSort2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSort(ctx context.Context, v interface{}) (model.Sort, error) {
+	return ec.unmarshalInputSort(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNSort2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSort(ctx context.Context, v interface{}) (*model.Sort, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalNSort2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSort(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) marshalNStaff2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaff(ctx context.Context, sel ast.SelectionSet, v model.Staff) graphql.Marshaler {
 	return ec._Staff(ctx, sel, &v)
 }
@@ -4781,6 +4867,38 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return ec.marshalOFloat2float64(ctx, sel, *v)
 }
 
+func (ec *executionContext) unmarshalOID2ᚕint64ᚄ(ctx context.Context, v interface{}) ([]int64, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]int64, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNID2int64(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOID2ᚕint64ᚄ(ctx context.Context, sel ast.SelectionSet, v []int64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNID2int64(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalOInt2int64(ctx context.Context, v interface{}) (int64, error) {
 	return graphql.UnmarshalInt64(v)
 }
@@ -4864,6 +4982,18 @@ func (ec *executionContext) unmarshalONewSubtitle2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77v
 	return res, nil
 }
 
+func (ec *executionContext) unmarshalONewSubtitles2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx context.Context, v interface{}) (model.NewSubtitles, error) {
+	return ec.unmarshalInputNewSubtitles(ctx, v)
+}
+
+func (ec *executionContext) unmarshalONewSubtitles2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx context.Context, v interface{}) (*model.NewSubtitles, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalONewSubtitles2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+	return &res, err
+}
+
 func (ec *executionContext) unmarshalONewUpdateEpisode2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {
 	return ec.unmarshalInputNewUpdateEpisode(ctx, v)
 }
@@ -4886,6 +5016,26 @@ func (ec *executionContext) unmarshalONewUpdateVideo2ᚖgitᚗ9d77vᚗmeᚋ9d77v
 	}
 	res, err := ec.unmarshalONewUpdateVideo2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateVideo(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) unmarshalOSort2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx context.Context, v interface{}) ([]*model.Sort, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]*model.Sort, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNSort2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSort(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {

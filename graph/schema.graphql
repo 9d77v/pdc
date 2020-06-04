@@ -1,0 +1,15 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Query {
+  Videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  presignedUrl(bucketName:String!,objectName:String!):String!
+}
+
+type Mutation {
+  createVideo(input: NewVideo!): Video!
+  createEpisode(input:NewEpisode!):Episode!
+  updateVideo(input:NewUpdateVideo):Video!
+  updateEpisode(input:NewUpdateEpisode):Episode!
+}

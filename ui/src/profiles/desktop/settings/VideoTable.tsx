@@ -1,15 +1,16 @@
-import { Table, Button } from 'antd';
-import React, { useState } from 'react'
+import { Table, Button, message } from 'antd';
+import React, { useState, useEffect } from 'react'
 
-import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../gqls/video.gql';
+import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateFrom';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateFrom';
 import moment from 'moment';
-import { VideoPlayer } from '../../components/VideoPlayer';
+import { VideoPlayer } from '../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateFrom';
 import { EpisodeUpdateForm } from './EpisodeUpdateFrom';
+import { Img } from '../../../components/Img';
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
     const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
     const columns = [
@@ -19,7 +20,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
         { title: '简介', dataIndex: 'desc', key: 'desc' },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
-            render: (value: string) => value === "" ? "" : <img src={value} width={160} height={210} alt={"图片不存在"} />
+            render: (value: string) => <Img src={value} />
         }, {
             title: '视频', dataIndex: 'url', key: 'url', width: 490,
             render: (value: string, record: any) => {
@@ -105,13 +106,29 @@ export default function VideoTable() {
         {
             variables: {
                 page: 1,
-                pageSize: 10
+                pageSize: 10,
+                sorts: [{
+                    field: 'id',
+                    isAsc: false
+                }]
             }
         });
     const [num, setNum] = useState(1);
-    if (error) return <div>Error! ${error}</div>;
+
+    useEffect(() => {
+        if (error) {
+            message.error("接口请求失败！")
+        }
+    }, [error])
 
     const onVideoCreate = async (values: any) => {
+        let subtitles = undefined
+        if (values.subtitles && values.subtitles.length > 0) {
+            subtitles = {
+                "name": values.subtitle_lang,
+                "urls": values.subtitles
+            }
+        }
         await addVideo({
             variables: {
                 "input": {
@@ -122,7 +139,7 @@ export default function VideoTable() {
                     // "tags": values.tags,
                     "isShow": values.isShow,
                     "videoURLs": values.videoURLs,
-                    "subtitles": values.subtitles
+                    "subtitles": subtitles
                 }
             }
         });
@@ -183,7 +200,7 @@ export default function VideoTable() {
         await refetch()
     };
 
-    const onChange = (page: number) => {
+    const onChange = async (page: number) => {
         fetchMore({
             variables: {
                 page: page
@@ -227,7 +244,7 @@ export default function VideoTable() {
         { title: '简介', dataIndex: 'desc', key: 'desc', width: 400 },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
-            render: (value: string) => value === "" ? "" : <img src={value} width={160} height={210} alt={"图片不存在"} />
+            render: (value: string) => <Img src={value} />
         },
         {
             title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',
@@ -332,6 +349,7 @@ export default function VideoTable() {
                     total: data ? data.Videos.totalCount : 0,
                     locale: 'zh_CN',
                     showQuickJumper: true,
+                    hideOnSinglePage: true
                 }}
                 dataSource={data ? data.Videos.edges : []}
             />
