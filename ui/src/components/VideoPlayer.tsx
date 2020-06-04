@@ -76,7 +76,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }
         }
         return () => {
-            player?.dispose()
+            if (!url) {
+                player?.dispose()
+            }
         }
     }, [videoNode, props, player, url, subtitles]);
 
