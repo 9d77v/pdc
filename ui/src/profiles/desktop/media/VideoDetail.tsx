@@ -81,6 +81,7 @@ export const VideoDetail = () => {
                     minWidth={638}
                     height={"100%"}
                     width={"100%"}
+                    autoplay={true}
                 />
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <Img src={videoItem.cover} />

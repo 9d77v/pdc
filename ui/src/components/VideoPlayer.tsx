@@ -16,6 +16,7 @@ export interface VideoPlayerProps {
     width?: any
     minHeight?: number
     minWidth?: number
+    autoplay?: boolean
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -25,14 +26,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     height,
     width,
     minWidth,
-    minHeight
+    minHeight,
+    autoplay
 }) => {
 
     const videoID = "custom-video" + episodeID
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()
     const props: VideoJsPlayerOptions = {
-        autoplay: false,
+        autoplay: autoplay,
         sources: [{
             src: url,
             type: 'video/mp4',
