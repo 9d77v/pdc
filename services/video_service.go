@@ -136,7 +136,7 @@ func (s VideoService) UpdateEpisode(input *model.NewUpdateEpisode) (*model.Episo
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, offset, limit int64) (int64, []*model.Video, error) {
+func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
 	filedMap, _ := utils.GetFieldData(ctx, "")
@@ -144,12 +144,25 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64) (int64
 	if filedMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, []string{"episodes", "__typename"}))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		if limit > 0 {
+			builder = builder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				builder = builder.Order(v.Field + " ASC")
+			} else {
+				builder = builder.Order(v.Field + " DESC")
+			}
+		}
 		if edgeFieldMap["episodes"] {
 			err = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
-			}).Offset(offset).Limit(limit).Order("id DESC").Find(&data).Error
+			}).Find(&data).Error
 		} else {
-			err = builder.Offset(offset).Limit(limit).Order("id DESC").Find(&data).Error
+			err = builder.Find(&data).Error
 		}
 		if err != nil {
 			return 0, result, err
@@ -157,9 +170,13 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64) (int64
 	}
 	var total int64
 	if filedMap["totalCount"] {
-		err = models.Gorm.Model(&models.Video{}).Count(&total).Error
-		if err != nil {
-			return 0, result, err
+		if limit == -1 {
+			total = int64(len(data))
+		} else {
+			err = models.Gorm.Model(&models.Video{}).Count(&total).Error
+			if err != nil {
+				return 0, result, err
+			}
 		}
 	}
 	for _, m := range data {

@@ -11,7 +11,7 @@ import { AppHeader } from './common/AppHeader';
 import { AppSlider } from './common/AppSlider';
 import { AppNavigator } from './common/AppNavigator';
 import { VideoPage } from './media/VideoPage';
-const { Content } = Layout;
+import { VideoDetail } from './media/VideoDetail';
 
 export default function DesktopIndex() {
 
@@ -24,16 +24,9 @@ export default function DesktopIndex() {
                     height: 'calc(100vh - 64px)',
                 }}>
                     <AppSlider />
-                    <Layout style={{ padding: '24px' }}>
+                    <Layout style={{ padding: '10px' }}>
                         <AppNavigator />
-                        <Content
-                            className="site-layout-background"
-                            style={{
-                                padding: 24,
-                                margin: 0,
-                                minHeight: 280,
-                            }}
-                        >
+                        <div className={"wall"}>
                             <Switch>
                                 <Route exact path="/">
                                     欢迎使用{document.title}
@@ -41,12 +34,14 @@ export default function DesktopIndex() {
                                 <Route path="/settings/videos">
                                     <VideoTable />
                                 </Route>
+                                <Route path="/media/videos/:id"  >
+                                    <VideoDetail />
+                                </Route>
                                 <Route path="/media/videos">
                                     <VideoPage />
                                 </Route>
                             </Switch>
-                        </Content>
-                        <div className="clear"></div>
+                        </div>
                     </Layout>
                 </Layout>
             </Layout>

@@ -85,6 +85,11 @@ type NewVideo struct {
 	Subtitles  *NewSubtitles   `json:"subtitles"`
 }
 
+type Sort struct {
+	Field string `json:"field"`
+	IsAsc bool   `json:"isAsc"`
+}
+
 type Staff struct {
 	Job     string   `json:"Job"`
 	Persons []string `json:"Persons"`

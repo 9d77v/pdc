@@ -31,21 +31,24 @@ func (r *mutationResolver) UpdateEpisode(ctx context.Context, input *model.NewUp
 	return videoService.UpdateEpisode(input)
 }
 
-func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
 	o := ptrs.Int64(page)
 	l := ptrs.Int64(pageSize)
 	if o < 1 {
 		o = 1
 	}
-	if l < 1 {
-		l = 1
+	if l == 0 {
+		l = 10
+	}
+	if l < 0 {
+		l = -1
 	}
 	if l > 100 {
 		l = 100
 	}
 	o = (o - 1) * l
 	con := new(model.VideoConnection)
-	total, data, err := videoService.ListVideo(ctx, o, l)
+	total, data, err := videoService.ListVideo(ctx, o, l, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

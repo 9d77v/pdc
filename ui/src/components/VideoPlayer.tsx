@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
-
 import "video.js/dist/video-js.css"
 import "./VideoPlayer.less"
 
@@ -13,8 +12,10 @@ export interface VideoPlayerProps {
     episodeID: number
     url: string
     subtitles: [SubtitleProps] | null
-    height: number
-    width: number
+    height?: any
+    width?: any
+    minHeight?: number
+    minWidth?: number
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -22,7 +23,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     url,
     subtitles,
     height,
-    width
+    width,
+    minWidth,
+    minHeight
 }) => {
 
     const videoID = "custom-video" + episodeID
@@ -40,7 +43,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     useEffect(() => {
-        if (videoNode && !player) {
+        if (videoNode && !player && url) {
             let tmpPlayer = videojs(videoNode, props, () => {
                 for (const item of subtitles || []) {
                     tmpPlayer.addRemoteTextTrack({
@@ -53,23 +56,27 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             })
             setPlayer(tmpPlayer)
         }
-        if (videoNode && player) {
+        if (videoNode && player && url) {
             player.src(url)
-            if (player.remoteTextTracks.length === 0) {
-                for (const item of subtitles || []) {
-                    player.addRemoteTextTrack({
-                        "kind": "subtitles",
-                        "src": item.url,
-                        "label": item.name,
-                        "default": true
-                    }, false)
-                }
+            var oldTracks = player.remoteTextTracks();
+            var i = oldTracks.length;
+            while (i--) {
+                const item: any = oldTracks[i]
+                player.removeRemoteTextTrack(item);
+            }
+            for (const item of subtitles || []) {
+                player.addRemoteTextTrack({
+                    "kind": "subtitles",
+                    "src": item.url,
+                    "label": item.name,
+                    "default": true
+                }, false)
             }
         }
     }, [videoNode, props, player, url, subtitles]);
 
     return (
-        <div data-vjs-player style={{ width, height }} >
+        <div data-vjs-player style={{ width: width, height: height, minWidth: minWidth, minHeight: minHeight }} >
             <video id={videoID}
                 ref={(node: any) => setVideoNode(node)}
                 className="video-js vjs-big-play-centered"

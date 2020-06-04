@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react"
+import { useHistory } from 'react-router-dom';
+
 import { message } from "antd"
 import "./video.less"
 import { useQuery } from "@apollo/react-hooks";
@@ -12,7 +14,11 @@ export const VideoPage = () => {
         {
             variables: {
                 page: 1,
-                pageSize: 10
+                pageSize: 10,
+                sorts: [{
+                    field: "title",
+                    isAsc: true
+                }]
             }
         });
 
@@ -22,20 +28,24 @@ export const VideoPage = () => {
         }
     }, [error])
 
+    const history = useHistory()
     useEffect(() => {
         if (data && data.Videos.edges) {
             const videos = data.Videos.edges
             setCards(videos.map((item: any) =>
                 <div key={item.id}
-                    onClick={() => console.log('clicked')}
+                    onClick={() => history.push('/media/videos/' + item.id)}
                     className={"card"}
                 >
+                    <div style={{ clear: "both" }} />
                     <Img src={item.cover} />
-                    <div>{item.title}</div>
-                    <div style={{ color: "#99a2aa" }}>全{item.episodes ? item.episodes.length : 0}话</div>
+                    <div style={{ marginTop: 5, fontSize: 14 }}>{item.title}</div>
+                    <div style={{ fontSize: 12 }}>全{item.episodes ? item.episodes.length : 0}话</div>
                 </div >
             ))
         }
-    }, [data])
-    return (<div>{cards}</div>)
+    }, [data, history])
+    return (
+        <div >{cards}</div>
+    )
 }

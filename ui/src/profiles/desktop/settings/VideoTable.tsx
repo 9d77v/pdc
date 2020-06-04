@@ -106,7 +106,11 @@ export default function VideoTable() {
         {
             variables: {
                 page: 1,
-                pageSize: 10
+                pageSize: 10,
+                sorts: [{
+                    field: 'id',
+                    isAsc: false
+                }]
             }
         });
     const [num, setNum] = useState(1);
