@@ -34,7 +34,7 @@ export const VideoPage = () => {
             const videos = data.Videos.edges
             setCards(videos.map((item: any) =>
                 <div key={item.id}
-                    onClick={() => history.push('/media/videos/' + item.id)}
+                    onClick={() => history.push('/app/media/videos/' + item.id)}
                     className={"card"}
                 >
                     <div style={{ clear: "both" }} />

@@ -7,11 +7,11 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 const locationMap = new Map<string, any>([
-    ["/settings/videos", {
+    ["/app/settings/videos", {
         "defaultOpenKeys": ["settings"],
         "defaultSelectedKeys": ['settings-videos']
     }],
-    ["/media/videos", {
+    ["/app/media/videos", {
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-videos']
     }]
@@ -39,7 +39,7 @@ export const AppSlider = () => {
                     }
                 >
                     <Menu.Item key="media-videos">
-                        <Link to="/media/videos">视频</Link>
+                        <Link to="/app/media/videos">视频</Link>
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu
@@ -52,7 +52,7 @@ export const AppSlider = () => {
                     }
                 >
                     <Menu.Item key="settings-videos">
-                        <Link to="/settings/videos">视频管理</Link>
+                        <Link to="/app/settings/videos">视频管理</Link>
                     </Menu.Item>
                 </SubMenu>
             </Menu>

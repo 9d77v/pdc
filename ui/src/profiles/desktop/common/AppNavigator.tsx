@@ -4,14 +4,14 @@ import { useLocation, Link, useRouteMatch } from "react-router-dom";
 
 
 const breadcrumbNameMap = new Map<string, string>([
-    ['/settings', '系统设置'],
-    ['/settings/videos', '视频管理'],
-    ['/media', '媒体库'],
-    ['/media/videos', '视频'],
-    ['/media/videos/:id', '播放页']
+    ['/app/settings', '系统设置'],
+    ['/app/settings/videos', '视频管理'],
+    ['/app/media', '媒体库'],
+    ['/app/media/videos', '视频'],
+    ['/app/media/videos/:id', '播放页']
 ])
 
-const matchRotes = '/media/videos/:id'
+const matchRotes = '/app/media/videos/:id'
 export const AppNavigator = () => {
     const location = useLocation();
     const match = useRouteMatch(matchRotes);
