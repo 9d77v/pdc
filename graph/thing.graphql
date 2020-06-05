@@ -1,0 +1,52 @@
+type Thing {
+  id: ID!
+  uid: ID!
+  name: String!  
+  desc: String
+  num: Int!
+  brandName: String
+  pics: [String!]
+  unitPrice: Double
+  unit: String
+  category: String!
+  status: String!
+  purchaseDate: Int!
+  purchasePlatform: String
+  refOrderID: string!
+  rubbishCategory: [string!]
+}
+
+
+type ThingConnection {
+  totalCount: Int!
+  edges:[Thing!]!
+}
+
+
+input NewThing {
+  name: String!  
+  desc: String
+  num: Int!
+  brandName: String
+  pics: [String!]
+  unitPrice: Double
+  unit: String
+  category: String!
+  status: String!
+  purchaseDate: Int!
+  purchasePlatform: String
+  refOrderID: string!
+  rubbishCategory: [string!]
+}
+
+input NewUpdateThing{
+  id:ID!
+  title: String
+  desc: String
+  pubDate: Int
+  cover: String
+  characters: [NewCharacter!]
+  staffs: [NewStaff!]
+  tags: [String!]
+  isShow: Boolean 
+}

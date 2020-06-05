@@ -10,6 +10,7 @@ import (
 	"github.com/9d77v/go-lib/clients/config"
 	"github.com/jinzhu/gorm"
 	minio "github.com/minio/minio-go/v6"
+	"golang.org/x/crypto/bcrypt"
 
 	//postgres driver
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -18,6 +19,9 @@ import (
 //环境变量
 var (
 	DEBUG = utils.GetEnvBool("DEBUG", true)
+
+	OwnerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
+	OwnerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
 
 	DBHost     = utils.GetEnvStr("DB_HOST", "127.0.0.1")
 	DBPort     = utils.GetEnvInt("DB_PORT", 5432)
@@ -42,6 +46,7 @@ var (
 func init() {
 	initDB()
 	initMinio()
+	initDBData()
 }
 
 func initDB() {
@@ -61,11 +66,35 @@ func initDB() {
 	if err != nil {
 		log.Printf("Could not initialize gorm: %s", err.Error())
 	}
-	log.Println(Gorm, err)
 	Gorm.AutoMigrate(
 		&Video{},
 		&Episode{},
+		&User{},
+		&Thing{},
 	)
+}
+
+func initDBData() {
+	var total int64
+	err := Gorm.Model(&User{}).Count(&total).Error
+	if err != nil {
+		log.Panicf("Get User total failed:%v/n", err)
+	}
+	if total == 0 {
+		bytes, err := bcrypt.GenerateFromPassword([]byte(OwnerPassword), 12)
+		if err != nil {
+			log.Panicf("generate password failed:%v/n", err)
+		}
+		user := &User{
+			Name:     OwnerName,
+			Password: string(bytes),
+			RoleID:   1,
+		}
+		err = Gorm.Create(user).Error
+		if err != nil {
+			log.Panicf("create owner failed:%v/n", err)
+		}
+	}
 }
 
 func initMinio() {
