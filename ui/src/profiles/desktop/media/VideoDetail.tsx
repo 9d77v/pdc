@@ -8,7 +8,7 @@ import { VideoPlayer } from "../../../components/VideoPlayer";
 import { useRouteMatch } from "react-router-dom";
 
 export const VideoDetail = () => {
-    const match = useRouteMatch('/media/videos/:id');
+    const match = useRouteMatch('/app/media/videos/:id');
     const [num, setNum] = useState(0)
     let ids: number[] = []
     if (match) {
