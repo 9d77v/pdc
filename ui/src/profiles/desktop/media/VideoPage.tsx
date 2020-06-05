@@ -14,7 +14,7 @@ export const VideoPage = () => {
         {
             variables: {
                 page: 1,
-                pageSize: 10,
+                pageSize: -1,
                 sorts: [{
                     field: "title",
                     isAsc: true
