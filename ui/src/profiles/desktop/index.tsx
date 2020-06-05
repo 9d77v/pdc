@@ -31,13 +31,13 @@ export default function DesktopIndex() {
                                 <Route exact path="/">
                                     欢迎使用{document.title}
                                 </Route>
-                                <Route path="/settings/videos">
+                                <Route path="/app/settings/videos">
                                     <VideoTable />
                                 </Route>
-                                <Route path="/media/videos/:id"  >
+                                <Route path="/app/media/videos/:id"  >
                                     <VideoDetail />
                                 </Route>
-                                <Route path="/media/videos">
+                                <Route path="/app/media/videos">
                                     <VideoPage />
                                 </Route>
                             </Switch>
