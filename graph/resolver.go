@@ -13,4 +13,5 @@ type Resolver struct{}
 var (
 	videoService  = services.VideoService{}
 	commonService = services.CommonService{}
+	thingService  = services.ThingService{}
 )

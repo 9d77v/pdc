@@ -3,17 +3,20 @@ type Thing {
   uid: ID!
   name: String!  
   desc: String
-  num: Int!
+  num: Float!
   brandName: String
   pics: [String!]
-  unitPrice: Double
+  unitPrice: Float!
   unit: String
   category: String!
-  status: String!
+  location: String!
+  status: Int!
   purchaseDate: Int!
   purchasePlatform: String
-  refOrderID: string!
-  rubbishCategory: [string!]
+  refOrderID: String!
+  rubbishCategory: [String!]
+  createdAt: Int!
+  updatedAt: Int!
 }
 
 
@@ -26,27 +29,34 @@ type ThingConnection {
 input NewThing {
   name: String!  
   desc: String
-  num: Int!
+  num: Float!
   brandName: String
   pics: [String!]
-  unitPrice: Double
+  unitPrice: Float!
   unit: String
   category: String!
-  status: String!
+  location: String!
+  status: Int!
   purchaseDate: Int!
   purchasePlatform: String
-  refOrderID: string!
-  rubbishCategory: [string!]
+  refOrderID: String
+  rubbishCategory: [String!]
 }
 
 input NewUpdateThing{
-  id:ID!
-  title: String
+  id: ID!
+  name: String
   desc: String
-  pubDate: Int
-  cover: String
-  characters: [NewCharacter!]
-  staffs: [NewStaff!]
-  tags: [String!]
-  isShow: Boolean 
+  num: Float
+  brandName: String
+  pics: [String!]
+  unitPrice: Float
+  unit: String
+  category: String
+  location: String
+  status: Int
+  purchaseDate: Int
+  purchasePlatform: String
+  refOrderID: String
+  rubbishCategory: [String!]
 }

@@ -23,12 +23,20 @@ func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpi
 	return videoService.CreateEpisode(input)
 }
 
+func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error) {
+	return thingService.CreateThing(input)
+}
+
 func (r *mutationResolver) UpdateVideo(ctx context.Context, input *model.NewUpdateVideo) (*model.Video, error) {
-	return videoService.UpdateVideo(input)
+	return videoService.UpdateVideo(ctx, input)
 }
 
 func (r *mutationResolver) UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error) {
-	return videoService.UpdateEpisode(input)
+	return videoService.UpdateEpisode(ctx, input)
+}
+
+func (r *mutationResolver) UpdateThing(ctx context.Context, input *model.NewUpdateThing) (*model.Thing, error) {
+	return thingService.UpdateThing(ctx, input)
 }
 
 func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
@@ -49,6 +57,14 @@ func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64
 	o = (o - 1) * l
 	con := new(model.VideoConnection)
 	total, data, err := videoService.ListVideo(ctx, o, l, ids, sorts)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
+}
+
+func (r *queryResolver) Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
+	con := new(model.ThingConnection)
+	total, data, err := thingService.ListThing(ctx, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

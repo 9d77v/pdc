@@ -44,11 +44,11 @@ func CamelToSnack(s string) string {
 			newStr += string(s[i])
 		}
 	}
-	return newStr
+	return strings.ReplaceAll(newStr, "_i_d", "_id")
 }
 
 //ToDBFields ..
-func ToDBFields(fields []string, omitFields []string) []string {
+func ToDBFields(fields []string, omitFields ...string) []string {
 	dbFields := make([]string, 0)
 	omitFieldMap := make(map[string]bool)
 	for _, v := range omitFields {
@@ -56,7 +56,12 @@ func ToDBFields(fields []string, omitFields []string) []string {
 	}
 	for _, v := range fields {
 		if !omitFieldMap[v] {
-			dbFields = append(dbFields, fmt.Sprintf("\"%s\"", CamelToSnack(v)))
+			value := CamelToSnack(v)
+			if strings.Contains(value, "price") {
+				dbFields = append(dbFields, fmt.Sprintf("\"%s\"::money::numeric::float8", CamelToSnack(v)))
+			} else {
+				dbFields = append(dbFields, fmt.Sprintf("\"%s\"", CamelToSnack(v)))
+			}
 		}
 	}
 	return dbFields

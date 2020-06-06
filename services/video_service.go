@@ -9,6 +9,7 @@ import (
 	"git.9d77v.me/9d77v/pdc/graph/model"
 	"git.9d77v.me/9d77v/pdc/models"
 	"git.9d77v.me/9d77v/pdc/utils"
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -68,9 +69,15 @@ func (s VideoService) CreateVideo(input model.NewVideo) (*model.Video, error) {
 }
 
 //UpdateVideo ..
-func (s VideoService) UpdateVideo(input *model.NewUpdateVideo) (*model.Video, error) {
+func (s VideoService) UpdateVideo(ctx context.Context, input *model.NewUpdateVideo) (*model.Video, error) {
 	video := new(models.Video)
-	if err := models.Gorm.First(video, "id=?", input.ID).Error; err != nil {
+	fields := make([]string, 0)
+	varibales := graphql.GetRequestContext(ctx).Variables
+	for k := range varibales["input"].(map[string]interface{}) {
+		fields = append(fields, k)
+	}
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).
+		First(video, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	cs := make(postgres.Hstore, len(input.Characters))
@@ -115,9 +122,14 @@ func (s VideoService) CreateEpisode(input model.NewEpisode) (*model.Episode, err
 }
 
 //UpdateEpisode ..
-func (s VideoService) UpdateEpisode(input *model.NewUpdateEpisode) (*model.Episode, error) {
+func (s VideoService) UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
-	if err := models.Gorm.First(episode, "id=?", input.ID).Error; err != nil {
+	varibales := graphql.GetRequestContext(ctx).Variables
+	fields := make([]string, 0)
+	for k := range varibales["input"].(map[string]interface{}) {
+		fields = append(fields, k)
+	}
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(episode, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	cs := make(postgres.Hstore, len(input.Subtitles))
@@ -139,11 +151,11 @@ func (s VideoService) UpdateEpisode(input *model.NewUpdateEpisode) (*model.Episo
 func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
-	filedMap, _ := utils.GetFieldData(ctx, "")
+	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	if filedMap["edges"] {
+	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, []string{"episodes", "__typename"}))
+		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
@@ -169,7 +181,7 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []
 		}
 	}
 	var total int64
-	if filedMap["totalCount"] {
+	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
