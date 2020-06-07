@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"git.9d77v.me/9d77v/pdc/dtos"
@@ -94,9 +95,10 @@ func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids 
 
 	filedMap, _ := utils.GetFieldData(ctx, "")
 	var err error
+	builder := models.Gorm
 	if filedMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, "__typename"))
+		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
@@ -120,7 +122,7 @@ func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids 
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = models.Gorm.Model(&models.Thing{}).Count(&total).Error
+			err = builder.Model(&models.Thing{}).Count(&total).Error
 			if err != nil {
 				return 0, result, err
 			}
@@ -131,4 +133,27 @@ func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids 
 		result = append(result, r)
 	}
 	return total, result, nil
+}
+
+//ThingSeries 获取物品数据
+func (s ThingService) ThingSeries(ctx context.Context, dimension, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error) {
+	data := make([]*model.SerieData, 0)
+	builder := models.Gorm.Model(&models.Thing{})
+	if index == "num" {
+		builder = builder.Select(fmt.Sprintf("%s as name, sum(num) as value ", dimension))
+	} else if index == "price" {
+		builder = builder.Select(fmt.Sprintf("%s as name, sum(num*unit_price)::money::numeric::float8 as value ", dimension))
+	}
+	startTime := ptrs.Int64(start)
+	endTime := ptrs.Int64(end)
+	if endTime == 0 {
+		endTime = time.Now().Unix()
+	}
+	builder = builder.Where("purchase_date>=? and purchase_date<=?", time.Unix(startTime, 0), time.Unix(endTime, 0))
+	if len(status) > 0 {
+		builder = builder.Where("status in (?)", status)
+	}
+	builder = builder.Group(dimension).Order("name")
+	err := builder.Scan(&data).Error
+	return data, err
 }

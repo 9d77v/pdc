@@ -6,6 +6,7 @@ interface PieProps {
     title: string
     name: string
     data: SerieData[]
+    unit: string
     style?: React.CSSProperties
 }
 
@@ -13,6 +14,7 @@ export const Pie: React.FC<PieProps> = ({
     title,
     name,
     data,
+    unit,
     style
 }) => {
     let legendData: string[] = []
@@ -26,7 +28,7 @@ export const Pie: React.FC<PieProps> = ({
         },
         label: {
             trigger: 'item' as const,
-            formatter: '{b} : {c} ({d}%)'
+            formatter: unit === '￥' ? '{b} : ' + unit + '{c} ({d}%)' : '{b} : {c}' + unit + ' ({d}%)'
         },
         legend: {
             orient: 'vertical' as const,

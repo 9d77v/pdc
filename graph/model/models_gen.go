@@ -120,6 +120,11 @@ type NewVideo struct {
 	Subtitles  *NewSubtitles   `json:"subtitles"`
 }
 
+type SerieData struct {
+	Name  string  `json:"name"`
+	Value float64 `json:"value"`
+}
+
 type Sort struct {
 	Field string `json:"field"`
 	IsAsc bool   `json:"isAsc"`

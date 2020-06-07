@@ -70,6 +70,10 @@ func (r *queryResolver) Things(ctx context.Context, page *int64, pageSize *int64
 	return con, err
 }
 
+func (r *queryResolver) ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error) {
+	return thingService.ThingSeries(ctx, dimension, index, start, end, status)
+}
+
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	return commonService.PresignedURL(bucketName, objectName)
 }

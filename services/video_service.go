@@ -153,9 +153,10 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
+	builder := models.Gorm
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder := models.Gorm.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))
+		builder = builder.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
@@ -185,7 +186,7 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = models.Gorm.Model(&models.Video{}).Count(&total).Error
+			err = builder.Model(&models.Video{}).Count(&total).Error
 			if err != nil {
 				return 0, result, err
 			}
