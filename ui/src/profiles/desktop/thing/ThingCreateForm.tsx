@@ -2,6 +2,7 @@ import { Modal, Form, Input, DatePicker, InputNumber, Select } from 'antd';
 import React, { useState } from 'react'
 import { Uploader } from '../../../components/Uploader';
 import { CategoryMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from '../../../consts/category_data';
+import moment from 'moment';
 
 interface Values {
     title: string;
@@ -73,7 +74,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 layout="horizontal"
                 name="thingCreateForm"
                 style={{ maxHeight: 600, overflowY: 'scroll' }}
-                initialValues={{ num: 1, unitPrice: 0, category: "01", rubbishCategory: [0], status: 1 }}
+                initialValues={{ num: 1, unitPrice: 0, category: "01", rubbishCategory: [0], status: 1, purchaseDate: moment(0) }}
             >
                 <Form.Item
                     name="name"
