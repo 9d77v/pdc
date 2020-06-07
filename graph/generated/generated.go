@@ -90,7 +90,6 @@ type ComplexityRoot struct {
 		BrandName        func(childComplexity int) int
 		Category         func(childComplexity int) int
 		CreatedAt        func(childComplexity int) int
-		Desc             func(childComplexity int) int
 		ID               func(childComplexity int) int
 		Location         func(childComplexity int) int
 		Name             func(childComplexity int) int
@@ -100,6 +99,7 @@ type ComplexityRoot struct {
 		PurchasePlatform func(childComplexity int) int
 		RefOrderID       func(childComplexity int) int
 		RubbishCategory  func(childComplexity int) int
+		Specifications   func(childComplexity int) int
 		Status           func(childComplexity int) int
 		UID              func(childComplexity int) int
 		Unit             func(childComplexity int) int
@@ -403,13 +403,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Thing.CreatedAt(childComplexity), true
 
-	case "Thing.desc":
-		if e.complexity.Thing.Desc == nil {
-			break
-		}
-
-		return e.complexity.Thing.Desc(childComplexity), true
-
 	case "Thing.id":
 		if e.complexity.Thing.ID == nil {
 			break
@@ -472,6 +465,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Thing.RubbishCategory(childComplexity), true
+
+	case "Thing.specifications":
+		if e.complexity.Thing.Specifications == nil {
+			break
+		}
+
+		return e.complexity.Thing.Specifications(childComplexity), true
 
 	case "Thing.status":
 		if e.complexity.Thing.Status == nil {
@@ -713,19 +713,19 @@ type Mutation {
   id: ID!
   uid: ID!
   name: String!  
-  desc: String
   num: Float!
   brandName: String
   pics: [String!]
   unitPrice: Float!
   unit: String
+  specifications:String
   category: String!
   location: String!
   status: Int!
   purchaseDate: Int!
   purchasePlatform: String
   refOrderID: String!
-  rubbishCategory: [String!]
+  rubbishCategory: [Int!]
   createdAt: Int!
   updatedAt: Int!
 }
@@ -739,37 +739,37 @@ type ThingConnection {
 
 input NewThing {
   name: String!  
-  desc: String
   num: Float!
   brandName: String
   pics: [String!]
   unitPrice: Float!
   unit: String
+  specifications:String
   category: String!
-  location: String!
+  location: String
   status: Int!
   purchaseDate: Int!
   purchasePlatform: String
   refOrderID: String
-  rubbishCategory: [String!]
+  rubbishCategory: [Int!]
 }
 
 input NewUpdateThing{
   id: ID!
   name: String
-  desc: String
   num: Float
   brandName: String
   pics: [String!]
   unitPrice: Float
   unit: String
+  specifications:String
   category: String
   location: String
   status: Int
   purchaseDate: Int
   purchasePlatform: String
   refOrderID: String
-  rubbishCategory: [String!]
+  rubbishCategory: [Int!]
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "graph/video.graphql", Input: `type Video {
@@ -2208,37 +2208,6 @@ func (ec *executionContext) _Thing_name(ctx context.Context, field graphql.Colle
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Thing_desc(ctx context.Context, field graphql.CollectedField, obj *model.Thing) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Thing",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Desc, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Thing_num(ctx context.Context, field graphql.CollectedField, obj *model.Thing) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2387,6 +2356,37 @@ func (ec *executionContext) _Thing_unit(ctx context.Context, field graphql.Colle
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Unit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Thing_specifications(ctx context.Context, field graphql.CollectedField, obj *model.Thing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Thing",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Specifications, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2627,9 +2627,9 @@ func (ec *executionContext) _Thing_rubbishCategory(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]int64)
 	fc.Result = res
-	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚕint64ᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Thing_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Thing) (ret graphql.Marshaler) {
@@ -4458,12 +4458,6 @@ func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "desc":
-			var err error
-			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "num":
 			var err error
 			it.Num, err = ec.unmarshalNFloat2float64(ctx, v)
@@ -4494,6 +4488,12 @@ func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "specifications":
+			var err error
+			it.Specifications, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "category":
 			var err error
 			it.Category, err = ec.unmarshalNString2string(ctx, v)
@@ -4502,7 +4502,7 @@ func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj inte
 			}
 		case "location":
 			var err error
-			it.Location, err = ec.unmarshalNString2string(ctx, v)
+			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4532,7 +4532,7 @@ func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj inte
 			}
 		case "rubbishCategory":
 			var err error
-			it.RubbishCategory, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.RubbishCategory, err = ec.unmarshalOInt2ᚕint64ᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4614,12 +4614,6 @@ func (ec *executionContext) unmarshalInputNewUpdateThing(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "desc":
-			var err error
-			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "num":
 			var err error
 			it.Num, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
@@ -4647,6 +4641,12 @@ func (ec *executionContext) unmarshalInputNewUpdateThing(ctx context.Context, ob
 		case "unit":
 			var err error
 			it.Unit, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "specifications":
+			var err error
+			it.Specifications, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4688,7 +4688,7 @@ func (ec *executionContext) unmarshalInputNewUpdateThing(ctx context.Context, ob
 			}
 		case "rubbishCategory":
 			var err error
-			it.RubbishCategory, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.RubbishCategory, err = ec.unmarshalOInt2ᚕint64ᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5190,8 +5190,6 @@ func (ec *executionContext) _Thing(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "desc":
-			out.Values[i] = ec._Thing_desc(ctx, field, obj)
 		case "num":
 			out.Values[i] = ec._Thing_num(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5208,6 +5206,8 @@ func (ec *executionContext) _Thing(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "unit":
 			out.Values[i] = ec._Thing_unit(ctx, field, obj)
+		case "specifications":
+			out.Values[i] = ec._Thing_specifications(ctx, field, obj)
 		case "category":
 			out.Values[i] = ec._Thing_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -6449,6 +6449,38 @@ func (ec *executionContext) unmarshalOInt2int64(ctx context.Context, v interface
 
 func (ec *executionContext) marshalOInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
 	return graphql.MarshalInt64(v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚕint64ᚄ(ctx context.Context, v interface{}) ([]int64, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]int64, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNInt2int64(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInt2ᚕint64ᚄ(ctx context.Context, sel ast.SelectionSet, v []int64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNInt2int64(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOInt2ᚖint64(ctx context.Context, v interface{}) (*int64, error) {

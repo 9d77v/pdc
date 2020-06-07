@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react'
 
 import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
-import { VideoCreateForm } from './VideoCreateFrom';
+import { VideoCreateForm } from './VideoCreateForm';
 import { useMutation } from '@apollo/react-hooks';
-import { EpisodeCreateForm } from './EpisodeCreateFrom';
+import { EpisodeCreateForm } from './EpisodeCreateForm';
 import moment from 'moment';
 import { VideoPlayer } from '../../../components/VideoPlayer';
-import { VideoUpdateForm } from './VideoUpdateFrom';
-import { EpisodeUpdateForm } from './EpisodeUpdateFrom';
+import { VideoUpdateForm } from './VideoUpdateForm';
+import { EpisodeUpdateForm } from './EpisodeUpdateForm';
 import { Img } from '../../../components/Img';
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
     const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
@@ -17,7 +17,10 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
         { title: 'EpisodeID', dataIndex: 'id', key: 'id' },
         { title: '话', dataIndex: 'num', key: 'num' },
         { title: '标题', dataIndex: 'title', key: 'title' },
-        { title: '简介', dataIndex: 'desc', key: 'desc' },
+        {
+            title: '简介', dataIndex: 'desc', key: 'desc',
+            ellipsis: true
+        },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
             render: (value: string) => <Img src={value} />
@@ -240,8 +243,10 @@ export default function VideoTable() {
 
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
-        { title: '标题', dataIndex: 'title', key: 'title' },
-        { title: '简介', dataIndex: 'desc', key: 'desc', width: 400 },
+        { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
+        {
+            title: '简介', dataIndex: 'desc', key: 'desc', width: 400
+        },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
             render: (value: string) => <Img src={value} />

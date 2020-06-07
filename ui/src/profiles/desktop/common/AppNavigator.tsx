@@ -8,7 +8,9 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/app/settings/videos', '视频管理'],
     ['/app/media', '媒体库'],
     ['/app/media/videos', '视频'],
-    ['/app/media/videos/:id', '播放页']
+    ['/app/media/videos/:id', '播放页'],
+    ['/app/thing', '物品'],
+    ['/app/thing/things', '物品列表']
 ])
 
 const matchRotes = '/app/media/videos/:id'

@@ -52,19 +52,19 @@ type NewSubtitles struct {
 
 type NewThing struct {
 	Name             string   `json:"name"`
-	Desc             *string  `json:"desc"`
 	Num              float64  `json:"num"`
 	BrandName        *string  `json:"brandName"`
 	Pics             []string `json:"pics"`
 	UnitPrice        float64  `json:"unitPrice"`
 	Unit             *string  `json:"unit"`
+	Specifications   *string  `json:"specifications"`
 	Category         string   `json:"category"`
-	Location         string   `json:"location"`
+	Location         *string  `json:"location"`
 	Status           int64    `json:"status"`
 	PurchaseDate     int64    `json:"purchaseDate"`
 	PurchasePlatform *string  `json:"purchasePlatform"`
 	RefOrderID       *string  `json:"refOrderID"`
-	RubbishCategory  []string `json:"rubbishCategory"`
+	RubbishCategory  []int64  `json:"rubbishCategory"`
 }
 
 type NewUpdateEpisode struct {
@@ -80,19 +80,19 @@ type NewUpdateEpisode struct {
 type NewUpdateThing struct {
 	ID               int64    `json:"id"`
 	Name             *string  `json:"name"`
-	Desc             *string  `json:"desc"`
 	Num              *float64 `json:"num"`
 	BrandName        *string  `json:"brandName"`
 	Pics             []string `json:"pics"`
 	UnitPrice        *float64 `json:"unitPrice"`
 	Unit             *string  `json:"unit"`
+	Specifications   *string  `json:"specifications"`
 	Category         *string  `json:"category"`
 	Location         *string  `json:"location"`
 	Status           *int64   `json:"status"`
 	PurchaseDate     *int64   `json:"purchaseDate"`
 	PurchasePlatform *string  `json:"purchasePlatform"`
 	RefOrderID       *string  `json:"refOrderID"`
-	RubbishCategory  []string `json:"rubbishCategory"`
+	RubbishCategory  []int64  `json:"rubbishCategory"`
 }
 
 type NewUpdateVideo struct {
@@ -139,19 +139,19 @@ type Thing struct {
 	ID               int64    `json:"id"`
 	UID              int64    `json:"uid"`
 	Name             string   `json:"name"`
-	Desc             *string  `json:"desc"`
 	Num              float64  `json:"num"`
 	BrandName        *string  `json:"brandName"`
 	Pics             []string `json:"pics"`
 	UnitPrice        float64  `json:"unitPrice"`
 	Unit             *string  `json:"unit"`
+	Specifications   *string  `json:"specifications"`
 	Category         string   `json:"category"`
 	Location         string   `json:"location"`
 	Status           int64    `json:"status"`
 	PurchaseDate     int64    `json:"purchaseDate"`
 	PurchasePlatform *string  `json:"purchasePlatform"`
 	RefOrderID       string   `json:"refOrderID"`
-	RubbishCategory  []string `json:"rubbishCategory"`
+	RubbishCategory  []int64  `json:"rubbishCategory"`
 	CreatedAt        int64    `json:"createdAt"`
 	UpdatedAt        int64    `json:"updatedAt"`
 }
