@@ -50,6 +50,23 @@ type NewSubtitles struct {
 	Urls []string `json:"urls"`
 }
 
+type NewThing struct {
+	Name             string   `json:"name"`
+	Num              float64  `json:"num"`
+	BrandName        *string  `json:"brandName"`
+	Pics             []string `json:"pics"`
+	UnitPrice        float64  `json:"unitPrice"`
+	Unit             *string  `json:"unit"`
+	Specifications   *string  `json:"specifications"`
+	Category         string   `json:"category"`
+	Location         *string  `json:"location"`
+	Status           int64    `json:"status"`
+	PurchaseDate     int64    `json:"purchaseDate"`
+	PurchasePlatform *string  `json:"purchasePlatform"`
+	RefOrderID       *string  `json:"refOrderID"`
+	RubbishCategory  []int64  `json:"rubbishCategory"`
+}
+
 type NewUpdateEpisode struct {
 	ID        int64          `json:"id"`
 	Num       *float64       `json:"num"`
@@ -58,6 +75,24 @@ type NewUpdateEpisode struct {
 	Cover     *string        `json:"cover"`
 	URL       string         `json:"url"`
 	Subtitles []*NewSubtitle `json:"subtitles"`
+}
+
+type NewUpdateThing struct {
+	ID               int64    `json:"id"`
+	Name             *string  `json:"name"`
+	Num              *float64 `json:"num"`
+	BrandName        *string  `json:"brandName"`
+	Pics             []string `json:"pics"`
+	UnitPrice        *float64 `json:"unitPrice"`
+	Unit             *string  `json:"unit"`
+	Specifications   *string  `json:"specifications"`
+	Category         *string  `json:"category"`
+	Location         *string  `json:"location"`
+	Status           *int64   `json:"status"`
+	PurchaseDate     *int64   `json:"purchaseDate"`
+	PurchasePlatform *string  `json:"purchasePlatform"`
+	RefOrderID       *string  `json:"refOrderID"`
+	RubbishCategory  []int64  `json:"rubbishCategory"`
 }
 
 type NewUpdateVideo struct {
@@ -85,6 +120,11 @@ type NewVideo struct {
 	Subtitles  *NewSubtitles   `json:"subtitles"`
 }
 
+type SerieData struct {
+	Name  string  `json:"name"`
+	Value float64 `json:"value"`
+}
+
 type Sort struct {
 	Field string `json:"field"`
 	IsAsc bool   `json:"isAsc"`
@@ -98,6 +138,32 @@ type Staff struct {
 type Subtitle struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
+}
+
+type Thing struct {
+	ID               int64    `json:"id"`
+	UID              int64    `json:"uid"`
+	Name             string   `json:"name"`
+	Num              float64  `json:"num"`
+	BrandName        *string  `json:"brandName"`
+	Pics             []string `json:"pics"`
+	UnitPrice        float64  `json:"unitPrice"`
+	Unit             *string  `json:"unit"`
+	Specifications   *string  `json:"specifications"`
+	Category         string   `json:"category"`
+	Location         string   `json:"location"`
+	Status           int64    `json:"status"`
+	PurchaseDate     int64    `json:"purchaseDate"`
+	PurchasePlatform *string  `json:"purchasePlatform"`
+	RefOrderID       string   `json:"refOrderID"`
+	RubbishCategory  []int64  `json:"rubbishCategory"`
+	CreatedAt        int64    `json:"createdAt"`
+	UpdatedAt        int64    `json:"updatedAt"`
+}
+
+type ThingConnection struct {
+	TotalCount int64    `json:"totalCount"`
+	Edges      []*Thing `json:"edges"`
 }
 
 type Video struct {

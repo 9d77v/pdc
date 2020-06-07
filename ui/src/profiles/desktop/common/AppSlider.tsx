@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SettingOutlined, PlaySquareOutlined } from '@ant-design/icons';
+import { SettingOutlined, PlaySquareOutlined, ShoppingOutlined } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -40,6 +40,22 @@ export const AppSlider = () => {
                 >
                     <Menu.Item key="media-videos">
                         <Link to="/app/media/videos">视频</Link>
+                    </Menu.Item>
+                </SubMenu>
+                <SubMenu
+                    key="thing"
+                    title={
+                        <span>
+                            <ShoppingOutlined />
+                            <span>物品</span>
+                        </span>
+                    }
+                >
+                    <Menu.Item key="ting-dashboard">
+                        <Link to="/app/thing/dashboard">物品概览</Link>
+                    </Menu.Item>
+                    <Menu.Item key="ting-things">
+                        <Link to="/app/thing/things">物品列表</Link>
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu

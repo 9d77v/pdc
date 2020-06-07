@@ -3,3 +3,8 @@ input Sort{
     field: String!
     isAsc: Boolean! 
 }
+
+type SerieData{
+    name: String!
+    value: Float!
+}

@@ -1,6 +1,6 @@
 #!/bin/sh
 app='pdc'
-version="0.0.2"
+version="0.0.3"
 sudo=""
 if command -v sudo >/dev/null 2>&1; then
     sudo="sudo"

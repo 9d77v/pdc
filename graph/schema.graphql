@@ -4,12 +4,16 @@
 
 type Query {
   Videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  Things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
+  ThingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
 type Mutation {
   createVideo(input: NewVideo!): Video!
   createEpisode(input:NewEpisode!):Episode!
+  createThing(input:NewThing!):Thing!
   updateVideo(input:NewUpdateVideo):Video!
   updateEpisode(input:NewUpdateEpisode):Episode!
+  updateThing(input:NewUpdateThing):Thing!
 }
