@@ -26,7 +26,8 @@ export const ThingDashboard = () => {
                 "index2": "num",
                 "start": start,
                 "end": 0,
-                "status": [1, 2, 3, 4, 5, 6]
+                "status1": [1, 2, 3, 4, 5, 6],
+                "status2": [1, 2, 3, 4, 5]
             }
         });
 
