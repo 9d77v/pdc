@@ -13,6 +13,7 @@ import { AppNavigator } from './common/AppNavigator';
 import { VideoPage } from './media/VideoPage';
 import { VideoDetail } from './media/VideoDetail';
 import ThingTable from './thing/ThingTable';
+import { ThingDashboard } from './thing/ThingDashboard';
 
 export default function DesktopIndex() {
 
@@ -40,6 +41,9 @@ export default function DesktopIndex() {
                                 </Route>
                                 <Route path="/app/media/videos">
                                     <VideoPage />
+                                </Route>
+                                <Route path="/app/thing/dashboard">
+                                    <ThingDashboard />
                                 </Route>
                                 <Route path="/app/thing/things">
                                     <ThingTable />

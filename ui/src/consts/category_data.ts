@@ -65,4 +65,6 @@ const ThingStatusMap = new Map<number, TagStyle>([
         text: "已清理"
     }]
 ])
-export { RubbishCategoryMap, CategoryMap, ThingStatusMap }
+
+const ThingStatusArr = ['待采购', '使用中', '已收纳', '故障', '维修中', '待清理', '已清理']
+export { RubbishCategoryMap, CategoryMap, ThingStatusMap, ThingStatusArr }

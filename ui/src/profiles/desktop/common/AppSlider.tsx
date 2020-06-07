@@ -51,6 +51,9 @@ export const AppSlider = () => {
                         </span>
                     }
                 >
+                    <Menu.Item key="ting-dashboard">
+                        <Link to="/app/thing/dashboard">物品概览</Link>
+                    </Menu.Item>
                     <Menu.Item key="ting-things">
                         <Link to="/app/thing/things">物品列表</Link>
                     </Menu.Item>

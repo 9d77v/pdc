@@ -10,6 +10,7 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/app/media/videos', '视频'],
     ['/app/media/videos/:id', '播放页'],
     ['/app/thing', '物品'],
+    ['/app/thing/dashboard', '物品概览'],
     ['/app/thing/things', '物品列表']
 ])
 

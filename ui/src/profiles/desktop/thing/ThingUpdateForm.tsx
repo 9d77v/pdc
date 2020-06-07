@@ -2,7 +2,7 @@ import { Modal, Form, Input, DatePicker, InputNumber, Select } from 'antd';
 import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../../components/Uploader';
 import moment from 'moment';
-import { CategoryMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/category_map';
+import { CategoryMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/category_data';
 
 interface Values {
     title: string;
