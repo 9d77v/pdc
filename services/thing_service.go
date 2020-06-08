@@ -102,17 +102,18 @@ func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids 
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
+		subBuilder := builder
 		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
+			subBuilder = subBuilder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
+				subBuilder = subBuilder.Order(v.Field + " ASC")
 			} else {
-				builder = builder.Order(v.Field + " DESC")
+				subBuilder = subBuilder.Order(v.Field + " DESC")
 			}
 		}
-		err = builder.Find(&data).Error
+		err = subBuilder.Find(&data).Error
 		if err != nil {
 			return 0, result, err
 		}
