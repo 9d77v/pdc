@@ -72,7 +72,7 @@ export const VideoDetail = () => {
         <div style={{
             display: 'flex', flexDirection: 'row', height: '100%', width: "100%"
         }}>
-            <div style={{ display: 'flex', flexDirection: 'column', padding: 10, width: 1107 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', padding: 10, width: 1107, height: 838 }}>
                 <VideoPlayer
                     episodeID={episodeItem.id}
                     url={episodeItem.url}

@@ -1,8 +1,10 @@
-import { Modal, Form, Input, DatePicker, InputNumber, Select } from 'antd';
+import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd';
 import React, { useState } from 'react'
 import { Uploader } from '../../../components/Uploader';
 import { CategoryMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from '../../../consts/category_data';
 import moment from 'moment';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+
 
 interface Values {
     title: string;
@@ -100,10 +102,14 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
 
                 <Form.Item
                     name="category"
-                    label="类别"
+                    label={<span>
+                        类别&nbsp;
+                        <Tooltip title={<a href="http://www.stats.gov.cn/tjsj/tjbz/201310/P020131021349384303616.pdf" target="_blank" rel="noopener noreferrer">居民消费支出分类（2013）</a>}>
+                            <QuestionCircleOutlined />
+                        </Tooltip>
+                    </span>}
                     hasFeedback
                     rules={[{ required: true, message: '请选择一个类别!' }]}
-
                 >
                     <Select placeholder="请选择一个类别!">
                         {categoryOptions}

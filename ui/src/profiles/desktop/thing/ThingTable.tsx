@@ -12,6 +12,7 @@ import { RubbishCategoryMap, CategoryMap, ThingStatusMap } from '../../../consts
 
 
 export default function ThingTable() {
+    const pageSize = 30
     const [visible, setVisible] = useState(false);
     const [updateThingVisible, setUpdateThingVisible] = useState(false)
     const [updateThingData, setUpdateThingData] = useState({
@@ -37,7 +38,7 @@ export default function ThingTable() {
         {
             variables: {
                 page: 1,
-                pageSize: 30,
+                pageSize: pageSize,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -260,7 +261,7 @@ export default function ThingTable() {
                 scroll={{ x: 1300 }}
                 bordered
                 pagination={{
-                    pageSize: 10,
+                    pageSize: pageSize,
                     onChange: onChange,
                     total: data ? data.Things.totalCount : 0,
                     locale: 'zh_CN',
