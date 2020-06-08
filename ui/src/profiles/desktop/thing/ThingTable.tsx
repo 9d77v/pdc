@@ -12,7 +12,7 @@ import { RubbishCategoryMap, CategoryMap, ThingStatusMap } from '../../../consts
 
 
 export default function ThingTable() {
-    const pageSize = 30
+    const pageSize = 10
     const [visible, setVisible] = useState(false);
     const [updateThingVisible, setUpdateThingVisible] = useState(false)
     const [updateThingData, setUpdateThingData] = useState({
@@ -266,7 +266,8 @@ export default function ThingTable() {
                     total: data ? data.Things.totalCount : 0,
                     locale: 'zh_CN',
                     showQuickJumper: true,
-                    hideOnSinglePage: true
+                    hideOnSinglePage: true,
+                    showSizeChanger: false
                 }}
                 dataSource={data ? data.Things.edges : []}
             />
