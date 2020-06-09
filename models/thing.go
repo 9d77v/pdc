@@ -11,7 +11,7 @@ import (
 type Thing struct {
 	gorm.Model
 	UID              int64  `grom:"column:uid"`
-	Name             string `gorm:"size:50"`
+	Name             string `gorm:"size:100"`
 	Num              float64
 	BrandName        string         `gorm:"size:50"`
 	Pics             pq.StringArray `gorm:"type:varchar(200)[]"`

@@ -79,6 +79,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
 
 
 export default function VideoTable() {
+    const pageSize = 10
     const [visible, setVisible] = useState(false);
     const [currentVideoID, setCurrentVideoID] = useState(0);
     const [episodeVisible, setEpisodeVisible] = useState(false);
@@ -109,7 +110,7 @@ export default function VideoTable() {
         {
             variables: {
                 page: 1,
-                pageSize: 10,
+                pageSize: pageSize,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -349,7 +350,7 @@ export default function VideoTable() {
                     }
                 }}
                 pagination={{
-                    pageSize: 10,
+                    pageSize: pageSize,
                     onChange: onChange,
                     total: data ? data.Videos.totalCount : 0,
                     locale: 'zh_CN',

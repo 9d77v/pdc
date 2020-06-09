@@ -160,22 +160,23 @@ func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
+		subBuilder := builder
 		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
+			subBuilder = subBuilder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
+				subBuilder = subBuilder.Order(v.Field + " ASC")
 			} else {
-				builder = builder.Order(v.Field + " DESC")
+				subBuilder = subBuilder.Order(v.Field + " DESC")
 			}
 		}
 		if edgeFieldMap["episodes"] {
-			err = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
+			err = subBuilder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
 			}).Find(&data).Error
 		} else {
-			err = builder.Find(&data).Error
+			err = subBuilder.Find(&data).Error
 		}
 		if err != nil {
 			return 0, result, err

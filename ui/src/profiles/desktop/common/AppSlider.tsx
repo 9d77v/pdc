@@ -14,6 +14,14 @@ const locationMap = new Map<string, any>([
     ["/app/media/videos", {
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-videos']
+    }],
+    ["/app/thing/dashboard", {
+        "defaultOpenKeys": ["thing"],
+        "defaultSelectedKeys": ['thing-dashboard']
+    }],
+    ["/app/thing/things", {
+        "defaultOpenKeys": ["thing"],
+        "defaultSelectedKeys": ['thing-things']
     }]
 ])
 export const AppSlider = () => {
@@ -51,10 +59,10 @@ export const AppSlider = () => {
                         </span>
                     }
                 >
-                    <Menu.Item key="ting-dashboard">
+                    <Menu.Item key="thing-dashboard">
                         <Link to="/app/thing/dashboard">物品概览</Link>
                     </Menu.Item>
-                    <Menu.Item key="ting-things">
+                    <Menu.Item key="thing-things">
                         <Link to="/app/thing/things">物品列表</Link>
                     </Menu.Item>
                 </SubMenu>

@@ -10,13 +10,14 @@ import { SerieData } from "../../../consts/chart";
 
 const mapFunc = (value: SerieData) => {
     return {
-        name: CategoryMap.get(value.name) || ThingStatusMap.get(parseInt(value.name))?.text || value.name,
+        name: CategoryMap.get(value.name) || ThingStatusMap.get(parseInt(value.name))?.text || (value.name === "" ? "未知" : value.name),
         value: value.value
     }
 }
 export const ThingDashboard = () => {
 
     const start = moment().startOf("year").unix()
+    const year = new Date().getFullYear()
     const [dynamicDimension, setDynamicDimension] = useState("category")
     const { error, data } = useQuery(THING_SERIES,
         {
@@ -37,7 +38,7 @@ export const ThingDashboard = () => {
         }
     }, [error])
 
-    const chartStyle = { width: 600, height: 400, padding: 10 }
+    const chartStyle = { width: 800, height: 400, padding: 10 }
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <Select defaultValue={dynamicDimension} onChange={(value: string) => setDynamicDimension(value)} style={{ width: 200 }}>
@@ -47,10 +48,10 @@ export const ThingDashboard = () => {
                 <Select.Option value="purchase_platform">购买平台</Select.Option>
             </Select>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10 }}>
-                <Pie title="2020年物品金额" name="物品类别" data={data ? data.Series1.map(mapFunc) : []} style={chartStyle} unit='￥' />
-                <Pie title="现存物品金额" name="物品类别" data={data ? data.Series3.map(mapFunc) : []} style={chartStyle} unit='￥' />
-                <Pie title="2020年物品数量" name="物品类别" data={data ? data.Series2.map(mapFunc) : []} style={chartStyle} unit='件' />
-                <Pie title="现存物品数量" name="物品类别" data={data ? data.Series4.map(mapFunc) : []} style={chartStyle} unit='件' />
+                <Pie title={year + "年物品金额"} name="物品类别" data={data ? data.Series1.map(mapFunc) : []} style={chartStyle} unit={'￥'} />
+                <Pie title="现存物品金额" name="物品类别" data={data ? data.Series3.map(mapFunc) : []} style={chartStyle} unit={'￥'} />
+                <Pie title={year + "年物品数量"} name="物品类别" data={data ? data.Series2.map(mapFunc) : []} style={chartStyle} unit={'件'} />
+                <Pie title="现存物品数量" name="物品类别" data={data ? data.Series4.map(mapFunc) : []} style={chartStyle} unit={'件'} />
             </div>
         </div>
 

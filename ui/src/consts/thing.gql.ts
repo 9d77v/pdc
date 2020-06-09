@@ -48,7 +48,7 @@ const THING_SERIES = gql`
       name
       value
    }
-    Series2:ThingSeries(dimension: $dimension, index: $index2,start:$start,end:$end,status:$status1){
+   Series2:ThingSeries(dimension: $dimension, index: $index2,start:$start,end:$end,status:$status1){
       name
       value
    }
@@ -56,7 +56,7 @@ const THING_SERIES = gql`
       name
       value
    }
-    Series4:ThingSeries(dimension: $dimension, index: $index2,status:$status2){
+   Series4:ThingSeries(dimension: $dimension, index: $index2,status:$status2){
       name
       value
    }
