@@ -15,7 +15,6 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-videos']
     }],
-
     ["/app/thing/dashboard", {
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-dashboard']

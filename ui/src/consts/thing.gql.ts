@@ -43,12 +43,20 @@ const LIST_THING = gql`
 `;
 
 const THING_SERIES = gql`
- query ThingSeries($dimension:String!,$index:String!,$start:Int,$end:Int,$status1:[Int!],$status2:[Int!]) {
-   Series1:ThingSeries(dimension: $dimension, index: $index,start:$start,end:$end,status:$status1){
+ query ThingSeries($dimension:String!,$index1:String!,$index2:String!,$start:Int,$end:Int,$status1:[Int!],$status2:[Int!]) {
+   Series1:ThingSeries(dimension: $dimension, index: $index1,start:$start,end:$end,status:$status1){
       name
       value
    }
-    Series3:ThingSeries(dimension: $dimension, index: $index,status:$status2){
+   Series2:ThingSeries(dimension: $dimension, index: $index2,start:$start,end:$end,status:$status1){
+      name
+      value
+   }
+    Series3:ThingSeries(dimension: $dimension, index: $index1,status:$status2){
+      name
+      value
+   }
+   Series4:ThingSeries(dimension: $dimension, index: $index2,status:$status2){
       name
       value
    }

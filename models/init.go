@@ -72,10 +72,6 @@ func initDB() {
 		&User{},
 		&Thing{},
 	)
-	err = Gorm.Exec("set lc_monetary='zh_CN';").Error
-	if err != nil {
-		log.Panicf("set lc_monetary failed")
-	}
 }
 
 func initDBData() {
