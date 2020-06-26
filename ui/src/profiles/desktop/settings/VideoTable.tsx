@@ -11,6 +11,7 @@ import { VideoPlayer } from '../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateForm';
 import { EpisodeUpdateForm } from './EpisodeUpdateForm';
 import { Img } from '../../../components/Img';
+import TextArea from 'antd/lib/input/TextArea';
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
     const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
     const columns = [
@@ -246,7 +247,16 @@ export default function VideoTable() {
         { title: 'ID', dataIndex: 'id', key: 'id' },
         { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
         {
-            title: '简介', dataIndex: 'desc', key: 'desc', width: 400
+            title: '简介', dataIndex: 'desc', key: 'desc', width: 400,
+            render: (value: string) =>
+                <TextArea
+                    value={value}
+                    rows={9}
+                    contentEditable={false}
+                    style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0)',
+                        border: 0,
+                    }} />
         },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',

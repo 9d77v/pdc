@@ -128,7 +128,7 @@ export default function ThingTable() {
     }
 
     const columns = [
-        { title: '名称', dataIndex: 'name', key: 'name', fixed: 'left' as const, width: 150, },
+        { title: '名称', dataIndex: 'name', key: 'name', fixed: 'left' as const, width: 200 },
         { title: '数量', dataIndex: 'num', key: 'num', fixed: 'left' as const, width: 80, },
         {
             title: '图片', dataIndex: 'pics', key: 'pics', fixed: 'left' as const, width: 80,
