@@ -45,7 +45,7 @@ func (s ThingService) CreateThing(input model.NewThing) (*model.Thing, error) {
 }
 
 //UpdateThing ..
-func (s ThingService) UpdateThing(ctx context.Context, input *model.NewUpdateThing) (*model.Thing, error) {
+func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
 	Thing := new(models.Thing)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
@@ -77,24 +77,9 @@ func (s ThingService) UpdateThing(ctx context.Context, input *model.NewUpdateThi
 
 //ListThing ..
 func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Thing, error) {
-	offset := ptrs.Int64(page)
-	limit := ptrs.Int64(pageSize)
-	if offset < 1 {
-		offset = 1
-	}
-	if limit == 0 {
-		limit = 10
-	}
-	if limit < 0 {
-		limit = -1
-	}
-	if limit > 50 {
-		limit = 50
-	}
-	offset = (offset - 1) * limit
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
-
+	offset, limit := GetPageInfo(page, pageSize)
 	filedMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm

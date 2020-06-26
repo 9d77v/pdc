@@ -1,0 +1,42 @@
+type User {
+  id: ID!
+  name:String!
+	avatar: String
+	roleID: Int!  
+	gender: Int!
+	color: String
+	birthDate:Int!
+	ip:String   
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+
+type UserConnection {
+  totalCount: Int!
+  edges:[User!]!
+}
+
+
+input NewUser {
+  name:String!
+  password:String!
+	avatar: String
+	roleID: Int!  
+	gender: Int!
+	color: String
+	birthDate:Int!
+	ip:String   
+}
+
+input NewUpdateUser{
+  id: ID!
+  password:String
+	avatar: String
+	roleID: Int  
+	gender: Int
+	color: String
+	birthDate:Int
+	ip:String   
+}
+

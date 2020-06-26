@@ -97,6 +97,17 @@ type NewUpdateThing struct {
 	RubbishCategory     []int64  `json:"rubbishCategory"`
 }
 
+type NewUpdateUser struct {
+	ID        int64   `json:"id"`
+	Password  *string `json:"password"`
+	Avatar    *string `json:"avatar"`
+	RoleID    *int64  `json:"roleID"`
+	Gender    *int64  `json:"gender"`
+	Color     *string `json:"color"`
+	BirthDate *int64  `json:"birthDate"`
+	IP        *string `json:"ip"`
+}
+
 type NewUpdateVideo struct {
 	ID         int64           `json:"id"`
 	Title      *string         `json:"title"`
@@ -107,6 +118,17 @@ type NewUpdateVideo struct {
 	Staffs     []*NewStaff     `json:"staffs"`
 	Tags       []string        `json:"tags"`
 	IsShow     *bool           `json:"isShow"`
+}
+
+type NewUser struct {
+	Name      string  `json:"name"`
+	Password  string  `json:"password"`
+	Avatar    *string `json:"avatar"`
+	RoleID    int64   `json:"roleID"`
+	Gender    int64   `json:"gender"`
+	Color     *string `json:"color"`
+	BirthDate int64   `json:"birthDate"`
+	IP        *string `json:"ip"`
 }
 
 type NewVideo struct {
@@ -173,6 +195,24 @@ type Thing struct {
 type ThingConnection struct {
 	TotalCount int64    `json:"totalCount"`
 	Edges      []*Thing `json:"edges"`
+}
+
+type User struct {
+	ID        int64   `json:"id"`
+	Name      string  `json:"name"`
+	Avatar    *string `json:"avatar"`
+	RoleID    int64   `json:"roleID"`
+	Gender    int64   `json:"gender"`
+	Color     *string `json:"color"`
+	BirthDate int64   `json:"birthDate"`
+	IP        *string `json:"ip"`
+	CreatedAt int64   `json:"createdAt"`
+	UpdatedAt int64   `json:"updatedAt"`
+}
+
+type UserConnection struct {
+	TotalCount int64   `json:"totalCount"`
+	Edges      []*User `json:"edges"`
 }
 
 type Video struct {
