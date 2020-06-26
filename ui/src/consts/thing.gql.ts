@@ -29,6 +29,7 @@ const LIST_THING = gql`
             unit
             specifications
             category
+            consumerExpenditure
             location
             status
             purchaseDate
@@ -43,23 +44,30 @@ const LIST_THING = gql`
 `;
 
 const THING_SERIES = gql`
- query ThingSeries($dimension:String!,$index1:String!,$index2:String!,$start:Int,$end:Int,$status1:[Int!],$status2:[Int!]) {
-   Series1:ThingSeries(dimension: $dimension, index: $index1,start:$start,end:$end,status:$status1){
+ query ThingSeries($dimension:String!,$index1:String!,$index2:String!,$status:[Int!]) {
+    Series3:ThingSeries(dimension: $dimension, index: $index1,status:$status){
       name
       value
    }
-   Series2:ThingSeries(dimension: $dimension, index: $index2,start:$start,end:$end,status:$status1){
-      name
-      value
-   }
-    Series3:ThingSeries(dimension: $dimension, index: $index1,status:$status2){
-      name
-      value
-   }
-   Series4:ThingSeries(dimension: $dimension, index: $index2,status:$status2){
+   Series4:ThingSeries(dimension: $dimension, index: $index2,status:$status){
       name
       value
    }
   }
 `
-export { LIST_THING, ADD_THING, UPDATE_THING, THING_SERIES }
+
+const THING_ANALYZE = gql`
+ query ThingAnalyze($dimension:String!,$index1:String!,$index2:String!,$start:Int,$group:String!) {
+   Series1:ThingAnalyze(dimension: $dimension, index: $index1,start:$start,group:$group){
+      x1
+      x2
+      y
+   }
+    Series2:ThingAnalyze(dimension: $dimension, index: $index2,start:$start,group:$group){
+      x1
+      x2
+      y
+   }
+  }
+`
+export { LIST_THING, ADD_THING, UPDATE_THING, THING_SERIES, THING_ANALYZE }

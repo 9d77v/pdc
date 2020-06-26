@@ -1,7 +1,7 @@
 import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd';
 import React, { useState } from 'react'
 import { Uploader } from '../../../components/Uploader';
-import { CategoryMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from '../../../consts/category_data';
+import { ConsumerExpenditureMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from '../../../consts/category_data';
 import moment from 'moment';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
@@ -25,11 +25,11 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
     const [form] = Form.useForm();
     const [thingURLs, setThingURLs] = useState([])
     const layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 16 },
+        labelCol: { span: 5 },
+        wrapperCol: { span: 15 },
     }
     let categoryOptions: any[] = []
-    CategoryMap.forEach((value: string, key: string) => {
+    ConsumerExpenditureMap.forEach((value: string, key: string) => {
         categoryOptions.push(<Select.Option value={key} key={'category_options_' + key}>{value}</Select.Option>)
     })
     let rubbishCategoryOptions: any[] = []
@@ -76,7 +76,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 layout="horizontal"
                 name="thingCreateForm"
                 style={{ maxHeight: 600, overflowY: 'scroll' }}
-                initialValues={{ num: 1, unitPrice: 0, category: "01", rubbishCategory: [0], status: 1, purchaseDate: moment(0) }}
+                initialValues={{ num: 1, unitPrice: 0, consumerExpenditure: "01", category: 0, status: 1, purchaseDate: moment() }}
             >
                 <Form.Item
                     name="name"
@@ -99,19 +99,29 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 >
                     <InputNumber min={0} step={0.01} />
                 </Form.Item>
-
                 <Form.Item
-                    name="category"
+                    name="consumerExpenditure"
                     label={<span>
-                        类别&nbsp;
+                        消费支出&nbsp;
                         <Tooltip title={<a href="http://www.stats.gov.cn/tjsj/tjbz/201310/P020131021349384303616.pdf" target="_blank" rel="noopener noreferrer">居民消费支出分类（2013）</a>}>
                             <QuestionCircleOutlined />
                         </Tooltip>
                     </span>}
                     hasFeedback
-                    rules={[{ required: true, message: '请选择一个类别!' }]}
+                    rules={[{ required: true, message: '请选择一个消费支出!' }]}
                 >
-                    <Select placeholder="请选择一个类别!">
+                    <Select placeholder="请选择一个消费支出!">
+                        {categoryOptions}
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    name="category"
+                    label="分类"
+                    hasFeedback
+                    rules={[{ required: true, message: '请选择一个分类!' }]}
+                    noStyle
+                >
+                    <Select placeholder="请选择一个分类!" style={{ display: "none" }}>
                         {categoryOptions}
                     </Select>
                 </Form.Item>

@@ -22,6 +22,10 @@ const locationMap = new Map<string, any>([
     ["/app/thing/things", {
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-things']
+    }],
+    ["/app/thing/analysis", {
+        "defaultOpenKeys": ["thing"],
+        "defaultSelectedKeys": ['thing-analysis']
     }]
 ])
 export const AppSlider = () => {
@@ -52,6 +56,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="thing"
+                    style={{ display: "none" }}
                     title={
                         <span>
                             <ShoppingOutlined />
@@ -64,6 +69,9 @@ export const AppSlider = () => {
                     </Menu.Item>
                     <Menu.Item key="thing-things">
                         <Link to="/app/thing/things">物品列表</Link>
+                    </Menu.Item>
+                    <Menu.Item key="thing-analysis">
+                        <Link to="/app/thing/analysis">物品分析</Link>
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu

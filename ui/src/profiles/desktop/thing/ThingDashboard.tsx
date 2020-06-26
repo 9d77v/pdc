@@ -5,30 +5,24 @@ import { useQuery } from "@apollo/react-hooks";
 import { Pie } from "../../../components/Pie";
 import { THING_SERIES } from "../../../consts/thing.gql";
 import moment from "moment";
-import { CategoryMap, ThingStatusMap } from "../../../consts/category_data";
+import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/category_data";
 import { SerieData } from "../../../consts/chart";
 
 const mapFunc = (value: SerieData) => {
     return {
-        name: CategoryMap.get(value.name) || ThingStatusMap.get(parseInt(value.name))?.text || (value.name === "" ? "未知" : value.name),
+        name: ConsumerExpenditureMap.get(value.name) || ThingStatusMap.get(parseInt(value.name))?.text || (value.name === "" ? "未知" : value.name),
         value: value.value
     }
 }
 export const ThingDashboard = () => {
-
-    const start = moment().startOf("year").unix()
-    const year = new Date().getFullYear()
-    const [dynamicDimension, setDynamicDimension] = useState("category")
+    const [dynamicDimension, setDynamicDimension] = useState("consumer_expenditure")
     const { error, data } = useQuery(THING_SERIES,
         {
             variables: {
                 "dimension": dynamicDimension,
                 "index1": "price",
                 "index2": "num",
-                "start": start,
-                "end": 0,
-                "status1": [1, 2, 3, 4, 5, 6],
-                "status2": [1, 2, 3, 4, 5]
+                "status": [1, 2, 3, 4, 5]
             }
         });
 
@@ -42,15 +36,13 @@ export const ThingDashboard = () => {
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <Select defaultValue={dynamicDimension} onChange={(value: string) => setDynamicDimension(value)} style={{ width: 200 }}>
-                <Select.Option value="category">物品类别</Select.Option>
+                <Select.Option value="consumer_expenditure">消费支出</Select.Option>
                 <Select.Option value="status">状态</Select.Option>
                 <Select.Option value="location">位置</Select.Option>
                 <Select.Option value="purchase_platform">购买平台</Select.Option>
             </Select>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10 }}>
-                <Pie title={year + "年物品金额"} name="物品类别" data={data ? data.Series1.map(mapFunc) : []} style={chartStyle} unit={'￥'} />
                 <Pie title="现存物品金额" name="物品类别" data={data ? data.Series3.map(mapFunc) : []} style={chartStyle} unit={'￥'} />
-                <Pie title={year + "年物品数量"} name="物品类别" data={data ? data.Series2.map(mapFunc) : []} style={chartStyle} unit={'件'} />
                 <Pie title="现存物品数量" name="物品类别" data={data ? data.Series4.map(mapFunc) : []} style={chartStyle} unit={'件'} />
             </div>
         </div>

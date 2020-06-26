@@ -6,6 +6,7 @@ type Query {
   Videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
   Things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   ThingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
+  ThingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 

@@ -14,6 +14,7 @@ import { VideoPage } from './media/VideoPage';
 import { VideoDetail } from './media/VideoDetail';
 import ThingTable from './thing/ThingTable';
 import { ThingDashboard } from './thing/ThingDashboard';
+import { ThingAnalysis } from './thing/ThingAnalysis';
 
 export default function DesktopIndex() {
 
@@ -47,6 +48,9 @@ export default function DesktopIndex() {
                                 </Route>
                                 <Route path="/app/thing/things">
                                     <ThingTable />
+                                </Route>
+                                <Route path="/app/thing/analysis">
+                                    <ThingAnalysis />
                                 </Route>
                             </Switch>
                         </div>

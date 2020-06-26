@@ -2,7 +2,7 @@ import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'an
 import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../../components/Uploader';
 import moment from 'moment';
-import { CategoryMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/category_data';
+import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/category_data';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
 interface Values {
@@ -19,7 +19,8 @@ interface UpdateThingProps {
     unitPrice: number
     unit: string
     specifications: string
-    category: string
+    category: number
+    consumerExpenditure: string
     location: string
     status: number
     purchaseDate: number
@@ -44,8 +45,8 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
     const emptURLS: string[] = []
     const [thingURLs, setThingURLs] = useState(emptURLS)
     const layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 16 },
+        labelCol: { span: 5 },
+        wrapperCol: { span: 15 },
     }
     useEffect(() => {
         form.setFieldsValue({
@@ -58,6 +59,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
             "unit": data.unit,
             "specifications": data.specifications,
             "category": data.category,
+            "consumerExpenditure": data.consumerExpenditure,
             "location": data.location,
             "status": data.status,
             "purchaseDate": moment(data.purchaseDate * 1000),
@@ -69,7 +71,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
     }, [form, data]);
 
     let categoryOptions: any[] = []
-    CategoryMap.forEach((value: string, key: string) => {
+    ConsumerExpenditureMap.forEach((value: string, key: string) => {
         categoryOptions.push(<Select.Option value={key} key={'category_options_' + key}>{value}</Select.Option>)
     })
     let rubbishCategoryOptions: any[] = []
@@ -145,19 +147,29 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
                 >
                     <InputNumber min={0} step={0.01} />
                 </Form.Item>
-
                 <Form.Item
-                    name="category"
+                    name="consumerExpenditure"
                     label={<span>
-                        类别&nbsp;
+                        消费支出&nbsp;
                         <Tooltip title={<a href="http://www.stats.gov.cn/tjsj/tjbz/201310/P020131021349384303616.pdf" target="_blank" rel="noopener noreferrer">居民消费支出分类（2013）</a>}>
                             <QuestionCircleOutlined />
                         </Tooltip>
                     </span>}
                     hasFeedback
-                    rules={[{ required: true, message: '请选择一个类别!' }]}
+                    rules={[{ required: true, message: '请选择一个消费支出!' }]}
                 >
-                    <Select placeholder="请选择一个类别!">
+                    <Select placeholder="请选择一个消费支出!">
+                        {categoryOptions}
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    name="category"
+                    label="分类"
+                    hasFeedback
+                    rules={[{ required: true, message: '请选择一个分类!' }]}
+                    noStyle
+                >
+                    <Select placeholder="请选择一个分类!" style={{ display: "none" }}>
                         {categoryOptions}
                     </Select>
                 </Form.Item>
