@@ -24,7 +24,7 @@ const RubbishCategoryMap = new Map<number, TagStyle>([
     }],
 ])
 
-const CategoryMap = new Map<string, string>([
+const ConsumerExpenditureMap = new Map<string, string>([
     ["01", "食品烟酒"],
     ["02", "衣着"],
     ["03", "居住"],
@@ -67,4 +67,4 @@ const ThingStatusMap = new Map<number, TagStyle>([
 ])
 
 const ThingStatusArr = ['待采购', '使用中', '已收纳', '故障', '维修中', '待清理', '已清理']
-export { RubbishCategoryMap, CategoryMap, ThingStatusMap, ThingStatusArr }
+export { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr }

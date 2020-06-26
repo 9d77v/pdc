@@ -51,20 +51,21 @@ type NewSubtitles struct {
 }
 
 type NewThing struct {
-	Name             string   `json:"name"`
-	Num              float64  `json:"num"`
-	BrandName        *string  `json:"brandName"`
-	Pics             []string `json:"pics"`
-	UnitPrice        float64  `json:"unitPrice"`
-	Unit             *string  `json:"unit"`
-	Specifications   *string  `json:"specifications"`
-	Category         string   `json:"category"`
-	Location         *string  `json:"location"`
-	Status           int64    `json:"status"`
-	PurchaseDate     int64    `json:"purchaseDate"`
-	PurchasePlatform *string  `json:"purchasePlatform"`
-	RefOrderID       *string  `json:"refOrderID"`
-	RubbishCategory  []int64  `json:"rubbishCategory"`
+	Name                string   `json:"name"`
+	Num                 float64  `json:"num"`
+	BrandName           *string  `json:"brandName"`
+	Pics                []string `json:"pics"`
+	UnitPrice           float64  `json:"unitPrice"`
+	Unit                *string  `json:"unit"`
+	Specifications      *string  `json:"specifications"`
+	Category            int64    `json:"category"`
+	ConsumerExpenditure string   `json:"consumerExpenditure"`
+	Location            *string  `json:"location"`
+	Status              int64    `json:"status"`
+	PurchaseDate        int64    `json:"purchaseDate"`
+	PurchasePlatform    *string  `json:"purchasePlatform"`
+	RefOrderID          *string  `json:"refOrderID"`
+	RubbishCategory     []int64  `json:"rubbishCategory"`
 }
 
 type NewUpdateEpisode struct {
@@ -78,21 +79,22 @@ type NewUpdateEpisode struct {
 }
 
 type NewUpdateThing struct {
-	ID               int64    `json:"id"`
-	Name             *string  `json:"name"`
-	Num              *float64 `json:"num"`
-	BrandName        *string  `json:"brandName"`
-	Pics             []string `json:"pics"`
-	UnitPrice        *float64 `json:"unitPrice"`
-	Unit             *string  `json:"unit"`
-	Specifications   *string  `json:"specifications"`
-	Category         *string  `json:"category"`
-	Location         *string  `json:"location"`
-	Status           *int64   `json:"status"`
-	PurchaseDate     *int64   `json:"purchaseDate"`
-	PurchasePlatform *string  `json:"purchasePlatform"`
-	RefOrderID       *string  `json:"refOrderID"`
-	RubbishCategory  []int64  `json:"rubbishCategory"`
+	ID                  int64    `json:"id"`
+	Name                *string  `json:"name"`
+	Num                 *float64 `json:"num"`
+	BrandName           *string  `json:"brandName"`
+	Pics                []string `json:"pics"`
+	UnitPrice           *float64 `json:"unitPrice"`
+	Unit                *string  `json:"unit"`
+	Specifications      *string  `json:"specifications"`
+	Category            *int64   `json:"category"`
+	ConsumerExpenditure *string  `json:"consumerExpenditure"`
+	Location            *string  `json:"location"`
+	Status              *int64   `json:"status"`
+	PurchaseDate        *int64   `json:"purchaseDate"`
+	PurchasePlatform    *string  `json:"purchasePlatform"`
+	RefOrderID          *string  `json:"refOrderID"`
+	RubbishCategory     []int64  `json:"rubbishCategory"`
 }
 
 type NewUpdateVideo struct {
@@ -120,6 +122,12 @@ type NewVideo struct {
 	Subtitles  *NewSubtitles   `json:"subtitles"`
 }
 
+type PieLineSerieData struct {
+	X1 []string  `json:"x1"`
+	X2 []string  `json:"x2"`
+	Y  []float64 `json:"y"`
+}
+
 type SerieData struct {
 	Name  string  `json:"name"`
 	Value float64 `json:"value"`
@@ -141,24 +149,25 @@ type Subtitle struct {
 }
 
 type Thing struct {
-	ID               int64    `json:"id"`
-	UID              int64    `json:"uid"`
-	Name             string   `json:"name"`
-	Num              float64  `json:"num"`
-	BrandName        *string  `json:"brandName"`
-	Pics             []string `json:"pics"`
-	UnitPrice        float64  `json:"unitPrice"`
-	Unit             *string  `json:"unit"`
-	Specifications   *string  `json:"specifications"`
-	Category         string   `json:"category"`
-	Location         string   `json:"location"`
-	Status           int64    `json:"status"`
-	PurchaseDate     int64    `json:"purchaseDate"`
-	PurchasePlatform *string  `json:"purchasePlatform"`
-	RefOrderID       string   `json:"refOrderID"`
-	RubbishCategory  []int64  `json:"rubbishCategory"`
-	CreatedAt        int64    `json:"createdAt"`
-	UpdatedAt        int64    `json:"updatedAt"`
+	ID                  int64    `json:"id"`
+	UID                 int64    `json:"uid"`
+	Name                string   `json:"name"`
+	Num                 float64  `json:"num"`
+	BrandName           *string  `json:"brandName"`
+	Pics                []string `json:"pics"`
+	UnitPrice           float64  `json:"unitPrice"`
+	Unit                *string  `json:"unit"`
+	Specifications      *string  `json:"specifications"`
+	Category            int64    `json:"category"`
+	ConsumerExpenditure string   `json:"consumerExpenditure"`
+	Location            string   `json:"location"`
+	Status              int64    `json:"status"`
+	PurchaseDate        int64    `json:"purchaseDate"`
+	PurchasePlatform    *string  `json:"purchasePlatform"`
+	RefOrderID          string   `json:"refOrderID"`
+	RubbishCategory     []int64  `json:"rubbishCategory"`
+	CreatedAt           int64    `json:"createdAt"`
+	UpdatedAt           int64    `json:"updatedAt"`
 }
 
 type ThingConnection struct {

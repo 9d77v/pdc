@@ -70,8 +70,15 @@ type ComplexityRoot struct {
 		UpdateVideo   func(childComplexity int, input *model.NewUpdateVideo) int
 	}
 
+	PieLineSerieData struct {
+		X1 func(childComplexity int) int
+		X2 func(childComplexity int) int
+		Y  func(childComplexity int) int
+	}
+
 	Query struct {
 		PresignedURL func(childComplexity int, bucketName string, objectName string) int
+		ThingAnalyze func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries  func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
 		Things       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Videos       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
@@ -93,24 +100,25 @@ type ComplexityRoot struct {
 	}
 
 	Thing struct {
-		BrandName        func(childComplexity int) int
-		Category         func(childComplexity int) int
-		CreatedAt        func(childComplexity int) int
-		ID               func(childComplexity int) int
-		Location         func(childComplexity int) int
-		Name             func(childComplexity int) int
-		Num              func(childComplexity int) int
-		Pics             func(childComplexity int) int
-		PurchaseDate     func(childComplexity int) int
-		PurchasePlatform func(childComplexity int) int
-		RefOrderID       func(childComplexity int) int
-		RubbishCategory  func(childComplexity int) int
-		Specifications   func(childComplexity int) int
-		Status           func(childComplexity int) int
-		UID              func(childComplexity int) int
-		Unit             func(childComplexity int) int
-		UnitPrice        func(childComplexity int) int
-		UpdatedAt        func(childComplexity int) int
+		BrandName           func(childComplexity int) int
+		Category            func(childComplexity int) int
+		ConsumerExpenditure func(childComplexity int) int
+		CreatedAt           func(childComplexity int) int
+		ID                  func(childComplexity int) int
+		Location            func(childComplexity int) int
+		Name                func(childComplexity int) int
+		Num                 func(childComplexity int) int
+		Pics                func(childComplexity int) int
+		PurchaseDate        func(childComplexity int) int
+		PurchasePlatform    func(childComplexity int) int
+		RefOrderID          func(childComplexity int) int
+		RubbishCategory     func(childComplexity int) int
+		Specifications      func(childComplexity int) int
+		Status              func(childComplexity int) int
+		UID                 func(childComplexity int) int
+		Unit                func(childComplexity int) int
+		UnitPrice           func(childComplexity int) int
+		UpdatedAt           func(childComplexity int) int
 	}
 
 	ThingConnection struct {
@@ -151,6 +159,7 @@ type QueryResolver interface {
 	Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
 	Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
+	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
 }
 
@@ -325,6 +334,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateVideo(childComplexity, args["input"].(*model.NewUpdateVideo)), true
 
+	case "PieLineSerieData.x1":
+		if e.complexity.PieLineSerieData.X1 == nil {
+			break
+		}
+
+		return e.complexity.PieLineSerieData.X1(childComplexity), true
+
+	case "PieLineSerieData.x2":
+		if e.complexity.PieLineSerieData.X2 == nil {
+			break
+		}
+
+		return e.complexity.PieLineSerieData.X2(childComplexity), true
+
+	case "PieLineSerieData.y":
+		if e.complexity.PieLineSerieData.Y == nil {
+			break
+		}
+
+		return e.complexity.PieLineSerieData.Y(childComplexity), true
+
 	case "Query.presignedUrl":
 		if e.complexity.Query.PresignedURL == nil {
 			break
@@ -336,6 +366,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.PresignedURL(childComplexity, args["bucketName"].(string), args["objectName"].(string)), true
+
+	case "Query.ThingAnalyze":
+		if e.complexity.Query.ThingAnalyze == nil {
+			break
+		}
+
+		args, err := ec.field_Query_ThingAnalyze_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ThingAnalyze(childComplexity, args["dimension"].(string), args["index"].(string), args["start"].(*int64), args["group"].(string)), true
 
 	case "Query.ThingSeries":
 		if e.complexity.Query.ThingSeries == nil {
@@ -428,6 +470,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Thing.Category(childComplexity), true
+
+	case "Thing.consumerExpenditure":
+		if e.complexity.Thing.ConsumerExpenditure == nil {
+			break
+		}
+
+		return e.complexity.Thing.ConsumerExpenditure(childComplexity), true
 
 	case "Thing.createdAt":
 		if e.complexity.Thing.CreatedAt == nil {
@@ -727,6 +776,12 @@ type SerieData{
     name: String!
     value: Float!
 }
+
+type PieLineSerieData{
+    x1:[String!]!
+    x2:[String!]!
+    y:[Float!]!
+}
 `, BuiltIn: false},
 	&ast.Source{Name: "graph/schema.graphql", Input: `# GraphQL schema example
 #
@@ -736,6 +791,7 @@ type Query {
   Videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
   Things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   ThingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
+  ThingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
@@ -758,7 +814,8 @@ type Mutation {
   unitPrice: Float!
   unit: String
   specifications:String
-  category: String!
+  category: Int!
+  consumerExpenditure:String!
   location: String!
   status: Int!
   purchaseDate: Int!
@@ -784,7 +841,8 @@ input NewThing {
   unitPrice: Float!
   unit: String
   specifications:String
-  category: String!
+  category: Int!
+  consumerExpenditure:String!
   location: String
   status: Int!
   purchaseDate: Int!
@@ -802,7 +860,8 @@ input NewUpdateThing{
   unitPrice: Float
   unit: String
   specifications:String
-  category: String
+  category: Int
+  consumerExpenditure:String
   location: String
   status: Int
   purchaseDate: Int
@@ -1012,6 +1071,44 @@ func (ec *executionContext) field_Mutation_updateVideo_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_ThingAnalyze_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["dimension"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["dimension"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["index"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["index"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["start"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["start"] = arg2
+	var arg3 string
+	if tmp, ok := rawArgs["group"]; ok {
+		arg3, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["group"] = arg3
 	return args, nil
 }
 
@@ -1863,6 +1960,108 @@ func (ec *executionContext) _Mutation_updateThing(ctx context.Context, field gra
 	return ec.marshalNThing2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐThing(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _PieLineSerieData_x1(ctx context.Context, field graphql.CollectedField, obj *model.PieLineSerieData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "PieLineSerieData",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.X1, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PieLineSerieData_x2(ctx context.Context, field graphql.CollectedField, obj *model.PieLineSerieData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "PieLineSerieData",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.X2, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PieLineSerieData_y(ctx context.Context, field graphql.CollectedField, obj *model.PieLineSerieData) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "PieLineSerieData",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Y, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]float64)
+	fc.Result = res
+	return ec.marshalNFloat2ᚕfloat64ᚄ(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_Videos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1984,6 +2183,47 @@ func (ec *executionContext) _Query_ThingSeries(ctx context.Context, field graphq
 	res := resTmp.([]*model.SerieData)
 	fc.Result = res
 	return ec.marshalNSerieData2ᚕᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSerieDataᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_ThingAnalyze(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_ThingAnalyze_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().ThingAnalyze(rctx, args["dimension"].(string), args["index"].(string), args["start"].(*int64), args["group"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.PieLineSerieData)
+	fc.Result = res
+	return ec.marshalNPieLineSerieData2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐPieLineSerieData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_presignedUrl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2612,6 +2852,40 @@ func (ec *executionContext) _Thing_category(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Category, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Thing_consumerExpenditure(ctx context.Context, field graphql.CollectedField, obj *model.Thing) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Thing",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConsumerExpenditure, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4690,7 +4964,13 @@ func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj inte
 			}
 		case "category":
 			var err error
-			it.Category, err = ec.unmarshalNString2string(ctx, v)
+			it.Category, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "consumerExpenditure":
+			var err error
+			it.ConsumerExpenditure, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4846,7 +5126,13 @@ func (ec *executionContext) unmarshalInputNewUpdateThing(ctx context.Context, ob
 			}
 		case "category":
 			var err error
-			it.Category, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Category, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "consumerExpenditure":
+			var err error
+			it.ConsumerExpenditure, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5222,6 +5508,43 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var pieLineSerieDataImplementors = []string{"PieLineSerieData"}
+
+func (ec *executionContext) _PieLineSerieData(ctx context.Context, sel ast.SelectionSet, obj *model.PieLineSerieData) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pieLineSerieDataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PieLineSerieData")
+		case "x1":
+			out.Values[i] = ec._PieLineSerieData_x1(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "x2":
+			out.Values[i] = ec._PieLineSerieData_x2(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "y":
+			out.Values[i] = ec._PieLineSerieData_y(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5274,6 +5597,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_ThingSeries(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "ThingAnalyze":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_ThingAnalyze(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5450,6 +5787,11 @@ func (ec *executionContext) _Thing(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Thing_specifications(ctx, field, obj)
 		case "category":
 			out.Values[i] = ec._Thing_category(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "consumerExpenditure":
+			out.Values[i] = ec._Thing_consumerExpenditure(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6016,6 +6358,35 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNFloat2ᚕfloat64ᚄ(ctx context.Context, v interface{}) ([]float64, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]float64, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalNFloat2float64(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNFloat2ᚕfloat64ᚄ(ctx context.Context, sel ast.SelectionSet, v []float64) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNFloat2float64(ctx, sel, v[i])
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNID2int64(ctx context.Context, v interface{}) (int64, error) {
 	return graphql.UnmarshalInt64(v)
 }
@@ -6090,6 +6461,20 @@ func (ec *executionContext) unmarshalNNewThing2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋ
 
 func (ec *executionContext) unmarshalNNewVideo2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewVideo(ctx context.Context, v interface{}) (model.NewVideo, error) {
 	return ec.unmarshalInputNewVideo(ctx, v)
+}
+
+func (ec *executionContext) marshalNPieLineSerieData2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐPieLineSerieData(ctx context.Context, sel ast.SelectionSet, v model.PieLineSerieData) graphql.Marshaler {
+	return ec._PieLineSerieData(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNPieLineSerieData2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐPieLineSerieData(ctx context.Context, sel ast.SelectionSet, v *model.PieLineSerieData) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._PieLineSerieData(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNSerieData2gitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSerieData(ctx context.Context, sel ast.SelectionSet, v model.SerieData) graphql.Marshaler {

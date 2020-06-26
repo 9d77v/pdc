@@ -8,7 +8,7 @@ import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 import { ThingUpdateForm } from './ThingUpdateForm';
 import { Img } from '../../../components/Img';
-import { RubbishCategoryMap, CategoryMap, ThingStatusMap } from '../../../consts/category_data';
+import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/category_data';
 
 
 export default function ThingTable() {
@@ -24,7 +24,8 @@ export default function ThingTable() {
         unitPrice: 0,
         unit: "",
         specifications: "",
-        category: "",
+        category: 0,
+        consumerExpenditure: "",
         location: "",
         status: 1,
         purchaseDate: 0,
@@ -64,6 +65,7 @@ export default function ThingTable() {
                     "unit": values.unit,
                     "specifications": values.specifications,
                     "category": values.category,
+                    "consumerExpenditure": values.consumerExpenditure,
                     "location": values.location,
                     "status": values.status,
                     "purchaseDate": values.purchaseDate ? values.purchaseDate.unix() : 0,
@@ -90,6 +92,7 @@ export default function ThingTable() {
                     "unit": values.unit,
                     "specifications": values.specifications,
                     "category": values.category,
+                    "consumerExpenditure": values.consumerExpenditure,
                     "location": values.location,
                     "status": values.status,
                     "purchaseDate": values.purchaseDate ? values.purchaseDate.unix() : 0,
@@ -125,7 +128,6 @@ export default function ThingTable() {
     }
 
     const columns = [
-        { title: 'ID', dataIndex: 'id', key: 'id', fixed: 'left' as const, width: 80, },
         { title: '名称', dataIndex: 'name', key: 'name', fixed: 'left' as const, width: 150, },
         { title: '数量', dataIndex: 'num', key: 'num', fixed: 'left' as const, width: 80, },
         {
@@ -142,11 +144,11 @@ export default function ThingTable() {
             }
         },
         {
-            title: '类别', dataIndex: 'category', key: 'category', fixed: 'left' as const,
+            title: '消费支出', dataIndex: 'consumerExpenditure', key: 'consumerExpenditure', fixed: 'left' as const,
             width: 120,
             render: (value: string) => {
                 return <Tag color={"cyan"} >
-                    {CategoryMap.get(value)}
+                    {ConsumerExpenditureMap.get(value)}
                 </Tag>
             }
         },
@@ -184,14 +186,17 @@ export default function ThingTable() {
             title: '垃圾分类', dataIndex: 'rubbishCategory', key: 'rubbishCategory', fixed: "right" as const,
             width: 100,
             render: (values: number[]) => {
-                const tagNodes = values.map(value => {
-                    return (
-                        <Tag color={RubbishCategoryMap.get(value)?.color || 'default'} key={"rubbish_category_tag" + value}>
-                            {RubbishCategoryMap.get(value)?.text}
-                        </Tag>
-                    );
-                })
-                return <div>{tagNodes}</div>
+                if (values) {
+                    const tagNodes = values.map(value => {
+                        return (
+                            <Tag color={RubbishCategoryMap.get(value)?.color || 'default'} key={"rubbish_category_tag" + value}>
+                                {RubbishCategoryMap.get(value)?.text}
+                            </Tag>
+                        );
+                    })
+                    return <div>{tagNodes}</div>
+                }
+                return <div />
             }
         },
         {
@@ -216,6 +221,7 @@ export default function ThingTable() {
                             "unit": record.unit,
                             "specifications": record.specifications,
                             "category": record.category,
+                            "consumerExpenditure": record.consumerExpenditure,
                             "location": record.location,
                             "status": record.status,
                             "purchaseDate": record.purchaseDate,

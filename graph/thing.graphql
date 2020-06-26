@@ -8,7 +8,8 @@ type Thing {
   unitPrice: Float!
   unit: String
   specifications:String
-  category: String!
+  category: Int!
+  consumerExpenditure:String!
   location: String!
   status: Int!
   purchaseDate: Int!
@@ -34,7 +35,8 @@ input NewThing {
   unitPrice: Float!
   unit: String
   specifications:String
-  category: String!
+  category: Int!
+  consumerExpenditure:String!
   location: String
   status: Int!
   purchaseDate: Int!
@@ -52,7 +54,8 @@ input NewUpdateThing{
   unitPrice: Float
   unit: String
   specifications:String
-  category: String
+  category: Int
+  consumerExpenditure:String
   location: String
   status: Int
   purchaseDate: Int

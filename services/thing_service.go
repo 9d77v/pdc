@@ -20,21 +20,22 @@ type ThingService struct {
 //CreateThing ..
 func (s ThingService) CreateThing(input model.NewThing) (*model.Thing, error) {
 	m := &models.Thing{
-		UID:              1,
-		Name:             input.Name,
-		Num:              input.Num,
-		BrandName:        ptrs.String(input.BrandName),
-		Pics:             input.Pics,
-		UnitPrice:        input.UnitPrice,
-		Unit:             ptrs.String(input.Unit),
-		Specifications:   ptrs.String(input.Specifications),
-		Category:         input.Category,
-		Location:         ptrs.String(input.Location),
-		PurchaseDate:     time.Unix(input.PurchaseDate, 0),
-		Status:           int8(input.Status),
-		PurchasePlatform: ptrs.String(input.PurchasePlatform),
-		RefOrderID:       ptrs.String(input.RefOrderID),
-		RubbishCategory:  input.RubbishCategory,
+		UID:                 1,
+		Name:                input.Name,
+		Num:                 input.Num,
+		BrandName:           ptrs.String(input.BrandName),
+		Pics:                input.Pics,
+		UnitPrice:           input.UnitPrice,
+		Unit:                ptrs.String(input.Unit),
+		Specifications:      ptrs.String(input.Specifications),
+		Category:            int8(input.Category),
+		ConsumerExpenditure: input.ConsumerExpenditure,
+		Location:            ptrs.String(input.Location),
+		PurchaseDate:        time.Unix(input.PurchaseDate, 0),
+		Status:              int8(input.Status),
+		PurchasePlatform:    ptrs.String(input.PurchasePlatform),
+		RefOrderID:          ptrs.String(input.RefOrderID),
+		RubbishCategory:     input.RubbishCategory,
 	}
 	err := models.Gorm.Create(m).Error
 	if err != nil {
@@ -55,20 +56,21 @@ func (s ThingService) UpdateThing(ctx context.Context, input *model.NewUpdateThi
 		return nil, err
 	}
 	err := models.Gorm.Model(Thing).Update(map[string]interface{}{
-		"name":              ptrs.String(input.Name),
-		"num":               ptrs.Float64(input.Num),
-		"brand_name":        ptrs.String(input.BrandName),
-		"pics":              input.Pics,
-		"unit_price":        ptrs.Float64(input.UnitPrice),
-		"unit":              ptrs.String(input.Unit),
-		"specifications":    ptrs.String(input.Specifications),
-		"category":          ptrs.String(input.Category),
-		"location":          ptrs.String(input.Location),
-		"status":            ptrs.Int64(input.Status),
-		"purchase_date":     time.Unix(ptrs.Int64(input.PurchaseDate), 0),
-		"purchase_platform": ptrs.String(input.PurchasePlatform),
-		"ref_order_id":      ptrs.String(input.RefOrderID),
-		"rubbish_category":  input.RubbishCategory,
+		"name":                 ptrs.String(input.Name),
+		"num":                  ptrs.Float64(input.Num),
+		"brand_name":           ptrs.String(input.BrandName),
+		"pics":                 input.Pics,
+		"unit_price":           ptrs.Float64(input.UnitPrice),
+		"unit":                 ptrs.String(input.Unit),
+		"specifications":       ptrs.String(input.Specifications),
+		"category":             ptrs.Int64(input.Category),
+		"consumer_expenditure": ptrs.String(input.ConsumerExpenditure),
+		"location":             ptrs.String(input.Location),
+		"status":               ptrs.Int64(input.Status),
+		"purchase_date":        time.Unix(ptrs.Int64(input.PurchaseDate), 0),
+		"purchase_platform":    ptrs.String(input.PurchasePlatform),
+		"ref_order_id":         ptrs.String(input.RefOrderID),
+		"rubbish_category":     input.RubbishCategory,
 	}).Error
 	return &model.Thing{ID: int64(Thing.ID)}, err
 }
@@ -137,7 +139,7 @@ func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids 
 }
 
 //ThingSeries 获取物品数据
-func (s ThingService) ThingSeries(ctx context.Context, dimension, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error) {
+func (s ThingService) ThingSeries(ctx context.Context, dimension, index string, start *int64, end *int64, status []int64, uid int64) ([]*model.SerieData, error) {
 	data := make([]*model.SerieData, 0)
 	builder := models.Gorm.Model(&models.Thing{})
 	if index == "num" {
@@ -154,7 +156,48 @@ func (s ThingService) ThingSeries(ctx context.Context, dimension, index string, 
 	if len(status) > 0 {
 		builder = builder.Where("status in (?)", status)
 	}
+	builder = builder.Where("uid=?", 1)
 	builder = builder.Group(dimension).Order("name")
 	err := builder.Scan(&data).Error
 	return data, err
+}
+
+//ThingAnalyze 物品分析
+func (s ThingService) ThingAnalyze(ctx context.Context, dimension, index string, start *int64, group string, uid int64) (*model.PieLineSerieData, error) {
+	startInt := ptrs.Int64(start)
+	startTime := time.Unix(startInt, 0)
+	var endTime time.Time
+	var format string
+	switch group {
+	case "month":
+		year, month, _ := startTime.Date()
+		startTime = time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+		endTime = startTime.AddDate(0, 1, 0)
+		format = "YYYY-MM-DD"
+	case "year":
+		year, _, _ := startTime.Date()
+		startTime = time.Date(year, 1, 1, 0, 0, 0, 0, time.Local)
+		endTime = startTime.AddDate(1, 0, 0)
+		format = "YYYY-MM"
+	default:
+		startTime = time.Date(1991, 4, 18, 0, 0, 0, 0, time.Local)
+		endTime = time.Now()
+		format = "YYYY"
+	}
+	builder := models.Gorm.Model(&models.Thing{})
+	if index == "num" {
+		builder = builder.Select(
+			fmt.Sprintf("to_char(purchase_date,'%s') as x1, %s as x2, sum(num) as y ",
+				format, dimension))
+	} else if index == "price" {
+		builder = builder.Select(
+			fmt.Sprintf("to_char(purchase_date,'%s') as x1,%s as x2, sum(num*unit_price)::money::numeric::float8 as y ",
+				format, dimension))
+	}
+	builder = builder.Where("purchase_date>=? and purchase_date<?", startTime, endTime)
+	builder = builder.Where("uid=?", 1)
+	builder = builder.Group("x1," + dimension).Order("x1," + dimension)
+	data := make([]*models.PieLineSerie, 0)
+	err := builder.Scan(&data).Error
+	return dtos.ToPieLineSerieData(data), err
 }
