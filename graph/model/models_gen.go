@@ -126,8 +126,7 @@ type NewUser struct {
 	Avatar    *string `json:"avatar"`
 	RoleID    int64   `json:"roleID"`
 	Gender    int64   `json:"gender"`
-	Color     *string `json:"color"`
-	BirthDate int64   `json:"birthDate"`
+	BirthDate *int64  `json:"birthDate"`
 	IP        *string `json:"ip"`
 }
 

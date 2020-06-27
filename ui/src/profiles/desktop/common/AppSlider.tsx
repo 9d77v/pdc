@@ -56,7 +56,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="thing"
-                    style={{ display: "none" }}
+                    style={{ display: "border" }}
                     title={
                         <span>
                             <ShoppingOutlined />
@@ -85,6 +85,9 @@ export const AppSlider = () => {
                 >
                     <Menu.Item key="settings-videos">
                         <Link to="/app/settings/videos">视频管理</Link>
+                    </Menu.Item>
+                    <Menu.Item key="settings-users">
+                        <Link to="/app/settings/users">用户管理</Link>
                     </Menu.Item>
                 </SubMenu>
             </Menu>

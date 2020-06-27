@@ -4,7 +4,7 @@ import { message, Select, Radio, DatePicker } from "antd"
 import { useQuery } from "@apollo/react-hooks";
 import { THING_ANALYZE } from "../../../consts/thing.gql";
 import moment from "moment";
-import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/category_data";
+import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/consts";
 import { RadioChangeEvent } from "antd/lib/radio";
 import { PieLine } from "../../../components/PieLine";
 

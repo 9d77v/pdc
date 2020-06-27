@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Modal, Form, Radio } from 'antd'
-import { Uploader } from '../../../components/Uploader'
+import { Uploader } from '../../../../components/Uploader'
 
 interface ModalFormProps {
     visible: boolean

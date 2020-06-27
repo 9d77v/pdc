@@ -8,7 +8,7 @@ import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 import { ThingUpdateForm } from './ThingUpdateForm';
 import { Img } from '../../../components/Img';
-import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/category_data';
+import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/consts';
 
 
 export default function ThingTable() {

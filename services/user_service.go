@@ -31,8 +31,7 @@ func (s UserService) CreateUser(input model.NewUser) (*model.User, error) {
 		Password:  string(bytes),
 		RoleID:    int(input.RoleID),
 		Gender:    int(input.Gender),
-		Color:     ptrs.String(input.Color),
-		BirthDate: time.Unix(input.BirthDate, 0),
+		BirthDate: time.Unix(ptrs.Int64(input.BirthDate), 0),
 		IP:        ptrs.String(input.IP),
 	}
 	err = models.Gorm.Create(m).Error

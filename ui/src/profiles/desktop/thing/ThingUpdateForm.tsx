@@ -2,7 +2,7 @@ import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'an
 import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../../components/Uploader';
 import moment from 'moment';
-import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/category_data';
+import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/consts';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
 interface Values {

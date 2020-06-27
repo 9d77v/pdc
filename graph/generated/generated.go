@@ -1019,39 +1019,38 @@ input NewUpdateThing{
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "graph/user.graphql", Input: `type User {
-  id: ID!
-  name:String!
+	id: ID!
+	name:String!
 	avatar: String
 	roleID: Int!  
 	gender: Int!
 	color: String
 	birthDate:Int!
 	ip:String   
-  createdAt: Int!
-  updatedAt: Int!
+	createdAt: Int!
+	updatedAt: Int!
 }
 
 
 type UserConnection {
-  totalCount: Int!
-  edges:[User!]!
+	totalCount: Int!
+	edges:[User!]!
 }
 
 
 input NewUser {
-  name:String!
-  password:String!
+	name:String!
+	password:String!
 	avatar: String
 	roleID: Int!  
 	gender: Int!
-	color: String
-	birthDate:Int!
+	birthDate:Int
 	ip:String   
 }
 
 input NewUpdateUser{
-  id: ID!
-  password:String
+	id: ID!
+	password:String
 	avatar: String
 	roleID: Int  
 	gender: Int
@@ -6119,15 +6118,9 @@ func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
-		case "color":
-			var err error
-			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "birthDate":
 			var err error
-			it.BirthDate, err = ec.unmarshalNInt2int64(ctx, v)
+			it.BirthDate, err = ec.unmarshalOInt2ᚖint64(ctx, v)
 			if err != nil {
 				return it, err
 			}

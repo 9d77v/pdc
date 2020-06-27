@@ -4,8 +4,7 @@ import { message, Select } from "antd"
 import { useQuery } from "@apollo/react-hooks";
 import { Pie } from "../../../components/Pie";
 import { THING_SERIES } from "../../../consts/thing.gql";
-import moment from "moment";
-import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/category_data";
+import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/consts";
 import { SerieData } from "../../../consts/chart";
 
 const mapFunc = (value: SerieData) => {
