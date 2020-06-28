@@ -71,15 +71,17 @@ export const VideoDetail = () => {
 
     return (
         <div style={{
-            display: 'flex', flexDirection: 'row', height: '100%', width: "100%"
+            display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
         }}>
-            <div style={{ display: 'flex', flexDirection: 'column', padding: 10, width: 1107, height: 838 }}>
+            <div style={{
+                display: 'flex', flexDirection: 'column', padding: 10,
+                width: 1107, height: 838, minHeight: 179, minWidth: 319,
+            }}>
                 <VideoPlayer
                     episodeID={episodeItem.id}
                     url={episodeItem.url}
                     subtitles={episodeItem.subtitles}
-                    minHeight={358}
-                    minWidth={638}
+
                     height={"100%"}
                     width={"100%"}
                     autoplay={true}

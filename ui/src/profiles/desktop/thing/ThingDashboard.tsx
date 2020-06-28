@@ -40,7 +40,7 @@ export const ThingDashboard = () => {
                 <Select.Option value="location">位置</Select.Option>
                 <Select.Option value="purchase_platform">购买平台</Select.Option>
             </Select>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10, overflowX: "scroll" }}>
                 <Pie title="现存物品金额" name="物品类别" data={data ? data.Series3.map(mapFunc) : []} style={chartStyle} unit={'￥'} />
                 <Pie title="现存物品数量" name="物品类别" data={data ? data.Series4.map(mapFunc) : []} style={chartStyle} unit={'件'} />
             </div>

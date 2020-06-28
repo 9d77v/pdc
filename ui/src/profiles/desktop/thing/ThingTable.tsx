@@ -141,7 +141,7 @@ export default function ThingTable() {
     }
 
     const columns = [
-        { title: '名称', dataIndex: 'name', key: 'name', fixed: 'left' as const, width: 200 },
+        { title: '名称', dataIndex: 'name', key: 'name', fixed: 'left' as const, width: 250 },
         { title: '数量', dataIndex: 'num', key: 'num', fixed: 'left' as const, width: 80, },
         {
             title: '图片', dataIndex: 'pics', key: 'pics', fixed: 'left' as const, width: 80,
@@ -157,7 +157,7 @@ export default function ThingTable() {
             }
         },
         {
-            title: '消费支出', dataIndex: 'consumerExpenditure', key: 'consumerExpenditure', fixed: 'left' as const,
+            title: '消费支出', dataIndex: 'consumerExpenditure', key: 'consumerExpenditure',
             width: 120,
             render: (value: string) => {
                 return <Tag color={"cyan"} >
@@ -196,7 +196,7 @@ export default function ThingTable() {
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
-            title: '垃圾分类', dataIndex: 'rubbishCategory', key: 'rubbishCategory', fixed: "right" as const,
+            title: '垃圾分类', dataIndex: 'rubbishCategory', key: 'rubbishCategory',
             width: 100,
             render: (values: number[]) => {
                 if (values) {

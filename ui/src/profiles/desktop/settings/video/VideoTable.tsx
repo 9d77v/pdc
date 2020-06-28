@@ -75,6 +75,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
         <Table
             rowKey={record => record.id}
             columns={columns}
+            scroll={{ x: 1300 }}
             dataSource={episodeData}
             pagination={false} />
     </div>
@@ -373,6 +374,7 @@ export default function VideoTable() {
                         return EpisodeTable(record, setUpdateEpisodeData, setUpdateEpisodeVisible)
                     }
                 }}
+                scroll={{ x: 1300 }}
                 onChange={onChange}
                 pagination={{
                     ...pagination,
