@@ -23,14 +23,14 @@ var (
 	OwnerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
 	OwnerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
 
-	DBHost     = utils.GetEnvStr("DB_HOST", "127.0.0.1")
+	DBHost     = utils.GetEnvStr("DB_HOST", "domain.com")
 	DBPort     = utils.GetEnvInt("DB_PORT", 5432)
 	DBUser     = utils.GetEnvStr("DB_USER", "postgres")
 	DBPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
 	DBName     = utils.GetEnvStr("DB_NAME", "pdc")
 	DBPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
 
-	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "127.0.0.1:9000")
+	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "domain.com:9000")
 	MinioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	MinioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
 	MinioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
