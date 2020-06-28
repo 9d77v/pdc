@@ -12,6 +12,8 @@ import { VideoUpdateForm } from './VideoUpdateForm';
 import { EpisodeUpdateForm } from './EpisodeUpdateForm';
 import { Img } from '../../../../components/Img';
 import TextArea from 'antd/lib/input/TextArea';
+import { TablePaginationConfig } from 'antd/lib/table';
+
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
     const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
     const columns = [
@@ -78,9 +80,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
     </div>
 }
 
-
 export default function VideoTable() {
-    const pageSize = 10
     const [visible, setVisible] = useState(false);
     const [currentVideoID, setCurrentVideoID] = useState(0);
     const [episodeVisible, setEpisodeVisible] = useState(false);
@@ -103,6 +103,13 @@ export default function VideoTable() {
         url: "",
         subtitles: [],
     })
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        total: 0
+    })
     const [addVideo] = useMutation(ADD_VIDEO);
     const [updateVideo] = useMutation(UPDATE_VIDEO)
     const [addEpisode] = useMutation(ADD_EPISODE)
@@ -110,8 +117,8 @@ export default function VideoTable() {
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
             variables: {
-                page: 1,
-                pageSize: pageSize,
+                page: pagination.current,
+                pageSize: pagination.pageSize,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -205,14 +212,21 @@ export default function VideoTable() {
         await refetch()
     };
 
-    const onChange = async (page: number) => {
+    const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
-                page: page
+                page: pageConfig.current || 1,
+                pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
                 const newEdges = fetchMoreResult ? fetchMoreResult.Videos.edges : [];
                 const totalCount = fetchMoreResult ? fetchMoreResult.Videos.totalCount : 0;
+                const t = {
+                    ...pagination,
+                    current: pageConfig.current || 1,
+                    pageSize: pageConfig.pageSize || 10
+                }
+                setPagination(t)
                 return newEdges.length
                     ? {
                         Videos: {
@@ -359,13 +373,10 @@ export default function VideoTable() {
                         return EpisodeTable(record, setUpdateEpisodeData, setUpdateEpisodeVisible)
                     }
                 }}
+                onChange={onChange}
                 pagination={{
-                    pageSize: pageSize,
-                    onChange: onChange,
-                    total: data ? data.Videos.totalCount : 0,
-                    locale: 'zh_CN',
-                    showQuickJumper: true,
-                    hideOnSinglePage: true
+                    ...pagination,
+                    total: data ? data.Videos.totalCount : 0
                 }}
                 dataSource={data ? data.Videos.edges : []}
             />

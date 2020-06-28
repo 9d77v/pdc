@@ -9,11 +9,18 @@ import moment from 'moment';
 import { ThingUpdateForm } from './ThingUpdateForm';
 import { Img } from '../../../components/Img';
 import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/consts';
+import { TablePaginationConfig } from 'antd/lib/table';
 
 
 export default function ThingTable() {
-    const pageSize = 10
     const [visible, setVisible] = useState(false);
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        total: 0
+    })
     const [updateThingVisible, setUpdateThingVisible] = useState(false)
     const [updateThingData, setUpdateThingData] = useState({
         id: 0,
@@ -38,8 +45,8 @@ export default function ThingTable() {
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_THING,
         {
             variables: {
-                page: 1,
-                pageSize: pageSize,
+                page: pagination.current,
+                pageSize: pagination.pageSize,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -106,14 +113,20 @@ export default function ThingTable() {
         await refetch()
     };
 
-    const onChange = async (page: number) => {
+    const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
-                page: page
+                page: pageConfig.current || 1,
+                pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
                 const newEdges = fetchMoreResult ? fetchMoreResult.Things.edges : [];
                 const totalCount = fetchMoreResult ? fetchMoreResult.Things.totalCount : 0;
+                setPagination({
+                    ...pagination,
+                    current: pageConfig.current || 1,
+                    pageSize: pageConfig.pageSize || 10
+                })
                 return newEdges.length
                     ? {
                         Things: {
@@ -266,14 +279,10 @@ export default function ThingTable() {
                 columns={columns}
                 scroll={{ x: 1300 }}
                 bordered
+                onChange={onChange}
                 pagination={{
-                    pageSize: pageSize,
-                    onChange: onChange,
-                    total: data ? data.Things.totalCount : 0,
-                    locale: 'zh_CN',
-                    showQuickJumper: true,
-                    hideOnSinglePage: true,
-                    showSizeChanger: false
+                    ...pagination,
+                    total: data ? data.Things.totalCount : 0
                 }}
                 dataSource={data ? data.Things.edges : []}
             />

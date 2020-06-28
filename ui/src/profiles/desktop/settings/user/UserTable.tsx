@@ -9,12 +9,19 @@ import moment from 'moment';
 import { UserUpdateForm } from './UserUpdateForm';
 import { Img } from '../../../../components/Img';
 import { GenderMap, FullRoleMap } from '../../../../consts/consts';
+import { TablePaginationConfig } from 'antd/lib/table';
 
 
 export default function UserTable() {
-    const pageSize = 10
     const [visible, setVisible] = useState(false);
     const [updateUserVisible, setUpdateUserVisible] = useState(false)
+    const [pagination, setPagination] = useState({
+        current: 1,
+        pageSize: 10,
+        showQuickJumper: true,
+        showSizeChanger: true,
+        total: 0
+    })
     const [updateUserData, setUpdateUserData] = useState({
         id: 0,
         name: "",
@@ -30,8 +37,8 @@ export default function UserTable() {
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_USER,
         {
             variables: {
-                page: 1,
-                pageSize: pageSize,
+                page: pagination.current,
+                pageSize: pagination.pageSize,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -46,7 +53,6 @@ export default function UserTable() {
     }, [error])
 
     const onUserCreate = async (values: any) => {
-        console.log(values)
         await addUser({
             variables: {
                 "input": {
@@ -82,14 +88,20 @@ export default function UserTable() {
         await refetch()
     };
 
-    const onChange = async (page: number) => {
+    const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
-                page: page
+                page: pageConfig.current || 1,
+                pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
                 const newEdges = fetchMoreResult ? fetchMoreResult.Users.edges : [];
                 const totalCount = fetchMoreResult ? fetchMoreResult.Users.totalCount : 0;
+                setPagination({
+                    ...pagination,
+                    current: pageConfig.current || 1,
+                    pageSize: pageConfig.pageSize || 10
+                })
                 return newEdges.length
                     ? {
                         Users: {
@@ -183,14 +195,10 @@ export default function UserTable() {
                 columns={columns}
                 scroll={{ x: 1300 }}
                 bordered
+                onChange={onChange}
                 pagination={{
-                    pageSize: pageSize,
-                    onChange: onChange,
-                    total: data ? data.Users.totalCount : 0,
-                    locale: 'zh_CN',
-                    showQuickJumper: true,
-                    hideOnSinglePage: true,
-                    showSizeChanger: false
+                    ...pagination,
+                    total: data ? data.Users.totalCount : 0
                 }}
                 dataSource={data ? data.Users.edges : []}
             />
