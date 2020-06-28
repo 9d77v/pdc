@@ -11,6 +11,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["settings"],
         "defaultSelectedKeys": ['settings-videos']
     }],
+    ["/app/settings/users", {
+        "defaultOpenKeys": ["settings"],
+        "defaultSelectedKeys": ['settings-users']
+    }],
     ["/app/media/videos", {
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-videos']
