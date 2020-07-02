@@ -1,15 +1,11 @@
 import React from 'react';
 import './App.css';
 import { Spin, ConfigProvider } from 'antd';
-import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import zhCN from 'antd/es/locale/zh_CN';
+import { client } from './utils/client';
 
 const DesktopIndex = React.lazy(() => import('./profiles/desktop/index'))
-
-const client = new ApolloClient({
-  uri: '/api',
-});
 
 function App() {
   return (

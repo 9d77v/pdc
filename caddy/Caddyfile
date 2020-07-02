@@ -1,0 +1,12 @@
+domain.com{
+    encode gzip
+    reverse_proxy pdc:8080 
+    log {
+        output file         access.log
+        format single_field common_log
+    }
+}
+
+oss.domain.com{
+    reverse_proxy minio:9000 
+}

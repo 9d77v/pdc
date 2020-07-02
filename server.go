@@ -7,6 +7,7 @@ import (
 
 	"git.9d77v.me/9d77v/pdc/graph"
 	"git.9d77v.me/9d77v/pdc/graph/generated"
+	"git.9d77v.me/9d77v/pdc/models"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 )
@@ -20,16 +21,15 @@ func main() {
 	}
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
-
-	http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
+	if models.DEBUG {
+		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
+	}
 	http.Handle("/api", srv)
-	http.HandleFunc("/app/", handleRedirect)
+	http.HandleFunc("/app/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "ui/build/index.html")
+	})
 	http.Handle("/", http.FileServer(http.Dir("ui/build")))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
-}
-
-func handleRedirect(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "ui/build/index.html")
 }

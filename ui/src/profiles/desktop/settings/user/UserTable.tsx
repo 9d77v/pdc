@@ -46,11 +46,6 @@ export default function UserTable() {
             }
         });
 
-    useEffect(() => {
-        if (error) {
-            message.error("接口请求失败！")
-        }
-    }, [error])
 
     const onUserCreate = async (values: any) => {
         await addUser({

@@ -20,20 +20,20 @@ import (
 var (
 	DEBUG = utils.GetEnvBool("DEBUG", true)
 
-	OwnerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
-	OwnerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
+	ownerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
+	ownerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
 
-	DBHost     = utils.GetEnvStr("DB_HOST", "domain.com")
-	DBPort     = utils.GetEnvInt("DB_PORT", 5432)
-	DBUser     = utils.GetEnvStr("DB_USER", "postgres")
-	DBPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
-	DBName     = utils.GetEnvStr("DB_NAME", "pdc")
-	DBPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
+	dbHost     = utils.GetEnvStr("DB_HOST", "domain.com")
+	dbPort     = utils.GetEnvInt("DB_PORT", 5432)
+	dbUser     = utils.GetEnvStr("DB_USER", "postgres")
+	dbPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
+	dbName     = utils.GetEnvStr("DB_NAME", "pdc")
+	dbPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
 
-	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "domain.com:9000")
-	MinioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
-	MinioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
-	MinioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
+	minioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "domain.com:9000")
+	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
+	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
+	minioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
 )
 
 var (
@@ -52,11 +52,11 @@ func init() {
 func initDB() {
 	dbConfig := &config.DBConfig{
 		Driver:       "postgres",
-		Host:         DBHost,
-		Port:         uint(DBPort),
-		User:         DBUser,
-		Password:     DBPassword,
-		Name:         DBName,
+		Host:         dbHost,
+		Port:         uint(dbPort),
+		User:         dbUser,
+		Password:     dbPassword,
+		Name:         dbName,
 		MaxIdleConns: 10,
 		MaxOpenConns: 100,
 		EnableLog:    DEBUG,
@@ -81,12 +81,12 @@ func initDBData() {
 		log.Panicf("Get User total failed:%v/n", err)
 	}
 	if total == 0 {
-		bytes, err := bcrypt.GenerateFromPassword([]byte(OwnerPassword), 12)
+		bytes, err := bcrypt.GenerateFromPassword([]byte(ownerPassword), 12)
 		if err != nil {
 			log.Panicf("generate password failed:%v/n", err)
 		}
 		user := &User{
-			Name:     OwnerName,
+			Name:     ownerName,
 			Password: string(bytes),
 			RoleID:   1,
 		}
@@ -98,10 +98,10 @@ func initDBData() {
 }
 
 func initMinio() {
-	endpoint := MinioAddress
-	accessKeyID := MinioAccessKeyID
-	secretAccessKey := MinioSecretAccessKey
-	useSSL := MinioUseSSL
+	endpoint := minioAddress
+	accessKeyID := minioAccessKeyID
+	secretAccessKey := minioSecretAccessKey
+	useSSL := minioUseSSL
 
 	var err error
 	MinioClient, err = minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
@@ -168,7 +168,7 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 
 	//设置表名称的前缀
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return fmt.Sprintf("%s_%s", DBPrefix, defaultTableName)
+		return fmt.Sprintf("%s_%s", dbPrefix, defaultTableName)
 	}
 
 	db.SingularTable(true)

@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -19,7 +20,14 @@ type UserService struct {
 }
 
 //CreateUser ..
-func (s UserService) CreateUser(input model.NewUser) (*model.User, error) {
+func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	flag, err := s.checkUserName(ctx, input.Name)
+	if err != nil {
+		return nil, err
+	}
+	if !flag {
+		return nil, errors.New("user is exist")
+	}
 	bytes, err := bcrypt.GenerateFromPassword([]byte(input.Password), 12)
 	if err != nil {
 		log.Printf("generate password failed:%v/n", err)
@@ -118,4 +126,12 @@ func (s UserService) ListUser(ctx context.Context, page, pageSize *int64, ids []
 		result = append(result, r)
 	}
 	return total, result, nil
+}
+
+func (s UserService) checkUserName(ctx context.Context, name string) (bool, error) {
+	var total int64
+	if err := models.Gorm.Model(&models.User{}).Select("name").Where("name=?", name).Count(&total).Error; err != nil {
+		return false, err
+	}
+	return total == 0, nil
 }

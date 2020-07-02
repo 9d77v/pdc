@@ -27,7 +27,7 @@ func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing
 }
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	return userService.CreateUser(input)
+	return userService.CreateUser(ctx, input)
 }
 
 func (r *mutationResolver) UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error) {
