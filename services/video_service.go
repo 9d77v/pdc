@@ -69,7 +69,7 @@ func (s VideoService) CreateVideo(input model.NewVideo) (*model.Video, error) {
 }
 
 //UpdateVideo ..
-func (s VideoService) UpdateVideo(ctx context.Context, input *model.NewUpdateVideo) (*model.Video, error) {
+func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error) {
 	video := new(models.Video)
 	fields := make([]string, 0)
 	varibales := graphql.GetRequestContext(ctx).Variables
@@ -122,7 +122,7 @@ func (s VideoService) CreateEpisode(input model.NewEpisode) (*model.Episode, err
 }
 
 //UpdateEpisode ..
-func (s VideoService) UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error) {
+func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
@@ -148,7 +148,8 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input *model.NewUpdateE
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, offset, limit int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
+func (s VideoService) ListVideo(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
+	offset, limit := GetPageInfo(page, pageSize)
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")

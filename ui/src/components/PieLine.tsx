@@ -1,8 +1,13 @@
 import React, { useState } from "react"
 import { PieLineSerieData } from "../consts/chart"
-import ReactEcharts from 'echarts-for-react';
+import ReactEchartsCore from 'echarts-for-react/lib/core';
 import moment from "moment";
-
+import echarts from 'echarts/lib/echarts';
+import 'echarts/lib/chart/pie';
+import 'echarts/lib/chart/line';
+import 'echarts/lib/component/tooltip';
+import 'echarts/lib/component/title';
+import 'echarts/lib/component/legend';
 interface PieProps {
     title: string
     start: moment.Moment
@@ -59,7 +64,8 @@ export const PieLine: React.FC<PieProps> = ({
             }
         }
     }
-    return (<ReactEcharts
+    return (<ReactEchartsCore
+        echarts={echarts}
         ref={(node: any) => setNode(node)}
         option={option}
         style={style}

@@ -6,6 +6,7 @@ import { GET_VIDEO } from '../../../consts/video.gql';
 import { Img } from "../../../components/Img";
 import { VideoPlayer } from "../../../components/VideoPlayer";
 import { useRouteMatch } from "react-router-dom";
+import TextArea from "antd/lib/input/TextArea";
 
 export const VideoDetail = () => {
     const match = useRouteMatch('/app/media/videos/:id');
@@ -70,15 +71,17 @@ export const VideoDetail = () => {
 
     return (
         <div style={{
-            display: 'flex', flexDirection: 'row', height: '100%', width: "100%"
+            display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
         }}>
-            <div style={{ display: 'flex', flexDirection: 'column', padding: 10, width: 1107, height: 838 }}>
+            <div style={{
+                display: 'flex', flexDirection: 'column', padding: 10,
+                width: 1107, height: 838, minHeight: 179, minWidth: 319,
+            }}>
                 <VideoPlayer
                     episodeID={episodeItem.id}
                     url={episodeItem.url}
                     subtitles={episodeItem.subtitles}
-                    minHeight={358}
-                    minWidth={638}
+
                     height={"100%"}
                     width={"100%"}
                     autoplay={true}
@@ -88,7 +91,16 @@ export const VideoDetail = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingInline: 10 }} >
                         <div style={{ textAlign: "left", fontSize: 18, padding: 10 }}> {videoItem.title}</div>
                         <div style={{ textAlign: "left", paddingLeft: 10, paddingRight: 10 }}> 全{videoItem.episodes.length}话</div>
-                        <div style={{ textAlign: 'left', paddingLeft: 10, paddingRight: 10 }}> {videoItem.desc}</div>
+                        <div style={{ textAlign: 'left', paddingLeft: 10, paddingRight: 10 }}>
+                            <TextArea
+                                value={videoItem.desc}
+                                rows={9}
+                                contentEditable={false}
+                                style={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0)',
+                                    border: 0,
+                                }} />
+                        </div>
                     </div>
                 </div>
             </div>

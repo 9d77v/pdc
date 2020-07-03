@@ -14,4 +14,5 @@ var (
 	videoService  = services.VideoService{}
 	commonService = services.CommonService{}
 	thingService  = services.ThingService{}
+	userService   = services.UserService{}
 )

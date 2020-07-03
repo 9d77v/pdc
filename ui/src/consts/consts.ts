@@ -66,5 +66,28 @@ const ThingStatusMap = new Map<number, TagStyle>([
     }]
 ])
 
+
+
+const GenderMap = new Map<number, string>([
+    [0, "男"],
+    [1, "女"],
+    [2, '未知']
+])
+
+const RoleMap = new Map<number, string>([
+    [2, "管理员"],
+    [3, '普通用户']
+])
+
+const FullRoleMap = new Map<number, string>([
+    [0, "未知"],
+    [1, "所有者"],
+    [2, "管理员"],
+    [3, '普通用户']
+])
+
 const ThingStatusArr = ['待采购', '使用中', '已收纳', '故障', '维修中', '待清理', '已清理']
-export { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr }
+export {
+    RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr,
+    GenderMap, RoleMap, FullRoleMap
+}

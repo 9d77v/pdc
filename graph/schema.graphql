@@ -7,6 +7,7 @@ type Query {
   Things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   ThingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   ThingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
+  Users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   presignedUrl(bucketName:String!,objectName:String!):String!
 }
 
@@ -14,7 +15,10 @@ type Mutation {
   createVideo(input: NewVideo!): Video!
   createEpisode(input:NewEpisode!):Episode!
   createThing(input:NewThing!):Thing!
-  updateVideo(input:NewUpdateVideo):Video!
-  updateEpisode(input:NewUpdateEpisode):Episode!
-  updateThing(input:NewUpdateThing):Thing!
+  createUser(input:NewUser!):User!
+
+  updateVideo(input:NewUpdateVideo!):Video!
+  updateEpisode(input:NewUpdateEpisode!):Episode!
+  updateThing(input:NewUpdateThing!):Thing!
+  updateUser(input:NewUpdateUser!):User!
 }

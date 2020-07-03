@@ -34,3 +34,14 @@ services:
     env_file:
       - pdc.env
     container_name: pdc
+  caddy:
+    image: caddy:2.1.1-alpine
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/logs:/opt/logs
+      - ./caddy/data:/data
+    container_name: caddy

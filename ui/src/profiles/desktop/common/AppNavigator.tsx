@@ -6,6 +6,7 @@ import { useLocation, Link, useRouteMatch } from "react-router-dom";
 const breadcrumbNameMap = new Map<string, string>([
     ['/app/settings', '系统设置'],
     ['/app/settings/videos', '视频管理'],
+    ['/app/settings/users', '用户管理'],
     ['/app/media', '媒体库'],
     ['/app/media/videos', '视频'],
     ['/app/media/videos/:id', '播放页'],

@@ -1,0 +1,16 @@
+{
+    auto_https off
+}
+
+domain.com:80 {
+    encode gzip
+    reverse_proxy pdc:8080 
+    log {
+        output file         access.log
+        format single_field common_log
+    }
+}
+
+oss.domain.com:80 {
+    reverse_proxy minio:9000 
+}

@@ -5,7 +5,7 @@ import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
 import crypto from 'crypto'
 import { getVttFromFile, getType } from '../utils/subtitle';
-import { getTextFromFile } from '../utils/file';
+import { getTextFromFile, replaceURL } from '../utils/file';
 
 interface UploaderProps {
     fileLimit: number
@@ -120,13 +120,14 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
         onSuccess: (response: any, file: UploadFile) => {
             message.success(`${file.name} 文件上传成功.`);
             const index = action.indexOf("?")
+            const url = replaceURL(action.substring(0, index))
             if (fileLimit === 1) {
-                setURL(action.substring(0, index))
+                setURL(url)
                 setFileList([file])
             } else {
                 file.status = 'done';
                 file.response = response;
-                file.url = action.substring(0, index)
+                file.url = url
                 setSucceedFile(file)
             }
         },

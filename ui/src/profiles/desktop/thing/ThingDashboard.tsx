@@ -4,8 +4,7 @@ import { message, Select } from "antd"
 import { useQuery } from "@apollo/react-hooks";
 import { Pie } from "../../../components/Pie";
 import { THING_SERIES } from "../../../consts/thing.gql";
-import moment from "moment";
-import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/category_data";
+import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/consts";
 import { SerieData } from "../../../consts/chart";
 
 const mapFunc = (value: SerieData) => {
@@ -41,7 +40,7 @@ export const ThingDashboard = () => {
                 <Select.Option value="location">位置</Select.Option>
                 <Select.Option value="purchase_platform">购买平台</Select.Option>
             </Select>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10, overflowX: "scroll" }}>
                 <Pie title="现存物品金额" name="物品类别" data={data ? data.Series3.map(mapFunc) : []} style={chartStyle} unit={'￥'} />
                 <Pie title="现存物品数量" name="物品类别" data={data ? data.Series4.map(mapFunc) : []} style={chartStyle} unit={'件'} />
             </div>

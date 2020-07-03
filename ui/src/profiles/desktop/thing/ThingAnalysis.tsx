@@ -4,7 +4,7 @@ import { message, Select, Radio, DatePicker } from "antd"
 import { useQuery } from "@apollo/react-hooks";
 import { THING_ANALYZE } from "../../../consts/thing.gql";
 import moment from "moment";
-import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/category_data";
+import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/consts";
 import { RadioChangeEvent } from "antd/lib/radio";
 import { PieLine } from "../../../components/PieLine";
 
@@ -58,7 +58,7 @@ export const ThingAnalysis = () => {
                 defaultValue={start}
                 style={{ width: 136, justifyContent: 'center' }} />}
             </span>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10, overflowX: "scroll" }}>
                 <PieLine title={"物品金额"} start={start} data={data ? data.Series1 : undefined} style={chartStyle} unit={'￥'} group={group || ""} />
                 <PieLine title={"物品数量"} start={start} data={data ? data.Series2 : undefined} style={chartStyle} unit={'件'} group={group || ""} />
             </div>

@@ -45,17 +45,17 @@ func (s ThingService) CreateThing(input model.NewThing) (*model.Thing, error) {
 }
 
 //UpdateThing ..
-func (s ThingService) UpdateThing(ctx context.Context, input *model.NewUpdateThing) (*model.Thing, error) {
-	Thing := new(models.Thing)
+func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
+	thing := new(models.Thing)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(Thing, "id=?", input.ID).Error; err != nil {
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(thing, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
-	err := models.Gorm.Model(Thing).Update(map[string]interface{}{
+	err := models.Gorm.Model(thing).Update(map[string]interface{}{
 		"name":                 ptrs.String(input.Name),
 		"num":                  ptrs.Float64(input.Num),
 		"brand_name":           ptrs.String(input.BrandName),
@@ -72,29 +72,14 @@ func (s ThingService) UpdateThing(ctx context.Context, input *model.NewUpdateThi
 		"ref_order_id":         ptrs.String(input.RefOrderID),
 		"rubbish_category":     input.RubbishCategory,
 	}).Error
-	return &model.Thing{ID: int64(Thing.ID)}, err
+	return &model.Thing{ID: int64(thing.ID)}, err
 }
 
 //ListThing ..
 func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Thing, error) {
-	offset := ptrs.Int64(page)
-	limit := ptrs.Int64(pageSize)
-	if offset < 1 {
-		offset = 1
-	}
-	if limit == 0 {
-		limit = 10
-	}
-	if limit < 0 {
-		limit = -1
-	}
-	if limit > 50 {
-		limit = 50
-	}
-	offset = (offset - 1) * limit
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
-
+	offset, limit := GetPageInfo(page, pageSize)
 	filedMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm

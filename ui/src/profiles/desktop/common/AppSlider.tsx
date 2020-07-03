@@ -11,6 +11,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["settings"],
         "defaultSelectedKeys": ['settings-videos']
     }],
+    ["/app/settings/users", {
+        "defaultOpenKeys": ["settings"],
+        "defaultSelectedKeys": ['settings-users']
+    }],
     ["/app/media/videos", {
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-videos']
@@ -76,6 +80,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="settings"
+                    style={{ display: "none" }}
                     title={
                         <span>
                             <SettingOutlined />
@@ -85,6 +90,9 @@ export const AppSlider = () => {
                 >
                     <Menu.Item key="settings-videos">
                         <Link to="/app/settings/videos">视频管理</Link>
+                    </Menu.Item>
+                    <Menu.Item key="settings-users">
+                        <Link to="/app/settings/users">用户管理</Link>
                     </Menu.Item>
                 </SubMenu>
             </Menu>

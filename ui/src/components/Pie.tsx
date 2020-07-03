@@ -1,7 +1,11 @@
 import React from "react"
 import { SerieData } from "../consts/chart"
-import ReactEcharts from 'echarts-for-react';
-
+import ReactEchartsCore from 'echarts-for-react/lib/core';
+import echarts from 'echarts/lib/echarts';
+import 'echarts/lib/chart/pie';
+import 'echarts/lib/component/tooltip';
+import 'echarts/lib/component/title';
+import 'echarts/lib/component/legend';
 interface PieProps {
     title: string
     name: string
@@ -52,5 +56,8 @@ export const Pie: React.FC<PieProps> = ({
             }
         ]
     }
-    return (<ReactEcharts option={option} style={style} />)
+    return (<ReactEchartsCore
+        echarts={echarts}
+        option={option}
+        style={style} />)
 }

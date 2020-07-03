@@ -9,7 +9,6 @@ import (
 
 	"git.9d77v.me/9d77v/pdc/graph/generated"
 	"git.9d77v.me/9d77v/pdc/graph/model"
-	"github.com/9d77v/go-lib/ptrs"
 )
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
@@ -27,36 +26,29 @@ func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing
 	return thingService.CreateThing(input)
 }
 
-func (r *mutationResolver) UpdateVideo(ctx context.Context, input *model.NewUpdateVideo) (*model.Video, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	return userService.CreateUser(ctx, input)
+}
+
+func (r *mutationResolver) UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error) {
 	return videoService.UpdateVideo(ctx, input)
 }
 
-func (r *mutationResolver) UpdateEpisode(ctx context.Context, input *model.NewUpdateEpisode) (*model.Episode, error) {
+func (r *mutationResolver) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
 	return videoService.UpdateEpisode(ctx, input)
 }
 
-func (r *mutationResolver) UpdateThing(ctx context.Context, input *model.NewUpdateThing) (*model.Thing, error) {
+func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
 	return thingService.UpdateThing(ctx, input)
 }
 
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error) {
+	return userService.UpdateUser(ctx, input)
+}
+
 func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
-	o := ptrs.Int64(page)
-	l := ptrs.Int64(pageSize)
-	if o < 1 {
-		o = 1
-	}
-	if l == 0 {
-		l = 10
-	}
-	if l < 0 {
-		l = -1
-	}
-	if l > 100 {
-		l = 100
-	}
-	o = (o - 1) * l
 	con := new(model.VideoConnection)
-	total, data, err := videoService.ListVideo(ctx, o, l, ids, sorts)
+	total, data, err := videoService.ListVideo(ctx, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -76,6 +68,14 @@ func (r *queryResolver) ThingSeries(ctx context.Context, dimension string, index
 
 func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error) {
 	return thingService.ThingAnalyze(ctx, dimension, index, start, group, 1)
+}
+
+func (r *queryResolver) Users(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {
+	con := new(model.UserConnection)
+	total, data, err := userService.ListUser(ctx, page, pageSize, ids, sorts)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {

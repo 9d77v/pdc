@@ -1,6 +1,6 @@
 import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
 import React, { useState, useEffect } from 'react'
-import { Uploader } from '../../../components/Uploader'
+import { Uploader } from '../../../../components/Uploader'
 import { SubtitleForm } from './SubtitleForm'
 import {
     DeleteOutlined
