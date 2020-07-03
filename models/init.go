@@ -35,7 +35,7 @@ var (
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
 	minioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
 
-	OssPrefix = ""
+	OssPrefix = utils.GetEnvStr("OSS_PREFIX", "http://domain.com")
 )
 
 var (
@@ -135,12 +135,6 @@ func initMinio() {
 			log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
 		}
 	}
-
-	schema := "http"
-	if minioUseSSL {
-		schema = "https"
-	}
-	OssPrefix = fmt.Sprintf("%s://%s", schema, minioAddress)
 }
 
 //NewClient gorm client
