@@ -60,7 +60,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="thing"
-                    style={{ display: "border" }}
+                    style={{ display: "none" }}
                     title={
                         <span>
                             <ShoppingOutlined />
@@ -80,6 +80,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="settings"
+                    style={{ display: "none" }}
                     title={
                         <span>
                             <SettingOutlined />
