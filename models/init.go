@@ -23,7 +23,7 @@ var (
 	ownerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
 	ownerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
 
-	dbHost     = utils.GetEnvStr("DB_HOST", "domain.com")
+	dbHost     = utils.GetEnvStr("DB_HOST", "pdc.9d77v.me")
 	dbPort     = utils.GetEnvInt("DB_PORT", 5432)
 	dbUser     = utils.GetEnvStr("DB_USER", "postgres")
 	dbPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
@@ -34,6 +34,8 @@ var (
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
 	minioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
+
+	OssPrefix = ""
 )
 
 var (
@@ -133,6 +135,12 @@ func initMinio() {
 			log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
 		}
 	}
+
+	schema := "http"
+	if minioUseSSL {
+		schema = "https"
+	}
+	OssPrefix = fmt.Sprintf("%s://%s", schema, minioAddress)
 }
 
 //NewClient gorm client

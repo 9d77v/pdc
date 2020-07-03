@@ -46,16 +46,16 @@ func (s ThingService) CreateThing(input model.NewThing) (*model.Thing, error) {
 
 //UpdateThing ..
 func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
-	Thing := new(models.Thing)
+	thing := new(models.Thing)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(Thing, "id=?", input.ID).Error; err != nil {
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(thing, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
-	err := models.Gorm.Model(Thing).Update(map[string]interface{}{
+	err := models.Gorm.Model(thing).Update(map[string]interface{}{
 		"name":                 ptrs.String(input.Name),
 		"num":                  ptrs.Float64(input.Num),
 		"brand_name":           ptrs.String(input.BrandName),
@@ -72,7 +72,7 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 		"ref_order_id":         ptrs.String(input.RefOrderID),
 		"rubbish_category":     input.RubbishCategory,
 	}).Error
-	return &model.Thing{ID: int64(Thing.ID)}, err
+	return &model.Thing{ID: int64(thing.ID)}, err
 }
 
 //ListThing ..

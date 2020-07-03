@@ -1,4 +1,8 @@
-domain.com{
+{
+    auto_https off
+}
+
+domain.com:80 {
     encode gzip
     reverse_proxy pdc:8080 
     log {
@@ -7,6 +11,6 @@ domain.com{
     }
 }
 
-oss.domain.com{
+oss.domain.com:80 {
     reverse_proxy minio:9000 
 }

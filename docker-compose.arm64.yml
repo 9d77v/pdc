@@ -43,4 +43,5 @@ services:
       volumes:
         - ./caddy/Caddyfile:/etc/caddy/Caddyfile
         - ./caddy/logs:/opt/logs
+        - ./caddy/data:/data
       container_name: caddy

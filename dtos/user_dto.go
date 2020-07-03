@@ -7,10 +7,14 @@ import (
 
 //ToUserDto ...
 func ToUserDto(m *models.User) *model.User {
+	avatar := ""
+	if m.Avatar != "" {
+		avatar = models.OssPrefix + m.Avatar
+	}
 	return &model.User{
 		ID:        int64(m.ID),
 		Name:      m.Name,
-		Avatar:    &m.Avatar,
+		Avatar:    &avatar,
 		RoleID:    int64(m.RoleID),
 		Gender:    int64(m.Gender),
 		Color:     &m.Color,

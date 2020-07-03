@@ -15,16 +15,24 @@ func ToVideoDto(m *models.Video) *model.Video {
 		for k, v := range e.Subtitles {
 			sArr = append(sArr, &model.Subtitle{
 				Name: k,
-				URL:  *v,
+				URL:  models.OssPrefix + *v,
 			})
+		}
+		cover := ""
+		if e.Cover != "" {
+			cover = models.OssPrefix + e.Cover
+		}
+		url := ""
+		if e.URL != "" {
+			url = models.OssPrefix + e.URL
 		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
 			Num:       e.Num,
 			Title:     e.Title,
 			Desc:      e.Desc,
-			Cover:     e.Cover,
-			URL:       e.URL,
+			Cover:     cover,
+			URL:       url,
 			Subtitles: sArr,
 			CreatedAt: e.CreatedAt.Unix(),
 			UpdatedAt: e.UpdatedAt.Unix(),
@@ -44,13 +52,17 @@ func ToVideoDto(m *models.Video) *model.Video {
 			Persons: strings.Split(*v, ","),
 		})
 	}
+	cover := ""
+	if m.Cover != "" {
+		cover = models.OssPrefix + m.Cover
+	}
 	return &model.Video{
 		ID:         int64(m.ID),
 		Title:      m.Title,
 		Desc:       m.Desc,
 		PubDate:    m.PubDate.Unix(),
 		Episodes:   es,
-		Cover:      m.Cover,
+		Cover:      cover,
 		Characters: cArr,
 		Staffs:     sArr,
 		Tags:       m.Tags,
