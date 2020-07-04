@@ -1,9 +1,6 @@
-{
-    auto_https off
-}
-
-domain.com:80 {
+domain.local {
     encode gzip
+    tls internal
     reverse_proxy pdc:8080 
     log {
         output file         access.log
@@ -11,6 +8,7 @@ domain.com:80 {
     }
 }
 
-oss.domain.com:80 {
+oss.domain.local {
+    tls internal
     reverse_proxy minio:9000 
 }

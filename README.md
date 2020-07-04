@@ -2,21 +2,51 @@
 Personal Data Center.
 
 # Quickstart
+1. set host
+
+add `your_ip domain.local` to host file
+
+win10:C:\Windows\System32\drivers\etc\hosts
+
+linux/mac: /etc/hosts
+
+2. run app
 ```
 git clone git@github.com:9d77v/pdc.git
 cd pdc
 
-#amd64 machine
+# arm64 machine
 docker-compose up -d
-
-#arm64 machine
-docker-compose up -d -f docker-compose.arm64.yml
 ```
-homepage http://localhost:8080
 
-docs http://localhost:8080/docs
+3. install crt
+```
+docker cp caddy:/data/caddy/pki/authorities/local/root.crt root.crt
 
-# Develop reference
+docker cp caddy:/data/caddy/pki/authorities/local/intermediate.crt intermediate.crt
+
+docker cp caddy:/data/caddy/certificates/local/domain.local/domain.local.crt domain.local.crt
+
+docker cp caddy:/data/caddy/certificates/local/oss.domain.local/oss.domain.local.crt oss.domain.local.crt
+```
+install crts to your system
+
+4. visit homepage
+```
+homepage https://domain.local
+
+docs https://domain.local/docs
+
+# Develop 
+## run server
+```
+./run dev
+```
+## run ui
+```
+./run ui
+```
+## reference docs
 gqlgen https://gqlgen.com/
 
 gorm https://gorm.io/zh_CN/docs/index.html
