@@ -19,7 +19,19 @@ cd pdc
 docker-compose up -d
 ```
 
-3. visit homepage
+3. install crt
+```
+docker cp caddy:/data/caddy/pki/authorities/local/root.crt root.crt
+
+docker cp caddy:/data/caddy/pki/authorities/local/intermediate.crt intermediate.crt
+
+docker cp caddy:/data/caddy/certificates/local/domain.local/domain.local.crt domain.local.crt
+
+docker cp caddy:/data/caddy/certificates/local/oss.domain.local/oss.domain.local.crt oss.domain.local.crt
+```
+install crts to your system
+
+4. visit homepage
 ```
 homepage https://domain.local
 
