@@ -40,8 +40,10 @@ services:
     ports:
       - 80:80
       - 443:443
+    user: root
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./caddy/logs:/opt/logs
-      - ./caddy/data:/data
+      - ./caddy/config:/config/caddy
+      - ./caddy/data:/data/caddy
     container_name: caddy
