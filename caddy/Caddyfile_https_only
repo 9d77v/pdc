@@ -1,0 +1,23 @@
+{
+  https_port 7000
+  auto_https disable_redirects
+}
+
+http://domain.local:7000 {
+    tls {
+        dns lego_deprecated alidns
+    }
+    encode gzip
+    reverse_proxy pdc:8080
+    log {
+        output file         access.log
+        format single_field common_log
+    }
+}
+
+http://oss.domain.local:7000 {
+    tls {
+        dns lego_deprecated alidns
+    }
+    reverse_proxy minio:9000
+}

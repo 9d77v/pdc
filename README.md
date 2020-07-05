@@ -32,7 +32,6 @@ docker cp caddy:/data/caddy/certificates/local/oss.domain.local/oss.domain.local
 install crts to your system
 
 4. visit homepage
-```
 homepage https://domain.local
 
 docs https://domain.local/docs
