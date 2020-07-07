@@ -3,22 +3,25 @@
 # https://gqlgen.com/getting-started/
 
 type Query {
-  Videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
-  Things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
-  ThingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
-  ThingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
-  Users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   presignedUrl(bucketName:String!,objectName:String!):String!
+  users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
+  videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
+  thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
+  thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 }
 
 type Mutation {
-  createVideo(input: NewVideo!): Video!
-  createEpisode(input:NewEpisode!):Episode!
-  createThing(input:NewThing!):Thing!
   createUser(input:NewUser!):User!
-
-  updateVideo(input:NewUpdateVideo!):Video!
-  updateEpisode(input:NewUpdateEpisode!):Episode!
-  updateThing(input:NewUpdateThing!):Thing!
   updateUser(input:NewUpdateUser!):User!
+  login(username:String!,password:String!):LoginResponse!
+  refreshToken(refreshToken:String!):LoginResponse!
+
+  createVideo(input: NewVideo!): Video!
+  updateVideo(input:NewUpdateVideo!):Video!
+  createEpisode(input:NewEpisode!):Episode!
+  updateEpisode(input:NewUpdateEpisode!):Episode!
+
+  createThing(input:NewThing!):Thing!
+  updateThing(input:NewUpdateThing!):Thing!
 }

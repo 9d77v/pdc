@@ -19,6 +19,11 @@ import (
 type UserService struct {
 }
 
+const (
+	accessExpire  = time.Hour
+	refreshExpire = 14 * 24 * time.Hour
+)
+
 //CreateUser ..
 func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	flag, err := s.checkUserName(ctx, input.Name)
@@ -134,4 +139,33 @@ func (s UserService) checkUserName(ctx context.Context, name string) (bool, erro
 		return false, err
 	}
 	return total == 0, nil
+}
+
+//Login ..
+func (s UserService) Login(ctx context.Context, username string, password string) (*model.LoginResponse, error) {
+	res := new(model.LoginResponse)
+	user := new(models.User)
+	if err := models.Gorm.Select("id,name,password").Where("name=?", username).First(user).Error; err != nil {
+		return res, err
+	}
+	err := bcrypt.CompareHashAndPassword([]byte(user.Name), []byte(password))
+	if err != nil {
+		return res, err
+	}
+	res.AccessToken = utils.JWT([]byte(models.JWTtAccessSecret), int64(user.ID), accessExpire, models.JWTIssuer)
+	res.RefreshToken = utils.JWT([]byte(models.JWTRefreshSecret), int64(user.ID), refreshExpire, models.JWTIssuer)
+	return res, nil
+}
+
+//RefreshToken ..
+func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*model.LoginResponse, error) {
+	res := new(model.LoginResponse)
+	token, err := utils.ParseJWT([]byte(models.JWTRefreshSecret), refreshToken)
+	if err != nil {
+		return res, err
+	}
+	data, _ := token.Claims.(*utils.MyCustomClaims)
+	res.AccessToken = utils.JWT([]byte(models.JWTtAccessSecret), data.UID, accessExpire, models.JWTIssuer)
+	res.RefreshToken = utils.JWT([]byte(models.JWTRefreshSecret), data.UID, refreshExpire, models.JWTIssuer)
+	return res, nil
 }
