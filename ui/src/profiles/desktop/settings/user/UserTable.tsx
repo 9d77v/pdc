@@ -198,9 +198,9 @@ export default function UserTable() {
                 onChange={onChange}
                 pagination={{
                     ...pagination,
-                    total: data ? data.Users.totalCount : 0
+                    total: data ? data.users.totalCount : 0
                 }}
-                dataSource={data ? data.Users.edges : []}
+                dataSource={data ? data.users.edges : []}
             />
         </div>
 

@@ -15,8 +15,8 @@ mutation updateUser($input:NewUpdateUser!){
 }
 `
 const LIST_USER = gql`
- query Users( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   Users(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query users( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   users(page: $page, pageSize: $pageSize,sorts:$sorts){
         totalCount
         edges{
             id

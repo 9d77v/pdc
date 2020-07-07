@@ -242,7 +242,7 @@ export default function VideoTable() {
     }
     const getNum = (currentVideoID: number) => {
         const mediaMap = new Map<number, number>()
-        for (const v of data ? data.Videos.edges : []) {
+        for (const v of data ? data.videos.edges : []) {
             const episodeData = v.episodes
             if (episodeData.length > 0) {
                 mediaMap.set(v.id, episodeData[episodeData.length - 1].num + 1)
@@ -378,9 +378,9 @@ export default function VideoTable() {
                 onChange={onChange}
                 pagination={{
                     ...pagination,
-                    total: data ? data.Videos.totalCount : 0
+                    total: data ? data.videos.totalCount : 0
                 }}
-                dataSource={data ? data.Videos.edges : []}
+                dataSource={data ? data.videos.edges : []}
             />
         </div>
 

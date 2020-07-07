@@ -42,8 +42,8 @@ export const VideoDetail = () => {
         subtitles: null
     }
     let buttons: any = []
-    if (data && data.Videos.edges) {
-        const videos = data.Videos.edges
+    if (data && data.videos.edges) {
+        const videos = data.videos.edges
         const video = videos.length > 0 ? videos[0] : null
         if (video) {
             videoItem = ({

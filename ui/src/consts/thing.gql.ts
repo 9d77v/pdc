@@ -15,8 +15,8 @@ mutation updateThing($input:NewUpdateThing!){
 }
 `
 const LIST_THING = gql`
- query Things( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   Things(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query things( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   things(page: $page, pageSize: $pageSize,sorts:$sorts){
         totalCount
         edges{
             id
@@ -44,12 +44,12 @@ const LIST_THING = gql`
 `;
 
 const THING_SERIES = gql`
- query ThingSeries($dimension:String!,$index1:String!,$index2:String!,$status:[Int!]) {
-    Series3:ThingSeries(dimension: $dimension, index: $index1,status:$status){
+ query thingSeries($dimension:String!,$index1:String!,$index2:String!,$status:[Int!]) {
+    series3:thingSeries(dimension: $dimension, index: $index1,status:$status){
       name
       value
    }
-   Series4:ThingSeries(dimension: $dimension, index: $index2,status:$status){
+   series4:thingSeries(dimension: $dimension, index: $index2,status:$status){
       name
       value
    }
@@ -57,13 +57,13 @@ const THING_SERIES = gql`
 `
 
 const THING_ANALYZE = gql`
- query ThingAnalyze($dimension:String!,$index1:String!,$index2:String!,$start:Int,$group:String!) {
-   Series1:ThingAnalyze(dimension: $dimension, index: $index1,start:$start,group:$group){
+ query thingAnalyze($dimension:String!,$index1:String!,$index2:String!,$start:Int,$group:String!) {
+   series1:thingAnalyze(dimension: $dimension, index: $index1,start:$start,group:$group){
       x1
       x2
       y
    }
-    Series2:ThingAnalyze(dimension: $dimension, index: $index2,start:$start,group:$group){
+    series2:thingAnalyze(dimension: $dimension, index: $index2,start:$start,group:$group){
       x1
       x2
       y

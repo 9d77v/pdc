@@ -30,10 +30,10 @@ export const ThingAnalysis = () => {
         }
     }, [error])
     if (data) {
-        data.Series1.x2 = data.Series1.x2.map((value: string) => {
+        data.series1.x2 = data.series1.x2.map((value: string) => {
             return ConsumerExpenditureMap.get(value) || ThingStatusMap.get(parseInt(value))?.text || value
         })
-        data.Series2.x2 = data.Series2.x2.map((value: string) => {
+        data.series2.x2 = data.series2.x2.map((value: string) => {
             return ConsumerExpenditureMap.get(value) || ThingStatusMap.get(parseInt(value))?.text || value
         })
     }
@@ -59,8 +59,8 @@ export const ThingAnalysis = () => {
                 style={{ width: 136, justifyContent: 'center' }} />}
             </span>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10, overflowX: "scroll" }}>
-                <PieLine title={"物品金额"} start={start} data={data ? data.Series1 : undefined} style={chartStyle} unit={'￥'} group={group || ""} />
-                <PieLine title={"物品数量"} start={start} data={data ? data.Series2 : undefined} style={chartStyle} unit={'件'} group={group || ""} />
+                <PieLine title={"物品金额"} start={start} data={data ? data.series1 : undefined} style={chartStyle} unit={'￥'} group={group || ""} />
+                <PieLine title={"物品数量"} start={start} data={data ? data.series2 : undefined} style={chartStyle} unit={'件'} group={group || ""} />
             </div>
         </div>
     )
