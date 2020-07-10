@@ -10,13 +10,11 @@ const DesktopIndex = React.lazy(() => import('./profiles/desktop/index'))
 function App() {
   return (
     <ApolloProvider client={client}>
-      <div className="App">
-        <React.Suspense fallback={<Spin />}>
-          <ConfigProvider locale={zhCN}>
-            <DesktopIndex />
-          </ConfigProvider>
-        </React.Suspense>
-      </div>
+      <React.Suspense fallback={<Spin />}>
+        <ConfigProvider locale={zhCN}>
+          <DesktopIndex />
+        </ConfigProvider>
+      </React.Suspense>
     </ApolloProvider>
   );
 }

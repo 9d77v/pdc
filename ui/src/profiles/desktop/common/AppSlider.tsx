@@ -7,6 +7,10 @@ const { Sider } = Layout;
 const { SubMenu } = Menu;
 
 const locationMap = new Map<string, any>([
+    ["/app/home", {
+        "defaultOpenKeys": ["home"],
+        "defaultSelectedKeys": ['home']
+    }],
     ["/app/settings/videos", {
         "defaultOpenKeys": ["settings"],
         "defaultSelectedKeys": ['settings-videos']
@@ -32,10 +36,15 @@ const locationMap = new Map<string, any>([
         "defaultSelectedKeys": ['thing-analysis']
     }]
 ])
-export const AppSlider = () => {
+
+interface AppHeaderProps {
+    roleID: number;
+}
+export const AppSlider = (props: AppHeaderProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
     const config = locationMap.get(location.pathname) || []
+    const roleID = props.roleID
     return (
         <Sider width={200} className="site-layout-background" collapsible collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)}>
             <Menu
@@ -45,8 +54,12 @@ export const AppSlider = () => {
                 defaultOpenKeys={config["defaultOpenKeys"]}
                 style={{ height: '100%', borderRight: 0 }}
             >
+                <Menu.Item key="home">
+                    <Link to="/app/home">首页</Link>
+                </Menu.Item>
                 <SubMenu
                     key="media"
+                    style={{ display: roleID > 0 ? "block" : "none" }}
                     title={
                         <span>
                             <PlaySquareOutlined />
@@ -60,7 +73,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="thing"
-                    style={{ display: "none" }}
+                    style={{ display: roleID > 0 ? "block" : "none" }}
                     title={
                         <span>
                             <ShoppingOutlined />
@@ -80,7 +93,7 @@ export const AppSlider = () => {
                 </SubMenu>
                 <SubMenu
                     key="settings"
-                    style={{ display: "none" }}
+                    style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
                     title={
                         <span>
                             <SettingOutlined />
@@ -88,10 +101,12 @@ export const AppSlider = () => {
                         </span>
                     }
                 >
-                    <Menu.Item key="settings-videos">
+                    <Menu.Item key="settings-videos"                                  >
                         <Link to="/app/settings/videos">视频管理</Link>
                     </Menu.Item>
-                    <Menu.Item key="settings-users">
+                    <Menu.Item key="settings-users"
+                        style={{ display: roleID === 1 ? "block" : "none" }}
+                    >
                         <Link to="/app/settings/users">用户管理</Link>
                     </Menu.Item>
                 </SubMenu>
