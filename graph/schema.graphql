@@ -5,6 +5,7 @@
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
   users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
+  userInfo(uid:ID):User!
   videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
   things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!

@@ -6,10 +6,11 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 
+	"git.9d77v.me/9d77v/pdc/dtos"
 	"git.9d77v.me/9d77v/pdc/graph/generated"
 	"git.9d77v.me/9d77v/pdc/graph/model"
+	"git.9d77v.me/9d77v/pdc/middleware"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -21,11 +22,11 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUpdate
 }
 
 func (r *mutationResolver) Login(ctx context.Context, username string, password string) (*model.LoginResponse, error) {
-	panic(fmt.Errorf("not implemented"))
+	return userService.Login(ctx, username, password)
 }
 
 func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string) (*model.LoginResponse, error) {
-	panic(fmt.Errorf("not implemented"))
+	return userService.RefreshToken(ctx, refreshToken)
 }
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
@@ -67,6 +68,10 @@ func (r *queryResolver) Users(ctx context.Context, page *int64, pageSize *int64,
 	return con, err
 }
 
+func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, error) {
+	return dtos.ToUserDto(middleware.ForContext(ctx)), nil
+}
+
 func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
 	total, data, err := videoService.ListVideo(ctx, page, pageSize, ids, sorts)
@@ -76,19 +81,22 @@ func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64
 }
 
 func (r *queryResolver) Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
+	user := middleware.ForContext(ctx)
 	con := new(model.ThingConnection)
-	total, data, err := thingService.ListThing(ctx, page, pageSize, ids, sorts)
+	total, data, err := thingService.ListThing(ctx, page, pageSize, ids, sorts, int64(user.ID))
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
 func (r *queryResolver) ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error) {
-	return thingService.ThingSeries(ctx, dimension, index, start, end, status, 1)
+	user := middleware.ForContext(ctx)
+	return thingService.ThingSeries(ctx, dimension, index, start, end, status, int64(user.ID))
 }
 
 func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error) {
-	return thingService.ThingAnalyze(ctx, dimension, index, start, group, 1)
+	user := middleware.ForContext(ctx)
+	return thingService.ThingAnalyze(ctx, dimension, index, start, group, int64(user.ID))
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -99,16 +107,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) Login(ctx context.Context, username string, password string) (*model.LoginResponse, error) {
-	return userService.Login(ctx, username, password)
-}
-func (r *queryResolver) RefreshToken(ctx context.Context, refreshToken string) (*model.LoginResponse, error) {
-	return userService.RefreshToken(ctx, refreshToken)
-}

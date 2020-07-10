@@ -90,6 +90,7 @@ type ComplexityRoot struct {
 		ThingAnalyze func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries  func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
 		Things       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		UserInfo     func(childComplexity int, uid *int64) int
 		Users        func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Videos       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 	}
@@ -190,6 +191,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
 	Users(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
+	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
 	Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
 	Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
@@ -497,6 +499,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Things(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+
+	case "Query.userInfo":
+		if e.complexity.Query.UserInfo == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userInfo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserInfo(childComplexity, args["uid"].(*int64)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -981,6 +995,7 @@ type PieLineSerieData{
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
   users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
+  userInfo(uid:ID):User!
   videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
   things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
@@ -1534,6 +1549,20 @@ func (ec *executionContext) field_Query_things_args(ctx context.Context, rawArgs
 		}
 	}
 	args["sorts"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int64
+	if tmp, ok := rawArgs["uid"]; ok {
+		arg0, err = ec.unmarshalOID2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uid"] = arg0
 	return args, nil
 }
 
@@ -2717,6 +2746,47 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	res := resTmp.(*model.UserConnection)
 	fc.Result = res
 	return ec.marshalNUserConnection2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUserConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_userInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_userInfo_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().UserInfo(rctx, args["uid"].(*int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgitᚗ9d77vᚗmeᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6769,6 +6839,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "userInfo":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userInfo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "videos":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -8476,6 +8560,14 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return ec.marshalOFloat2float64(ctx, sel, *v)
 }
 
+func (ec *executionContext) unmarshalOID2int64(ctx context.Context, v interface{}) (int64, error) {
+	return graphql.UnmarshalInt64(v)
+}
+
+func (ec *executionContext) marshalOID2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	return graphql.MarshalInt64(v)
+}
+
 func (ec *executionContext) unmarshalOID2ᚕint64ᚄ(ctx context.Context, v interface{}) ([]int64, error) {
 	var vSlice []interface{}
 	if v != nil {
@@ -8506,6 +8598,21 @@ func (ec *executionContext) marshalOID2ᚕint64ᚄ(ctx context.Context, sel ast.
 	}
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalOID2ᚖint64(ctx context.Context, v interface{}) (*int64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalOID2int64(ctx, v)
+	return &res, err
+}
+
+func (ec *executionContext) marshalOID2ᚖint64(ctx context.Context, sel ast.SelectionSet, v *int64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec.marshalOID2int64(ctx, sel, *v)
 }
 
 func (ec *executionContext) unmarshalOInt2int64(ctx context.Context, v interface{}) (int64, error) {

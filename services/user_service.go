@@ -148,7 +148,7 @@ func (s UserService) Login(ctx context.Context, username string, password string
 	if err := models.Gorm.Select("id,name,password").Where("name=?", username).First(user).Error; err != nil {
 		return res, err
 	}
-	err := bcrypt.CompareHashAndPassword([]byte(user.Name), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return res, err
 	}
@@ -167,5 +167,15 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 	data, _ := token.Claims.(*utils.MyCustomClaims)
 	res.AccessToken = utils.JWT([]byte(models.JWTtAccessSecret), data.UID, accessExpire, models.JWTIssuer)
 	res.RefreshToken = utils.JWT([]byte(models.JWTRefreshSecret), data.UID, refreshExpire, models.JWTIssuer)
+	return res, nil
+}
+
+//GetByID ..
+func (s UserService) GetByID(uid int64) (*model.User, error) {
+	res := new(model.User)
+	user := new(models.User)
+	if err := user.GetByID(uid); err != nil {
+		return res, err
+	}
 	return res, nil
 }

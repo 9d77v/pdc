@@ -49,6 +49,13 @@ var (
 	MinioClient *minio.Client
 )
 
+//角色
+const (
+	RoleAdmin   = 1
+	RoleManager = 2
+	RoleUser    = 3
+)
+
 func init() {
 	initDB()
 	initMinio()
