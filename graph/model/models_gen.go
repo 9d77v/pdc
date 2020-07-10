@@ -20,6 +20,11 @@ type Episode struct {
 	UpdatedAt int64       `json:"updatedAt"`
 }
 
+type LoginResponse struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
 type NewCharacter struct {
 	CharacterName string `json:"characterName"`
 	OriginalName  string `json:"originalName"`

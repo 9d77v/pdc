@@ -11,12 +11,10 @@ type User {
 	updatedAt: Int!
 }
 
-
 type UserConnection {
 	totalCount: Int!
 	edges:[User!]!
 }
-
 
 input NewUser {
 	name:String!
@@ -39,3 +37,7 @@ input NewUpdateUser{
 	ip:String   
 }
 
+type LoginResponse{
+	accessToken: String!
+	refreshToken: String!
+}

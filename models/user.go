@@ -18,3 +18,8 @@ type User struct {
 	BirthDate time.Time
 	IP        string `gorm:"size:50;NOT NULL;"` //check if user is online
 }
+
+//GetByID ..
+func (u *User) GetByID(uid int64) error {
+	return Gorm.Where("id=?", uid).First(u).Error
+}

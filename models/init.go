@@ -30,6 +30,10 @@ var (
 	dbName     = utils.GetEnvStr("DB_NAME", "pdc")
 	dbPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
 
+	JWTtAccessSecret = utils.GetEnvStr("JWT_ACCESS_SECRET", "JWT_ACCESS_SECRET")
+	JWTRefreshSecret = utils.GetEnvStr("JWT_REFRESH_SECRET", "JWT_REFRESH_SECRET")
+	JWTIssuer        = utils.GetEnvStr("JWT_ISSUER", "domain.local")
+
 	minioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
@@ -43,6 +47,13 @@ var (
 	Gorm *gorm.DB
 	//MinioClient S3 OSS
 	MinioClient *minio.Client
+)
+
+//角色
+const (
+	RoleAdmin   = 1
+	RoleManager = 2
+	RoleUser    = 3
 )
 
 func init() {
