@@ -1,6 +1,6 @@
 #!/bin/sh
 app='pdc'
-version="0.0.4"
+version="0.0.5"
 sudo=""
 if command -v sudo >/dev/null 2>&1; then
     sudo="sudo"
@@ -22,9 +22,9 @@ case $1 in
         $sudo docker push 9d77v/$app-base:$version
        ;;
     deploy)
-        cd ui 
-        yarn build
-        cd ..
+        # cd ui 
+        # yarn build
+        # cd ..
         IMAGE_TAG=`git log --pretty=format:"%ad_%h" -1 --date=short`
         $sudo docker build -t 9d77v/$app:$IMAGE_TAG .
         $sudo docker push 9d77v/$app:$IMAGE_TAG

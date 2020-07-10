@@ -6,8 +6,8 @@ import (
 	"log"
 	"strings"
 
-	"git.9d77v.me/9d77v/pdc/utils"
 	"github.com/9d77v/go-lib/clients/config"
+	"github.com/9d77v/pdc/utils"
 	"github.com/jinzhu/gorm"
 	minio "github.com/minio/minio-go/v6"
 	"golang.org/x/crypto/bcrypt"
