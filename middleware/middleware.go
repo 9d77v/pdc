@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"git.9d77v.me/9d77v/pdc/models"
-	"git.9d77v.me/9d77v/pdc/utils"
+	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/utils"
 )
 
 var userCtxKey = &contextKey{"user"}

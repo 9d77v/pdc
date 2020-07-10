@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
-	"git.9d77v.me/9d77v/pdc/dtos"
-	"git.9d77v.me/9d77v/pdc/graph/model"
-	"git.9d77v.me/9d77v/pdc/models"
-	"git.9d77v.me/9d77v/pdc/utils"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/pdc/dtos"
+	"github.com/9d77v/pdc/graph/model"
+	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/utils"
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )

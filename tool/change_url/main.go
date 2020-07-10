@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	"git.9d77v.me/9d77v/pdc/models"
+	"github.com/9d77v/pdc/models"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"git.9d77v.me/9d77v/pdc/dtos"
-	"git.9d77v.me/9d77v/pdc/graph/model"
-	"git.9d77v.me/9d77v/pdc/models"
-	"git.9d77v.me/9d77v/pdc/utils"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/pdc/dtos"
+	"github.com/9d77v/pdc/graph/model"
+	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/utils"
 )
 
 //ThingService ..
@@ -18,9 +18,9 @@ type ThingService struct {
 }
 
 //CreateThing ..
-func (s ThingService) CreateThing(input model.NewThing) (*model.Thing, error) {
+func (s ThingService) CreateThing(input model.NewThing, uid int64) (*model.Thing, error) {
 	m := &models.Thing{
-		UID:                 1,
+		UID:                 uid,
 		Name:                input.Name,
 		Num:                 input.Num,
 		BrandName:           ptrs.String(input.BrandName),
@@ -45,14 +45,14 @@ func (s ThingService) CreateThing(input model.NewThing) (*model.Thing, error) {
 }
 
 //UpdateThing ..
-func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
+func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing, uid int64) (*model.Thing, error) {
 	thing := new(models.Thing)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(thing, "id=?", input.ID).Error; err != nil {
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(thing, "id=? and uid=?", input.ID, uid).Error; err != nil {
 		return nil, err
 	}
 	err := models.Gorm.Model(thing).Update(map[string]interface{}{

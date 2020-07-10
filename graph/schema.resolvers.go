@@ -7,10 +7,10 @@ import (
 	"context"
 	"errors"
 
-	"git.9d77v.me/9d77v/pdc/dtos"
-	"git.9d77v.me/9d77v/pdc/graph/generated"
-	"git.9d77v.me/9d77v/pdc/graph/model"
-	"git.9d77v.me/9d77v/pdc/middleware"
+	"github.com/9d77v/pdc/dtos"
+	"github.com/9d77v/pdc/graph/generated"
+	"github.com/9d77v/pdc/graph/model"
+	"github.com/9d77v/pdc/middleware"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -49,11 +49,13 @@ func (r *mutationResolver) UpdateEpisode(ctx context.Context, input model.NewUpd
 }
 
 func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error) {
-	return thingService.CreateThing(input)
+	user := middleware.ForContext(ctx)
+	return thingService.CreateThing(input, int64(user.ID))
 }
 
 func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
-	return thingService.UpdateThing(ctx, input)
+	user := middleware.ForContext(ctx)
+	return thingService.UpdateThing(ctx, input, int64(user.ID))
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
