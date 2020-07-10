@@ -27,7 +27,7 @@ services:
       - ./postgres/data:/var/lib/postgresql/data
     container_name: db
   pdc:
-    image: 9d77v/pdc:2020-07-03_0845d5f
+    image: 9d77v/pdc:2020-07-10_fc50de0
     restart: always
     ports: 
       - 8080:8080
