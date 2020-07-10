@@ -15,8 +15,8 @@ mutation updateUser($input:NewUpdateUser!){
 }
 `
 const LIST_USER = gql`
- query Users( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   Users(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query users( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   users(page: $page, pageSize: $pageSize,sorts:$sorts){
         totalCount
         edges{
             id
@@ -34,5 +34,36 @@ const LIST_USER = gql`
   }
 `;
 
+const GET_USER = gql`
+ query userInfo($uid:ID) {
+   userInfo(uid:$uid){
+      id
+      name
+      avatar
+      roleID
+      gender
+      color
+      birthDate
+      ip 
+   }
+  }
+`;
 
-export { LIST_USER, ADD_USER, UPDATE_USER }
+const LOGIN = gql`
+mutation login($username:String!,$password:String!){
+   login(username:$username,password:$password){
+      accessToken
+      refreshToken
+   }
+}
+`
+
+const REFRESH_TOKEN = gql`
+mutation refreshToken($refreshToken:String!){
+   refreshToken(refreshToken:$refreshToken){
+      accessToken
+      refreshToken
+   }
+}
+`
+export { LIST_USER, ADD_USER, UPDATE_USER, GET_USER, LOGIN, REFRESH_TOKEN }

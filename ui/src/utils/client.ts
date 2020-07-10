@@ -1,25 +1,46 @@
 import { ApolloClient } from 'apollo-client';
-import { createHttpLink } from 'apollo-link-http';
-import { setContext } from 'apollo-link-context';
+import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { ApolloLink, from } from 'apollo-link';
+import { onError } from 'apollo-link-error';
 
-const httpLink = createHttpLink({
-    uri: '/api',
-});
+const httpLink = new HttpLink({ uri: '/api' });
 
-const authLink = setContext((_, { headers }) => {
-    // get the authentication token from local storage if it exists
-    const token = localStorage.getItem('token');
-    // return the headers to the context so httpLink can read them
-    return {
+
+const authLink = new ApolloLink((operation, forward) => {
+    // add the authorization to the headers
+    const token = localStorage.getItem('accessToken');
+    operation.setContext({
         headers: {
-            ...headers,
-            authorization: token ? `Bearer ${token}` : "",
+            Authorization: token ? `Bearer ${token}` : "",
         }
+    });
+
+    return forward(operation);
+})
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+        graphQLErrors.map(({ message, locations, path }) =>
+            console.log(
+                `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+            ),
+        )
     }
-});
+    if (networkError) {
+        const err: any = networkError
+        if (err.statusCode === 401) {
+            localStorage.clear()
+        }
+    };
+})
 
 export const client = new ApolloClient({
-    link: authLink.concat(httpLink),
+    link: from([
+        errorLink,
+        authLink,
+        httpLink,
+
+    ]),
     cache: new InMemoryCache()
 });

@@ -30,8 +30,8 @@ export const VideoPage = () => {
 
     const history = useHistory()
     useEffect(() => {
-        if (data && data.Videos.edges) {
-            const videos = data.Videos.edges
+        if (data && data.videos.edges) {
+            const videos = data.videos.edges
             setCards(videos.map((item: any) =>
                 <div key={item.id}
                     onClick={() => history.push('/app/media/videos/' + item.id)}

@@ -31,8 +31,8 @@ mutation updateEpisode($input:NewUpdateEpisode!){
 }
 `
 const LIST_VIDEO = gql`
- query Videos( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   Videos(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query videos( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   videos(page: $page, pageSize: $pageSize,sorts:$sorts){
        totalCount
        edges{
              id
@@ -64,8 +64,8 @@ const LIST_VIDEO = gql`
 `;
 
 const LIST_VIDEO_CARD = gql`
- query Videos( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   Videos(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query videos( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   videos(page: $page, pageSize: $pageSize,sorts:$sorts){
        edges{
             id
             title
@@ -80,8 +80,8 @@ const LIST_VIDEO_CARD = gql`
 `;
 
 const GET_VIDEO = gql`
- query Videos( $ids: [ID!]) {
-   Videos(ids:$ids){
+ query videos( $ids: [ID!]) {
+   videos(ids:$ids){
        edges{
             id
             title

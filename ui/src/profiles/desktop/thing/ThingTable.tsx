@@ -282,11 +282,10 @@ export default function ThingTable() {
                 onChange={onChange}
                 pagination={{
                     ...pagination,
-                    total: data ? data.Things.totalCount : 0
+                    total: data ? data.things.totalCount : 0
                 }}
-                dataSource={data ? data.Things.edges : []}
+                dataSource={data ? data.things.edges : []}
             />
         </div>
-
     );
 }
