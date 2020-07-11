@@ -1,6 +1,6 @@
 import { message, Upload } from 'antd';
 import React, { useState, useEffect } from 'react'
-import { getUploadURL } from "../consts/upload.gql";
+import { getUploadURL } from "../consts/http";
 import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
 import crypto from 'crypto'
