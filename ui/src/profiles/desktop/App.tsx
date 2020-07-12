@@ -42,25 +42,25 @@ export default function App() {
                         <Route exact path="/app/home">
                             欢迎使用{document.title}
                         </Route>
-                        <Route path="/app/settings/videos">
+                        <Route exact path="/app/settings/videos">
                             <VideoTable />
                         </Route>
-                        <Route path="/app/settings/users">
+                        <Route exact path="/app/settings/users">
                             <UserTable />
                         </Route>
-                        <Route path="/app/media/videos/:id"  >
+                        <Route exact path="/app/media/videos/:id"  >
                             <VideoDetail />
                         </Route>
-                        <Route path="/app/media/videos">
+                        <Route exact path="/app/media/videos">
                             <VideoPage />
                         </Route>
-                        <Route path="/app/thing/dashboard">
+                        <Route exact path="/app/thing/dashboard">
                             <ThingDashboard />
                         </Route>
-                        <Route path="/app/thing/things">
+                        <Route exact path="/app/thing/things">
                             <ThingTable />
                         </Route>
-                        <Route path="/app/thing/analysis">
+                        <Route exact path="/app/thing/analysis">
                             <ThingAnalysis />
                         </Route>
                     </div>
