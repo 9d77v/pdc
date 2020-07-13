@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -17,6 +18,16 @@ type User struct {
 	Color     string `gorm:"size:50;NOT NULL;"` //favorite color
 	BirthDate time.Time
 	IP        string `gorm:"size:50;NOT NULL;"` //check if user is online
+}
+
+//MarshalBinary ..
+func (u *User) MarshalBinary() ([]byte, error) {
+	return json.Marshal(u)
+}
+
+//UnmarshalBinary ..
+func (u *User) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, u)
 }
 
 //GetByID ..

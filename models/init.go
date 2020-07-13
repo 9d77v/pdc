@@ -8,6 +8,7 @@ import (
 
 	"github.com/9d77v/go-lib/clients/config"
 	"github.com/9d77v/pdc/utils"
+	redis "github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
 	minio "github.com/minio/minio-go/v6"
 	"golang.org/x/crypto/bcrypt"
@@ -40,6 +41,9 @@ var (
 	minioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
 
 	OssPrefix = utils.GetEnvStr("OSS_PREFIX", "http://oss.domain.local:9000")
+
+	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
+	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
 )
 
 var (
@@ -47,6 +51,8 @@ var (
 	Gorm *gorm.DB
 	//MinioClient S3 OSS
 	MinioClient *minio.Client
+	//RedisClient ..
+	RedisClient *redis.Client
 )
 
 //角色
@@ -56,10 +62,16 @@ const (
 	RoleUser    = 3
 )
 
+//redis前缀
+const (
+	PrefixUser = "USER"
+)
+
 func init() {
 	initDB()
-	initMinio()
 	initDBData()
+	initMinio()
+	initRedis()
 }
 
 func initDB() {
@@ -146,6 +158,14 @@ func initMinio() {
 			log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
 		}
 	}
+}
+
+func initRedis() {
+	RedisClient = redis.NewClient(&redis.Options{
+		Addr:     redisAddress,
+		Password: redisPassword,
+		DB:       0, // use default DB
+	})
 }
 
 //NewClient gorm client

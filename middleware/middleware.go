@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/services"
 	"github.com/9d77v/pdc/utils"
 )
 
@@ -22,6 +23,8 @@ type contextKey struct {
 type GraphReq struct {
 	OperationName string `json:"operationName"`
 }
+
+var userService = services.UserService{}
 
 var publicOperationArr = []string{"login", "refreshToken"}
 var permissonMap = map[string][]int{
@@ -76,8 +79,8 @@ func Auth() func(http.Handler) http.Handler {
 					http.Error(w, "Invalid token", http.StatusUnauthorized)
 					return
 				}
-				user := new(models.User)
-				err = user.GetByID(data.UID)
+
+				user, err := userService.GetByID(r.Context(), data.UID)
 				if err != nil {
 					http.Error(w, "Invalid token", http.StatusUnauthorized)
 					return

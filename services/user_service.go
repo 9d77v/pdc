@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -171,11 +172,18 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 }
 
 //GetByID ..
-func (s UserService) GetByID(uid int64) (*model.User, error) {
-	res := new(model.User)
+func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, error) {
 	user := new(models.User)
-	if err := user.GetByID(uid); err != nil {
-		return res, err
+	key := fmt.Sprintf("%s:%d", models.PrefixUser, uid)
+	err := models.RedisClient.Get(ctx, key).Scan(user)
+	if err != nil {
+		if err := user.GetByID(uid); err != nil {
+			return user, err
+		}
+		err = models.RedisClient.Set(ctx, key, user, time.Hour).Err()
+		if err != nil {
+			log.Printf("set redis key %s error：%v", key, err)
+		}
 	}
-	return res, nil
+	return user, nil
 }
