@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { message } from "antd"
 import "./video.less"
+import "../../../style/button.less"
 import { useQuery } from "@apollo/react-hooks";
 import { GET_VIDEO } from '../../../consts/video.gql';
 import { Img } from "../../../components/Img";
