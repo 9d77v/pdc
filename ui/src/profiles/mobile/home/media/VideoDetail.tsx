@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react"
 import { message } from "antd"
-import "./video.less"
+import "../../../../style/button.less"
 import { useQuery } from "@apollo/react-hooks";
-import { GET_VIDEO } from '../../../consts/video.gql';
-import { Img } from "../../../components/Img";
-import { VideoPlayer } from "../../../components/VideoPlayer";
-import { useRouteMatch } from "react-router-dom";
-import TextArea from "antd/lib/input/TextArea";
+import { GET_VIDEO } from '../../../../consts/video.gql';
+import { VideoPlayer } from "../../../../components/VideoPlayer";
+import { useRouteMatch, useHistory } from "react-router-dom";
+import { NavBar, Icon } from "antd-mobile";
 
 export default function VideoDetail() {
     const match = useRouteMatch('/app/media/videos/:id');
+    const history = useHistory()
+
     const [num, setNum] = useState(0)
     let ids: number[] = []
     if (match) {
@@ -56,7 +57,7 @@ export default function VideoDetail() {
             if (video.episodes && video.episodes.length > 0) {
                 buttons = video.episodes.map((value: any, index: number) => {
                     if (index === num) {
-                        return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"} >{value.num}</div>
+                        return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"}  >{value.num}</div>
                     }
                     return <div key={"pdc-button-" + value.id} className={"pdc-button"} onClick={() => { setNum(index) }} >{value.num}</div>
                 })
@@ -70,45 +71,30 @@ export default function VideoDetail() {
     }
 
     return (
-        <div style={{
-            display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
-        }}>
+        <div style={{ height: "100%" }}>
+            <NavBar
+                mode="light"
+                icon={<Icon type="left" />}
+                onLeftClick={() => history.push("/app/media/videos")}
+            >{videoItem.title + " 第" + (num + 1) + "话"} </NavBar>
+
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
-                width: 1107, height: 838, minHeight: 179, minWidth: 319,
+                width: "100%", height: "100%"
             }}>
                 <VideoPlayer
                     episodeID={episodeItem.id}
                     url={episodeItem.url}
                     subtitles={episodeItem.subtitles}
 
-                    height={"100%"}
+                    height={256}
                     width={"100%"}
                     autoplay={true}
                 />
-                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
-                    <Img src={videoItem.cover} />
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingInline: 10 }} >
-                        <div style={{ textAlign: "left", fontSize: 18, padding: 10 }}> {videoItem.title}</div>
-                        <div style={{ textAlign: "left", paddingLeft: 10, paddingRight: 10 }}> 全{videoItem.episodes.length}话</div>
-                        <div style={{ textAlign: 'left', paddingLeft: 10, paddingRight: 10 }}>
-                            <TextArea
-                                value={videoItem.desc}
-                                rows={9}
-                                contentEditable={false}
-                                style={{
-                                    backgroundColor: 'rgba(255, 255, 255, 0)',
-                                    border: 0,
-                                }} />
-                        </div>
-                    </div>
+                <div style={{ marginTop: 20, display: "flex", flexDirection: 'column' }}>
+                    <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}> 选集</span>
+                    <div>{buttons}</div>
                 </div>
-            </div>
-            <div style={{ margin: 20, display: "flex", flexDirection: 'column', width: 350 }}>
-                <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}> 剧集列表</span>
-                <div>{buttons}</div>
-            </div>
-            <div style={{ flex: 1 }}>
             </div>
         </div>)
 }

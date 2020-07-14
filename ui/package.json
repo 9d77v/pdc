@@ -17,6 +17,7 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/video.js": "^7.3.9",
     "antd": "^4.3.0",
+    "antd-mobile": "^2.3.3",
     "apollo-boost": "^0.4.9",
     "apollo-link-context": "^1.0.20",
     "axios": "^0.19.2",

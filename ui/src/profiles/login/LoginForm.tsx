@@ -1,7 +1,7 @@
 import { Form, Input, Button, message } from 'antd';
 import React, { useEffect } from 'react';
 import "./LoginForm.less"
-import { LOGIN } from '../consts/user.gpl';
+import { LOGIN } from '../../consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
 import { useHistory } from 'react-router-dom';
 const layout = {

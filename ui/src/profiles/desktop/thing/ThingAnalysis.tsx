@@ -9,7 +9,7 @@ import { RadioChangeEvent } from "antd/lib/radio";
 import { PieLine } from "../../../components/PieLine";
 
 
-export const ThingAnalysis = () => {
+export default function ThingAnalysis() {
     const [dynamicDimension, setDynamicDimension] = useState("consumer_expenditure")
     const [group, setGroup] = useState<"year" | "month" | "week" | "quarter" | "date" | "time" | undefined>("month")
     const [start, setStart] = useState(moment().startOf("month"))
