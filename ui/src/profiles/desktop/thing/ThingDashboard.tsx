@@ -13,7 +13,8 @@ const mapFunc = (value: SerieData) => {
         value: value.value
     }
 }
-export const ThingDashboard = () => {
+
+export default function ThingDashboard() {
     const [dynamicDimension, setDynamicDimension] = useState("consumer_expenditure")
     const { error, data } = useQuery(THING_SERIES,
         {

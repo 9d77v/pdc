@@ -1,6 +1,6 @@
 import React from 'react';
 import "./Login.less"
-import { LoginForm } from '../../../components/LoginForm';
+import { LoginForm } from './LoginForm';
 import { useHistory } from 'react-router-dom';
 
 export const Login = () => {

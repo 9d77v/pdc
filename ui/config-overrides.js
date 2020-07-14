@@ -5,8 +5,13 @@ const {
 } = require('customize-cra');
 
 module.exports = override(
-    fixBabelImports('import', {
+    fixBabelImports('antd', {
         libraryName: 'antd',
+        libraryDirectory: 'es',
+        style: true,
+    }),
+    fixBabelImports('antd-mobile', {
+        libraryName: 'antd-mobile',
         libraryDirectory: 'es',
         style: true,
     }),

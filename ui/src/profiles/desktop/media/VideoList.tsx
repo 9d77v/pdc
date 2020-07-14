@@ -7,7 +7,7 @@ import { useQuery } from "@apollo/react-hooks";
 import { LIST_VIDEO_CARD } from '../../../consts/video.gql';
 import { Img } from "../../../components/Img";
 
-export const VideoPage = () => {
+export default function VideoList() {
 
     const [cards, setCards] = useState(<div />)
     const { error, data } = useQuery(LIST_VIDEO_CARD,

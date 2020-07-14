@@ -4,8 +4,8 @@ import "./img.less"
 import { Modal } from "antd"
 interface ImageProps {
     src: string
-    width?: number
-    height?: number
+    width?: number | string
+    height?: number | string
 }
 
 export const Img: React.FC<ImageProps> = ({
