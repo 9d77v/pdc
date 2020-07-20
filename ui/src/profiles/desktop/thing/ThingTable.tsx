@@ -120,8 +120,8 @@ export default function ThingTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.Things.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.Things.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.things.edges : [];
+                const totalCount = fetchMoreResult ? fetchMoreResult.things.totalCount : 0;
                 setPagination({
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -129,8 +129,8 @@ export default function ThingTable() {
                 })
                 return newEdges.length
                     ? {
-                        Things: {
-                            __typename: previousResult.Things.__typename,
+                        things: {
+                            __typename: previousResult.things.__typename,
                             edges: newEdges,
                             totalCount
                         }

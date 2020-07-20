@@ -90,8 +90,8 @@ export default function UserTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.Users.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.Users.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.users.edges : [];
+                const totalCount = fetchMoreResult ? fetchMoreResult.users.totalCount : 0;
                 setPagination({
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -99,8 +99,8 @@ export default function UserTable() {
                 })
                 return newEdges.length
                     ? {
-                        Users: {
-                            __typename: previousResult.Users.__typename,
+                        users: {
+                            __typename: previousResult.users.__typename,
                             edges: newEdges,
                             totalCount
                         }

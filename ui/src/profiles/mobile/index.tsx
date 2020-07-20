@@ -11,6 +11,8 @@ import { NewUser } from '../desktop/settings/user/UserCreateForm';
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const VideoDetail = React.lazy(() => import('./home/media/VideoDetail'))
+
+
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
     const history = useHistory();
@@ -18,7 +20,6 @@ export default function MobileIndex() {
     if (!token) {
         history.push('/login')
     }
-
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
 

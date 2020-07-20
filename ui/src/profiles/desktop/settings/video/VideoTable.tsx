@@ -220,8 +220,8 @@ export default function VideoTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.Videos.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.Videos.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.videos.edges : [];
+                const totalCount = fetchMoreResult ? fetchMoreResult.videos.totalCount : 0;
                 const t = {
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -230,8 +230,8 @@ export default function VideoTable() {
                 setPagination(t)
                 return newEdges.length
                     ? {
-                        Videos: {
-                            __typename: previousResult.Videos.__typename,
+                        videos: {
+                            __typename: previousResult.videos.__typename,
                             edges: newEdges,
                             totalCount
                         }
