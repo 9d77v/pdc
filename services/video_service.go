@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -145,6 +146,57 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 		"subtitles": cs,
 	}).Error
 	return &model.Episode{ID: int64(episode.ID)}, err
+}
+
+//UpdateSubtitle ..
+func (s VideoService) UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error) {
+	data := make([]*models.Episode, 0)
+	if err := models.Gorm.Select("id,subtitles").Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
+		return nil, err
+	}
+	tx := models.Gorm.Begin()
+	if len(input.Subtitles.Urls) == 0 {
+		for _, d := range data {
+			if d.Subtitles == nil {
+				continue
+			}
+			cs := make(postgres.Hstore, len(d.Subtitles))
+			for k, v := range d.Subtitles {
+				if k != input.Subtitles.Name {
+					cs[k] = v
+				}
+			}
+			err := models.Gorm.Model(d).Update(map[string]interface{}{
+				"subtitles": cs,
+			}).Error
+			if err != nil {
+				tx.Rollback()
+				return nil, err
+			}
+		}
+	} else {
+		if len(input.Subtitles.Urls) != len(data) {
+			return nil, errors.New("视频与字幕数量不一致")
+		}
+		for i, d := range data {
+			if d.Subtitles == nil {
+				cs := make(postgres.Hstore, len(d.Subtitles))
+				cs[input.Subtitles.Name] = &input.Subtitles.Urls[i]
+				d.Subtitles = cs
+			} else {
+				d.Subtitles[input.Subtitles.Name] = &input.Subtitles.Urls[i]
+			}
+			err := models.Gorm.Model(d).Update(map[string]interface{}{
+				"subtitles": d.Subtitles,
+			}).Error
+			if err != nil {
+				tx.Rollback()
+				return nil, err
+			}
+		}
+	}
+	tx.Commit()
+	return &model.Video{ID: int64(input.ID)}, nil
 }
 
 //ListVideo ..

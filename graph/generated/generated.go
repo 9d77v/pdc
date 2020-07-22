@@ -67,16 +67,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateEpisode func(childComplexity int, input model.NewEpisode) int
-		CreateThing   func(childComplexity int, input model.NewThing) int
-		CreateUser    func(childComplexity int, input model.NewUser) int
-		CreateVideo   func(childComplexity int, input model.NewVideo) int
-		Login         func(childComplexity int, username string, password string) int
-		RefreshToken  func(childComplexity int, refreshToken string) int
-		UpdateEpisode func(childComplexity int, input model.NewUpdateEpisode) int
-		UpdateThing   func(childComplexity int, input model.NewUpdateThing) int
-		UpdateUser    func(childComplexity int, input model.NewUpdateUser) int
-		UpdateVideo   func(childComplexity int, input model.NewUpdateVideo) int
+		CreateEpisode  func(childComplexity int, input model.NewEpisode) int
+		CreateThing    func(childComplexity int, input model.NewThing) int
+		CreateUser     func(childComplexity int, input model.NewUser) int
+		CreateVideo    func(childComplexity int, input model.NewVideo) int
+		Login          func(childComplexity int, username string, password string) int
+		RefreshToken   func(childComplexity int, refreshToken string) int
+		UpdateEpisode  func(childComplexity int, input model.NewUpdateEpisode) int
+		UpdateSubtitle func(childComplexity int, input model.NewUpdateSubtitles) int
+		UpdateThing    func(childComplexity int, input model.NewUpdateThing) int
+		UpdateUser     func(childComplexity int, input model.NewUpdateUser) int
+		UpdateVideo    func(childComplexity int, input model.NewUpdateVideo) int
 	}
 
 	PieLineSerieData struct {
@@ -185,6 +186,7 @@ type MutationResolver interface {
 	UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error)
 	CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error)
 	UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error)
+	UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error)
 	CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error)
 	UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error)
 }
@@ -394,6 +396,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEpisode(childComplexity, args["input"].(model.NewUpdateEpisode)), true
+
+	case "Mutation.updateSubtitle":
+		if e.complexity.Mutation.UpdateSubtitle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateSubtitle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSubtitle(childComplexity, args["input"].(model.NewUpdateSubtitles)), true
 
 	case "Mutation.updateThing":
 		if e.complexity.Mutation.UpdateThing == nil {
@@ -1012,6 +1026,7 @@ type Mutation {
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
+  updateSubtitle(input:NewUpdateSubtitles!):Video!
 
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
@@ -1238,7 +1253,11 @@ input NewUpdateEpisode{
   url: String!
   subtitles:  [NewSubtitle!]  
 }
-`, BuiltIn: false},
+
+input NewUpdateSubtitles {
+  id:ID!
+  subtitles:NewSubtitles
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -1344,6 +1363,20 @@ func (ec *executionContext) field_Mutation_updateEpisode_args(ctx context.Contex
 	var arg0 model.NewUpdateEpisode
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateSubtitle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateSubtitles
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2480,6 +2513,47 @@ func (ec *executionContext) _Mutation_updateEpisode(ctx context.Context, field g
 	res := resTmp.(*model.Episode)
 	fc.Result = res
 	return ec.marshalNEpisode2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateSubtitle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateSubtitle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSubtitle(rctx, args["input"].(model.NewUpdateSubtitles))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createThing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -6155,6 +6229,30 @@ func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUpdateSubtitles(ctx context.Context, obj interface{}) (model.NewUpdateSubtitles, error) {
+	var it model.NewUpdateSubtitles
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subtitles":
+			var err error
+			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUpdateThing(ctx context.Context, obj interface{}) (model.NewUpdateThing, error) {
 	var it model.NewUpdateThing
 	var asMap = obj.(map[string]interface{})
@@ -6735,6 +6833,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateEpisode":
 			out.Values[i] = ec._Mutation_updateEpisode(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateSubtitle":
+			out.Values[i] = ec._Mutation_updateSubtitle(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7849,6 +7952,10 @@ func (ec *executionContext) unmarshalNNewThing2githubᚗcomᚋ9d77vᚋpdcᚋgrap
 
 func (ec *executionContext) unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {
 	return ec.unmarshalInputNewUpdateEpisode(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx context.Context, v interface{}) (model.NewUpdateSubtitles, error) {
+	return ec.unmarshalInputNewUpdateSubtitles(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewUpdateThing2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateThing(ctx context.Context, v interface{}) (model.NewUpdateThing, error) {

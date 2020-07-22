@@ -83,6 +83,11 @@ type NewUpdateEpisode struct {
 	Subtitles []*NewSubtitle `json:"subtitles"`
 }
 
+type NewUpdateSubtitles struct {
+	ID        int64         `json:"id"`
+	Subtitles *NewSubtitles `json:"subtitles"`
+}
+
 type NewUpdateThing struct {
 	ID                  int64    `json:"id"`
 	Name                *string  `json:"name"`

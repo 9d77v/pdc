@@ -22,6 +22,7 @@ type Mutation {
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
+  updateSubtitle(input:NewUpdateSubtitles!):Video!
 
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
