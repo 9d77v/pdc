@@ -83,6 +83,8 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 		updateMap["password"] = string(bytes)
 	}
 	err := models.Gorm.Model(User).Update(updateMap).Error
+	key := fmt.Sprintf("%s:%d", models.PrefixUser, input.ID)
+	models.RedisClient.Del(ctx, key).Err()
 	return &model.User{ID: int64(User.ID)}, err
 }
 
