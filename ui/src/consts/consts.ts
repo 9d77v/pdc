@@ -76,14 +76,16 @@ const GenderMap = new Map<number, string>([
 
 const RoleMap = new Map<number, string>([
     [2, "管理员"],
-    [3, '普通用户']
+    [3, '普通用户'],
+    [4, '访客']
 ])
 
 const FullRoleMap = new Map<number, string>([
     [0, "未知"],
     [1, "所有者"],
     [2, "管理员"],
-    [3, '普通用户']
+    [3, '普通用户'],
+    [4, '访客']
 ])
 
 const ThingStatusArr = ['待采购', '使用中', '已收纳', '故障', '维修中', '待清理', '已清理']

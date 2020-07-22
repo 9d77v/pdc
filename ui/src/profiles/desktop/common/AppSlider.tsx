@@ -73,7 +73,7 @@ export const AppSlider = (props: AppHeaderProps) => {
                 </SubMenu>
                 <SubMenu
                     key="thing"
-                    style={{ display: roleID > 0 ? "block" : "none" }}
+                    style={{ display: roleID >= 1 && roleID <= 3 ? "block" : "none" }}
                     title={
                         <span>
                             <ShoppingOutlined />
