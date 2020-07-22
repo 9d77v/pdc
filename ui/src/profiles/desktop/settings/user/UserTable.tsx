@@ -43,7 +43,8 @@ export default function UserTable() {
                     field: 'id',
                     isAsc: false
                 }]
-            }
+            },
+            fetchPolicy: "cache-and-network"
         });
 
 

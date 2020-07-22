@@ -51,7 +51,8 @@ export default function ThingTable() {
                     field: 'id',
                     isAsc: false
                 }]
-            }
+            },
+            fetchPolicy: "cache-and-network"
         });
 
     useEffect(() => {

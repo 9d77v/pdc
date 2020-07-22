@@ -19,7 +19,8 @@ export default function VideoList() {
                     field: "title",
                     isAsc: true
                 }]
-            }
+            },
+            fetchPolicy: "cache-and-network"
         });
 
     useEffect(() => {

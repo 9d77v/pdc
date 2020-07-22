@@ -124,10 +124,10 @@ export default function VideoTable() {
                     field: 'id',
                     isAsc: false
                 }]
-            }
+            },
+            fetchPolicy: "cache-and-network"
         });
     const [num, setNum] = useState(1);
-
     useEffect(() => {
         if (error) {
             message.error("接口请求失败！")
@@ -213,7 +213,7 @@ export default function VideoTable() {
         await refetch()
     };
 
-    const onChange = async (pageConfig: TablePaginationConfig) => {
+    const onChange = (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
                 page: pageConfig.current || 1,
@@ -228,6 +228,7 @@ export default function VideoTable() {
                     pageSize: pageConfig.pageSize || 10
                 }
                 setPagination(t)
+                console.log(newEdges)
                 return newEdges.length
                     ? {
                         videos: {
@@ -236,7 +237,7 @@ export default function VideoTable() {
                             totalCount
                         }
                     }
-                    : previousResult;
+                    : previousResult
             }
         })
     }
@@ -322,6 +323,7 @@ export default function VideoTable() {
                 </span>
         },
     ];
+    console.log(data)
     return (
         <div>
             <Button
