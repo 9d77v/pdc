@@ -30,6 +30,14 @@ mutation updateEpisode($input:NewUpdateEpisode!){
    }
 }
 `
+
+const UPDATE_SUBTITLE = gql`
+mutation updateSubtitle($input:NewUpdateSubtitles!){
+  updateSubtitle(input:$input){
+     id
+   }
+}
+`
 const LIST_VIDEO = gql`
  query videos( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
    videos(page: $page, pageSize: $pageSize,sorts:$sorts){
@@ -106,4 +114,7 @@ const GET_VIDEO = gql`
   }
 `;
 
-export { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO }
+export {
+  LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE,
+  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, UPDATE_SUBTITLE
+}

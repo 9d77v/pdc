@@ -1,7 +1,7 @@
-import { Table, Button, message } from 'antd';
+import { Table, Button, message, Tag, Modal } from 'antd';
 import React, { useState, useEffect } from 'react'
 
-import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE } from '../../../../consts/video.gql';
+import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE, UPDATE_SUBTITLE } from '../../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateForm';
 import { useMutation } from '@apollo/react-hooks';
@@ -13,8 +13,11 @@ import { EpisodeUpdateForm } from './EpisodeUpdateForm';
 import { Img } from '../../../../components/Img';
 import TextArea from 'antd/lib/input/TextArea';
 import { TablePaginationConfig } from 'antd/lib/table';
+import { PlaySquareTwoTone } from '@ant-design/icons';
+import { SubtitleUpdateForm } from './SubtitleUpdateForm';
 
-function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any) {
+
+function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
     const episodeData = episodeRawData === undefined ? [] : episodeRawData.episodes
     const columns = [
         { title: 'EpisodeID', dataIndex: 'id', key: 'id' },
@@ -28,15 +31,18 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
             title: '封面', dataIndex: 'cover', key: 'cover',
             render: (value: string) => <Img src={value} />
         }, {
-            title: '视频', dataIndex: 'url', key: 'url', width: 490,
+            title: '视频', dataIndex: 'url', key: 'url',
             render: (value: string, record: any) => {
                 return (
-                    <VideoPlayer
-                        episodeID={record.id}
-                        url={value}
-                        subtitles={record.subtitles}
-                        height={270}
-                        width={480}
+                    <Button
+                        onClick={() => setPlayerData({
+                            episodeID: record.id,
+                            title: episodeRawData.title + " 第" + record.num + "话",
+                            url: value,
+                            subtitles: record.subtitles,
+                            visible: true
+                        })}
+                        icon={<PlaySquareTwoTone />}
                     />
                 )
             }
@@ -91,7 +97,7 @@ export default function VideoTable() {
         desc: "",
         cover: "",
         pubDate: 0,
-        // tags: values.tags,
+        tags: [],
         isShow: false,
     })
     const [updateEpisodeVisible, setUpdateEpisodeVisible] = useState(false)
@@ -104,6 +110,7 @@ export default function VideoTable() {
         url: "",
         subtitles: [],
     })
+    const [updateSubtitleVisible, setUpdateSubtitleVisible] = useState(false)
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 10,
@@ -111,10 +118,18 @@ export default function VideoTable() {
         showSizeChanger: true,
         total: 0
     })
+    const [playerData, setPlayerData] = useState({
+        episodeID: 0,
+        title: "",
+        url: "",
+        subtitles: null,
+        visible: false
+    })
     const [addVideo] = useMutation(ADD_VIDEO);
     const [updateVideo] = useMutation(UPDATE_VIDEO)
     const [addEpisode] = useMutation(ADD_EPISODE)
     const [updateEpisode] = useMutation(UPDATE_EPISODE)
+    const [updateSubtitle] = useMutation(UPDATE_SUBTITLE)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
             variables: {
@@ -149,7 +164,7 @@ export default function VideoTable() {
                     "desc": values.desc,
                     "cover": values.cover,
                     "pubDate": values.pubDate ? values.pubDate.unix() : 0,
-                    // "tags": values.tags,
+                    "tags": values.tags || [],
                     "isShow": values.isShow,
                     "videoURLs": values.videoURLs,
                     "subtitles": subtitles
@@ -169,7 +184,7 @@ export default function VideoTable() {
                     "desc": values.desc,
                     "cover": values.cover,
                     "pubDate": values.pubDate ? values.pubDate.unix() : 0,
-                    // "tags": values.tags,
+                    "tags": values.tags || [],
                     "isShow": values.isShow,
                 }
             }
@@ -213,6 +228,22 @@ export default function VideoTable() {
         await refetch()
     };
 
+    const onSubtitleUpdate = async (values: any) => {
+        await updateSubtitle({
+            variables: {
+                "input": {
+                    "id": currentVideoID,
+                    "subtitles": {
+                        "name": values.subtitle_lang,
+                        "urls": values.subtitles
+                    }
+                }
+            }
+        });
+        setUpdateSubtitleVisible(false);
+        await refetch()
+    };
+
     const onChange = (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
@@ -228,7 +259,6 @@ export default function VideoTable() {
                     pageSize: pageConfig.pageSize || 10
                 }
                 setPagination(t)
-                console.log(newEdges)
                 return newEdges.length
                     ? {
                         videos: {
@@ -286,6 +316,21 @@ export default function VideoTable() {
             title: '总话数', dataIndex: 'total', key: 'total',
             render: (value: number, record: any) => record.episodes.length
         }, {
+            title: '标签', dataIndex: 'tags', key: 'tags',
+            render: (values: string[], record: any) => {
+                if (values) {
+                    const tagNodes = values.map((value: string, index: number) => {
+                        return (
+                            <Tag color={'cyan'} key={"tag_" + record.id + "_" + index}>
+                                {value}
+                            </Tag>
+                        );
+                    })
+                    return <div>{tagNodes}</div>
+                }
+                return <div />
+            }
+        }, {
             title: '是否显示', dataIndex: 'isShow', key: 'isShow',
             render: (value: Boolean, record: any) => (
                 value ? "是" : "否"
@@ -309,21 +354,25 @@ export default function VideoTable() {
                             desc: record.desc,
                             cover: record.cover,
                             pubDate: record.pubDate,
-                            // tags: values.tags,
+                            tags: record.tags || [],
                             isShow: record.isShow,
                         })
                         setUpdateVideoVisible(true)
                     }}>编辑视频</Button>
-                    <Button type="dashed"
+                    <Button
                         onClick={() => {
                             setCurrentVideoID(record.id)
                             setNum(getNum(record.id))
                             setEpisodeVisible(true)
                         }}>新增分集</Button>
+                    <Button
+                        onClick={() => {
+                            setCurrentVideoID(record.id)
+                            setUpdateSubtitleVisible(true)
+                        }}>更换字幕</Button>
                 </span>
-        },
+        }
     ];
-    console.log(data)
     return (
         <div>
             <Button
@@ -366,6 +415,48 @@ export default function VideoTable() {
                     setUpdateEpisodeVisible(false);
                 }}
             />
+            <SubtitleUpdateForm
+                visible={updateSubtitleVisible}
+                onUpdate={onSubtitleUpdate}
+                onCancel={() => {
+                    setUpdateSubtitleVisible(false);
+                }}
+            />
+            <Modal
+                visible={playerData.visible}
+                title={playerData.title}
+                okText="确定"
+                destroyOnClose={true}
+                cancelText="取消"
+                width={1008}
+                onCancel={
+                    () => {
+                        setPlayerData({
+                            episodeID: 0,
+                            title: "",
+                            url: "",
+                            subtitles: null,
+                            visible: false
+                        })
+                    }
+                }
+                getContainer={false}
+                onOk={() => {
+                    setPlayerData({
+                        episodeID: 0,
+                        title: "",
+                        url: "",
+                        subtitles: null,
+                        visible: false
+                    })
+                }}
+            >  <VideoPlayer
+                    episodeID={playerData.episodeID}
+                    url={playerData.url}
+                    subtitles={playerData.subtitles}
+                    height={540}
+                    width={960}
+                /></Modal>
             <Table
                 loading={loading}
                 rowKey={record => record.id}
@@ -373,7 +464,7 @@ export default function VideoTable() {
                 columns={columns}
                 expandable={{
                     expandedRowRender: (record: any) => {
-                        return EpisodeTable(record, setUpdateEpisodeData, setUpdateEpisodeVisible)
+                        return EpisodeTable(record, setUpdateEpisodeData, setUpdateEpisodeVisible, setPlayerData)
                     }
                 }}
                 scroll={{ x: 1300 }}

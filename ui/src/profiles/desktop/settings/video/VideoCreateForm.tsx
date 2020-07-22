@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Switch, DatePicker, message, Radio } from 'antd';
+import { Modal, Form, Input, Switch, DatePicker, message, Radio, Select } from 'antd';
 import React, { useState } from 'react'
 import { Uploader } from '../../../../components/Uploader';
 
@@ -95,6 +95,14 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 </Form.Item>
                 <Form.Item name="pubDate" label="上映时间">
                     <DatePicker />
+                </Form.Item>
+                <Form.Item name="tags" label="标签">
+                    <Select
+                        mode="tags"
+                        size={"large"}
+                        style={{ width: '100%' }}
+                    >
+                    </Select>
                 </Form.Item>
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />

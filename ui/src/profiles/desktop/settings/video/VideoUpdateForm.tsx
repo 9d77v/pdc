@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Switch, DatePicker } from 'antd';
+import { Modal, Form, Input, Switch, DatePicker, Select } from 'antd';
 import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../../../components/Uploader';
 import moment from 'moment';
@@ -15,7 +15,7 @@ interface UpdateVideoProps {
     desc: string,
     cover: string,
     pubDate: number,
-    // tags: values.tags,
+    tags: string[],
     isShow: boolean,
 }
 interface VideoUpdateFormProps {
@@ -42,6 +42,7 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
             "cover": data.cover,
             "title": data.title,
             "desc": data.desc,
+            "tags": data.tags,
             "pubDate": moment(data.pubDate * 1000),
             "isShow": data.isShow
         })
@@ -104,6 +105,14 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
                 </Form.Item>
                 <Form.Item name="pubDate" label="上映时间">
                     <DatePicker />
+                </Form.Item>
+                <Form.Item name="tags" label="标签">
+                    <Select
+                        mode="tags"
+                        size={"large"}
+                        style={{ width: '100%' }}
+                    >
+                    </Select>
                 </Form.Item>
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />

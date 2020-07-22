@@ -84,6 +84,7 @@ export default function VideoDetail() {
                 height={231}
                 width={"100%"}
                 autoplay={true}
+                autoDestroy={false}
             />
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
