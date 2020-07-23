@@ -89,13 +89,16 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 }
 
 //ListUser ..
-func (s UserService) ListUser(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.User, error) {
+func (s UserService) ListUser(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.User, error) {
 	result := make([]*model.User, 0)
 	data := make([]*models.User, 0)
 	offset, limit := GetPageInfo(page, pageSize)
 	filedMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
+	}
 	if filedMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))

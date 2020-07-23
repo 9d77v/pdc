@@ -200,13 +200,16 @@ func (s VideoService) UpdateSubtitle(ctx context.Context, input model.NewUpdateS
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
+func (s VideoService) ListVideo(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
 	offset, limit := GetPageInfo(page, pageSize)
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("title like ?", "%"+ptrs.String(keyword)+"%")
+	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder = builder.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))

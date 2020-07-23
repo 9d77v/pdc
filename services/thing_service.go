@@ -76,7 +76,7 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 }
 
 //ListThing ..
-func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort, uid int64) (int64, []*model.Thing, error) {
+func (s ThingService) ListThing(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort, uid int64) (int64, []*model.Thing, error) {
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
 	offset, limit := GetPageInfo(page, pageSize)
@@ -84,6 +84,9 @@ func (s ThingService) ListThing(ctx context.Context, page, pageSize *int64, ids 
 	var err error
 	builder := models.Gorm
 	builder = builder.Where("uid=?", uid)
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
+	}
 	if filedMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))

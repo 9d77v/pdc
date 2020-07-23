@@ -90,10 +90,10 @@ type ComplexityRoot struct {
 		PresignedURL func(childComplexity int, bucketName string, objectName string) int
 		ThingAnalyze func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries  func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
-		Things       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Things       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		UserInfo     func(childComplexity int, uid *int64) int
-		Users        func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Videos       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Users        func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Videos       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 	}
 
 	SerieData struct {
@@ -192,10 +192,10 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
-	Users(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
+	Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
-	Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
-	Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
+	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
+	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
 }
@@ -512,7 +512,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Things(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Things(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.userInfo":
 		if e.complexity.Query.UserInfo == nil {
@@ -536,7 +536,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Users(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Users(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -548,7 +548,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Videos(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Videos(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "SerieData.name":
 		if e.complexity.SerieData.Name == nil {
@@ -1008,10 +1008,10 @@ type PieLineSerieData{
 
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
-  users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
+  users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   userInfo(uid:ID):User!
-  videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
-  things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
+  videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 }
@@ -1550,38 +1550,46 @@ func (ec *executionContext) field_Query_thingSeries_args(ctx context.Context, ra
 func (ec *executionContext) field_Query_things_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg0
+	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg1
-	var arg2 []int64
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg2
-	var arg3 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg3, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg3
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -1602,76 +1610,92 @@ func (ec *executionContext) field_Query_userInfo_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg0
+	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg1
-	var arg2 []int64
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg2
-	var arg3 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg3, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg3
+	args["sorts"] = arg4
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_videos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg0
+	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg1
-	var arg2 []int64
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg2
-	var arg3 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg3, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg3
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -2805,7 +2829,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Users(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2887,7 +2911,7 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Videos(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Videos(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2928,7 +2952,7 @@ func (ec *executionContext) _Query_things(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Things(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Things(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

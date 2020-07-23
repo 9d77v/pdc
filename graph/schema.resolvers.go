@@ -66,9 +66,9 @@ func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, obj
 	return commonService.PresignedURL(bucketName, objectName)
 }
 
-func (r *queryResolver) Users(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {
+func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {
 	con := new(model.UserConnection)
-	total, data, err := userService.ListUser(ctx, page, pageSize, ids, sorts)
+	total, data, err := userService.ListUser(ctx, keyword, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -78,18 +78,18 @@ func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, 
 	return dtos.ToUserDto(middleware.ForContext(ctx)), nil
 }
 
-func (r *queryResolver) Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
-	total, data, err := videoService.ListVideo(ctx, page, pageSize, ids, sorts)
+	total, data, err := videoService.ListVideo(ctx, keyword, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
+func (r *queryResolver) Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
 	user := middleware.ForContext(ctx)
 	con := new(model.ThingConnection)
-	total, data, err := thingService.ListThing(ctx, page, pageSize, ids, sorts, int64(user.ID))
+	total, data, err := thingService.ListThing(ctx, keyword, page, pageSize, ids, sorts, int64(user.ID))
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
