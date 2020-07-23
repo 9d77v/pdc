@@ -39,8 +39,8 @@ mutation updateSubtitle($input:NewUpdateSubtitles!){
 }
 `
 const LIST_VIDEO = gql`
- query videos( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   videos(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query videos($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   videos(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
        totalCount
        edges{
              id

@@ -15,8 +15,8 @@ mutation updateThing($input:NewUpdateThing!){
 }
 `
 const LIST_THING = gql`
- query things( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   things(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query things($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   things(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
         totalCount
         edges{
             id

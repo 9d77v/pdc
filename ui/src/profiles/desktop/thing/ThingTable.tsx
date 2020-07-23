@@ -10,6 +10,7 @@ import { ThingUpdateForm } from './ThingUpdateForm';
 import { Img } from '../../../components/Img';
 import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/consts';
 import { TablePaginationConfig } from 'antd/lib/table';
+import Search from 'antd/lib/input/Search';
 
 
 export default function ThingTable() {
@@ -40,6 +41,7 @@ export default function ThingTable() {
         refOrderID: "",
         rubbishCategory: []
     })
+    const [keyword, setKeyword] = useState("")
     const [addThing] = useMutation(ADD_THING);
     const [updateThing] = useMutation(UPDATE_THING)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_THING,
@@ -47,6 +49,7 @@ export default function ThingTable() {
             variables: {
                 page: pagination.current,
                 pageSize: pagination.pageSize,
+                keyword: keyword,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -249,16 +252,21 @@ export default function ThingTable() {
         },
     ];
     return (
-        <div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
                 type="primary"
                 onClick={() => {
                     setVisible(true);
                 }}
-                style={{ float: 'left', marginBottom: 12, zIndex: 1 }}
+                style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
                 新增物品
             </Button>
+            <Search
+                placeholder="搜索"
+                onSearch={value => setKeyword(value)}
+                style={{ width: 200, marginBottom: 12 }}
+            />
             <ThingCreateForm
                 visible={visible}
                 onCreate={onThingCreate}

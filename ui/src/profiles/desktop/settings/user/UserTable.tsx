@@ -10,6 +10,7 @@ import { UserUpdateForm } from './UserUpdateForm';
 import { Img } from '../../../../components/Img';
 import { GenderMap, FullRoleMap } from '../../../../consts/consts';
 import { TablePaginationConfig } from 'antd/lib/table';
+import Search from 'antd/lib/input/Search';
 
 
 export default function UserTable() {
@@ -32,6 +33,7 @@ export default function UserTable() {
         birthDate: 0,
         ip: ""
     })
+    const [keyword, setKeyword] = useState("")
     const [addUser] = useMutation(ADD_USER);
     const [updateUser] = useMutation(UPDATE_USER)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_USER,
@@ -39,6 +41,7 @@ export default function UserTable() {
             variables: {
                 page: pagination.current,
                 pageSize: pagination.pageSize,
+                keyword: keyword,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -165,16 +168,21 @@ export default function UserTable() {
         },
     ];
     return (
-        <div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
                 type="primary"
                 onClick={() => {
                     setVisible(true);
                 }}
-                style={{ float: 'left', marginBottom: 12, zIndex: 1 }}
+                style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
                 新增用户
             </Button>
+            <Search
+                placeholder="搜索"
+                onSearch={value => setKeyword(value)}
+                style={{ width: 200, marginBottom: 12 }}
+            />
             <UserCreateForm
                 visible={visible}
                 onCreate={onUserCreate}

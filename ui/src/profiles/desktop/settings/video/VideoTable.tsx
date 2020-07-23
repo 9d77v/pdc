@@ -15,6 +15,7 @@ import TextArea from 'antd/lib/input/TextArea';
 import { TablePaginationConfig } from 'antd/lib/table';
 import { PlaySquareTwoTone } from '@ant-design/icons';
 import { SubtitleUpdateForm } from './SubtitleUpdateForm';
+import Search from 'antd/lib/input/Search';
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -125,6 +126,7 @@ export default function VideoTable() {
         subtitles: null,
         visible: false
     })
+    const [keyword, setKeyword] = useState("")
     const [addVideo] = useMutation(ADD_VIDEO);
     const [updateVideo] = useMutation(UPDATE_VIDEO)
     const [addEpisode] = useMutation(ADD_EPISODE)
@@ -135,6 +137,7 @@ export default function VideoTable() {
             variables: {
                 page: pagination.current,
                 pageSize: pagination.pageSize,
+                keyword: keyword,
                 sorts: [{
                     field: 'id',
                     isAsc: false
@@ -291,13 +294,13 @@ export default function VideoTable() {
 
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id' },
-        { title: '标题', dataIndex: 'title', key: 'title', width: 200 },
+        { title: '标题', dataIndex: 'title', key: 'title', width: 180 },
         {
-            title: '简介', dataIndex: 'desc', key: 'desc', width: 400,
+            title: '简介', dataIndex: 'desc', key: 'desc', width: 300,
             render: (value: string) =>
                 <TextArea
                     value={value}
-                    rows={9}
+                    rows={4}
                     contentEditable={false}
                     style={{
                         backgroundColor: 'rgba(255, 255, 255, 0)',
@@ -306,7 +309,7 @@ export default function VideoTable() {
         },
         {
             title: '封面', dataIndex: 'cover', key: 'cover',
-            render: (value: string) => <Img src={value} />
+            render: (value: string) => <Img src={value} height={107} width={80} />
         },
         {
             title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',
@@ -374,16 +377,21 @@ export default function VideoTable() {
         }
     ];
     return (
-        <div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
                 type="primary"
                 onClick={() => {
-                    setVisible(true);
+                    setVisible(true)
                 }}
-                style={{ float: 'left', marginBottom: 12, zIndex: 1 }}
+                style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
                 新增视频
             </Button>
+            <Search
+                placeholder="搜索"
+                onSearch={value => setKeyword(value)}
+                style={{ width: 200, marginBottom: 12 }}
+            />
             <VideoCreateForm
                 visible={visible}
                 onCreate={onVideoCreate}
