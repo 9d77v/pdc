@@ -7,6 +7,8 @@ import { useHistory, Route } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from '../desktop/settings/user/UserCreateForm';
+import { UpdateProfileForm } from './me/UpdateFrofileForm';
+import UpdatePasswordForm from './me/UpdatePasswordForm';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
@@ -27,6 +29,12 @@ export default function MobileIndex() {
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
             <Route exact path="/app/media/videos/:id"  >
                 <VideoDetail />
+            </Route>
+            <Route exact path="/app/user/profile"  >
+                <UpdateProfileForm user={user} />
+            </Route>
+            <Route exact path="/app/user/account"  >
+                <UpdatePasswordForm />
             </Route>
             <TabBar
                 unselectedTintColor="#949494"

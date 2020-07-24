@@ -10,9 +10,12 @@ import { AppNavigator } from './common/AppNavigator';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from './settings/user/UserCreateForm';
+import { UpdateProfileForm } from './user/UpdateFrofileForm';
 
 const VideoTable = React.lazy(() => import('./settings/video/VideoTable'))
 const UserTable = React.lazy(() => import('./settings/user/UserTable'))
+const UpdatePasswordForm = React.lazy(() => import("./user/UpdatePasswordForm"))
+
 
 const ThingTable = React.lazy(() => import('./thing/ThingTable'))
 const ThingDashboard = React.lazy(() => import('./thing/ThingDashboard'))
@@ -46,12 +49,6 @@ export default function DesktopIndex() {
                         <Route exact path="/app/home">
                             欢迎使用{document.title}
                         </Route>
-                        <Route exact path="/app/settings/videos">
-                            <VideoTable />
-                        </Route>
-                        <Route exact path="/app/settings/users">
-                            <UserTable />
-                        </Route>
                         <Route exact path="/app/media/videos/:id"  >
                             <VideoDetail />
                         </Route>
@@ -64,8 +61,20 @@ export default function DesktopIndex() {
                         <Route exact path="/app/thing/things">
                             <ThingTable />
                         </Route>
+                        <Route exact path="/app/user/profile">
+                            <UpdateProfileForm user={user} />
+                        </Route>
+                        <Route exact path="/app/user/account">
+                            <UpdatePasswordForm />
+                        </Route>
                         <Route exact path="/app/thing/analysis">
                             <ThingAnalysis />
+                        </Route>
+                        <Route exact path="/app/settings/videos">
+                            <VideoTable />
+                        </Route>
+                        <Route exact path="/app/settings/users">
+                            <UserTable />
                         </Route>
                     </div>
                 </Layout>
