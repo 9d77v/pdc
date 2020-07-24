@@ -37,6 +37,8 @@ var permissonMap = map[string][]int{
 	"thingAnalyze":   {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"createUser":     {models.RoleAdmin},
 	"updateUser":     {models.RoleAdmin},
+	"updateProfile":  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"updatePassword": {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"createVideo":    {models.RoleAdmin, models.RoleManager},
 	"updateVideo":    {models.RoleAdmin, models.RoleManager},
 	"createEpisode":  {models.RoleAdmin, models.RoleManager},

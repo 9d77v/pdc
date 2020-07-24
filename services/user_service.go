@@ -57,22 +57,24 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 
 //UpdateUser ..
 func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error) {
-	User := new(models.User)
+	user := new(models.User)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(User, "id=?", input.ID).Error; err != nil {
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(user, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
-		"avatar":     ptrs.String(input.Avatar),
 		"role_id":    ptrs.Int64(input.RoleID),
 		"gender":     ptrs.Int64(input.Gender),
 		"color":      ptrs.String(input.Color),
 		"birth_date": time.Unix(ptrs.Int64(input.BirthDate), 0),
 		"ip":         ptrs.String(input.IP),
+	}
+	if input.Avatar != nil {
+		updateMap["avatar"] = ptrs.String(input.Avatar)
 	}
 	if input.Password != nil {
 		bytes, err := bcrypt.GenerateFromPassword([]byte(ptrs.String(input.Password)), 12)
@@ -82,10 +84,10 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 		}
 		updateMap["password"] = string(bytes)
 	}
-	err := models.Gorm.Model(User).Update(updateMap).Error
+	err := models.Gorm.Model(user).Update(updateMap).Error
 	key := fmt.Sprintf("%s:%d", models.PrefixUser, input.ID)
 	models.RedisClient.Del(ctx, key).Err()
-	return &model.User{ID: int64(User.ID)}, err
+	return &model.User{ID: int64(user.ID)}, err
 }
 
 //ListUser ..
@@ -191,4 +193,63 @@ func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, erro
 		}
 	}
 	return user, nil
+}
+
+//UpdateProfile ..
+func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdateProfile, uid uint) (*model.User, error) {
+	user := new(models.User)
+	varibales := graphql.GetRequestContext(ctx).Variables
+	fields := make([]string, 0)
+	for k := range varibales["input"].(map[string]interface{}) {
+		fields = append(fields, k)
+	}
+	fields = append(fields, "id")
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(user, "id=?", uid).Error; err != nil {
+		return nil, err
+	}
+	updateMap := map[string]interface{}{
+		"gender":     ptrs.Int64(input.Gender),
+		"color":      ptrs.String(input.Color),
+		"birth_date": time.Unix(ptrs.Int64(input.BirthDate), 0),
+		"ip":         ptrs.String(input.IP),
+	}
+	if input.Avatar != nil {
+		updateMap["avatar"] = ptrs.String(input.Avatar)
+	}
+	err := models.Gorm.Model(user).Update(updateMap).Error
+	key := fmt.Sprintf("%s:%d", models.PrefixUser, uid)
+	models.RedisClient.Del(ctx, key).Err()
+	return &model.User{ID: int64(uid)}, err
+}
+
+//UpdatePassword ..
+func (s UserService) UpdatePassword(ctx context.Context, oldPassword string, newPassword string, uid uint) (*model.User, error) {
+	if len(newPassword) < 10 || len(newPassword) > 32 {
+		return nil, errors.New("新旧密码长度需要在10-32之间")
+	}
+	if oldPassword == newPassword {
+		return nil, errors.New("新旧密码长度不能相同")
+	}
+	user := new(models.User)
+	if err := models.Gorm.Select("id,password").First(user, "id=?", uid).Error; err != nil {
+		return nil, err
+	}
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(oldPassword))
+	if err != nil {
+		return nil, errors.New("旧密码错误")
+	}
+	bytes, err := bcrypt.GenerateFromPassword([]byte(newPassword), 12)
+	if err != nil {
+		log.Printf("generate password failed:%v/n", err)
+		return nil, err
+	}
+	updateMap := map[string]interface{}{
+		"password": string(bytes),
+	}
+	err = models.Gorm.Model(user).Update(updateMap).Error
+	if err != nil {
+		log.Println("update password failed")
+		return nil, err
+	}
+	return &model.User{ID: int64(uid)}, nil
 }

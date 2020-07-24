@@ -138,7 +138,7 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 		cs[v.Name] = &v.URL
 	}
 	err := models.Gorm.Model(episode).Update(map[string]interface{}{
-		"num":       input.Num,
+		"num":       ptrs.Float64(input.Num),
 		"title":     ptrs.String(input.Title),
 		"cover":     ptrs.String(input.Cover),
 		"desc":      ptrs.String(input.Desc),

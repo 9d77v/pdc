@@ -55,11 +55,10 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(thing, "id=? and uid=?", input.ID, uid).Error; err != nil {
 		return nil, err
 	}
-	err := models.Gorm.Model(thing).Update(map[string]interface{}{
+	updateMap := map[string]interface{}{
 		"name":                 ptrs.String(input.Name),
 		"num":                  ptrs.Float64(input.Num),
 		"brand_name":           ptrs.String(input.BrandName),
-		"pics":                 input.Pics,
 		"unit_price":           ptrs.Float64(input.UnitPrice),
 		"unit":                 ptrs.String(input.Unit),
 		"specifications":       ptrs.String(input.Specifications),
@@ -71,7 +70,11 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 		"purchase_platform":    ptrs.String(input.PurchasePlatform),
 		"ref_order_id":         ptrs.String(input.RefOrderID),
 		"rubbish_category":     input.RubbishCategory,
-	}).Error
+	}
+	if len(input.Pics) > 0 {
+		updateMap["pics"] = input.Pics
+	}
+	err := models.Gorm.Model(thing).Update(updateMap).Error
 	return &model.Thing{ID: int64(thing.ID)}, err
 }
 

@@ -37,6 +37,14 @@ input NewUpdateUser{
 	ip:String   
 }
 
+input NewUpdateProfile{
+	avatar: String
+	gender: Int
+	color: String
+	birthDate:Int
+	ip:String 	
+}
+
 type LoginResponse{
 	accessToken: String!
 	refreshToken: String!

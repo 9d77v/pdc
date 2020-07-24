@@ -21,6 +21,16 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input model.NewUpdate
 	return userService.UpdateUser(ctx, input)
 }
 
+func (r *mutationResolver) UpdateProfile(ctx context.Context, input model.NewUpdateProfile) (*model.User, error) {
+	user := middleware.ForContext(ctx)
+	return userService.UpdateProfile(ctx, input, user.ID)
+}
+
+func (r *mutationResolver) UpdatePassword(ctx context.Context, oldPassword string, newPassword string) (*model.User, error) {
+	user := middleware.ForContext(ctx)
+	return userService.UpdatePassword(ctx, oldPassword, newPassword, user.ID)
+}
+
 func (r *mutationResolver) Login(ctx context.Context, username string, password string) (*model.LoginResponse, error) {
 	return userService.Login(ctx, username, password)
 }

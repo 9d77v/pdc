@@ -83,6 +83,14 @@ type NewUpdateEpisode struct {
 	Subtitles []*NewSubtitle `json:"subtitles"`
 }
 
+type NewUpdateProfile struct {
+	Avatar    *string `json:"avatar"`
+	Gender    *int64  `json:"gender"`
+	Color     *string `json:"color"`
+	BirthDate *int64  `json:"birthDate"`
+	IP        *string `json:"ip"`
+}
+
 type NewUpdateSubtitles struct {
 	ID        int64         `json:"id"`
 	Subtitles *NewSubtitles `json:"subtitles"`

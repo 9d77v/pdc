@@ -15,6 +15,8 @@ type Query {
 type Mutation {
   createUser(input:NewUser!):User!
   updateUser(input:NewUpdateUser!):User!
+  updateProfile(input:NewUpdateProfile!):User!
+  updatePassword(oldPassword:String!,newPassword:String!):User!
   login(username:String!,password:String!):LoginResponse!
   refreshToken(refreshToken:String!):LoginResponse!
 

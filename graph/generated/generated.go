@@ -74,6 +74,8 @@ type ComplexityRoot struct {
 		Login          func(childComplexity int, username string, password string) int
 		RefreshToken   func(childComplexity int, refreshToken string) int
 		UpdateEpisode  func(childComplexity int, input model.NewUpdateEpisode) int
+		UpdatePassword func(childComplexity int, oldPassword string, newPassword string) int
+		UpdateProfile  func(childComplexity int, input model.NewUpdateProfile) int
 		UpdateSubtitle func(childComplexity int, input model.NewUpdateSubtitles) int
 		UpdateThing    func(childComplexity int, input model.NewUpdateThing) int
 		UpdateUser     func(childComplexity int, input model.NewUpdateUser) int
@@ -180,6 +182,8 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
 	UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error)
+	UpdateProfile(ctx context.Context, input model.NewUpdateProfile) (*model.User, error)
+	UpdatePassword(ctx context.Context, oldPassword string, newPassword string) (*model.User, error)
 	Login(ctx context.Context, username string, password string) (*model.LoginResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*model.LoginResponse, error)
 	CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error)
@@ -396,6 +400,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateEpisode(childComplexity, args["input"].(model.NewUpdateEpisode)), true
+
+	case "Mutation.updatePassword":
+		if e.complexity.Mutation.UpdatePassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePassword_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePassword(childComplexity, args["oldPassword"].(string), args["newPassword"].(string)), true
+
+	case "Mutation.updateProfile":
+		if e.complexity.Mutation.UpdateProfile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProfile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProfile(childComplexity, args["input"].(model.NewUpdateProfile)), true
 
 	case "Mutation.updateSubtitle":
 		if e.complexity.Mutation.UpdateSubtitle == nil {
@@ -1019,6 +1047,8 @@ type Query {
 type Mutation {
   createUser(input:NewUser!):User!
   updateUser(input:NewUpdateUser!):User!
+  updateProfile(input:NewUpdateProfile!):User!
+  updatePassword(oldPassword:String!,newPassword:String!):User!
   login(username:String!,password:String!):LoginResponse!
   refreshToken(refreshToken:String!):LoginResponse!
 
@@ -1135,6 +1165,14 @@ input NewUpdateUser{
 	color: String
 	birthDate:Int
 	ip:String   
+}
+
+input NewUpdateProfile{
+	avatar: String
+	gender: Int
+	color: String
+	birthDate:Int
+	ip:String 	
 }
 
 type LoginResponse{
@@ -1363,6 +1401,42 @@ func (ec *executionContext) field_Mutation_updateEpisode_args(ctx context.Contex
 	var arg0 model.NewUpdateEpisode
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["oldPassword"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["oldPassword"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["newPassword"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["newPassword"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProfile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateProfile
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateProfile(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2277,6 +2351,88 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateUser(rctx, args["input"].(model.NewUpdateUser))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateProfile_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProfile(rctx, args["input"].(model.NewUpdateProfile))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updatePassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updatePassword_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePassword(rctx, args["oldPassword"].(string), args["newPassword"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6253,6 +6409,48 @@ func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUpdateProfile(ctx context.Context, obj interface{}) (model.NewUpdateProfile, error) {
+	var it model.NewUpdateProfile
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "avatar":
+			var err error
+			it.Avatar, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "gender":
+			var err error
+			it.Gender, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "color":
+			var err error
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "birthDate":
+			var err error
+			it.BirthDate, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ip":
+			var err error
+			it.IP, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUpdateSubtitles(ctx context.Context, obj interface{}) (model.NewUpdateSubtitles, error) {
 	var it model.NewUpdateSubtitles
 	var asMap = obj.(map[string]interface{})
@@ -6827,6 +7025,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateUser":
 			out.Values[i] = ec._Mutation_updateUser(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateProfile":
+			out.Values[i] = ec._Mutation_updateProfile(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatePassword":
+			out.Values[i] = ec._Mutation_updatePassword(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7976,6 +8184,10 @@ func (ec *executionContext) unmarshalNNewThing2githubᚗcomᚋ9d77vᚋpdcᚋgrap
 
 func (ec *executionContext) unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {
 	return ec.unmarshalInputNewUpdateEpisode(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateProfile(ctx context.Context, v interface{}) (model.NewUpdateProfile, error) {
+	return ec.unmarshalInputNewUpdateProfile(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx context.Context, v interface{}) (model.NewUpdateSubtitles, error) {
