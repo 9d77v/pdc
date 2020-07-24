@@ -80,8 +80,7 @@ export default function VideoDetail() {
         }}>
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
-                width: 1080, height: 607.5,
-                minWidth: 360, minHeight: 202.5,
+                width: 1080, height: 891,
             }}>
                 <VideoPlayer
                     episodeID={episodeItem.id}

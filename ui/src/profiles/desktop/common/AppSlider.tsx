@@ -104,7 +104,7 @@ export const AppSlider = (props: AppHeaderProps) => {
                     title={
                         <span>
                             <UserOutlined />
-                            <span>个人中心</span>
+                            <span>个人设置</span>
                         </span>
                     }
                 >

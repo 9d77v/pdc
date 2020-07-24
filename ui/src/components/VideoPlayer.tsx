@@ -88,7 +88,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }, [videoNode, props, player, url, subtitles, autoDestroy]);
 
     return (
-        <div data-vjs-player style={{ width: width, height: height, minWidth: minWidth, minHeight: minHeight }} >
+        <div data-vjs-player
+            style={{
+                width: width, height: height,
+                minWidth: minWidth, minHeight: minHeight
+            }} >
             <video id={videoID}
                 ref={(node: any) => setVideoNode(node)}
                 className="video-js vjs-big-play-centered"
