@@ -7,10 +7,14 @@ import { useHistory, Route } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from '../desktop/settings/user/UserCreateForm';
+import { UpdateProfileForm } from './me/UpdateFrofileForm';
+import UpdatePasswordForm from './me/UpdatePasswordForm';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const VideoDetail = React.lazy(() => import('./home/media/VideoDetail'))
+
+
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
     const history = useHistory();
@@ -18,7 +22,6 @@ export default function MobileIndex() {
     if (!token) {
         history.push('/login')
     }
-
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
 
@@ -26,6 +29,12 @@ export default function MobileIndex() {
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
             <Route exact path="/app/media/videos/:id"  >
                 <VideoDetail />
+            </Route>
+            <Route exact path="/app/user/profile"  >
+                <UpdateProfileForm user={user} />
+            </Route>
+            <Route exact path="/app/user/account"  >
+                <UpdatePasswordForm />
             </Route>
             <TabBar
                 unselectedTintColor="#949494"

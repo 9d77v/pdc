@@ -37,7 +37,6 @@ export const UserUpdateForm: React.FC<UserUpdateFormProps> = ({
     useEffect(() => {
         form.setFieldsValue({
             "id": data.id,
-            "avatar": data.avatar,
             "name": data.name,
             "password": data.password,
             "roleID": data.roleID,

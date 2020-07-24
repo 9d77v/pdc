@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SettingOutlined, PlaySquareOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { SettingOutlined, PlaySquareOutlined, ShoppingOutlined, UserOutlined } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -18,6 +18,14 @@ const locationMap = new Map<string, any>([
     ["/app/settings/users", {
         "defaultOpenKeys": ["settings"],
         "defaultSelectedKeys": ['settings-users']
+    }],
+    ["/app/user/profile", {
+        "defaultOpenKeys": ["user"],
+        "defaultSelectedKeys": ['user-profile']
+    }],
+    ["/app/user/account", {
+        "defaultOpenKeys": ["user"],
+        "defaultSelectedKeys": ['user-account']
     }],
     ["/app/media/videos", {
         "defaultOpenKeys": ["media"],
@@ -73,7 +81,7 @@ export const AppSlider = (props: AppHeaderProps) => {
                 </SubMenu>
                 <SubMenu
                     key="thing"
-                    style={{ display: roleID > 0 ? "block" : "none" }}
+                    style={{ display: roleID >= 1 && roleID <= 3 ? "block" : "none" }}
                     title={
                         <span>
                             <ShoppingOutlined />
@@ -92,16 +100,32 @@ export const AppSlider = (props: AppHeaderProps) => {
                     </Menu.Item>
                 </SubMenu>
                 <SubMenu
+                    key="user"
+                    title={
+                        <span>
+                            <UserOutlined />
+                            <span>个人中心</span>
+                        </span>
+                    }
+                >
+                    <Menu.Item key="user-profile"                    >
+                        <Link to="/app/user/profile">个人资料</Link>
+                    </Menu.Item>
+                    <Menu.Item key="user-account"                    >
+                        <Link to="/app/user/account">账户安全</Link>
+                    </Menu.Item>
+                </SubMenu>
+                <SubMenu
                     key="settings"
                     style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
                     title={
                         <span>
                             <SettingOutlined />
-                            <span>系统配置</span>
+                            <span>系统设置</span>
                         </span>
                     }
                 >
-                    <Menu.Item key="settings-videos"                                  >
+                    <Menu.Item key="settings-videos" >
                         <Link to="/app/settings/videos">视频管理</Link>
                     </Menu.Item>
                     <Menu.Item key="settings-users"

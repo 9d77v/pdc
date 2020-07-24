@@ -12,6 +12,11 @@ import TextArea from "antd/lib/input/TextArea";
 export default function VideoDetail() {
     const match = useRouteMatch('/app/media/videos/:id');
     const [num, setNum] = useState(0)
+    const [episodeItem, setEpisodeItem] = useState({
+        id: 0,
+        url: "",
+        subtitles: null
+    })
     let ids: number[] = []
     if (match) {
         const params: any = match.params
@@ -37,15 +42,11 @@ export default function VideoDetail() {
         desc: "",
         episodes: []
     }
-    let episodeItem = {
-        id: 0,
-        url: "",
-        subtitles: null
-    }
     let buttons: any = []
+    let video: any = null
     if (data && data.videos.edges) {
         const videos = data.videos.edges
-        const video = videos.length > 0 ? videos[0] : null
+        video = videos.length > 0 ? videos[0] : null
         if (video) {
             videoItem = ({
                 id: video.id,
@@ -61,31 +62,35 @@ export default function VideoDetail() {
                     }
                     return <div key={"pdc-button-" + value.id} className={"pdc-button"} onClick={() => { setNum(index) }} >{value.num}</div>
                 })
-                episodeItem = ({
-                    id: video.episodes[num].id,
-                    url: video.episodes[num].url,
-                    subtitles: video.episodes[num].subtitles
-                })
             }
         }
     }
-
+    useEffect(() => {
+        if (video) {
+            setEpisodeItem({
+                id: video.episodes[num].id,
+                url: video.episodes[num].url,
+                subtitles: video.episodes[num].subtitles,
+            })
+        }
+    }, [video, num])
     return (
         <div style={{
             display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
         }}>
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
-                width: 1107, height: 838, minHeight: 179, minWidth: 319,
+                width: 1080, height: 607.5,
+                minWidth: 360, minHeight: 202.5,
             }}>
                 <VideoPlayer
                     episodeID={episodeItem.id}
                     url={episodeItem.url}
                     subtitles={episodeItem.subtitles}
-
                     height={"100%"}
                     width={"100%"}
                     autoplay={true}
+                    autoDestroy={false}
                 />
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <Img src={videoItem.cover} />

@@ -10,6 +10,7 @@ import { UserUpdateForm } from './UserUpdateForm';
 import { Img } from '../../../../components/Img';
 import { GenderMap, FullRoleMap } from '../../../../consts/consts';
 import { TablePaginationConfig } from 'antd/lib/table';
+import Search from 'antd/lib/input/Search';
 
 
 export default function UserTable() {
@@ -32,6 +33,7 @@ export default function UserTable() {
         birthDate: 0,
         ip: ""
     })
+    const [keyword, setKeyword] = useState("")
     const [addUser] = useMutation(ADD_USER);
     const [updateUser] = useMutation(UPDATE_USER)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_USER,
@@ -39,11 +41,13 @@ export default function UserTable() {
             variables: {
                 page: pagination.current,
                 pageSize: pagination.pageSize,
+                keyword: keyword,
                 sorts: [{
                     field: 'id',
                     isAsc: false
                 }]
-            }
+            },
+            fetchPolicy: "cache-and-network"
         });
 
 
@@ -70,7 +74,7 @@ export default function UserTable() {
             variables: {
                 "input": {
                     "id": values.id,
-                    "avatar": values.avatar,
+                    "avatar": values.avatar === "" ? undefined : values.avatar,
                     "password": values.pasword,
                     "roleID": values.roleID,
                     "gender": values.gender,
@@ -90,8 +94,8 @@ export default function UserTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.Users.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.Users.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.users.edges : [];
+                const totalCount = fetchMoreResult ? fetchMoreResult.users.totalCount : 0;
                 setPagination({
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -99,8 +103,8 @@ export default function UserTable() {
                 })
                 return newEdges.length
                     ? {
-                        Users: {
-                            __typename: previousResult.Users.__typename,
+                        users: {
+                            __typename: previousResult.users.__typename,
                             edges: newEdges,
                             totalCount
                         }
@@ -164,16 +168,21 @@ export default function UserTable() {
         },
     ];
     return (
-        <div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
                 type="primary"
                 onClick={() => {
                     setVisible(true);
                 }}
-                style={{ float: 'left', marginBottom: 12, zIndex: 1 }}
+                style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
                 新增用户
             </Button>
+            <Search
+                placeholder="搜索"
+                onSearch={value => setKeyword(value)}
+                style={{ width: 200, marginBottom: 12 }}
+            />
             <UserCreateForm
                 visible={visible}
                 onCreate={onUserCreate}

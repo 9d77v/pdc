@@ -27,7 +27,9 @@ export default function MeIndex(props: AppHeaderProps) {
                 display: "flex",
                 flexDirection: "row",
                 height: 80
-            }}>
+            }}
+                onClick={() => history.push("/app/user/profile")}
+            >
                 <Avatar style={{
                     backgroundColor: "#00a2ae",
                     marginLeft: 20,
@@ -37,11 +39,17 @@ export default function MeIndex(props: AppHeaderProps) {
                 <div style={{ flex: 1, fontSize: 36 }}>{props.name}</div>
 
             </div>
-
             <div className="pdc-button" style={{
                 width: "100%",
                 marginTop: 20,
                 marginLeft: 0,
+                marginRight: 0,
+                borderRadius: 5
+            }} onClick={() => history.push("/app/user/account")} >修改密码</div>
+            <div className="pdc-button" style={{
+                width: "100%",
+                marginLeft: 0,
+                marginTop: 10,
                 marginRight: 0,
                 borderRadius: 5
             }} onClick={() => logout()} >退出登录</div>

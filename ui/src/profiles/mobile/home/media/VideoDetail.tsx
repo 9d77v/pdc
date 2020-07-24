@@ -77,20 +77,19 @@ export default function VideoDetail() {
                 icon={<Icon type="left" />}
                 onLeftClick={() => history.push("/app/media/videos")}
             >{videoItem.title + " 第" + (num + 1) + "话"} </NavBar>
-
+            <VideoPlayer
+                episodeID={episodeItem.id}
+                url={episodeItem.url}
+                subtitles={episodeItem.subtitles}
+                height={231}
+                width={"100%"}
+                autoplay={true}
+                autoDestroy={false}
+            />
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
                 width: "100%", height: "100%"
             }}>
-                <VideoPlayer
-                    episodeID={episodeItem.id}
-                    url={episodeItem.url}
-                    subtitles={episodeItem.subtitles}
-
-                    height={256}
-                    width={"100%"}
-                    autoplay={true}
-                />
                 <div style={{ marginTop: 20, display: "flex", flexDirection: 'column' }}>
                     <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}> 选集</span>
                     <div>{buttons}</div>

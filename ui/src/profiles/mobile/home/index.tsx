@@ -26,7 +26,6 @@ export default function HomeIndex() {
             initialPage={page}
             renderTab={tab => <span>{tab.title}</span>}
             onChange={(tab: any, index: number) => {
-                console.log(index)
                 switch (index) {
                     case 1:
                         history.push("/app/media/videos")

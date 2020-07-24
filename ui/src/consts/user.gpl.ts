@@ -15,8 +15,8 @@ mutation updateUser($input:NewUpdateUser!){
 }
 `
 const LIST_USER = gql`
- query users( $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   users(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query users($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+   users(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
         totalCount
         edges{
             id
@@ -66,4 +66,24 @@ mutation refreshToken($refreshToken:String!){
    }
 }
 `
-export { LIST_USER, ADD_USER, UPDATE_USER, GET_USER, LOGIN, REFRESH_TOKEN }
+
+const UPDATE_PROFILE = gql`
+mutation updateProfile($input:NewUpdateProfile!){
+   updateProfile(input:$input){
+      id
+   }
+}
+`
+const UPDATE_PASSWORD = gql`
+mutation updatePassword($oldPassword:String!,$newPassword:String!){
+   updatePassword(oldPassword:$oldPassword,newPassword:$newPassword){
+      id
+   }
+}
+`
+
+export {
+   LIST_USER, ADD_USER, UPDATE_USER, GET_USER,
+   LOGIN, REFRESH_TOKEN,
+   UPDATE_PROFILE, UPDATE_PASSWORD
+}
