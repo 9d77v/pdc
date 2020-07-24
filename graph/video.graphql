@@ -110,3 +110,8 @@ input NewUpdateEpisode{
   url: String!
   subtitles:  [NewSubtitle!]  
 }
+
+input NewUpdateSubtitles {
+  id:ID!
+  subtitles:NewSubtitles
+}

@@ -60,6 +60,7 @@ const (
 	RoleAdmin   = 1
 	RoleManager = 2
 	RoleUser    = 3
+	RoleGuest   = 4
 )
 
 //redis前缀

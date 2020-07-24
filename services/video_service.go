@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -137,7 +138,7 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 		cs[v.Name] = &v.URL
 	}
 	err := models.Gorm.Model(episode).Update(map[string]interface{}{
-		"num":       input.Num,
+		"num":       ptrs.Float64(input.Num),
 		"title":     ptrs.String(input.Title),
 		"cover":     ptrs.String(input.Cover),
 		"desc":      ptrs.String(input.Desc),
@@ -147,14 +148,68 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 	return &model.Episode{ID: int64(episode.ID)}, err
 }
 
+//UpdateSubtitle ..
+func (s VideoService) UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error) {
+	data := make([]*models.Episode, 0)
+	if err := models.Gorm.Select("id,subtitles").Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
+		return nil, err
+	}
+	tx := models.Gorm.Begin()
+	if len(input.Subtitles.Urls) == 0 {
+		for _, d := range data {
+			if d.Subtitles == nil {
+				continue
+			}
+			cs := make(postgres.Hstore, len(d.Subtitles))
+			for k, v := range d.Subtitles {
+				if k != input.Subtitles.Name {
+					cs[k] = v
+				}
+			}
+			err := models.Gorm.Model(d).Update(map[string]interface{}{
+				"subtitles": cs,
+			}).Error
+			if err != nil {
+				tx.Rollback()
+				return nil, err
+			}
+		}
+	} else {
+		if len(input.Subtitles.Urls) != len(data) {
+			return nil, errors.New("视频与字幕数量不一致")
+		}
+		for i, d := range data {
+			if d.Subtitles == nil {
+				cs := make(postgres.Hstore, len(d.Subtitles))
+				cs[input.Subtitles.Name] = &input.Subtitles.Urls[i]
+				d.Subtitles = cs
+			} else {
+				d.Subtitles[input.Subtitles.Name] = &input.Subtitles.Urls[i]
+			}
+			err := models.Gorm.Model(d).Update(map[string]interface{}{
+				"subtitles": d.Subtitles,
+			}).Error
+			if err != nil {
+				tx.Rollback()
+				return nil, err
+			}
+		}
+	}
+	tx.Commit()
+	return &model.Video{ID: int64(input.ID)}, nil
+}
+
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
+func (s VideoService) ListVideo(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
 	offset, limit := GetPageInfo(page, pageSize)
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("title like ?", "%"+ptrs.String(keyword)+"%")
+	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder = builder.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))

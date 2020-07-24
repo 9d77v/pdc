@@ -28,21 +28,24 @@ var userService = services.UserService{}
 
 var publicOperationArr = []string{"login", "refreshToken"}
 var permissonMap = map[string][]int{
-	"presignedUrl":  {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"users":         {models.RoleAdmin},
-	"userInfo":      {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"videos":        {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"things":        {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"thingSeries":   {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"thingAnalyze":  {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"createUser":    {models.RoleAdmin},
-	"updateUser":    {models.RoleAdmin},
-	"createVideo":   {models.RoleAdmin, models.RoleManager},
-	"updateVideo":   {models.RoleAdmin, models.RoleManager},
-	"createEpisode": {models.RoleAdmin, models.RoleManager},
-	"updateEpisode": {models.RoleAdmin, models.RoleManager},
-	"createThing":   {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"updateThing":   {models.RoleAdmin, models.RoleManager, models.RoleUser},
+	"presignedUrl":   {models.RoleAdmin, models.RoleManager, models.RoleUser},
+	"users":          {models.RoleAdmin},
+	"userInfo":       {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"videos":         {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"things":         {models.RoleAdmin, models.RoleManager, models.RoleUser},
+	"thingSeries":    {models.RoleAdmin, models.RoleManager, models.RoleUser},
+	"thingAnalyze":   {models.RoleAdmin, models.RoleManager, models.RoleUser},
+	"createUser":     {models.RoleAdmin},
+	"updateUser":     {models.RoleAdmin},
+	"updateProfile":  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"updatePassword": {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"createVideo":    {models.RoleAdmin, models.RoleManager},
+	"updateVideo":    {models.RoleAdmin, models.RoleManager},
+	"createEpisode":  {models.RoleAdmin, models.RoleManager},
+	"updateEpisode":  {models.RoleAdmin, models.RoleManager},
+	"updateSubtitle": {models.RoleAdmin, models.RoleManager},
+	"createThing":    {models.RoleAdmin, models.RoleManager, models.RoleUser},
+	"updateThing":    {models.RoleAdmin, models.RoleManager, models.RoleUser},
 }
 
 //Auth ..
@@ -95,10 +98,8 @@ func Auth() func(http.Handler) http.Handler {
 					}
 				}
 				if !valid {
-					if err != nil {
-						http.Error(w, "Permission denied", http.StatusForbidden)
-						return
-					}
+					http.Error(w, "Permission denied", http.StatusForbidden)
+					return
 				}
 				ctx := context.WithValue(r.Context(), userCtxKey, user)
 				r = r.WithContext(ctx)

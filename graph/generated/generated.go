@@ -67,16 +67,19 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateEpisode func(childComplexity int, input model.NewEpisode) int
-		CreateThing   func(childComplexity int, input model.NewThing) int
-		CreateUser    func(childComplexity int, input model.NewUser) int
-		CreateVideo   func(childComplexity int, input model.NewVideo) int
-		Login         func(childComplexity int, username string, password string) int
-		RefreshToken  func(childComplexity int, refreshToken string) int
-		UpdateEpisode func(childComplexity int, input model.NewUpdateEpisode) int
-		UpdateThing   func(childComplexity int, input model.NewUpdateThing) int
-		UpdateUser    func(childComplexity int, input model.NewUpdateUser) int
-		UpdateVideo   func(childComplexity int, input model.NewUpdateVideo) int
+		CreateEpisode  func(childComplexity int, input model.NewEpisode) int
+		CreateThing    func(childComplexity int, input model.NewThing) int
+		CreateUser     func(childComplexity int, input model.NewUser) int
+		CreateVideo    func(childComplexity int, input model.NewVideo) int
+		Login          func(childComplexity int, username string, password string) int
+		RefreshToken   func(childComplexity int, refreshToken string) int
+		UpdateEpisode  func(childComplexity int, input model.NewUpdateEpisode) int
+		UpdatePassword func(childComplexity int, oldPassword string, newPassword string) int
+		UpdateProfile  func(childComplexity int, input model.NewUpdateProfile) int
+		UpdateSubtitle func(childComplexity int, input model.NewUpdateSubtitles) int
+		UpdateThing    func(childComplexity int, input model.NewUpdateThing) int
+		UpdateUser     func(childComplexity int, input model.NewUpdateUser) int
+		UpdateVideo    func(childComplexity int, input model.NewUpdateVideo) int
 	}
 
 	PieLineSerieData struct {
@@ -89,10 +92,10 @@ type ComplexityRoot struct {
 		PresignedURL func(childComplexity int, bucketName string, objectName string) int
 		ThingAnalyze func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries  func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
-		Things       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Things       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		UserInfo     func(childComplexity int, uid *int64) int
-		Users        func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Videos       func(childComplexity int, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Users        func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Videos       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 	}
 
 	SerieData struct {
@@ -179,21 +182,24 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.NewUser) (*model.User, error)
 	UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error)
+	UpdateProfile(ctx context.Context, input model.NewUpdateProfile) (*model.User, error)
+	UpdatePassword(ctx context.Context, oldPassword string, newPassword string) (*model.User, error)
 	Login(ctx context.Context, username string, password string) (*model.LoginResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*model.LoginResponse, error)
 	CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error)
 	UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error)
 	CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error)
 	UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error)
+	UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error)
 	CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error)
 	UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error)
 }
 type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
-	Users(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
+	Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
-	Videos(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
-	Things(ctx context.Context, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
+	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error)
+	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
 }
@@ -395,6 +401,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateEpisode(childComplexity, args["input"].(model.NewUpdateEpisode)), true
 
+	case "Mutation.updatePassword":
+		if e.complexity.Mutation.UpdatePassword == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updatePassword_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdatePassword(childComplexity, args["oldPassword"].(string), args["newPassword"].(string)), true
+
+	case "Mutation.updateProfile":
+		if e.complexity.Mutation.UpdateProfile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProfile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProfile(childComplexity, args["input"].(model.NewUpdateProfile)), true
+
+	case "Mutation.updateSubtitle":
+		if e.complexity.Mutation.UpdateSubtitle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateSubtitle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSubtitle(childComplexity, args["input"].(model.NewUpdateSubtitles)), true
+
 	case "Mutation.updateThing":
 		if e.complexity.Mutation.UpdateThing == nil {
 			break
@@ -498,7 +540,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Things(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Things(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.userInfo":
 		if e.complexity.Query.UserInfo == nil {
@@ -522,7 +564,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Users(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Users(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -534,7 +576,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Videos(childComplexity, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Videos(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "SerieData.name":
 		if e.complexity.SerieData.Name == nil {
@@ -994,10 +1036,10 @@ type PieLineSerieData{
 
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
-  users(page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
+  users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   userInfo(uid:ID):User!
-  videos(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
-  things(page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
+  videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 }
@@ -1005,6 +1047,8 @@ type Query {
 type Mutation {
   createUser(input:NewUser!):User!
   updateUser(input:NewUpdateUser!):User!
+  updateProfile(input:NewUpdateProfile!):User!
+  updatePassword(oldPassword:String!,newPassword:String!):User!
   login(username:String!,password:String!):LoginResponse!
   refreshToken(refreshToken:String!):LoginResponse!
 
@@ -1012,6 +1056,7 @@ type Mutation {
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
+  updateSubtitle(input:NewUpdateSubtitles!):Video!
 
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
@@ -1120,6 +1165,14 @@ input NewUpdateUser{
 	color: String
 	birthDate:Int
 	ip:String   
+}
+
+input NewUpdateProfile{
+	avatar: String
+	gender: Int
+	color: String
+	birthDate:Int
+	ip:String 	
 }
 
 type LoginResponse{
@@ -1238,7 +1291,11 @@ input NewUpdateEpisode{
   url: String!
   subtitles:  [NewSubtitle!]  
 }
-`, BuiltIn: false},
+
+input NewUpdateSubtitles {
+  id:ID!
+  subtitles:NewSubtitles
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -1344,6 +1401,56 @@ func (ec *executionContext) field_Mutation_updateEpisode_args(ctx context.Contex
 	var arg0 model.NewUpdateEpisode
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["oldPassword"]; ok {
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["oldPassword"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["newPassword"]; ok {
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["newPassword"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProfile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateProfile
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateProfile(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateSubtitle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateSubtitles
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1517,38 +1624,46 @@ func (ec *executionContext) field_Query_thingSeries_args(ctx context.Context, ra
 func (ec *executionContext) field_Query_things_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg0
+	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg1
-	var arg2 []int64
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg2
-	var arg3 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg3, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg3
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -1569,76 +1684,92 @@ func (ec *executionContext) field_Query_userInfo_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg0
+	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg1
-	var arg2 []int64
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg2
-	var arg3 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg3, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg3
+	args["sorts"] = arg4
 	return args, nil
 }
 
 func (ec *executionContext) field_Query_videos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg0
+	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg1
-	var arg2 []int64
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg2, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg2
-	var arg3 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg3, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg3
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -2236,6 +2367,88 @@ func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field grap
 	return ec.marshalNUser2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_updateProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateProfile_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProfile(rctx, args["input"].(model.NewUpdateProfile))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updatePassword(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updatePassword_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdatePassword(rctx, args["oldPassword"].(string), args["newPassword"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2480,6 +2693,47 @@ func (ec *executionContext) _Mutation_updateEpisode(ctx context.Context, field g
 	res := resTmp.(*model.Episode)
 	fc.Result = res
 	return ec.marshalNEpisode2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateSubtitle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateSubtitle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSubtitle(rctx, args["input"].(model.NewUpdateSubtitles))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createThing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2731,7 +2985,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Users(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2813,7 +3067,7 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Videos(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Videos(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2854,7 +3108,7 @@ func (ec *executionContext) _Query_things(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Things(rctx, args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Things(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6155,6 +6409,72 @@ func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUpdateProfile(ctx context.Context, obj interface{}) (model.NewUpdateProfile, error) {
+	var it model.NewUpdateProfile
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "avatar":
+			var err error
+			it.Avatar, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "gender":
+			var err error
+			it.Gender, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "color":
+			var err error
+			it.Color, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "birthDate":
+			var err error
+			it.BirthDate, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ip":
+			var err error
+			it.IP, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUpdateSubtitles(ctx context.Context, obj interface{}) (model.NewUpdateSubtitles, error) {
+	var it model.NewUpdateSubtitles
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subtitles":
+			var err error
+			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUpdateThing(ctx context.Context, obj interface{}) (model.NewUpdateThing, error) {
 	var it model.NewUpdateThing
 	var asMap = obj.(map[string]interface{})
@@ -6708,6 +7028,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateProfile":
+			out.Values[i] = ec._Mutation_updateProfile(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatePassword":
+			out.Values[i] = ec._Mutation_updatePassword(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -6735,6 +7065,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateEpisode":
 			out.Values[i] = ec._Mutation_updateEpisode(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateSubtitle":
+			out.Values[i] = ec._Mutation_updateSubtitle(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7849,6 +8184,14 @@ func (ec *executionContext) unmarshalNNewThing2githubᚗcomᚋ9d77vᚋpdcᚋgrap
 
 func (ec *executionContext) unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {
 	return ec.unmarshalInputNewUpdateEpisode(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateProfile(ctx context.Context, v interface{}) (model.NewUpdateProfile, error) {
+	return ec.unmarshalInputNewUpdateProfile(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx context.Context, v interface{}) (model.NewUpdateSubtitles, error) {
+	return ec.unmarshalInputNewUpdateSubtitles(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewUpdateThing2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateThing(ctx context.Context, v interface{}) (model.NewUpdateThing, error) {

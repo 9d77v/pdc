@@ -13,7 +13,7 @@ type User struct {
 	Name      string `gorm:"size:50;unique;NOT NULL;"`
 	Password  string `gorm:"size:256;NOT NULL;"`
 	Avatar    string `gorm:"size:200;NOT NULL;"`
-	RoleID    int    //用户角色，1：owner，2：manager，3：normal user
+	RoleID    int    //用户角色，1：owner，2：manager，3：normal user,4: guest
 	Gender    int    //性别，0:male,1:female，2：unknown
 	Color     string `gorm:"size:50;NOT NULL;"` //favorite color
 	BirthDate time.Time
