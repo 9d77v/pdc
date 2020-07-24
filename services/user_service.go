@@ -154,11 +154,11 @@ func (s UserService) Login(ctx context.Context, username string, password string
 	res := new(model.LoginResponse)
 	user := new(models.User)
 	if err := models.Gorm.Select("id,name,password").Where("name=?", username).First(user).Error; err != nil {
-		return res, err
+		return res, errors.New("用户名或密码错误")
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return res, err
+		return res, errors.New("用户名或密码错误")
 	}
 	res.AccessToken = utils.JWT([]byte(models.JWTtAccessSecret), int64(user.ID), accessExpire, models.JWTIssuer)
 	res.RefreshToken = utils.JWT([]byte(models.JWTRefreshSecret), int64(user.ID), refreshExpire, models.JWTIssuer)
