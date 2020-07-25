@@ -17,6 +17,7 @@ type Episode struct {
 	Desc      string `gorm:"size:5000;NOT NULL;"`
 	Cover     string `gorm:"size:500;NOT NULL;"`
 	URL       string `gorm:"size:500;NOT NULL;"`
+	MobileURL string `gorm:"size:500;"`
 	Subtitles postgres.Hstore
 }
 

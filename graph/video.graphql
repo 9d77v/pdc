@@ -36,6 +36,7 @@ type Episode {
   desc: String!
   cover: String!
   url: String!
+  mobileURL: String!
   subtitles:  [Subtitle!]!
   createdAt: Int!
   updatedAt: Int!
@@ -70,7 +71,7 @@ input NewVideo {
   staffs: [NewStaff!]
   tags: [String!]
   isShow: Boolean!
-  videoURLs:[String!]
+  videoURLs:[String!]!
   subtitles:NewSubtitles
 }
 
@@ -114,4 +115,9 @@ input NewUpdateEpisode{
 input NewUpdateSubtitles {
   id:ID!
   subtitles:NewSubtitles
+}
+
+input NewUpdateMobileVideos{
+  id:ID!
+  videoURLs:[String!]!
 }

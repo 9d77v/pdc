@@ -20,4 +20,6 @@ http://oss.domain.local:7000 {
         dns lego_deprecated alidns
     }
     reverse_proxy minio:9000
+    header /image/* Cache-Control max-age=31536000
+    header /vtt/* Cache-Control max-age=31536000
 }

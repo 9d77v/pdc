@@ -26,6 +26,10 @@ func ToVideoDto(m *models.Video) *model.Video {
 		if e.URL != "" {
 			url = models.OssPrefix + e.URL
 		}
+		mobileURL := ""
+		if e.MobileURL != "" {
+			mobileURL = models.OssPrefix + e.MobileURL
+		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
 			Num:       e.Num,
@@ -33,6 +37,7 @@ func ToVideoDto(m *models.Video) *model.Video {
 			Desc:      e.Desc,
 			Cover:     cover,
 			URL:       url,
+			MobileURL: mobileURL,
 			Subtitles: sArr,
 			CreatedAt: e.CreatedAt.Unix(),
 			UpdatedAt: e.UpdatedAt.Unix(),

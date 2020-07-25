@@ -15,6 +15,7 @@ type Episode struct {
 	Desc      string      `json:"desc"`
 	Cover     string      `json:"cover"`
 	URL       string      `json:"url"`
+	MobileURL string      `json:"mobileURL"`
 	Subtitles []*Subtitle `json:"subtitles"`
 	CreatedAt int64       `json:"createdAt"`
 	UpdatedAt int64       `json:"updatedAt"`
@@ -81,6 +82,11 @@ type NewUpdateEpisode struct {
 	Cover     *string        `json:"cover"`
 	URL       string         `json:"url"`
 	Subtitles []*NewSubtitle `json:"subtitles"`
+}
+
+type NewUpdateMobileVideos struct {
+	ID        int64    `json:"id"`
+	VideoURLs []string `json:"videoURLs"`
 }
 
 type NewUpdateProfile struct {
