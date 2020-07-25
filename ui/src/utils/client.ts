@@ -8,7 +8,7 @@ import { onError } from 'apollo-link-error';
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 import { getRefreshToken } from '../consts/http';
-import { message as msg } from 'antd'
+import { message as msg, message } from 'antd'
 const httpLink = new HttpLink({ uri: '/api' });
 
 const authLink = setContext(
@@ -65,6 +65,9 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         if (err.statusCode === 401) {
             localStorage.clear()
             client.resetStore()
+            message.error("token失效，请刷新页面")
+        } else if (err.statusCode === 403) {
+            message.error("无操作权限")
         }
     };
 })

@@ -38,6 +38,14 @@ mutation updateSubtitle($input:NewUpdateSubtitles!){
    }
 }
 `
+
+const UPDATE_MOBILE_VIDEO = gql`
+mutation updateMobileVideo($input:NewUpdateMobileVideos!){
+  updateMobileVideo(input:$input){
+     id
+   }
+}
+`
 const LIST_VIDEO = gql`
  query videos($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
    videos(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
@@ -103,6 +111,7 @@ const GET_VIDEO = gql`
               desc
               cover
               url
+              mobileURL
               subtitles{
                   name
                   url
@@ -116,5 +125,6 @@ const GET_VIDEO = gql`
 
 export {
   LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE,
-  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, UPDATE_SUBTITLE
+  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, UPDATE_SUBTITLE,
+  UPDATE_MOBILE_VIDEO
 }
