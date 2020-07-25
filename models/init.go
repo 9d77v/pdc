@@ -35,12 +35,13 @@ var (
 	JWTRefreshSecret = utils.GetEnvStr("JWT_REFRESH_SECRET", "JWT_REFRESH_SECRET")
 	JWTIssuer        = utils.GetEnvStr("JWT_ISSUER", "domain.local")
 
-	minioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
+	InternalMinioAddress = utils.GetEnvStr("INTERNAL_MINIO_ADDRESS", "oss.domain.local:9000")
+	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
 	minioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
 
-	OssPrefix = utils.GetEnvStr("OSS_PREFIX", "http://oss.domain.local:9000")
+	OssPrefix = ""
 
 	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
@@ -124,13 +125,17 @@ func initDBData() {
 }
 
 func initMinio() {
-	endpoint := minioAddress
 	accessKeyID := minioAccessKeyID
 	secretAccessKey := minioSecretAccessKey
 	useSSL := minioUseSSL
 
+	scheme := "http"
+	if useSSL {
+		scheme = "https"
+	}
+	OssPrefix = fmt.Sprintf("%s://%s", scheme, MinioAddress)
 	var err error
-	MinioClient, err = minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
+	MinioClient, err = minio.New(MinioAddress, accessKeyID, secretAccessKey, useSSL)
 	if err != nil {
 		log.Fatalln(err)
 	}
