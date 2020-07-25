@@ -62,6 +62,10 @@ func (r *mutationResolver) UpdateSubtitle(ctx context.Context, input model.NewUp
 	return videoService.UpdateSubtitle(ctx, input)
 }
 
+func (r *mutationResolver) UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error) {
+	return videoService.UpdateMobileVideo(ctx, input)
+}
+
 func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error) {
 	user := middleware.ForContext(ctx)
 	return thingService.CreateThing(input, int64(user.ID))

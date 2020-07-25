@@ -199,6 +199,30 @@ func (s VideoService) UpdateSubtitle(ctx context.Context, input model.NewUpdateS
 	return &model.Video{ID: int64(input.ID)}, nil
 }
 
+//UpdateMobileVideo ..
+func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error) {
+	data := make([]*models.Episode, 0)
+	if err := models.Gorm.Select("id,subtitles").Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
+		return nil, err
+	}
+	tx := models.Gorm.Begin()
+	if len(input.VideoURLs) != len(data) {
+		return nil, errors.New("移动端视频与已有视频数量不一致")
+	}
+
+	for i, d := range data {
+		err := models.Gorm.Model(d).Update(map[string]interface{}{
+			"mobile_url": input.VideoURLs[i],
+		}).Error
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+	tx.Commit()
+	return &model.Video{ID: int64(input.ID)}, nil
+}
+
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
 	offset, limit := GetPageInfo(page, pageSize)
