@@ -10,12 +10,13 @@ import { getTextFromFile, replaceURL } from '../utils/file';
 interface UploaderProps {
     fileLimit: number
     bucketName: string
+    filePathPrefix?: string
     validFileTypes: string[]
     setURL: (e: any) => any
 }
 
 
-export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTypes, setURL }) => {
+export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPrefix, validFileTypes, setURL }) => {
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
@@ -99,6 +100,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, valid
                     }
                     fileName = `${hash.digest('hex')}.${fileType}`
                 }
+                fileName = filePathPrefix === undefined ? fileName : filePathPrefix + fileName
                 const data = await getUploadURL(bucketName, fileName);
                 setAction(data.data.presignedUrl)
                 resolve();

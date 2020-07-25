@@ -1,7 +1,7 @@
 import { Table, Button, message, Tag, Modal } from 'antd';
 import React, { useState, useEffect } from 'react'
 
-import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE, UPDATE_SUBTITLE } from '../../../../consts/video.gql';
+import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE, UPDATE_SUBTITLE, UPDATE_MOBILE_VIDEO } from '../../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateForm';
 import { useMutation } from '@apollo/react-hooks';
@@ -16,6 +16,7 @@ import { TablePaginationConfig } from 'antd/lib/table';
 import { PlaySquareTwoTone } from '@ant-design/icons';
 import { SubtitleUpdateForm } from './SubtitleUpdateForm';
 import Search from 'antd/lib/input/Search';
+import { MobileVideoUpdateForm } from './MobileVideoUpdateForm';
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -112,6 +113,8 @@ export default function VideoTable() {
         subtitles: [],
     })
     const [updateSubtitleVisible, setUpdateSubtitleVisible] = useState(false)
+    const [updateMobileVideoVisible, setUpdateMobileVideoVisible] = useState(false)
+
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 10,
@@ -132,6 +135,7 @@ export default function VideoTable() {
     const [addEpisode] = useMutation(ADD_EPISODE)
     const [updateEpisode] = useMutation(UPDATE_EPISODE)
     const [updateSubtitle] = useMutation(UPDATE_SUBTITLE)
+    const [updateMobileVideo] = useMutation(UPDATE_MOBILE_VIDEO)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
             variables: {
@@ -144,7 +148,7 @@ export default function VideoTable() {
                 }]
             },
             fetchPolicy: "cache-and-network"
-        });
+        })
     const [num, setNum] = useState(1);
     useEffect(() => {
         if (error) {
@@ -246,6 +250,18 @@ export default function VideoTable() {
         setUpdateSubtitleVisible(false);
         await refetch()
     };
+
+    const onMobileVideoUpdate = async (values: any) => {
+        await updateMobileVideo({
+            variables: {
+                "input": {
+                    "id": currentVideoID,
+                    "videoURLs": values.videoURLs,
+                }
+            }
+        });
+        setUpdateMobileVideoVisible(false);
+    }
 
     const onChange = (pageConfig: TablePaginationConfig) => {
         fetchMore({
@@ -373,6 +389,11 @@ export default function VideoTable() {
                             setCurrentVideoID(record.id)
                             setUpdateSubtitleVisible(true)
                         }}>更换字幕</Button>
+                    <Button
+                        onClick={() => {
+                            setCurrentVideoID(record.id)
+                            setUpdateMobileVideoVisible(true)
+                        }}>补充视频</Button>
                 </span>
         }
     ];
@@ -428,6 +449,14 @@ export default function VideoTable() {
                 onUpdate={onSubtitleUpdate}
                 onCancel={() => {
                     setUpdateSubtitleVisible(false);
+                }}
+            />
+            <MobileVideoUpdateForm
+                visible={updateMobileVideoVisible}
+                videoID={currentVideoID}
+                onUpdate={onMobileVideoUpdate}
+                onCancel={() => {
+                    setUpdateMobileVideoVisible(false);
                 }}
             />
             <Modal

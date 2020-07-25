@@ -40,6 +40,7 @@ export default function VideoDetail() {
     let episodeItem = {
         id: 0,
         url: "",
+        mobileURL: "",
         subtitles: null
     }
     let buttons: any = []
@@ -64,6 +65,7 @@ export default function VideoDetail() {
                 episodeItem = ({
                     id: video.episodes[num].id,
                     url: video.episodes[num].url,
+                    mobileURL: video.episodes[num].mobileURL || "",
                     subtitles: video.episodes[num].subtitles
                 })
             }
@@ -79,7 +81,7 @@ export default function VideoDetail() {
             >{videoItem.title + " 第" + (num + 1) + "话"} </NavBar>
             <VideoPlayer
                 episodeID={episodeItem.id}
-                url={episodeItem.url}
+                url={episodeItem.mobileURL !== "" ? episodeItem.mobileURL : episodeItem.url}
                 subtitles={episodeItem.subtitles}
                 height={231}
                 width={"100%"}
