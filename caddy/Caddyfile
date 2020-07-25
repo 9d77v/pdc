@@ -11,4 +11,6 @@ domain.local {
 oss.domain.local {
     tls internal
     reverse_proxy minio:9000 
+    header /image/* Cache-Control max-age=31536000
+    header /vtt/* Cache-Control max-age=31536000
 }
