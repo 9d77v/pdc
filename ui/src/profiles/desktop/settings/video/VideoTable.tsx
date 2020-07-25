@@ -393,7 +393,7 @@ export default function VideoTable() {
                         onClick={() => {
                             setCurrentVideoID(record.id)
                             setUpdateMobileVideoVisible(true)
-                        }}>补充视频</Button>
+                        }}>更换视频</Button>
                 </span>
         }
     ];

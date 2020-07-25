@@ -25,7 +25,7 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
     return (
         <Modal
             visible={visible}
-            title="新增移动端视频"
+            title="更换视频"
             okText="确定"
             cancelText="取消"
             onCancel={
@@ -56,11 +56,11 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
                 {...layout}
                 form={form}
                 layout="horizontal"
-                name="videoUpdateForm"
+                name="mobileVideoUpdateForm"
             >
                 <Form.Item
                     name="videoURLs"
-                    label="视频列表"
+                    label="手机视频"
                     rules={[{ required: true, message: '请上传视频!' }]}
                 >
                     <Uploader
