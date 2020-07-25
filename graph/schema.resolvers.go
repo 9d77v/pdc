@@ -77,7 +77,8 @@ func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdat
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
-	return commonService.PresignedURL(bucketName, objectName)
+	scheme := middleware.ForSchemeContext(ctx)
+	return commonService.PresignedURL(scheme, bucketName, objectName)
 }
 
 func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {

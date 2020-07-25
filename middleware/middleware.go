@@ -14,6 +14,7 @@ import (
 )
 
 var userCtxKey = &contextKey{"user"}
+var schemeCtxKey = &contextKey{"scheme"}
 
 type contextKey struct {
 	name string
@@ -103,6 +104,13 @@ func Auth() func(http.Handler) http.Handler {
 					return
 				}
 				ctx := context.WithValue(r.Context(), userCtxKey, user)
+				if req.OperationName == "presignedUrl" {
+					scheme := "http"
+					if r.TLS != nil {
+						scheme = "https"
+					}
+					ctx = context.WithValue(ctx, schemeCtxKey, scheme)
+				}
 				r = r.WithContext(ctx)
 			}
 			next.ServeHTTP(w, r)
@@ -113,6 +121,12 @@ func Auth() func(http.Handler) http.Handler {
 //ForContext ..
 func ForContext(ctx context.Context) *models.User {
 	raw, _ := ctx.Value(userCtxKey).(*models.User)
+	return raw
+}
+
+//ForSchemeContext ..
+func ForSchemeContext(ctx context.Context) string {
+	raw, _ := ctx.Value(schemeCtxKey).(string)
 	return raw
 }
 
