@@ -152,9 +152,10 @@ func initMinio() {
 			log.Printf("Successfully created %s\n", bucketName)
 		}
 		//mc  policy  set  download  minio/mybucket
-		policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS": 
-		["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource": 
-		["arn:aws:s3:::` + bucketName + `"]},{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
+		// {"Effect":"Allow","Principal":{"AWS":
+		// ["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource":
+		// ["arn:aws:s3:::` + bucketName + `"]},
+		policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
 		["s3:GetObject"],"Resource":["arn:aws:s3:::` + bucketName + `/*"]}]}`
 		err := MinioClient.SetBucketPolicy(bucketName, policy)
 		if err != nil {
