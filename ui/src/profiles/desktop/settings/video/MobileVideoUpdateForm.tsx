@@ -21,7 +21,7 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
-    const videoPathPrefix = videoID.toString() + "/mobile/"
+    const videoPathPrefix = "mobile/" + videoID.toString() + "/"
     return (
         <Modal
             visible={visible}
