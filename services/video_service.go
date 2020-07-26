@@ -90,16 +90,19 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 		staffs := strings.Join(v.Persons, ",")
 		ss[v.Job] = &staffs
 	}
-	err := models.Gorm.Model(video).Update(map[string]interface{}{
+	updateMap := map[string]interface{}{
 		"title":      ptrs.String(input.Title),
-		"cover":      ptrs.String(input.Cover),
 		"pub_date":   time.Unix(ptrs.Int64(input.PubDate), 0),
 		"desc":       ptrs.String(input.Desc),
 		"characters": cs,
 		"staffs":     ss,
 		"tags":       input.Tags,
 		"is_show":    ptrs.Bool(input.IsShow),
-	}).Error
+	}
+	if input.Cover != nil {
+		updateMap["cover"] = ptrs.String(input.Cover)
+	}
+	err := models.Gorm.Model(video).Update(updateMap).Error
 	return &model.Video{ID: int64(video.ID)}, err
 }
 
@@ -137,14 +140,17 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 	for _, v := range input.Subtitles {
 		cs[v.Name] = &v.URL
 	}
-	err := models.Gorm.Model(episode).Update(map[string]interface{}{
+	updateMap := map[string]interface{}{
 		"num":       ptrs.Float64(input.Num),
 		"title":     ptrs.String(input.Title),
-		"cover":     ptrs.String(input.Cover),
 		"desc":      ptrs.String(input.Desc),
 		"url":       input.URL,
 		"subtitles": cs,
-	}).Error
+	}
+	if input.Cover != nil {
+		updateMap["cover"] = ptrs.String(input.Cover)
+	}
+	err := models.Gorm.Model(episode).Update(updateMap).Error
 	return &model.Episode{ID: int64(episode.ID)}, err
 }
 
