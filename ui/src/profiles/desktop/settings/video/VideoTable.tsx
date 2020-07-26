@@ -61,6 +61,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
             title: '操作',
             dataIndex: 'operation',
             key: 'operation',
+            width: 120,
             render: (text: any, record: any) => <span>
                 <Button
                     onClick={() => {
@@ -364,7 +365,7 @@ export default function VideoTable() {
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
-            title: '操作', key: 'operation', render: (value: any, record: any) =>
+            title: '操作', key: 'operation', width: 120, render: (value: any, record: any) =>
                 <span><Button
                     onClick={() => {
                         setCurrentVideoID(record.id)
