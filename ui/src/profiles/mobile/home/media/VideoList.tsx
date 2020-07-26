@@ -36,8 +36,12 @@ export default function VideoList() {
                 <div key={item.id}
                     onClick={() => history.push('/app/media/videos/' + item.id)}
                     style={{
-                        padding: 10, flexGrow: 1, width: "33%",
-                        height: 200, display: "flex", flexDirection: "column"
+                        width: "30%",
+                        margin: "2.5% 0 0 2.5%",
+                        height: 210,
+                        display: "flex",
+                        float: "left",
+                        flexDirection: "column"
                     }}
                 >
                     <Img src={item.cover} width={"100%"} height={"70%"} />
@@ -54,10 +58,8 @@ export default function VideoList() {
     }, [data, history])
     return (
         <div style={{
-            display: "flex",
             width: "100%",
             height: "100%",
-            flexWrap: "wrap"
         }}>
             {cards}
         </div>
