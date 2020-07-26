@@ -36,6 +36,7 @@ var (
 	JWTIssuer        = utils.GetEnvStr("JWT_ISSUER", "domain.local")
 
 	InternalMinioAddress = utils.GetEnvStr("INTERNAL_MINIO_ADDRESS", "oss.domain.local:9000")
+	ExternalMinioAddress = utils.GetEnvStr("EXTERNAL_MINIO_ADDRESS", "oss.domain.local")
 	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
@@ -129,11 +130,7 @@ func initMinio() {
 	secretAccessKey := minioSecretAccessKey
 	useSSL := minioUseSSL
 
-	scheme := "http"
-	if useSSL {
-		scheme = "https"
-	}
-	OssPrefix = fmt.Sprintf("%s://%s", scheme, MinioAddress)
+	OssPrefix = fmt.Sprintf("https://%s", ExternalMinioAddress)
 	var err error
 	MinioClient, err = minio.New(MinioAddress, accessKeyID, secretAccessKey, useSSL)
 	if err != nil {
@@ -155,9 +152,10 @@ func initMinio() {
 			log.Printf("Successfully created %s\n", bucketName)
 		}
 		//mc  policy  set  download  minio/mybucket
-		policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS": 
-		["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource": 
-		["arn:aws:s3:::` + bucketName + `"]},{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
+		// {"Effect":"Allow","Principal":{"AWS":
+		// ["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource":
+		// ["arn:aws:s3:::` + bucketName + `"]},
+		policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
 		["s3:GetObject"],"Resource":["arn:aws:s3:::` + bucketName + `/*"]}]}`
 		err := MinioClient.SetBucketPolicy(bucketName, policy)
 		if err != nil {
