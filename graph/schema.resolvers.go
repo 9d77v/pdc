@@ -78,24 +78,29 @@ func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdat
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return commonService.PresignedURL(scheme, bucketName, objectName)
+	return commonService.PresignedURL(ctx, scheme, bucketName, objectName)
 }
 
 func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {
 	con := new(model.UserConnection)
-	total, data, err := userService.ListUser(ctx, keyword, page, pageSize, ids, sorts)
+	scheme := middleware.ForSchemeContext(ctx)
+	total, data, err := userService.ListUser(ctx, keyword,
+		page, pageSize, ids, sorts, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
 func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, error) {
-	return dtos.ToUserDto(middleware.ForContext(ctx)), nil
+	scheme := middleware.ForSchemeContext(ctx)
+	return dtos.ToUserDto(middleware.ForContext(ctx), scheme), nil
 }
 
 func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
-	total, data, err := videoService.ListVideo(ctx, keyword, page, pageSize, ids, sorts)
+	scheme := middleware.ForSchemeContext(ctx)
+	total, data, err := videoService.ListVideo(ctx, keyword,
+		page, pageSize, ids, sorts, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -103,8 +108,10 @@ func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64
 
 func (r *queryResolver) Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
 	user := middleware.ForContext(ctx)
+	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.ThingConnection)
-	total, data, err := thingService.ListThing(ctx, keyword, page, pageSize, ids, sorts, int64(user.ID))
+	total, data, err := thingService.ListThing(ctx, keyword,
+		page, pageSize, ids, sorts, int64(user.ID), scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

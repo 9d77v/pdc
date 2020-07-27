@@ -8,27 +8,27 @@ import (
 )
 
 //ToVideoDto ...
-func ToVideoDto(m *models.Video) *model.Video {
+func ToVideoDto(m *models.Video, scheme string) *model.Video {
 	es := make([]*model.Episode, 0, len(m.Episodes))
 	for _, e := range m.Episodes {
 		sArr := make([]*model.Subtitle, 0, len(e.Subtitles))
 		for k, v := range e.Subtitles {
 			sArr = append(sArr, &model.Subtitle{
 				Name: k,
-				URL:  models.OssPrefix + *v,
+				URL:  getOSSPrefix(scheme) + *v,
 			})
 		}
 		cover := ""
 		if e.Cover != "" {
-			cover = models.OssPrefix + e.Cover
+			cover = getOSSPrefix(scheme) + e.Cover
 		}
 		url := ""
 		if e.URL != "" {
-			url = models.OssPrefix + e.URL
+			url = getOSSPrefix(scheme) + e.URL
 		}
 		mobileURL := ""
 		if e.MobileURL != "" {
-			mobileURL = models.OssPrefix + e.MobileURL
+			mobileURL = getOSSPrefix(scheme) + e.MobileURL
 		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
@@ -59,7 +59,7 @@ func ToVideoDto(m *models.Video) *model.Video {
 	}
 	cover := ""
 	if m.Cover != "" {
-		cover = models.OssPrefix + m.Cover
+		cover = getOSSPrefix(scheme) + m.Cover
 	}
 	return &model.Video{
 		ID:         int64(m.ID),

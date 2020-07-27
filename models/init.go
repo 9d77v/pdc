@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
@@ -10,7 +11,8 @@ import (
 	"github.com/9d77v/pdc/utils"
 	redis "github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
-	minio "github.com/minio/minio-go/v6"
+	minio "github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"golang.org/x/crypto/bcrypt"
 
 	//postgres driver
@@ -35,14 +37,13 @@ var (
 	JWTRefreshSecret = utils.GetEnvStr("JWT_REFRESH_SECRET", "JWT_REFRESH_SECRET")
 	JWTIssuer        = utils.GetEnvStr("JWT_ISSUER", "domain.local")
 
-	InternalMinioAddress = utils.GetEnvStr("INTERNAL_MINIO_ADDRESS", "oss.domain.local:9000")
-	ExternalMinioAddress = utils.GetEnvStr("EXTERNAL_MINIO_ADDRESS", "oss.domain.local")
-	MinioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
+	minioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
+	secureMinioAddress   = utils.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
-	minioUseSSL          = utils.GetEnvBool("MINIO_USE_SSL", false)
 
-	OssPrefix = ""
+	OssPrefix       = ""
+	SecureOssPrerix = ""
 
 	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
@@ -51,8 +52,10 @@ var (
 var (
 	//Gorm global  orm
 	Gorm *gorm.DB
-	//MinioClient S3 OSS
+	//MinioClient S3 OSS by http
 	MinioClient *minio.Client
+	//SecureMinioClient S3 OSS by https
+	SecureMinioClient *minio.Client
 	//RedisClient ..
 	RedisClient *redis.Client
 )
@@ -128,21 +131,27 @@ func initDBData() {
 func initMinio() {
 	accessKeyID := minioAccessKeyID
 	secretAccessKey := minioSecretAccessKey
-	useSSL := minioUseSSL
 
-	OssPrefix = fmt.Sprintf("https://%s", ExternalMinioAddress)
+	OssPrefix = fmt.Sprintf("http://%s", minioAddress)
+	SecureOssPrerix = fmt.Sprintf("https://%s", secureMinioAddress)
 	var err error
-	MinioClient, err = minio.New(MinioAddress, accessKeyID, secretAccessKey, useSSL)
+	MinioClient, err = minio.New(minioAddress, &minio.Options{
+		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}
-
+	SecureMinioClient, err = minio.New(secureMinioAddress, &minio.Options{
+		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+		Secure: true,
+	})
 	preCreatedBuckets := []string{"image", "video", "vtt"}
 	location := "us-east-1"
 	for _, bucketName := range preCreatedBuckets {
-		err = MinioClient.MakeBucket(bucketName, location)
+		err = MinioClient.MakeBucket(context.Background(), bucketName,
+			minio.MakeBucketOptions{Region: location})
 		if err != nil {
-			exists, errBucketExists := MinioClient.BucketExists(bucketName)
+			exists, errBucketExists := MinioClient.BucketExists(context.Background(), bucketName)
 			if errBucketExists == nil && exists {
 				log.Printf("We already own %s\n", bucketName)
 			} else {
@@ -152,12 +161,9 @@ func initMinio() {
 			log.Printf("Successfully created %s\n", bucketName)
 		}
 		//mc  policy  set  download  minio/mybucket
-		// {"Effect":"Allow","Principal":{"AWS":
-		// ["*"]},"Action":["s3:GetBucketLocation","s3:ListBucket"],"Resource":
-		// ["arn:aws:s3:::` + bucketName + `"]},
 		policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
 		["s3:GetObject"],"Resource":["arn:aws:s3:::` + bucketName + `/*"]}]}`
-		err := MinioClient.SetBucketPolicy(bucketName, policy)
+		err := MinioClient.SetBucketPolicy(context.Background(), bucketName, policy)
 		if err != nil {
 			log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
 		}

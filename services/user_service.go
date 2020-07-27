@@ -91,7 +91,9 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 }
 
 //ListUser ..
-func (s UserService) ListUser(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.User, error) {
+func (s UserService) ListUser(ctx context.Context, keyword *string,
+	page, pageSize *int64, ids []int64, sorts []*model.Sort,
+	scheme string) (int64, []*model.User, error) {
 	result := make([]*model.User, 0)
 	data := make([]*models.User, 0)
 	offset, limit := GetPageInfo(page, pageSize)
@@ -135,7 +137,7 @@ func (s UserService) ListUser(ctx context.Context, keyword *string, page, pageSi
 		}
 	}
 	for _, m := range data {
-		r := dtos.ToUserDto(m)
+		r := dtos.ToUserDto(m, scheme)
 		result = append(result, r)
 	}
 	return total, result, nil

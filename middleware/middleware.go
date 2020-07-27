@@ -104,13 +104,8 @@ func Auth() func(http.Handler) http.Handler {
 					return
 				}
 				ctx := context.WithValue(r.Context(), userCtxKey, user)
-				if req.OperationName == "presignedUrl" {
-					scheme := "http"
-					if r.TLS != nil {
-						scheme = "https"
-					}
-					ctx = context.WithValue(ctx, schemeCtxKey, scheme)
-				}
+				scheme := r.Header.Get("X-Forwarded-Proto")
+				ctx = context.WithValue(ctx, schemeCtxKey, scheme)
 				r = r.WithContext(ctx)
 			}
 			next.ServeHTTP(w, r)

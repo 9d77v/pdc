@@ -6,10 +6,10 @@ import (
 )
 
 //ToThingDto ...
-func ToThingDto(m *models.Thing) *model.Thing {
+func ToThingDto(m *models.Thing, scheme string) *model.Thing {
 	newPics := make([]string, 0)
 	for _, v := range m.Pics {
-		newPics = append(newPics, models.OssPrefix+v)
+		newPics = append(newPics, getOSSPrefix(scheme)+v)
 	}
 	return &model.Thing{
 		ID:                  int64(m.ID),
