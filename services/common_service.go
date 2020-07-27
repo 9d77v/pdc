@@ -1,10 +1,11 @@
 package services
 
 import (
-	"strings"
+	"context"
 	"time"
 
 	"github.com/9d77v/pdc/models"
+	minio "github.com/minio/minio-go/v7"
 )
 
 //CommonService ..
@@ -12,15 +13,16 @@ type CommonService struct {
 }
 
 //PresignedURL ..
-func (s CommonService) PresignedURL(scheme, bucketName, objectName string) (string, error) {
-	u, err := models.MinioClient.PresignedPutObject(bucketName, objectName, 1*time.Hour)
+func (s CommonService) PresignedURL(ctx context.Context, scheme, bucketName, objectName string) (string, error) {
+	var minioClient *minio.Client
+	if scheme == "https" {
+		minioClient = models.SecureMinioClient
+	} else {
+		minioClient = models.MinioClient
+	}
+	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 6*time.Hour)
 	if err != nil {
 		return "", err
 	}
-	presignedURL := u.String()
-	if scheme == "http" {
-		u.Scheme = scheme
-		presignedURL = strings.Replace(u.String(), models.MinioAddress, models.InternalMinioAddress, 1)
-	}
-	return presignedURL, nil
+	return u.String(), nil
 }

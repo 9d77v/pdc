@@ -230,7 +230,9 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Video, error) {
+func (s VideoService) ListVideo(ctx context.Context, keyword *string,
+	page, pageSize *int64, ids []int64, sorts []*model.Sort,
+	scheme string) (int64, []*model.Video, error) {
 	offset, limit := GetPageInfo(page, pageSize)
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
@@ -280,7 +282,7 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string, page, page
 		}
 	}
 	for _, m := range data {
-		r := dtos.ToVideoDto(m)
+		r := dtos.ToVideoDto(m, scheme)
 		result = append(result, r)
 	}
 	return total, result, nil

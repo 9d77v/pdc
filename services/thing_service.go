@@ -79,7 +79,9 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 }
 
 //ListThing ..
-func (s ThingService) ListThing(ctx context.Context, keyword *string, page, pageSize *int64, ids []int64, sorts []*model.Sort, uid int64) (int64, []*model.Thing, error) {
+func (s ThingService) ListThing(ctx context.Context, keyword *string,
+	page, pageSize *int64, ids []int64, sorts []*model.Sort,
+	uid int64, scheme string) (int64, []*model.Thing, error) {
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
 	offset, limit := GetPageInfo(page, pageSize)
@@ -124,7 +126,7 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string, page, page
 		}
 	}
 	for _, m := range data {
-		r := dtos.ToThingDto(m)
+		r := dtos.ToThingDto(m, scheme)
 		result = append(result, r)
 	}
 	return total, result, nil

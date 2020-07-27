@@ -6,10 +6,10 @@ import (
 )
 
 //ToUserDto ...
-func ToUserDto(m *models.User) *model.User {
+func ToUserDto(m *models.User, scheme string) *model.User {
 	avatar := ""
 	if m.Avatar != "" {
-		avatar = models.OssPrefix + m.Avatar
+		avatar = getOSSPrefix(scheme) + m.Avatar
 	}
 	return &model.User{
 		ID:        int64(m.ID),

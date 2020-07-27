@@ -9,7 +9,7 @@ require (
 	github.com/go-redis/redis/v8 v8.0.0-beta.6
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.1.1
-	github.com/minio/minio-go/v6 v6.0.50
+	github.com/minio/minio-go/v7 v7.0.2
 	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
