@@ -18,7 +18,7 @@ type ThingService struct {
 }
 
 //CreateThing ..
-func (s ThingService) CreateThing(input model.NewThing, uid int64) (*model.Thing, error) {
+func (s ThingService) CreateThing(ctx context.Context, input model.NewThing, uid int64) (*model.Thing, error) {
 	m := &models.Thing{
 		UID:                 uid,
 		Name:                input.Name,

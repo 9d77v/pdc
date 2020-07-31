@@ -31,7 +31,7 @@ var (
 	dbUser     = utils.GetEnvStr("DB_USER", "postgres")
 	dbPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
 	dbName     = utils.GetEnvStr("DB_NAME", "pdc")
-	dbPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
+	DBPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
 
 	JWTtAccessSecret = utils.GetEnvStr("JWT_ACCESS_SECRET", "JWT_ACCESS_SECRET")
 	JWTRefreshSecret = utils.GetEnvStr("JWT_REFRESH_SECRET", "JWT_REFRESH_SECRET")
@@ -100,6 +100,8 @@ func initDB() {
 	Gorm.AutoMigrate(
 		&Video{},
 		&Episode{},
+		&VideoSeries{},
+		&VideoSeriesItem{},
 		&User{},
 		&Thing{},
 	)
@@ -211,7 +213,7 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 
 	//设置表名称的前缀
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return fmt.Sprintf("%s_%s", dbPrefix, defaultTableName)
+		return fmt.Sprintf("%s_%s", DBPrefix, defaultTableName)
 	}
 
 	db.SingularTable(true)

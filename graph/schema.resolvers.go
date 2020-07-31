@@ -43,7 +43,7 @@ func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo
 	if len(input.VideoURLs) > 0 && input.Subtitles != nil && len(input.Subtitles.Urls) > 0 && len(input.VideoURLs) != len(input.Subtitles.Urls) {
 		return nil, errors.New("视频与字幕数量不一致")
 	}
-	return videoService.CreateVideo(input)
+	return videoService.CreateVideo(ctx, input)
 }
 
 func (r *mutationResolver) UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error) {
@@ -51,7 +51,7 @@ func (r *mutationResolver) UpdateVideo(ctx context.Context, input model.NewUpdat
 }
 
 func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error) {
-	return videoService.CreateEpisode(input)
+	return videoService.CreateEpisode(ctx, input)
 }
 
 func (r *mutationResolver) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
@@ -66,9 +66,25 @@ func (r *mutationResolver) UpdateMobileVideo(ctx context.Context, input *model.N
 	return videoService.UpdateMobileVideo(ctx, input)
 }
 
+func (r *mutationResolver) CreateVideoSeries(ctx context.Context, input model.NewVideoSeries) (*model.VideoSeries, error) {
+	return videoService.CreateVideoSeries(ctx, input)
+}
+
+func (r *mutationResolver) UpdateVideoSeries(ctx context.Context, input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
+	return videoService.UpdateVideoSeries(ctx, input)
+}
+
+func (r *mutationResolver) CreateVideoSeriesItem(ctx context.Context, input model.NewVideoSeriesItem) (*model.VideoSeriesItem, error) {
+	return videoService.CreateVideoSeriesItem(ctx, input)
+}
+
+func (r *mutationResolver) UpdateVideoSeriesItem(ctx context.Context, input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error) {
+	return videoService.UpdateVideoSeriesItem(ctx, input)
+}
+
 func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error) {
 	user := middleware.ForContext(ctx)
-	return thingService.CreateThing(input, int64(user.ID))
+	return thingService.CreateThing(ctx, input, int64(user.ID))
 }
 
 func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
@@ -96,11 +112,20 @@ func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, 
 	return dtos.ToUserDto(middleware.ForContext(ctx), scheme), nil
 }
 
-func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
 	scheme := middleware.ForSchemeContext(ctx)
 	total, data, err := videoService.ListVideo(ctx, keyword,
-		page, pageSize, ids, sorts, scheme)
+		page, pageSize, ids, sorts, scheme, isFilterVideoSeries)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
+}
+
+func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error) {
+	con := new(model.VideoSeriesConnection)
+	total, data, err := videoService.ListVideoSeries(ctx, keyword,
+		page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

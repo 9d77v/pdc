@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -21,7 +22,7 @@ type VideoService struct {
 }
 
 //CreateVideo ..
-func (s VideoService) CreateVideo(input model.NewVideo) (*model.Video, error) {
+func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
 	cs := make(postgres.Hstore, len(input.Characters))
 	for _, v := range input.Characters {
 		cs[v.CharacterName] = &v.OriginalName
@@ -107,7 +108,7 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 }
 
 //CreateEpisode ..
-func (s VideoService) CreateEpisode(input model.NewEpisode) (*model.Episode, error) {
+func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error) {
 	cs := make(postgres.Hstore, len(input.Subtitles))
 	for _, v := range input.Subtitles {
 		cs[v.Name] = &v.URL
@@ -232,7 +233,7 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	page, pageSize *int64, ids []int64, sorts []*model.Sort,
-	scheme string) (int64, []*model.Video, error) {
+	scheme string, isCombo *bool) (int64, []*model.Video, error) {
 	offset, limit := GetPageInfo(page, pageSize)
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
@@ -241,6 +242,9 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	builder := models.Gorm
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("title like ?", "%"+ptrs.String(keyword)+"%")
+	}
+	if ptrs.Bool(isCombo) {
+		builder = builder.Where("NOT EXISTS (select video_id from " + models.DBPrefix + "_video_series_item where video_id=id)")
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
@@ -283,6 +287,159 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	}
 	for _, m := range data {
 		r := dtos.ToVideoDto(m, scheme)
+		result = append(result, r)
+	}
+	return total, result, nil
+}
+
+//CreateVideoSeries ..
+func (s VideoService) CreateVideoSeries(ctx context.Context, input model.NewVideoSeries) (*model.VideoSeries, error) {
+	m := &models.VideoSeries{
+		Name: input.Name,
+	}
+	err := models.Gorm.Create(m).Error
+	if err != nil {
+		return &model.VideoSeries{}, err
+	}
+	return &model.VideoSeries{ID: int64(m.ID)}, err
+}
+
+//UpdateVideoSeries ..
+func (s VideoService) UpdateVideoSeries(ctx context.Context, input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
+	videoSeries := new(models.VideoSeries)
+	fields := make([]string, 0)
+	varibales := graphql.GetRequestContext(ctx).Variables
+	for k := range varibales["input"].(map[string]interface{}) {
+		fields = append(fields, k)
+	}
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).
+		First(videoSeries, "id=?", input.ID).Error; err != nil {
+		return nil, err
+	}
+	updateMap := map[string]interface{}{
+		"name": input.Name,
+	}
+	err := models.Gorm.Model(videoSeries).Update(updateMap).Error
+	return &model.VideoSeries{ID: int64(videoSeries.ID)}, err
+}
+
+//CreateVideoSeriesItem ..
+func (s VideoService) CreateVideoSeriesItem(ctx context.Context, input model.NewVideoSeriesItem) (*model.VideoSeriesItem, error) {
+	e := &models.VideoSeriesItem{
+		VideoSeriesID: uint(input.VideoSeriesID),
+		VideoID:       uint(input.VideoID),
+		Alias:         input.Alias,
+	}
+	maxItem := &models.VideoSeriesItem{}
+	err := models.Gorm.Select("max(num) num").Where("video_series_id=?", input.VideoSeriesID).Take(maxItem).Error
+	if err != nil {
+		return nil, err
+	}
+	e.Num = maxItem.Num + 1
+	err = models.Gorm.Create(e).Error
+	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
+}
+
+//UpdateVideoSeriesItem ..
+func (s VideoService) UpdateVideoSeriesItem(ctx context.Context, input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error) {
+	item := new(models.VideoSeriesItem)
+	varibales := graphql.GetRequestContext(ctx).Variables
+	fields := make([]string, 0)
+	for k := range varibales["input"].(map[string]interface{}) {
+		fields = append(fields, k)
+	}
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(item, "video_id=? and video_series_id=?",
+		input.VideoID, input.VideoSeriesID).Error; err != nil {
+		return nil, err
+	}
+	updateMap := map[string]interface{}{
+		"alias": input.Alias,
+	}
+	err := models.Gorm.Model(item).Update(updateMap).Error
+	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
+}
+
+//ListVideoSeries ..
+func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string,
+	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.VideoSeries, error) {
+	offset, limit := GetPageInfo(page, pageSize)
+	result := make([]*model.VideoSeries, 0)
+	data := make([]*models.VideoSeries, 0)
+	fieldMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	builder := models.Gorm
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
+	}
+	if fieldMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields, "items", "__typename"))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		subBuilder := builder
+		if limit > 0 {
+			subBuilder = subBuilder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				subBuilder = subBuilder.Order(v.Field + " ASC")
+			} else {
+				subBuilder = subBuilder.Order(v.Field + " DESC")
+			}
+		}
+		err = subBuilder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
+		}
+		if edgeFieldMap["items"] && len(data) > 0 {
+			itemFIeldMap, itemFields := utils.GetFieldData(ctx, "edges.items.")
+			ids := make([]uint, 0)
+			for _, v := range data {
+				ids = append(ids, v.ID)
+			}
+			items := make([]*models.VideoSeriesItem, 0)
+			itemBuilder := models.Gorm
+			videoTableName := models.DBPrefix + "_video"
+			videoSeriesItemTableName := models.DBPrefix + "_video_series_item"
+			if itemFIeldMap["title"] {
+				itemBuilder = itemBuilder.Select(append(utils.ToDBFields(itemFields, "title", "__typename"),
+					videoTableName+".\"title\"")).
+					Joins(fmt.Sprintf("left join %s on %s.id=%s.video_id",
+						videoTableName, videoTableName, videoSeriesItemTableName))
+			} else {
+				itemBuilder = itemBuilder.Select(utils.ToDBFields(itemFields, "title", "__typename"))
+			}
+			subErr := itemBuilder.Where("video_series_id in (?)", ids).
+				Order("video_series_id asc").Order("num asc").Find(&items).Error
+			if subErr != nil {
+				return 0, result, subErr
+			}
+			itemMap := make(map[uint][]*models.VideoSeriesItem)
+			for _, v := range items {
+				if itemMap[v.VideoSeriesID] == nil {
+					itemMap[v.VideoSeriesID] = make([]*models.VideoSeriesItem, 0)
+				}
+				itemMap[v.VideoSeriesID] = append(itemMap[v.VideoSeriesID], v)
+			}
+			for _, v := range data {
+				v.Items = itemMap[v.ID]
+			}
+		}
+	}
+	var total int64
+	if fieldMap["totalCount"] {
+		if limit == -1 {
+			total = int64(len(data))
+		} else {
+			err = builder.Model(&models.VideoSeries{}).Count(&total).Error
+			if err != nil {
+				return 0, result, err
+			}
+		}
+	}
+	for _, m := range data {
+		r := dtos.ToVideoSeriesDto(m)
 		result = append(result, r)
 	}
 	return total, result, nil

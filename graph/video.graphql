@@ -121,3 +121,45 @@ input NewUpdateMobileVideos{
   id:ID!
   videoURLs:[String!]!
 }
+
+type VideoSeries {
+  id: ID!
+  name: String!  
+  items: [VideoSeriesItem!]!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type VideoSeriesItem {
+  videoSeriesID: ID!
+  videoID: ID!
+  title: String!
+  alias: String!
+  num: Int!
+}
+
+type VideoSeriesConnection {
+  totalCount: Int!
+  edges:[VideoSeries!]!
+}
+
+input NewVideoSeries {
+  name: String!  
+}
+
+input NewVideoSeriesItem{
+  videoSeriesID: ID!
+  videoID: ID!
+  alias: String!
+}
+
+input NewUpdateVideoSeries{
+  id:ID!
+  name: String!
+}
+
+input NewUpdateVideoSeriesItem{
+  videoSeriesID: ID!
+  videoID: ID!
+  alias: String!
+}
