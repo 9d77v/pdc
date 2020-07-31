@@ -1,16 +1,19 @@
 import { Table, Button, message, Tag, Modal } from 'antd';
 import React, { useState, useEffect } from 'react'
-
-import { LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE, UPDATE_EPISODE, UPDATE_SUBTITLE, UPDATE_MOBILE_VIDEO } from '../../../../consts/video.gql';
+import {
+    LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO,
+    ADD_EPISODE, UPDATE_EPISODE,
+    UPDATE_SUBTITLE, UPDATE_MOBILE_VIDEO
+} from '../../../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateForm';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateForm';
 import moment from 'moment';
-import { VideoPlayer } from '../../../../components/VideoPlayer';
+import { VideoPlayer } from '../../../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateForm';
 import { EpisodeUpdateForm } from './EpisodeUpdateForm';
-import { Img } from '../../../../components/Img';
+import { Img } from '../../../../../components/Img';
 import TextArea from 'antd/lib/input/TextArea';
 import { TablePaginationConfig } from 'antd/lib/table';
 import { PlaySquareTwoTone } from '@ant-design/icons';

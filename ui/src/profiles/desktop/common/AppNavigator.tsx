@@ -7,6 +7,8 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/app/home', '首页'],
     ['/app/settings', '系统设置'],
     ['/app/settings/videos', '视频管理'],
+    ['/app/settings/videos/video-list', '视频列表'],
+    ['/app/settings/videos/video-series-list', '视频系列列表'],
     ['/app/settings/users', '用户管理'],
     ['/app/user', '个人设置'],
     ['/app/user/profile', '个人资料'],

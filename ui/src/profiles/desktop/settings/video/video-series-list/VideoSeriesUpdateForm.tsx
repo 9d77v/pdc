@@ -1,45 +1,49 @@
-import { Modal, Form } from 'antd';
-import React, { useState } from 'react'
-import { Uploader } from '../../../../components/Uploader';
+import { Modal, Form, Input } from 'antd';
+import React, { useEffect } from 'react'
 
-interface MobileVideoUpdateProps {
+interface UpdateVideoProps {
+    id: number,
+    name: string,
+}
+interface VideoUpdateSeriesFormProps {
     visible: boolean;
-    videoID: number
-    onUpdate: (values: any) => void;
+    data: UpdateVideoProps,
+    onUpdate: (values: UpdateVideoProps) => void;
     onCancel: () => void;
 }
 
-export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
+export const VideoSeriesUpdateForm: React.FC<VideoUpdateSeriesFormProps> = ({
     visible,
-    videoID,
+    data,
     onUpdate,
     onCancel,
 }) => {
     const [form] = Form.useForm();
-    const [videoURLs, setVideoURLs] = useState([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
-    const videoPathPrefix = "mobile/" + videoID.toString() + "/"
+    useEffect(() => {
+        form.setFieldsValue({
+            "id": data.id,
+            "name": data.name,
+        })
+    }, [form, data]);
+
     return (
         <Modal
             visible={visible}
-            title="更换视频"
+            title="编辑视频系列"
             okText="确定"
             cancelText="取消"
             onCancel={
                 () => {
                     onCancel()
                     form.resetFields()
-                    setVideoURLs([])
                 }
             }
             getContainer={false}
             onOk={() => {
-                form.setFieldsValue({
-                    "videoURLs": videoURLs,
-                })
                 form
                     .validateFields()
                     .then((values: any) => {
@@ -49,29 +53,28 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info);
                     });
-                setVideoURLs([])
             }}
         >
             <Form
                 {...layout}
                 form={form}
                 layout="horizontal"
-                name="mobileVideoUpdateForm"
+                name="videoSeriesUpdateForm"
             >
                 <Form.Item
-                    name="videoURLs"
-                    label="手机视频"
-                    rules={[{ required: true, message: '请上传视频!' }]}
+                    name="id"
+                    noStyle
                 >
-                    <Uploader
-                        fileLimit={0}
-                        bucketName="video"
-                        filePathPrefix={videoPathPrefix}
-                        validFileTypes={["video/mp4"]}
-                        setURL={setVideoURLs}
-                    />
+                    <Input hidden />
+                </Form.Item>
+                <Form.Item
+                    name="name"
+                    label="名称"
+                    rules={[{ required: true, message: '请输入名称!' }]}
+                >
+                    <Input />
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

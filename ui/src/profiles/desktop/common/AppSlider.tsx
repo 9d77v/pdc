@@ -12,8 +12,16 @@ const locationMap = new Map<string, any>([
         "defaultSelectedKeys": ['home']
     }],
     ["/app/settings/videos", {
-        "defaultOpenKeys": ["settings"],
-        "defaultSelectedKeys": ['settings-videos']
+        "defaultOpenKeys": ["settings", "settings-videos"],
+        "defaultSelectedKeys": ['video-list']
+    }],
+    ["/app/settings/videos/video-list", {
+        "defaultOpenKeys": ["settings", "settings-videos"],
+        "defaultSelectedKeys": ['video-list']
+    }],
+    ["/app/settings/videos/video-series-list", {
+        "defaultOpenKeys": ["settings", "settings-videos"],
+        "defaultSelectedKeys": ['video-series-list']
     }],
     ["/app/settings/users", {
         "defaultOpenKeys": ["settings"],
@@ -125,9 +133,23 @@ export const AppSlider = (props: AppHeaderProps) => {
                         </span>
                     }
                 >
-                    <Menu.Item key="settings-videos" >
-                        <Link to="/app/settings/videos">视频管理</Link>
-                    </Menu.Item>
+                    <SubMenu
+                        key="settings-videos"
+                        style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
+                        title={
+                            <span>
+                                <PlaySquareOutlined />
+                                <span>视频管理</span>
+                            </span>
+                        }
+                    >
+                        <Menu.Item key="video-list" >
+                            <Link to="/app/settings/videos/video-list">视频列表</Link>
+                        </Menu.Item>
+                        <Menu.Item key="video-series-list" >
+                            <Link to="/app/settings/videos/video-series-list">视频系列列表</Link>
+                        </Menu.Item>
+                    </SubMenu>
                     <Menu.Item key="settings-users"
                         style={{ display: roleID === 1 ? "block" : "none" }}
                     >

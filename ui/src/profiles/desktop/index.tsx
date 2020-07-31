@@ -12,7 +12,9 @@ import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from './settings/user/UserCreateForm';
 import { UpdateProfileForm } from './user/UpdateFrofileForm';
 
-const VideoTable = React.lazy(() => import('./settings/video/VideoTable'))
+const VideoTable = React.lazy(() => import('./settings/video/video-list/VideoTable'))
+const VideoSeriesTable = React.lazy(() => import('./settings/video/video-series-list/VideoSeriesTable'))
+
 const UserTable = React.lazy(() => import('./settings/user/UserTable'))
 const UpdatePasswordForm = React.lazy(() => import("./user/UpdatePasswordForm"))
 
@@ -70,8 +72,11 @@ export default function DesktopIndex() {
                         <Route exact path="/app/thing/analysis">
                             <ThingAnalysis />
                         </Route>
-                        <Route exact path="/app/settings/videos">
+                        <Route exact path="/app/settings/videos/video-list">
                             <VideoTable />
+                        </Route>
+                        <Route exact path="/app/settings/videos/video-series-list">
+                            <VideoSeriesTable />
                         </Route>
                         <Route exact path="/app/settings/users">
                             <UserTable />
