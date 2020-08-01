@@ -51,6 +51,7 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
                     });
                 setVideoURLs([])
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

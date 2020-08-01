@@ -72,6 +72,7 @@ export const UserCreateForm: React.FC<UserCreateFormProps> = ({
                     });
                 setUrl('')
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

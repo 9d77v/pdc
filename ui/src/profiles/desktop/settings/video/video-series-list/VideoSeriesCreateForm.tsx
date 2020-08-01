@@ -48,6 +48,7 @@ export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
                         console.log('Validate Failed:', info);
                     });
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

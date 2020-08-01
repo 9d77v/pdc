@@ -106,6 +106,7 @@ export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
                 setUrl('')
                 setCoverUrl('')
             }}
+            maskClosable={false}
         >
             <Form.Provider
                 onFormFinish={(name, { values, forms }) => {

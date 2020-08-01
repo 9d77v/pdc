@@ -54,6 +54,7 @@ export const VideoSeriesUpdateForm: React.FC<VideoUpdateSeriesFormProps> = ({
                         console.log('Validate Failed:', info);
                     });
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

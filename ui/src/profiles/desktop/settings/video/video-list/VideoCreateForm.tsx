@@ -87,6 +87,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 setVideoURLs([])
                 setSubtitles([])
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

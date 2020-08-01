@@ -48,6 +48,7 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
                         console.log('Validate Failed:', info);
                     });
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

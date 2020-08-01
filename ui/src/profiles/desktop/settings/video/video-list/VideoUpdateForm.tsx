@@ -78,6 +78,7 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
                     });
                 setUrl('')
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

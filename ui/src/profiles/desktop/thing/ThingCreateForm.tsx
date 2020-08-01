@@ -69,6 +69,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                     });
                 setThingURLs([])
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

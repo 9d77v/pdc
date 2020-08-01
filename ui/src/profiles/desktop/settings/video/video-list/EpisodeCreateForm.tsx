@@ -93,6 +93,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                 setUrl('')
                 setCoverUrl('')
             }}
+            maskClosable={false}
         >
             <Form.Provider
                 onFormFinish={(name, { values, forms }) => {
