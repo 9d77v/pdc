@@ -101,7 +101,7 @@ type ComplexityRoot struct {
 		Things        func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		UserInfo      func(childComplexity int, uid *int64) int
 		Users         func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		VideoSerieses func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		VideoSerieses func(childComplexity int, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Videos        func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) int
 	}
 
@@ -232,7 +232,7 @@ type QueryResolver interface {
 	Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
 	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error)
-	VideoSerieses(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
+	VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
 	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
@@ -677,7 +677,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.VideoSerieses(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.VideoSerieses(childComplexity, args["keyword"].(*string), args["videoID"].(*int64), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -1236,7 +1236,7 @@ type Query {
   users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   userInfo(uid:ID):User!
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
-  videoSerieses(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
+  videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
@@ -2061,37 +2061,45 @@ func (ec *executionContext) field_Query_videoSerieses_args(ctx context.Context, 
 	}
 	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+	if tmp, ok := rawArgs["videoID"]; ok {
+		arg1, err = ec.unmarshalOID2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg1
+	args["videoID"] = arg1
 	var arg2 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
+	if tmp, ok := rawArgs["page"]; ok {
 		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["pageSize"] = arg2
-	var arg3 []int64
+	args["page"] = arg2
+	var arg3 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg3, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg3
+	var arg4 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg3
-	var arg4 []*model.Sort
+	args["ids"] = arg4
+	var arg5 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg5, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg4
+	args["sorts"] = arg5
 	return args, nil
 }
 
@@ -3723,7 +3731,7 @@ func (ec *executionContext) _Query_videoSerieses(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().VideoSerieses(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().VideoSerieses(rctx, args["keyword"].(*string), args["videoID"].(*int64), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

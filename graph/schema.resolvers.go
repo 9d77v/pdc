@@ -122,9 +122,9 @@ func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64
 	return con, err
 }
 
-func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error) {
+func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error) {
 	con := new(model.VideoSeriesConnection)
-	total, data, err := videoService.ListVideoSeries(ctx, keyword,
+	total, data, err := videoService.ListVideoSeries(ctx, keyword, videoID,
 		page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data

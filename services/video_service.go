@@ -360,12 +360,21 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context, input model.New
 }
 
 //ListVideoSeries ..
-func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string,
+func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, videoID *int64,
 	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.VideoSeries, error) {
 	offset, limit := GetPageInfo(page, pageSize)
 	result := make([]*model.VideoSeries, 0)
 	data := make([]*models.VideoSeries, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
+	if videoID != nil && ptrs.Int64(videoID) > 0 {
+		//获取视频所属系列
+		item := new(models.VideoSeriesItem)
+		err := models.Gorm.Select("video_series_id").Where("video_id=?", ptrs.Int64(videoID)).Take(item).Error
+		if err != nil {
+			return 0, result, err
+		}
+		ids = []int64{int64(item.VideoSeriesID)}
+	}
 	var err error
 	builder := models.Gorm
 	if keyword != nil && ptrs.String(keyword) != "" {

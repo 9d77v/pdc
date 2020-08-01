@@ -32,6 +32,9 @@ func main() {
 	http.HandleFunc("/app/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "ui/build/index.html")
 	})
+	http.HandleFunc("/admin/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "ui/build/index.html")
+	})
 	http.Handle("/", http.FileServer(http.Dir("ui/build")))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
