@@ -5,6 +5,11 @@ export interface TagStyle {
     text: string
 }
 
+export interface Combo {
+    value: number
+    text: string
+}
+
 const RubbishCategoryMap = new Map<number, TagStyle>([
     [0, {
         color: 'black',
@@ -65,7 +70,6 @@ const ThingStatusMap = new Map<number, TagStyle>([
         text: "已清理"
     }]
 ])
-
 
 
 const GenderMap = new Map<number, string>([

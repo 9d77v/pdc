@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Switch, DatePicker, message, Radio, Select } from 'antd';
 import React, { useState } from 'react'
-import { Uploader } from '../../../../components/Uploader';
-import { LIST_VIDEO } from '../../../../consts/video.gql';
+import { Uploader } from '../../../../../components/Uploader';
+import { LIST_VIDEO } from '../../../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 
 const { TextArea } = Input;
@@ -87,6 +87,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 setVideoURLs([])
                 setSubtitles([])
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

@@ -111,6 +111,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
                     });
                 setThingURLs([])
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

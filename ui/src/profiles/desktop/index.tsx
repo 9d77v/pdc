@@ -12,7 +12,9 @@ import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from './settings/user/UserCreateForm';
 import { UpdateProfileForm } from './user/UpdateFrofileForm';
 
-const VideoTable = React.lazy(() => import('./settings/video/VideoTable'))
+const VideoTable = React.lazy(() => import('./settings/video/video-list/VideoTable'))
+const VideoSeriesTable = React.lazy(() => import('./settings/video/video-series-list/VideoSeriesTable'))
+
 const UserTable = React.lazy(() => import('./settings/user/UserTable'))
 const UpdatePasswordForm = React.lazy(() => import("./user/UpdatePasswordForm"))
 
@@ -37,7 +39,10 @@ export default function DesktopIndex() {
     const user: NewUser = data?.userInfo
     return (
         <Layout style={{ textAlign: "center" }}>
-            <AppHeader name={user ? user.name.toString() : ""} avatar={user ? user.avatar.toString() : ""} />
+            <AppHeader
+                name={user ? user.name.toString() : ""}
+                avatar={user ? user.avatar.toString() : ""}
+                roleID={user ? user.roleID : 0} />
             <Layout style={{
                 overflow: 'auto',
                 height: 'calc(100vh - 64px)',
@@ -70,10 +75,13 @@ export default function DesktopIndex() {
                         <Route exact path="/app/thing/analysis">
                             <ThingAnalysis />
                         </Route>
-                        <Route exact path="/app/settings/videos">
+                        <Route exact path="/admin/videos/video-list">
                             <VideoTable />
                         </Route>
-                        <Route exact path="/app/settings/users">
+                        <Route exact path="/admin/videos/video-series-list">
+                            <VideoSeriesTable />
+                        </Route>
+                        <Route exact path="/admin/users">
                             <UserTable />
                         </Route>
                     </div>

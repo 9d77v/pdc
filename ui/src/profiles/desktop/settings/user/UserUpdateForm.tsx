@@ -95,6 +95,7 @@ export const UserUpdateForm: React.FC<UserUpdateFormProps> = ({
                     });
                 setUrl('')
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

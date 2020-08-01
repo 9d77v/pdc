@@ -1,10 +1,6 @@
 import { Modal, Form, Input, Radio } from 'antd';
 import React, { useState } from 'react'
-import { Uploader } from '../../../../components/Uploader';
-
-
-
-
+import { Uploader } from '../../../../../components/Uploader';
 
 interface SubtitleUpdateFormProps {
     visible: boolean;
@@ -52,6 +48,7 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
                         console.log('Validate Failed:', info);
                     });
             }}
+            maskClosable={false}
         >
             <Form
                 {...layout}

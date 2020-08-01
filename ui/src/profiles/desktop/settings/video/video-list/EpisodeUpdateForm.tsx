@@ -1,24 +1,25 @@
 import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
 import React, { useState, useEffect } from 'react'
-import { Uploader } from '../../../../components/Uploader'
+import { Uploader } from '../../../../../components/Uploader'
+import { Episode } from '../../../../../models/video'
 import { SubtitleForm } from './SubtitleForm'
 import {
     DeleteOutlined
 } from '@ant-design/icons';
 
 
-interface EpisodeCreateFormProps {
+interface EpisodeUpdateFormProps {
     visible: boolean
-    onCreate: (values: any) => void
+    onUpdate: (values: Episode) => void
     onCancel: () => void
-    num: number,
+    data: Episode
 }
 
-export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
+export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
     visible,
-    onCreate,
+    onUpdate,
     onCancel,
-    num
+    data
 }) => {
     const [form] = Form.useForm()
     const [url, setUrl] = useState('')
@@ -38,18 +39,30 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     }
 
     useEffect(() => {
-        if (num !== form.getFieldValue("num")) {
-            form.setFieldsValue({
-                "num": num
+        const subtitles = []
+        for (const item of data.subtitles) {
+            subtitles.push({
+                "name": item.name,
+                "url": item.url
             })
         }
-    }, [num, form])
+        form.setFieldsValue({
+            "id": data.id,
+            "title": data.title,
+            "cover": data.cover,
+            "url": data.url,
+            "desc": data.desc,
+            "num": data.num,
+            "subtitles": subtitles
+        })
+        setUrl(data.url)
+        setCoverUrl(data.cover)
+    }, [data, form])
 
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
-
     const removeSubtitle = (name: string) => {
         const subtitles = form.getFieldValue('subtitles') || []
         for (const i in subtitles) {
@@ -62,7 +75,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     return (
         <Modal
             visible={visible}
-            title="新增分集"
+            title="修改分集"
             okText="确定"
             cancelText="取消"
             onCancel={
@@ -84,7 +97,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     .then((values: any) => {
                         const subtitles = form.getFieldValue('subtitles') || []
                         values.subtitles = subtitles
-                        onCreate(values)
+                        onUpdate(values)
                         form.resetFields()
                     })
                     .catch(info => {
@@ -93,13 +106,14 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                 setUrl('')
                 setCoverUrl('')
             }}
+            maskClosable={false}
         >
             <Form.Provider
                 onFormFinish={(name, { values, forms }) => {
                     if (name === 'subtitleForm') {
-                        const { episodeCreateForm } = forms
-                        const subtitles = episodeCreateForm.getFieldValue('subtitles') || []
-                        episodeCreateForm.setFieldsValue({ subtitles: [...subtitles, values] })
+                        const { episodeUpdateForm } = forms
+                        const subtitles = episodeUpdateForm.getFieldValue('subtitles') || []
+                        episodeUpdateForm.setFieldsValue({ subtitles: [...subtitles, values] })
                         setSubtitleVisible(false)
                     }
                 }}
@@ -108,10 +122,15 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     {...layout}
                     form={form}
                     layout="horizontal"
-                    name="episodeCreateForm"
+                    name="episodeUpdateForm"
                     onFinish={onFinish}
-                    initialValues={{ num: num }}
                 >
+                    <Form.Item
+                        name="id"
+                        noStyle
+                    >
+                        <Input hidden />
+                    </Form.Item>
                     <Form.Item
                         name="title"
                         label="标题"
@@ -137,7 +156,6 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                     <Form.Item
                         name="url"
                         label="上传视频"
-                        rules={[{ required: true, message: '请上传视频!' }]}
                     >
                         <Uploader
                             fileLimit={1}

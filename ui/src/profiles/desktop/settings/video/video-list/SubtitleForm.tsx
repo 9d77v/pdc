@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Modal, Form, Radio } from 'antd'
-import { Uploader } from '../../../../components/Uploader'
+import { Uploader } from '../../../../../components/Uploader'
 
 interface ModalFormProps {
     visible: boolean
@@ -46,7 +46,9 @@ export const SubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) =>
                     form.resetFields()
                     setUrl('')
                 }
-            }        >
+            }
+            maskClosable={false}
+        >
             <Form form={form} layout="vertical" name="subtitleForm" initialValues={{ name: "简体中文" }}>
                 <Form.Item name="name" label="标签" rules={[{ required: true }]}>
                     <Radio.Group buttonStyle="solid">
