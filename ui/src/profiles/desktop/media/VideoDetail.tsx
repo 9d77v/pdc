@@ -132,7 +132,7 @@ export default function VideoDetail() {
                 <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}>选集</span>
                 <div>{buttons}</div>
                 <br />
-                <span style={{ textAlign: "left" }}>{seriesName}</span>
+                <span style={{ textAlign: "left", marginBottom: 10 }}>{seriesName}</span>
                 <div>{seriesButtons}</div>
             </div>
             <div style={{ flex: 1 }}>
