@@ -13,14 +13,16 @@ export default function VideoDetail() {
 
     const [num, setNum] = useState(0)
     let ids: number[] = []
+    let params: any
     if (match) {
-        const params: any = match.params
+        params = match.params
         ids = [params.id]
     }
     const { error, data } = useQuery(GET_VIDEO,
         {
             variables: {
-                ids: ids
+                ids: ids,
+                videoID: params.id
             }
         })
 
@@ -44,31 +46,46 @@ export default function VideoDetail() {
         subtitles: null
     }
     let buttons: any = []
-    if (data && data.videos.edges) {
-        const videos = data.videos.edges
-        const video = videos.length > 0 ? videos[0] : null
-        if (video) {
-            videoItem = ({
-                id: video.id,
-                cover: video.cover,
-                title: video.title,
-                desc: video.desc,
-                episodes: video.episodes
-            })
-            if (video.episodes && video.episodes.length > 0) {
-                buttons = video.episodes.map((value: any, index: number) => {
-                    if (index === num) {
-                        return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"}  >{value.num}</div>
-                    }
-                    return <div key={"pdc-button-" + value.id} className={"pdc-button"} onClick={() => { setNum(index) }} >{value.num}</div>
+    let seriesName: string = ""
+    let seriesButtons: any = []
+    if (data) {
+        if (data.videos.edges) {
+            const videos = data.videos.edges
+            const video = videos.length > 0 ? videos[0] : null
+            if (video) {
+                videoItem = ({
+                    id: video.id,
+                    cover: video.cover,
+                    title: video.title,
+                    desc: video.desc,
+                    episodes: video.episodes
                 })
-                episodeItem = ({
-                    id: video.episodes[num].id,
-                    url: video.episodes[num].url,
-                    mobileURL: video.episodes[num].mobileURL || "",
-                    subtitles: video.episodes[num].subtitles
-                })
+                if (video.episodes && video.episodes.length > 0) {
+                    buttons = video.episodes.map((value: any, index: number) => {
+                        if (index === num) {
+                            return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"}  >{value.num}</div>
+                        }
+                        return <div key={"pdc-button-" + value.id} className={"pdc-button"} onClick={() => { setNum(index) }} >{value.num}</div>
+                    })
+                    episodeItem = ({
+                        id: video.episodes[num].id,
+                        url: video.episodes[num].url,
+                        mobileURL: video.episodes[num].mobileURL || "",
+                        subtitles: video.episodes[num].subtitles
+                    })
+                }
             }
+        }
+        if (data.videoSerieses.edges && data.videoSerieses.edges.length > 0 && data.videoSerieses.edges[0].items) {
+            const items = data.videoSerieses.edges[0].items
+            seriesName = data.videoSerieses.edges[0].name
+            seriesButtons = items.map((value: any, index: number) => {
+                if (Number(params.id) === Number(value.videoID)) {
+                    return <div key={"pdc-button-" + value.videoID} className={"pdc-button-selected"} >{value.alias}</div>
+                }
+                return <div key={"pdc-button-" + value.videoID} className={"pdc-button"}
+                    onClick={() => { history.push('/app/media/videos/' + value.videoID) }} >{value.alias}</div>
+            })
         }
     }
 
@@ -95,6 +112,9 @@ export default function VideoDetail() {
                 <div style={{ marginTop: 20, display: "flex", flexDirection: 'column' }}>
                     <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}> 选集</span>
                     <div>{buttons}</div>
+                    <br />
+                    <span style={{ textAlign: "left" }}>{seriesName}</span>
+                    <div>{seriesButtons}</div>
                 </div>
             </div>
         </div>)

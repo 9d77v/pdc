@@ -107,7 +107,7 @@ const VIDEO_COMBO = gql`
 `;
 
 const GET_VIDEO = gql`
- query videos( $ids: [ID!]) {
+ query videos( $ids: [ID!],$videoID:ID!) {
    videos(ids:$ids){
        edges{
             id
@@ -129,6 +129,17 @@ const GET_VIDEO = gql`
               }
             }
             tags
+       }
+   }
+   videoSerieses(videoID:$videoID){
+       edges{
+            id
+            name
+            items{
+              videoID
+              videoSeriesID
+              alias
+            }
        }
    }
   }
