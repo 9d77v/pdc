@@ -371,7 +371,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 		item := new(models.VideoSeriesItem)
 		err := models.Gorm.Select("video_series_id").Where("video_id=?", ptrs.Int64(videoID)).Take(item).Error
 		if err != nil {
-			return 0, result, err
+			return 0, result, nil
 		}
 		ids = []int64{int64(item.VideoSeriesID)}
 	}
