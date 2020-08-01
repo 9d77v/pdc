@@ -125,11 +125,12 @@ export default function VideoSeriesTable() {
     };
 
     const onVideoSeriesItemCreate = async (values: any) => {
+        console.log(values)
         await addVideoSeriesItem({
             variables: {
                 "input": {
-                    "videoID": values.video_id,
-                    "videoSeriesID": values.video_series_id,
+                    "videoID": values.videoID,
+                    "videoSeriesID": values.videoSeriesID,
                     "alias": values.alias
                 }
             }
@@ -142,8 +143,8 @@ export default function VideoSeriesTable() {
         await updateVideoSeriesItem({
             variables: {
                 "input": {
-                    "videoID": values.video_id,
-                    "videoSeriesID": values.video_series_id,
+                    "videoID": values.videoID,
+                    "videoSeriesID": values.videoSeriesID,
                     "alias": values.alias,
                 }
             }

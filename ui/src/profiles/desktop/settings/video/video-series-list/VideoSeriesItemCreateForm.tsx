@@ -35,9 +35,10 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
     const onFinish = (values: any) => {
         console.log('Finish:', values)
     }
+    console.log(video_series_id)
     useEffect(() => {
         form.setFieldsValue({
-            "video_series_id": video_series_id,
+            "videoSeriesID": video_series_id,
         })
     }, [form, video_series_id])
 
@@ -68,7 +69,7 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
             onCancel={
                 () => {
                     onCancel()
-                    form.resetFields()
+                    form.resetFields(["videoID", "alias"])
                 }
             }
             getContainer={false}
@@ -77,7 +78,7 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
                     .validateFields()
                     .then((values: any) => {
                         onCreate(values)
-                        form.resetFields()
+                        form.resetFields(["videoID", "alias"])
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info)
@@ -93,14 +94,14 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
                 onFinish={onFinish}
             >
                 <Form.Item
-                    name="video_series_id"
+                    name="videoSeriesID"
                     label="视频系列"
                     noStyle
                 >
                     <Input hidden />
                 </Form.Item>
                 <Form.Item
-                    name="video_id"
+                    name="videoID"
                     label="视频"
                     rules={[{ required: true, message: '请选择视频!' }]}
                 >

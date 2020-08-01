@@ -41,7 +41,7 @@ export const VideoSeriesItemUpdateForm: React.FC<VideoSeriesItemUpdateFormProps>
             onCancel={
                 () => {
                     onCancel()
-                    form.resetFields()
+                    form.resetFields(["alias"])
                 }
             }
             getContainer={false}
@@ -50,7 +50,7 @@ export const VideoSeriesItemUpdateForm: React.FC<VideoSeriesItemUpdateFormProps>
                     .validateFields()
                     .then((values: any) => {
                         onUpdate(values)
-                        form.resetFields()
+                        form.resetFields(["alias"])
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info)
@@ -66,14 +66,14 @@ export const VideoSeriesItemUpdateForm: React.FC<VideoSeriesItemUpdateFormProps>
                 onFinish={onFinish}
             >
                 <Form.Item
-                    name="video_series_id"
+                    name="videoSeriesID"
                     label="视频系列"
                     noStyle
                 >
                     <Input hidden />
                 </Form.Item>
                 <Form.Item
-                    name="video_id"
+                    name="videoid"
                     label="视频"
                     noStyle
                 >
