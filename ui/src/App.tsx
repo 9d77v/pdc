@@ -24,6 +24,7 @@ export default function App() {
               </Route>
               <Route exact path="/login" component={Login} />
               <Route path="/app" component={isMobile() ? MobileIndex : DesktopIndex} />
+              <Route path="/admin" component={DesktopIndex} />
             </Switch>
           </Router >
         </ConfigProvider>

@@ -110,8 +110,9 @@ export default function VideoDetail() {
                 </div>
             </div>
             <div style={{ margin: 20, display: "flex", flexDirection: 'column', width: 350 }}>
-                <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}> 剧集列表</span>
+                <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}>选集</span>
                 <div>{buttons}</div>
+                <br />
             </div>
             <div style={{ flex: 1 }}>
             </div>
