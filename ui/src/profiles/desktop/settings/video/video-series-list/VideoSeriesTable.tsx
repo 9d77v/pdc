@@ -30,8 +30,8 @@ function VideoSeriesItemTable(itemRawData: any, setUpdateItemData: any, setUpdat
                 <Button
                     onClick={() => {
                         setUpdateItemData({
-                            video_id: record.videoID,
-                            video_series_id: record.videoSeriesID,
+                            videoID: record.videoID,
+                            videoSeriesID: record.videoSeriesID,
                             alias: record.alias,
                         })
                         setUpdateItemVisible(true)
@@ -62,8 +62,8 @@ export default function VideoSeriesTable() {
     })
     const [updateVideoSeriesItemVisible, setUpdateVideoSeriesItemVisible] = useState(false)
     const [updateVideoSeriesItemData, setUpdateVideoSeriesItemData] = useState({
-        video_id: 0,
-        video_series_id: 0,
+        videoID: 0,
+        videoSeriesID: 0,
         alias: "",
     })
 
