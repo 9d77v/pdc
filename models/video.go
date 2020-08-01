@@ -34,3 +34,19 @@ type Video struct {
 	Tags       pq.StringArray `gorm:"type:varchar(10)[]"`
 	IsShow     bool
 }
+
+//VideoSeriesItem 视频系列视频列表
+type VideoSeriesItem struct {
+	VideoSeriesID uint   `gorm:"primary_key;auto_increment:false"`
+	VideoID       uint   `gorm:"primary_key;auto_increment:false"`
+	Title         string `gorm:"-"`
+	Alias         string
+	Num           int
+}
+
+//VideoSeries 视频系列
+type VideoSeries struct {
+	gorm.Model
+	Name  string
+	Items []*VideoSeriesItem
+}

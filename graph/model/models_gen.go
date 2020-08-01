@@ -144,6 +144,17 @@ type NewUpdateVideo struct {
 	IsShow     *bool           `json:"isShow"`
 }
 
+type NewUpdateVideoSeries struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type NewUpdateVideoSeriesItem struct {
+	VideoSeriesID int64  `json:"videoSeriesID"`
+	VideoID       int64  `json:"videoID"`
+	Alias         string `json:"alias"`
+}
+
 type NewUser struct {
 	Name      string  `json:"name"`
 	Password  string  `json:"password"`
@@ -165,6 +176,16 @@ type NewVideo struct {
 	IsShow     bool            `json:"isShow"`
 	VideoURLs  []string        `json:"videoURLs"`
 	Subtitles  *NewSubtitles   `json:"subtitles"`
+}
+
+type NewVideoSeries struct {
+	Name string `json:"name"`
+}
+
+type NewVideoSeriesItem struct {
+	VideoSeriesID int64  `json:"videoSeriesID"`
+	VideoID       int64  `json:"videoID"`
+	Alias         string `json:"alias"`
 }
 
 type PieLineSerieData struct {
@@ -256,4 +277,25 @@ type Video struct {
 type VideoConnection struct {
 	TotalCount int64    `json:"totalCount"`
 	Edges      []*Video `json:"edges"`
+}
+
+type VideoSeries struct {
+	ID        int64              `json:"id"`
+	Name      string             `json:"name"`
+	Items     []*VideoSeriesItem `json:"items"`
+	CreatedAt int64              `json:"createdAt"`
+	UpdatedAt int64              `json:"updatedAt"`
+}
+
+type VideoSeriesConnection struct {
+	TotalCount int64          `json:"totalCount"`
+	Edges      []*VideoSeries `json:"edges"`
+}
+
+type VideoSeriesItem struct {
+	VideoSeriesID int64  `json:"videoSeriesID"`
+	VideoID       int64  `json:"videoID"`
+	Title         string `json:"title"`
+	Alias         string `json:"alias"`
+	Num           int64  `json:"num"`
 }

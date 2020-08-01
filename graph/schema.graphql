@@ -6,11 +6,12 @@ type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
   users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   userInfo(uid:ID):User!
-  videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoConnection!
+  videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
+  videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
-}
+} 
 
 type Mutation {
   createUser(input:NewUser!):User!
@@ -26,7 +27,11 @@ type Mutation {
   updateEpisode(input:NewUpdateEpisode!):Episode!
   updateSubtitle(input:NewUpdateSubtitles!):Video!
   updateMobileVideo(input:NewUpdateMobileVideos):Video!
-
+  createVideoSeries(input: NewVideoSeries!): VideoSeries!
+  updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!
+  createVideoSeriesItem(input:NewVideoSeriesItem!):VideoSeriesItem!
+  updateVideoSeriesItem(input:NewUpdateVideoSeriesItem!):VideoSeriesItem!
+  
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
 }

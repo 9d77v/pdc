@@ -76,3 +76,24 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 		UpdatedAt:  m.UpdatedAt.Unix(),
 	}
 }
+
+//ToVideoSeriesDto ...
+func ToVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {
+	items := make([]*model.VideoSeriesItem, 0, len(m.Items))
+	for _, item := range m.Items {
+		items = append(items, &model.VideoSeriesItem{
+			VideoID:       int64(item.VideoID),
+			VideoSeriesID: int64(item.VideoSeriesID),
+			Alias:         item.Alias,
+			Title:         item.Title,
+			Num:           int64(item.Num),
+		})
+	}
+	return &model.VideoSeries{
+		ID:        int64(m.ID),
+		Name:      m.Name,
+		Items:     items,
+		CreatedAt: m.CreatedAt.Unix(),
+		UpdatedAt: m.UpdatedAt.Unix(),
+	}
+}
