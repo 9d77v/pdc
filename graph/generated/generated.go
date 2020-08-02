@@ -62,6 +62,16 @@ type ComplexityRoot struct {
 		VideoID   func(childComplexity int) int
 	}
 
+	History struct {
+		CurrentTime   func(childComplexity int) int
+		RemainingTime func(childComplexity int) int
+		SourceID      func(childComplexity int) int
+		SourceType    func(childComplexity int) int
+		SubSourceID   func(childComplexity int) int
+		UID           func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
 	LoginResponse struct {
 		AccessToken  func(childComplexity int) int
 		RefreshToken func(childComplexity int) int
@@ -75,6 +85,7 @@ type ComplexityRoot struct {
 		CreateVideoSeries     func(childComplexity int, input model.NewVideoSeries) int
 		CreateVideoSeriesItem func(childComplexity int, input model.NewVideoSeriesItem) int
 		Login                 func(childComplexity int, username string, password string) int
+		RecordHistory         func(childComplexity int, input model.NewHistoryInput) int
 		RefreshToken          func(childComplexity int, refreshToken string) int
 		UpdateEpisode         func(childComplexity int, input model.NewUpdateEpisode) int
 		UpdateMobileVideo     func(childComplexity int, input *model.NewUpdateMobileVideos) int
@@ -95,6 +106,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		History       func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL  func(childComplexity int, bucketName string, objectName string) int
 		ThingAnalyze  func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries   func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
@@ -226,6 +238,7 @@ type MutationResolver interface {
 	UpdateVideoSeriesItem(ctx context.Context, input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error)
 	CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error)
 	UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error)
+	RecordHistory(ctx context.Context, input model.NewHistoryInput) (*model.History, error)
 }
 type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
@@ -236,6 +249,7 @@ type QueryResolver interface {
 	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
+	History(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 }
 
 type executableSchema struct {
@@ -344,6 +358,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Episode.VideoID(childComplexity), true
 
+	case "History.currentTime":
+		if e.complexity.History.CurrentTime == nil {
+			break
+		}
+
+		return e.complexity.History.CurrentTime(childComplexity), true
+
+	case "History.remainingTime":
+		if e.complexity.History.RemainingTime == nil {
+			break
+		}
+
+		return e.complexity.History.RemainingTime(childComplexity), true
+
+	case "History.sourceID":
+		if e.complexity.History.SourceID == nil {
+			break
+		}
+
+		return e.complexity.History.SourceID(childComplexity), true
+
+	case "History.sourceType":
+		if e.complexity.History.SourceType == nil {
+			break
+		}
+
+		return e.complexity.History.SourceType(childComplexity), true
+
+	case "History.subSourceID":
+		if e.complexity.History.SubSourceID == nil {
+			break
+		}
+
+		return e.complexity.History.SubSourceID(childComplexity), true
+
+	case "History.uid":
+		if e.complexity.History.UID == nil {
+			break
+		}
+
+		return e.complexity.History.UID(childComplexity), true
+
+	case "History.updatedAt":
+		if e.complexity.History.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.History.UpdatedAt(childComplexity), true
+
 	case "LoginResponse.accessToken":
 		if e.complexity.LoginResponse.AccessToken == nil {
 			break
@@ -441,6 +504,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["username"].(string), args["password"].(string)), true
+
+	case "Mutation.recordHistory":
+		if e.complexity.Mutation.RecordHistory == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_recordHistory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RecordHistory(childComplexity, args["input"].(model.NewHistoryInput)), true
 
 	case "Mutation.refreshToken":
 		if e.complexity.Mutation.RefreshToken == nil {
@@ -594,6 +669,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PieLineSerieData.Y(childComplexity), true
+
+	case "Query.history":
+		if e.complexity.Query.History == nil {
+			break
+		}
+
+		args, err := ec.field_Query_history_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.History(childComplexity, args["sourceType"].(int64), args["sourceID"].(int64)), true
 
 	case "Query.presignedUrl":
 		if e.complexity.Query.PresignedURL == nil {
@@ -1227,6 +1314,24 @@ type PieLineSerieData{
     y:[Float!]!
 }
 `, BuiltIn: false},
+	&ast.Source{Name: "graph/history.graphql", Input: `type History {
+	uid: ID!
+	sourceType:Int!
+	sourceID: Int!
+	subSourceID: Int!  
+    currentTime: Float!
+    remainingTime: Float!
+	updatedAt: Int!
+}
+
+input NewHistoryInput{
+	sourceType:Int!
+	sourceID: Int!
+	subSourceID: Int!  
+    currentTime: Float!
+    remainingTime: Float!
+}
+`, BuiltIn: false},
 	&ast.Source{Name: "graph/schema.graphql", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
@@ -1240,6 +1345,7 @@ type Query {
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
+  history(sourceType:Int!,sourceID:ID!):History
 } 
 
 type Mutation {
@@ -1263,6 +1369,8 @@ type Mutation {
   
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
+
+  recordHistory(input:NewHistoryInput!):History!  
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "graph/thing.graphql", Input: `type Thing {
@@ -1661,6 +1769,20 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_recordHistory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewHistoryInput
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewHistoryInput2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewHistoryInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_refreshToken_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1834,6 +1956,28 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_history_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["sourceType"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sourceType"] = arg0
+	var arg1 int64
+	if tmp, ok := rawArgs["sourceID"]; ok {
+		arg1, err = ec.unmarshalNID2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sourceID"] = arg1
 	return args, nil
 }
 
@@ -2610,6 +2754,244 @@ func (ec *executionContext) _Episode_updatedAt(ctx context.Context, field graphq
 	}()
 	fc := &graphql.FieldContext{
 		Object:   "Episode",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_uid(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_sourceType(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SourceType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_sourceID(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SourceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_subSourceID(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SubSourceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_currentTime(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CurrentTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_remainingTime(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RemainingTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _History_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "History",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -3441,6 +3823,47 @@ func (ec *executionContext) _Mutation_updateThing(ctx context.Context, field gra
 	return ec.marshalNThing2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐThing(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_recordHistory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_recordHistory_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RecordHistory(rctx, args["input"].(model.NewHistoryInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.History)
+	fc.Result = res
+	return ec.marshalNHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PieLineSerieData_x1(ctx context.Context, field graphql.CollectedField, obj *model.PieLineSerieData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3869,6 +4292,44 @@ func (ec *executionContext) _Query_thingAnalyze(ctx context.Context, field graph
 	res := resTmp.(*model.PieLineSerieData)
 	fc.Result = res
 	return ec.marshalNPieLineSerieData2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐPieLineSerieData(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_history(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_history_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().History(rctx, args["sourceType"].(int64), args["sourceID"].(int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.History)
+	fc.Result = res
+	return ec.marshalOHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7253,6 +7714,48 @@ func (ec *executionContext) unmarshalInputNewEpisode(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewHistoryInput(ctx context.Context, obj interface{}) (model.NewHistoryInput, error) {
+	var it model.NewHistoryInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "sourceType":
+			var err error
+			it.SourceType, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "sourceID":
+			var err error
+			it.SourceID, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subSourceID":
+			var err error
+			it.SubSourceID, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "currentTime":
+			var err error
+			it.CurrentTime, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "remainingTime":
+			var err error
+			it.RemainingTime, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewStaff(ctx context.Context, obj interface{}) (model.NewStaff, error) {
 	var it model.NewStaff
 	var asMap = obj.(map[string]interface{})
@@ -8174,6 +8677,63 @@ func (ec *executionContext) _Episode(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var historyImplementors = []string{"History"}
+
+func (ec *executionContext) _History(ctx context.Context, sel ast.SelectionSet, obj *model.History) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, historyImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("History")
+		case "uid":
+			out.Values[i] = ec._History_uid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "sourceType":
+			out.Values[i] = ec._History_sourceType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "sourceID":
+			out.Values[i] = ec._History_sourceID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "subSourceID":
+			out.Values[i] = ec._History_subSourceID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "currentTime":
+			out.Values[i] = ec._History_currentTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "remainingTime":
+			out.Values[i] = ec._History_remainingTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._History_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var loginResponseImplementors = []string{"LoginResponse"}
 
 func (ec *executionContext) _LoginResponse(ctx context.Context, sel ast.SelectionSet, obj *model.LoginResponse) graphql.Marshaler {
@@ -8308,6 +8868,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateThing":
 			out.Values[i] = ec._Mutation_updateThing(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "recordHistory":
+			out.Values[i] = ec._Mutation_recordHistory(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -8484,6 +9049,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			})
+		case "history":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_history(ctx, field)
 				return res
 			})
 		case "__type":
@@ -9464,6 +10040,20 @@ func (ec *executionContext) marshalNFloat2ᚕfloat64ᚄ(ctx context.Context, sel
 	return ret
 }
 
+func (ec *executionContext) marshalNHistory2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx context.Context, sel ast.SelectionSet, v model.History) graphql.Marshaler {
+	return ec._History(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx context.Context, sel ast.SelectionSet, v *model.History) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._History(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2int64(ctx context.Context, v interface{}) (int64, error) {
 	return graphql.UnmarshalInt64(v)
 }
@@ -9520,6 +10110,10 @@ func (ec *executionContext) unmarshalNNewCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdc
 
 func (ec *executionContext) unmarshalNNewEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewEpisode(ctx context.Context, v interface{}) (model.NewEpisode, error) {
 	return ec.unmarshalInputNewEpisode(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewHistoryInput2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewHistoryInput(ctx context.Context, v interface{}) (model.NewHistoryInput, error) {
+	return ec.unmarshalInputNewHistoryInput(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewStaff2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaff(ctx context.Context, v interface{}) (model.NewStaff, error) {
@@ -10401,6 +10995,17 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOFloat2float64(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOHistory2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx context.Context, sel ast.SelectionSet, v model.History) graphql.Marshaler {
+	return ec._History(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx context.Context, sel ast.SelectionSet, v *model.History) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._History(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOID2int64(ctx context.Context, v interface{}) (int64, error) {

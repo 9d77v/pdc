@@ -104,6 +104,7 @@ func initDB() {
 		&VideoSeriesItem{},
 		&User{},
 		&Thing{},
+		&History{},
 	)
 }
 

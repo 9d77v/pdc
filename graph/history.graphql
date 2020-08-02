@@ -1,0 +1,17 @@
+type History {
+	uid: ID!
+	sourceType:Int!
+	sourceID: Int!
+	subSourceID: Int!  
+    currentTime: Float!
+    remainingTime: Float!
+	updatedAt: Int!
+}
+
+input NewHistoryInput{
+	sourceType:Int!
+	sourceID: Int!
+	subSourceID: Int!  
+    currentTime: Float!
+    remainingTime: Float!
+}

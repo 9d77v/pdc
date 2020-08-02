@@ -11,8 +11,9 @@ import "github.com/9d77v/pdc/services"
 type Resolver struct{}
 
 var (
-	videoService  = services.VideoService{}
-	commonService = services.CommonService{}
-	thingService  = services.ThingService{}
-	userService   = services.UserService{}
+	videoService   = services.VideoService{}
+	commonService  = services.CommonService{}
+	thingService   = services.ThingService{}
+	userService    = services.UserService{}
+	historyService = services.HistoryService{}
 )

@@ -21,6 +21,16 @@ type Episode struct {
 	UpdatedAt int64       `json:"updatedAt"`
 }
 
+type History struct {
+	UID           int64   `json:"uid"`
+	SourceType    int64   `json:"sourceType"`
+	SourceID      int64   `json:"sourceID"`
+	SubSourceID   int64   `json:"subSourceID"`
+	CurrentTime   float64 `json:"currentTime"`
+	RemainingTime float64 `json:"remainingTime"`
+	UpdatedAt     int64   `json:"updatedAt"`
+}
+
 type LoginResponse struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
@@ -39,6 +49,14 @@ type NewEpisode struct {
 	Cover     *string        `json:"cover"`
 	URL       string         `json:"url"`
 	Subtitles []*NewSubtitle `json:"subtitles"`
+}
+
+type NewHistoryInput struct {
+	SourceType    int64   `json:"sourceType"`
+	SourceID      int64   `json:"sourceID"`
+	SubSourceID   int64   `json:"subSourceID"`
+	CurrentTime   float64 `json:"currentTime"`
+	RemainingTime float64 `json:"remainingTime"`
 }
 
 type NewStaff struct {
