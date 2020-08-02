@@ -92,6 +92,11 @@ func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdat
 	return thingService.UpdateThing(ctx, input, int64(user.ID))
 }
 
+func (r *mutationResolver) RecordHistory(ctx context.Context, input model.NewHistoryInput) (*model.History, error) {
+	user := middleware.ForContext(ctx)
+	return historyService.RecordHistory(ctx, input, user.ID)
+}
+
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
 	return commonService.PresignedURL(ctx, scheme, bucketName, objectName)
@@ -150,6 +155,11 @@ func (r *queryResolver) ThingSeries(ctx context.Context, dimension string, index
 func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error) {
 	user := middleware.ForContext(ctx)
 	return thingService.ThingAnalyze(ctx, dimension, index, start, group, int64(user.ID))
+}
+
+func (r *queryResolver) History(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error) {
+	user := middleware.ForContext(ctx)
+	return historyService.GetHistory(ctx, sourceType, sourceID, user.ID)
 }
 
 // Mutation returns generated.MutationResolver implementation.
