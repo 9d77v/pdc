@@ -107,7 +107,7 @@ const VIDEO_COMBO = gql`
 `;
 
 const GET_VIDEO = gql`
- query videos( $ids: [ID!],$videoID:ID!) {
+ query videos( $ids: [ID!],$videoID:ID!,$sourceType:Int!=1) {
    videos(ids:$ids){
        edges{
             id
@@ -141,6 +141,12 @@ const GET_VIDEO = gql`
               alias
             }
        }
+   }
+   history(sourceType:$sourceType,sourceID:$videoID){
+      subSourceID
+      currentTime
+      remainingTime
+      updatedAt
    }
   }
 `;

@@ -51,3 +51,41 @@ export const getRefreshToken = async (refreshToken: String) => {
     const data = await fetch("/api", requestOptions)
     return data.json()
 }
+
+export const recordHistory = async (
+    sourceType: number,
+    sourceID: number,
+    subSourceID: number,
+    currentTime: number,
+    remainingTime: number) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    const token = localStorage.getItem('accessToken') || "";
+    myHeaders.append("Authorization", token ? `Bearer ${token}` : "");
+
+    const graphql = JSON.stringify({
+        operationName: "recordHistory",
+        query: `mutation recordHistory($input:NewHistoryInput!){
+\n            recordHistory(input:$input){
+\n               subSourceID
+\n            }
+\n         }`,
+        variables: {
+            "input": {
+                "sourceType": sourceType,
+                "sourceID": sourceID,
+                "subSourceID": subSourceID,
+                "currentTime": currentTime,
+                "remainingTime": remainingTime
+            }
+        }
+    })
+    const requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: graphql,
+        redirect: 'follow' as const
+    };
+    const data = await fetch("/api", requestOptions)
+    return data.json()
+}

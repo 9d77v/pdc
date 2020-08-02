@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
 import "video.js/dist/video-js.css"
 import "./VideoPlayer.less"
+import { useLocation } from 'react-router-dom'
+import { recordHistory } from '../consts/http'
 
 export interface SubtitleProps {
     name: string
@@ -9,6 +11,7 @@ export interface SubtitleProps {
 }
 
 export interface VideoPlayerProps {
+    videoID: number
     episodeID: number
     url: string
     subtitles: [SubtitleProps] | null
@@ -18,9 +21,11 @@ export interface VideoPlayerProps {
     minWidth?: number
     autoplay?: boolean
     autoDestroy?: boolean
+    currentTime?: number
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
+    videoID,
     episodeID,
     url,
     subtitles,
@@ -29,12 +34,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     minWidth,
     minHeight,
     autoplay,
-    autoDestroy
+    autoDestroy,
+    currentTime = 0,
 }) => {
+    const location = useLocation();
+    const isApp = location.pathname.indexOf("/app") >= 0
 
-    const videoID = "custom-video" + episodeID
+    const videoKey = "custom-video" + episodeID
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()
+
     const props: VideoJsPlayerOptions = {
         autoplay: autoplay,
         sources: [{
@@ -43,7 +52,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }],
         controls: true,
         playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
-        loop: false
+        loop: false,
     };
 
     if (autoDestroy === undefined) {
@@ -61,10 +70,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     }, false)
                 }
             })
+            tmpPlayer.on("pause", () => {
+                if (isApp) {
+                    recordHistory(1, videoID, episodeID, tmpPlayer.currentTime(), tmpPlayer.remainingTime())
+                }
+            })
+            tmpPlayer.currentTime(currentTime)
             setPlayer(tmpPlayer)
         }
         if (videoNode && player && url) {
             player.src(url)
+            player.off("pause")
+            player.currentTime(currentTime)
+            player.on("pause", () => {
+                if (isApp) {
+                    recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime())
+                }
+            })
             var oldTracks = player.remoteTextTracks();
             var i = oldTracks.length;
             while (i--) {
@@ -85,7 +107,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 player?.dispose()
             }
         }
-    }, [videoNode, props, player, url, subtitles, autoDestroy]);
+    }, [videoNode, props, player, url, subtitles,
+        autoDestroy, episodeID, isApp, videoID, currentTime]);
 
     return (
         <div data-vjs-player
@@ -93,7 +116,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 width: width, height: height,
                 minWidth: minWidth, minHeight: minHeight
             }} >
-            <video id={videoID}
+            <video id={videoKey}
                 ref={(node: any) => setVideoNode(node)}
                 className="video-js vjs-big-play-centered"
                 crossOrigin="anonymous"

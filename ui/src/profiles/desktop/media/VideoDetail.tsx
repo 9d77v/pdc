@@ -12,7 +12,6 @@ import TextArea from "antd/lib/input/TextArea";
 export default function VideoDetail() {
     const match = useRouteMatch('/app/media/videos/:id');
     const history = useHistory()
-    const [num, setNum] = useState(0)
     const [episodeItem, setEpisodeItem] = useState({
         id: 0,
         url: "",
@@ -29,8 +28,10 @@ export default function VideoDetail() {
             variables: {
                 ids: ids,
                 videoID: params.id
-            }
+            },
+            fetchPolicy: "cache-and-network"
         })
+    const [num, setNum] = useState(0)
 
     useEffect(() => {
         if (error) {
@@ -84,6 +85,22 @@ export default function VideoDetail() {
             })
         }
     }
+
+    useEffect(() => {
+        if (data && data.history && data.videos.edges) {
+            const videos = data.videos.edges
+            const video = videos.length > 0 ? videos[0] : null
+            if (video && video.episodes && video.episodes.length > 0) {
+                let episodeNumMap = new Map<number, number>()
+                video.episodes.map((value: any, index: number) => {
+                    episodeNumMap.set(value.id, index)
+                    return value
+                })
+                setNum(episodeNumMap.get(data.history.subSourceID) || 0)
+            }
+        }
+    }, [data])
+
     useEffect(() => {
         if (video) {
             setEpisodeItem({
@@ -102,13 +119,15 @@ export default function VideoDetail() {
                 width: 1080, height: 891,
             }}>
                 <VideoPlayer
+                    videoID={videoItem.id}
                     episodeID={episodeItem.id}
                     url={episodeItem.url}
                     subtitles={episodeItem.subtitles}
                     height={"100%"}
                     width={"100%"}
-                    autoplay={true}
+                    autoplay={false}
                     autoDestroy={false}
+                    currentTime={data?.history?.currentTime}
                 />
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <Img src={videoItem.cover} />
