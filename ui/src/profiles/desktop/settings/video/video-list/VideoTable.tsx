@@ -41,6 +41,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
                 return (
                     <Button
                         onClick={() => setPlayerData({
+                            videoID: episodeRawData.id,
                             episodeID: record.id,
                             title: episodeRawData.title + " 第" + record.num + "话",
                             url: value,
@@ -127,6 +128,7 @@ export default function VideoTable() {
         total: 0
     })
     const [playerData, setPlayerData] = useState({
+        videoID: 0,
         episodeID: 0,
         title: "",
         url: "",
@@ -473,6 +475,7 @@ export default function VideoTable() {
                 onCancel={
                     () => {
                         setPlayerData({
+                            videoID: 0,
                             episodeID: 0,
                             title: "",
                             url: "",
@@ -484,6 +487,7 @@ export default function VideoTable() {
                 getContainer={false}
                 onOk={() => {
                     setPlayerData({
+                        videoID: 0,
                         episodeID: 0,
                         title: "",
                         url: "",
@@ -492,6 +496,7 @@ export default function VideoTable() {
                     })
                 }}
             >  <VideoPlayer
+                    videoID={playerData.videoID}
                     episodeID={playerData.episodeID}
                     url={playerData.url}
                     subtitles={playerData.subtitles}

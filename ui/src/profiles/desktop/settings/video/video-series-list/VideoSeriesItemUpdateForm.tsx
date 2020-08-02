@@ -22,8 +22,8 @@ export const VideoSeriesItemUpdateForm: React.FC<VideoSeriesItemUpdateFormProps>
 
     useEffect(() => {
         form.setFieldsValue({
-            "video_id": data.video_id,
-            "video_series_id": data.video_series_id,
+            "videoID": data.videoID,
+            "videoSeriesID": data.videoSeriesID,
             "alias": data.alias,
         })
     }, [data, form])
@@ -73,7 +73,7 @@ export const VideoSeriesItemUpdateForm: React.FC<VideoSeriesItemUpdateFormProps>
                     <Input hidden />
                 </Form.Item>
                 <Form.Item
-                    name="videoid"
+                    name="videoID"
                     label="视频"
                     noStyle
                 >
