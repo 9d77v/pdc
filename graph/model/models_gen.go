@@ -25,10 +25,20 @@ type History struct {
 	UID           int64   `json:"uid"`
 	SourceType    int64   `json:"sourceType"`
 	SourceID      int64   `json:"sourceID"`
+	Title         string  `json:"title"`
+	Num           int64   `json:"num"`
+	SubTitle      string  `json:"subTitle"`
+	Cover         string  `json:"cover"`
 	SubSourceID   int64   `json:"subSourceID"`
+	DeviceType    string  `json:"deviceType"`
 	CurrentTime   float64 `json:"currentTime"`
 	RemainingTime float64 `json:"remainingTime"`
 	UpdatedAt     int64   `json:"updatedAt"`
+}
+
+type HistoryConnection struct {
+	TotalCount int64      `json:"totalCount"`
+	Edges      []*History `json:"edges"`
 }
 
 type LoginResponse struct {
@@ -55,6 +65,7 @@ type NewHistoryInput struct {
 	SourceType    int64   `json:"sourceType"`
 	SourceID      int64   `json:"sourceID"`
 	SubSourceID   int64   `json:"subSourceID"`
+	DeviceType    string  `json:"deviceType"`
 	CurrentTime   float64 `json:"currentTime"`
 	RemainingTime float64 `json:"remainingTime"`
 }

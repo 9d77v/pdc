@@ -157,9 +157,19 @@ func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, inde
 	return thingService.ThingAnalyze(ctx, dimension, index, start, group, int64(user.ID))
 }
 
-func (r *queryResolver) History(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error) {
+func (r *queryResolver) HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error) {
 	user := middleware.ForContext(ctx)
 	return historyService.GetHistory(ctx, sourceType, sourceID, user.ID)
+}
+
+func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error) {
+	user := middleware.ForContext(ctx)
+	scheme := middleware.ForSchemeContext(ctx)
+	con := new(model.HistoryConnection)
+	total, data, err := historyService.ListHistory(ctx, sourceType, page, pageSize, int64(user.ID), scheme)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
 }
 
 // Mutation returns generated.MutationResolver implementation.

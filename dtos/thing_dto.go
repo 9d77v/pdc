@@ -9,7 +9,7 @@ import (
 func ToThingDto(m *models.Thing, scheme string) *model.Thing {
 	newPics := make([]string, 0)
 	for _, v := range m.Pics {
-		newPics = append(newPics, getOSSPrefix(scheme)+v)
+		newPics = append(newPics, GetOSSPrefix(scheme)+v)
 	}
 	return &model.Thing{
 		ID:                  int64(m.ID),

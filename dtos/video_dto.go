@@ -15,20 +15,20 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 		for k, v := range e.Subtitles {
 			sArr = append(sArr, &model.Subtitle{
 				Name: k,
-				URL:  getOSSPrefix(scheme) + *v,
+				URL:  GetOSSPrefix(scheme) + *v,
 			})
 		}
 		cover := ""
 		if e.Cover != "" {
-			cover = getOSSPrefix(scheme) + e.Cover
+			cover = GetOSSPrefix(scheme) + e.Cover
 		}
 		url := ""
 		if e.URL != "" {
-			url = getOSSPrefix(scheme) + e.URL
+			url = GetOSSPrefix(scheme) + e.URL
 		}
 		mobileURL := ""
 		if e.MobileURL != "" {
-			mobileURL = getOSSPrefix(scheme) + e.MobileURL
+			mobileURL = GetOSSPrefix(scheme) + e.MobileURL
 		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
@@ -59,7 +59,7 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 	}
 	cover := ""
 	if m.Cover != "" {
-		cover = getOSSPrefix(scheme) + m.Cover
+		cover = GetOSSPrefix(scheme) + m.Cover
 	}
 	return &model.Video{
 		ID:         int64(m.ID),

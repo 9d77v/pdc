@@ -13,6 +13,16 @@ services:
       MINIO_SECRET_KEY: minio123 
     command: minio server /data
     container_name: minio
+  clickhouse-server:
+    image: 9d77v/clickhouse-server:arm64.2020-08-05
+    restart: always
+    volumes: 
+      - ./clickhouse/data:/var/lib/clickhouse
+      # - ./clickhouse/config.xml:/ClickHouse/config.xml
+      # - ./clickhouse/users.mxl:/ClickHouse/users.xml
+    ports:
+      - 9001:9000
+    container_name: clickhouse-server
   db:
     image: postgres:12.1-alpine
     restart: always

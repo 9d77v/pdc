@@ -9,7 +9,7 @@ import (
 func ToUserDto(m *models.User, scheme string) *model.User {
 	avatar := ""
 	if m.Avatar != "" {
-		avatar = getOSSPrefix(scheme) + m.Avatar
+		avatar = GetOSSPrefix(scheme) + m.Avatar
 	}
 	return &model.User{
 		ID:        int64(m.ID),
