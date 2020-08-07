@@ -15,7 +15,7 @@ function formatRelativeTime(t: number): string {
     const m = moment(t * 1000)
     const day = m.format("YYYY-MM-DD")
     if (day === moment().format("YYYY-MM-DD")) {
-        return m.format("mm:ss")
+        return m.format("hh:mm")
     }
     return day
 }
