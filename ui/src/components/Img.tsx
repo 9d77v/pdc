@@ -1,18 +1,20 @@
 import React, { useState, useRef } from "react"
 
 import "./img.less"
-import { Modal } from "antd"
+import { Modal, Progress } from "antd"
 import useIntersectionObserver from "../hooks/use-intersection-observer"
 interface ImageProps {
     src: string
     width?: number | string
     height?: number | string
+    percent?: number
 }
 
 export const Img: React.FC<ImageProps> = ({
     src,
     width,
-    height
+    height,
+    percent
 }) => {
     const [visible, setVisible] = useState(false)
     const ref: any = useRef();
@@ -45,6 +47,9 @@ export const Img: React.FC<ImageProps> = ({
         >
             {src ? <img src={src} alt="图片不存在" /> : "暂无图片"}
         </Modal>
-        {src ? isVisible && (<img src={src} alt="图片不存在" onClick={() => setVisible(true)} />) : "暂无图片"}
+        {src ? isVisible && (<div style={{ width: "100%", height: "100%" }}><img src={src} alt="图片不存在" onClick={() => setVisible(true)} />
+            {percent ? <Progress percent={percent} showInfo={false} /> : ''}
+        </div>
+        ) : "暂无图片"}
     </div>)
 }

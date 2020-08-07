@@ -1,3 +1,4 @@
+import { isMobile } from "../utils/util";
 
 //getUploadURL 获取minio上传地址
 export const getUploadURL = async (bucketName: String, fileName: String) => {
@@ -75,6 +76,7 @@ export const recordHistory = async (
                 "sourceType": sourceType,
                 "sourceID": sourceID,
                 "subSourceID": subSourceID,
+                "deviceType": isMobile() ? "mobile" : "desktop",
                 "currentTime": currentTime,
                 "remainingTime": remainingTime
             }

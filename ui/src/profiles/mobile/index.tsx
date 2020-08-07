@@ -1,9 +1,9 @@
 import { TabBar } from 'antd-mobile';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserOutlined, HomeOutlined } from '@ant-design/icons';
 
 import "./index.less"
-import { useHistory, Route } from 'react-router-dom';
+import { useHistory, Route, useLocation } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from '../desktop/settings/user/UserCreateForm';
@@ -12,8 +12,10 @@ import UpdatePasswordForm from './me/UpdatePasswordForm';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
-const VideoDetail = React.lazy(() => import('./home/media/VideoDetail'))
-
+const VideoDetail = React.lazy(() => import('./media/video/VideoDetail'))
+const VideoList = React.lazy(() => import('./media/video/VideoList'))
+const VideoNavBar = React.lazy(() => import('./media/video/VideoNavBar'))
+const HistoryPage = React.lazy(() => import('./media/history/HistoryPage'))
 
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
@@ -25,10 +27,27 @@ export default function MobileIndex() {
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
 
+    const location = useLocation();
+    useEffect(() => {
+        switch (location.pathname) {
+            case "/app/media/videos":
+                setSelectedTab("mediaTab")
+                break
+            case "/app/user":
+                setSelectedTab("meTab")
+                break
+            default:
+                setSelectedTab("homeTab")
+                break
+        }
+    }, [location])
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
             <Route exact path="/app/media/videos/:id"  >
                 <VideoDetail />
+            </Route>
+            <Route exact path="/app/media/history"  >
+                <HistoryPage />
             </Route>
             <Route exact path="/app/user/profile"  >
                 <UpdateProfileForm user={user} />
@@ -49,10 +68,28 @@ export default function MobileIndex() {
                     selected={selectedTab === 'homeTab'}
                     onPress={() => {
                         setSelectedTab('homeTab')
+                        history.push('/app/home')
                     }}
                     data-seed="logId"
                 >
                     <HomeIndex />
+                </TabBar.Item>
+                <TabBar.Item
+                    title="多媒体"
+                    key="media"
+                    icon={<HomeOutlined />}
+                    selectedIcon={<HomeOutlined style={{ color: "#85dbf5" }} />}
+                    selected={selectedTab === 'mediaTab'}
+                    onPress={() => {
+                        setSelectedTab('mediaTab')
+                        history.push('/app/media/videos')
+                    }}
+                    data-seed="logId"
+                >
+                    <Route exact path="/app/media/videos">
+                        <VideoNavBar />
+                        <VideoList />
+                    </Route>
                 </TabBar.Item>
 
                 <TabBar.Item
@@ -63,9 +100,12 @@ export default function MobileIndex() {
                     selected={selectedTab === 'meTab'}
                     onPress={() => {
                         setSelectedTab('meTab')
+                        history.push('/app/user')
                     }}
                 >
-                    <MeIndex name={user ? user.name.toString() : ""} avatar={user ? user.avatar.toString() : ""} />
+                    <Route exact path="/app/user"  >
+                        <MeIndex name={user ? user.name.toString() : ""} avatar={user ? user.avatar.toString() : ""} />
+                    </Route>
                 </TabBar.Item>
             </TabBar>
         </div>

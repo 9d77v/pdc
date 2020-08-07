@@ -23,6 +23,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-videos']
     }],
+    ["/app/media/history", {
+        "defaultOpenKeys": ["media"],
+        "defaultSelectedKeys": ['media-history']
+    }],
     ["/app/thing/dashboard", {
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-dashboard']
@@ -83,6 +87,9 @@ const AppMenu = (props: AppHeaderProps) => {
             >
                 <Menu.Item key="media-videos">
                     <Link to="/app/media/videos">视频</Link>
+                </Menu.Item>
+                <Menu.Item key="media-history">
+                    <Link to="/app/media/history">历史记录</Link>
                 </Menu.Item>
             </SubMenu>
             <SubMenu
@@ -164,9 +171,10 @@ const AdminMenu = (props: AppHeaderProps) => {
 export const AppSlider = (props: AppHeaderProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
-    const config = locationMap.get(location.pathname) || []
+    let config = locationMap.get(location.pathname) || []
     const roleID = props.roleID
     const isApp = location.pathname.indexOf("/app") >= 0
+
     return (
         <Sider width={200} className="site-layout-background" collapsible collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)}>
             {isApp ? <AppMenu roleID={roleID} config={config} /> : <AdminMenu roleID={roleID} config={config} />}

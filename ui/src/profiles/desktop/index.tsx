@@ -23,10 +23,11 @@ const ThingTable = React.lazy(() => import('./thing/ThingTable'))
 const ThingDashboard = React.lazy(() => import('./thing/ThingDashboard'))
 const ThingAnalysis = React.lazy(() => import('./thing/ThingAnalysis'))
 
-const VideoList = React.lazy(() => import('./media/VideoList'))
-const VideoDetail = React.lazy(() => import('./media/VideoDetail'))
+const VideoList = React.lazy(() => import('./media/video/VideoList'))
+const VideoDetail = React.lazy(() => import('./media/video/VideoDetail'))
 
 
+const HistoryPage = React.lazy(() => import("./media/history/HistoryPage"))
 
 export default function DesktopIndex() {
     const history = useHistory();
@@ -59,6 +60,9 @@ export default function DesktopIndex() {
                         </Route>
                         <Route exact path="/app/media/videos">
                             <VideoList />
+                        </Route>
+                        <Route exact path="/app/media/history">
+                            <HistoryPage />
                         </Route>
                         <Route exact path="/app/thing/dashboard">
                             <ThingDashboard />
