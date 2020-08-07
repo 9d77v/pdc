@@ -59,47 +59,50 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         autoDestroy = true
     }
     useEffect(() => {
-        if (videoNode && !player && url) {
-            let tmpPlayer = videojs(videoNode, props, () => {
-                for (const item of subtitles || []) {
-                    tmpPlayer.addRemoteTextTrack({
-                        "kind": "subtitles",
-                        "src": item.url,
-                        "label": item.name,
-                        "default": true
-                    }, false)
-                }
-            })
-            tmpPlayer.on("pause", () => {
-                if (isApp) {
-                    recordHistory(1, videoID, episodeID, tmpPlayer.currentTime(), tmpPlayer.remainingTime())
-                }
-            })
-            tmpPlayer.currentTime(currentTime)
-            setPlayer(tmpPlayer)
-        }
-        if (videoNode && player && url) {
-            player.src(url)
-            player.off("pause")
-            player.currentTime(currentTime)
-            player.on("pause", () => {
-                if (isApp) {
-                    recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime())
-                }
-            })
-            var oldTracks = player.remoteTextTracks();
-            var i = oldTracks.length;
-            while (i--) {
-                const item: any = oldTracks[i]
-                player.removeRemoteTextTrack(item);
-            }
-            for (const item of subtitles || []) {
-                player.addRemoteTextTrack({
-                    "kind": "subtitles",
-                    "src": item.url,
-                    "label": item.name,
-                    "default": true
-                }, false)
+        if (videoNode && url) {
+            if (!player) {
+                let tmpPlayer = videojs(videoNode, props, () => {
+                    for (const item of subtitles || []) {
+                        tmpPlayer.addRemoteTextTrack({
+                            "kind": "subtitles",
+                            "src": item.url,
+                            "label": item.name,
+                            "default": true
+                        }, true)
+                    }
+                })
+                tmpPlayer.on("pause", () => {
+                    if (isApp) {
+                        recordHistory(1, videoID, episodeID, tmpPlayer.currentTime(), tmpPlayer.remainingTime())
+                    }
+                })
+                tmpPlayer.currentTime(currentTime)
+                setPlayer(tmpPlayer)
+            } else {
+                player.src(url)
+                player.off(["pause", "ready"])
+                player.currentTime(currentTime)
+                player.on("pause", () => {
+                    if (isApp) {
+                        recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime())
+                    }
+                })
+                player.ready(() => {
+                    const oldTracks = player.remoteTextTracks();
+                    let i = oldTracks.length
+                    while (i--) {
+                        const item: any = oldTracks[i]
+                        player.removeRemoteTextTrack(item);
+                    }
+                    for (const item of subtitles || []) {
+                        player.addRemoteTextTrack({
+                            "kind": "subtitles",
+                            "src": item.url,
+                            "label": item.name,
+                            "default": true
+                        }, true)
+                    }
+                })
             }
         }
         return () => {

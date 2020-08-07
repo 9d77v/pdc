@@ -1,5 +1,5 @@
 import React from "react"
-import { Layout, Dropdown, Avatar } from 'antd';
+import { Layout, Dropdown, Avatar, Button } from 'antd';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { client } from "../../../utils/client";
 const { Header } = Layout;
@@ -42,7 +42,7 @@ export const AppHeader = (props: AppHeaderProps) => {
                 <Dropdown
                     overlay={
                         <div style={{
-                            width: 200, height: 270, display: "flex",
+                            width: 200, height: 280, display: "flex",
                             justifyItems: "center", alignItems: "center",
                             flexDirection: "column", paddingTop: 20,
                             backgroundColor: "#fff", border: "0.5px solid"
@@ -52,10 +52,10 @@ export const AppHeader = (props: AppHeaderProps) => {
                                 marginBottom: 20
                             }} size={80} gap={1} src={props.avatar} >{props.name}</Avatar>
                             <div className="title">{props.name}</div>
-                            <button
-                                style={(roleID === 1 || roleID === 2) ? { display: "flex", marginBottom: 5 } : { display: "none" }}
-                                onClick={() => isApp ? gotoAdmin() : gotoApp()} > {isApp ? "系统设置" : "退出设置"}</button>
-                            <button onClick={() => logout()} >退出登录</button>
+                            <Button
+                                style={(roleID === 1 || roleID === 2) ? { display: "flex", marginBottom: 15 } : { display: "none" }}
+                                onClick={() => isApp ? gotoAdmin() : gotoApp()} > {isApp ? "系统设置" : "退出设置"}</Button>
+                            <Button onClick={() => logout()} danger >退出登录</Button>
                         </div>} >
                     <Avatar style={{ backgroundColor: "#00a2ae", verticalAlign: 'middle', float: 'left' }} size={"large"} gap={1} src={props.avatar} >{props.name}</Avatar>
                 </Dropdown>

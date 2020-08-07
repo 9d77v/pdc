@@ -142,7 +142,7 @@ const GET_VIDEO = gql`
             }
        }
    }
-   history(sourceType:$sourceType,sourceID:$videoID){
+   historyInfo(sourceType:$sourceType,sourceID:$videoID){
       subSourceID
       currentTime
       remainingTime

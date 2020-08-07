@@ -85,7 +85,7 @@ export default function VideoDetail() {
     }
 
     useEffect(() => {
-        if (data && data.history && data.videos.edges) {
+        if (data && data.historyInfo && data.videos.edges) {
             const videos = data.videos.edges
             const video = videos.length > 0 ? videos[0] : null
             if (video && video.episodes && video.episodes.length > 0) {
@@ -94,7 +94,7 @@ export default function VideoDetail() {
                     episodeNumMap.set(value.id, index)
                     return value
                 })
-                setNum(episodeNumMap.get(data.history.subSourceID) || 0)
+                setNum(episodeNumMap.get(data.historyInfo.subSourceID) || 0)
             }
         }
     }, [data])
@@ -126,7 +126,7 @@ export default function VideoDetail() {
                 width={"100%"}
                 autoplay={false}
                 autoDestroy={false}
-                currentTime={data?.history?.currentTime}
+                currentTime={(Number(data?.historyInfo?.subSourceID) !== 0 && Number(data?.historyInfo?.subSourceID) === Number(episodeItem.id)) ? data?.historyInfo?.currentTime : 0}
             />
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
@@ -136,7 +136,7 @@ export default function VideoDetail() {
                     <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}> 选集</span>
                     <div>{buttons}</div>
                     <br />
-                    <span style={{ textAlign: "left", marginBottom: 10 }}>{seriesName}</span>
+                    <span style={{ textAlign: "left", marginBottom: 10 }}>{seriesName === "" ? "" : seriesName + "系列"}</span>
                     <div>{seriesButtons}</div>
                 </div>
             </div>

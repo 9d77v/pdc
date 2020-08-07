@@ -62,7 +62,6 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
                 <Form.Item
                     name="videoURLs"
                     label="手机视频"
-                    rules={[{ required: true, message: '请上传视频!' }]}
                 >
                     <Uploader
                         fileLimit={0}

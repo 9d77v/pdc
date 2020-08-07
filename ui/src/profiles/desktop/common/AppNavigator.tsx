@@ -9,6 +9,7 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/app/user/profile', '个人资料'],
     ['/app/user/account', '账号安全'],
     ['/app/media', '媒体库'],
+    ['/app/media/history', '历史'],
     ['/app/media/videos', '视频'],
     ['/app/media/videos/:id', '播放页'],
     ['/app/thing', '物品'],
