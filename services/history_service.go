@@ -5,9 +5,11 @@ import (
 	"log"
 	"time"
 
+	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/utils"
 )
 
 //HistoryService ..
@@ -20,6 +22,7 @@ func (s HistoryService) RecordHistory(ctx context.Context, input model.NewHistor
 		SourceType:    uint8(input.SourceType),
 		SourceID:      uint(input.SourceID),
 		SubSourceID:   uint(input.SubSourceID),
+		DeviceType:    input.DeviceType,
 		CurrentTime:   input.CurrentTime,
 		RemainingTime: input.RemainingTime,
 		UpdatedAt:     time.Now(),
@@ -40,4 +43,46 @@ func (s HistoryService) GetHistory(ctx context.Context, sourceType int64, source
 		return nil, nil
 	}
 	return dtos.ToHistoryDto(history), nil
+}
+
+//ListHistory ..
+func (s HistoryService) ListHistory(ctx context.Context, sourceType, page, pageSize *int64, uid int64, scheme string) (int64, []*model.History, error) {
+	result := make([]*model.History, 0)
+	offset, limit := GetPageInfo(page, pageSize)
+	filedMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	builder := models.Gorm.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
+	if filedMap["edges"] {
+		subBuilder := builder
+		switch ptrs.Int64(sourceType) {
+		case 1:
+			subBuilder = subBuilder.Table(models.DBPrefix + "_history a").
+				Select("a.uid,a.source_type,a.source_id,a.sub_source_id,a.current_time,a.remaining_time,a.device_type,cast(EXTRACT(epoch FROM CAST( a.updated_at AS TIMESTAMP)) as bigint) updated_at,  b.title,b.cover,c.num,c.title sub_title").
+				Joins("JOIN pdc_video b ON a.source_id=b.id").
+				Joins("JOIN pdc_episode c on a.sub_source_id=c.id")
+		}
+		subBuilder = subBuilder.Order("updated_at desc")
+		if limit > 0 {
+			subBuilder = subBuilder.Offset(offset).Limit(limit)
+		}
+		err = subBuilder.Find(&result).Error
+		if err != nil {
+			return 0, result, err
+		}
+	}
+	var total int64
+	if filedMap["totalCount"] {
+		if limit == -1 {
+			total = int64(len(result))
+		} else {
+			err = builder.Model(&models.History{}).Count(&total).Error
+			if err != nil {
+				return 0, result, err
+			}
+		}
+	}
+	for _, v := range result {
+		v.Cover = dtos.GetOSSPrefix(scheme) + v.Cover
+	}
+	return total, result, nil
 }

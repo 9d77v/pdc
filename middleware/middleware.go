@@ -54,7 +54,8 @@ var permissonMap = map[string][]int{
 	"createThing":           {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"updateThing":           {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"recordHistory":         {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"history":               {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"historyInfo":           {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"histories":             {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 }
 
 //Auth ..

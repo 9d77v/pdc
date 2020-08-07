@@ -145,11 +145,13 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 		"num":       ptrs.Float64(input.Num),
 		"title":     ptrs.String(input.Title),
 		"desc":      ptrs.String(input.Desc),
-		"url":       input.URL,
 		"subtitles": cs,
 	}
 	if input.Cover != nil {
 		updateMap["cover"] = ptrs.String(input.Cover)
+	}
+	if input.URL != "" {
+		updateMap["url"] = input.URL
 	}
 	err := models.Gorm.Model(episode).Update(updateMap).Error
 	return &model.Episode{ID: int64(episode.ID)}, err

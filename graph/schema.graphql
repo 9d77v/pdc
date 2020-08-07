@@ -11,7 +11,8 @@ type Query {
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
-  history(sourceType:Int!,sourceID:ID!):History
+  historyInfo(sourceType:Int!,sourceID:ID!):History
+  histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
 } 
 
 type Mutation {
