@@ -68,7 +68,7 @@ export default function UpdatePasswordForm() {
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
-                onLeftClick={() => history.push("/app")}
+                onLeftClick={() => history.push("/app/user")}
             >修改密码</NavBar>
             <Form
                 {...layout}

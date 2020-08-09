@@ -55,7 +55,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         setLoading(false);
         if (!data.errors) {
             message.success("更新个人资料成功")
-            history.push("/app")
+            history.push("/app/user")
         }
     };
 
@@ -89,7 +89,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
-                onLeftClick={() => history.push("/app")}
+                onLeftClick={() => history.push("/app/user")}
             >修改个人资料</NavBar>
             <Form
                 {...layout}

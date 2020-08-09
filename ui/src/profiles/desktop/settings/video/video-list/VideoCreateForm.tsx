@@ -26,7 +26,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
     const [url, setUrl] = useState("")
     const [videoURLs, setVideoURLs] = useState([])
     const [subtitles, setSubtitles] = useState([])
-    const { data } = useQuery(LIST_VIDEO,
+    const { data, refetch } = useQuery(LIST_VIDEO,
         {
             variables: {
                 page: 1,
@@ -35,8 +35,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     field: 'id',
                     isAsc: false
                 }]
-            },
-            fetchPolicy: "cache-and-network"
+            }
         })
     const layout = {
         labelCol: { span: 4 },
@@ -47,6 +46,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
         maxNum = data.videos.edges[0].id + 1
     }
     const videoPathPrefix = "desktop/" + maxNum.toString() + "/"
+    console.log(videoPathPrefix)
     return (
         <Modal
             visible={visible}
@@ -79,6 +79,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     .then((values: any) => {
                         form.resetFields();
                         onCreate(values);
+                        refetch()
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info);
