@@ -89,7 +89,7 @@ const AppMenu = (props: AppHeaderProps) => {
                     <Link to="/app/media/videos">视频</Link>
                 </Menu.Item>
                 <Menu.Item key="media-history">
-                    <Link to="/app/media/history">历史记录</Link>
+                    <Link to="/app/media/history">历史</Link>
                 </Menu.Item>
             </SubMenu>
             <SubMenu

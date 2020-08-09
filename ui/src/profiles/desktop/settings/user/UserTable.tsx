@@ -75,7 +75,7 @@ export default function UserTable() {
                 "input": {
                     "id": values.id,
                     "avatar": values.avatar === "" ? undefined : values.avatar,
-                    "password": values.pasword,
+                    "password": values.password,
                     "roleID": values.roleID,
                     "gender": values.gender,
                     "birthDate": values.birthDate ? values.birthDate.unix() : 0,

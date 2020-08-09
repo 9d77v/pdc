@@ -6,6 +6,7 @@ import { GET_VIDEO } from '../../../../consts/video.gql';
 import { VideoPlayer } from "../../../../components/VideoPlayer";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { NavBar, Icon } from "antd-mobile";
+import { isIPhone } from "../../../../utils/util";
 
 export default function VideoDetail() {
     const match = useRouteMatch('/app/media/videos/:id');
@@ -120,7 +121,7 @@ export default function VideoDetail() {
             <VideoPlayer
                 videoID={videoItem.id}
                 episodeID={episodeItem.id}
-                url={episodeItem.mobileURL !== "" ? episodeItem.mobileURL : episodeItem.url}
+                url={(!isIPhone() && episodeItem.mobileURL !== "") ? episodeItem.mobileURL : episodeItem.url}
                 subtitles={episodeItem.subtitles}
                 height={231}
                 width={"100%"}
