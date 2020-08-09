@@ -35,7 +35,6 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
     const onFinish = (values: any) => {
         console.log('Finish:', values)
     }
-    console.log(video_series_id)
     useEffect(() => {
         form.setFieldsValue({
             "videoSeriesID": video_series_id,

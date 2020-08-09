@@ -125,7 +125,6 @@ export default function VideoSeriesTable() {
     };
 
     const onVideoSeriesItemCreate = async (values: any) => {
-        console.log(values)
         await addVideoSeriesItem({
             variables: {
                 "input": {

@@ -1,13 +1,10 @@
 import { isMobile } from "../utils/util";
+import jwt_decode from "jwt-decode";
+import moment from "moment";
 
 //getUploadURL 获取minio上传地址
 export const getUploadURL = async (bucketName: String, fileName: String) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const token = localStorage.getItem('accessToken') || "";
-    myHeaders.append("Authorization", token ? `Bearer ${token}` : "");
-
-    const graphql = JSON.stringify({
+    const body = JSON.stringify({
         operationName: "presignedUrl",
         query: ` query presignedUrl($bucketName: String!,$objectName:String!) {
  \n    presignedUrl(bucketName: $bucketName, objectName: $objectName)
@@ -17,21 +14,11 @@ export const getUploadURL = async (bucketName: String, fileName: String) => {
             "objectName": fileName
         }
     })
-    const requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: graphql,
-        redirect: 'follow' as const
-    };
-    const data = await fetch("/api", requestOptions)
-    return data.json()
+    return await request(body, true)
 }
 
 export const getRefreshToken = async (refreshToken: String) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const graphql = JSON.stringify({
+    const body = JSON.stringify({
         operationName: "refreshToken",
         query: `mutation refreshToken($refreshToken:String!){
 \n            refreshToken(refreshToken:$refreshToken){
@@ -43,14 +30,7 @@ export const getRefreshToken = async (refreshToken: String) => {
             "refreshToken": refreshToken
         }
     })
-    const requestOptions = {
-        method: 'POST',
-        headers: myHeaders,
-        body: graphql,
-        redirect: 'follow' as const
-    };
-    const data = await fetch("/api", requestOptions)
-    return data.json()
+    return await request(body, false)
 }
 
 export const recordHistory = async (
@@ -59,12 +39,7 @@ export const recordHistory = async (
     subSourceID: number,
     currentTime: number,
     remainingTime: number) => {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-    const token = localStorage.getItem('accessToken') || "";
-    myHeaders.append("Authorization", token ? `Bearer ${token}` : "");
-
-    const graphql = JSON.stringify({
+    const body = JSON.stringify({
         operationName: "recordHistory",
         query: `mutation recordHistory($input:NewHistoryInput!){
 \n            recordHistory(input:$input){
@@ -82,10 +57,34 @@ export const recordHistory = async (
             }
         }
     })
+    return await request(body, true)
+}
+
+
+const request = async (body: string, needToken?: boolean): Promise<any> => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    if (needToken) {
+        let token = localStorage.getItem('accessToken') || "";
+        if (token !== "") {
+            const accessToken: any = jwt_decode(token)
+            if (Number(accessToken.exp) - moment().unix() <= 0) {
+                const refreshToken = localStorage.getItem('refreshToken') || "";
+                const data = await getRefreshToken(refreshToken)
+                if (data.data) {
+                    const refreshData: any = data.data.refreshToken
+                    localStorage.setItem("accessToken", refreshData.accessToken)
+                    localStorage.setItem("refreshToken", refreshData.refreshToken)
+                    token = refreshData.accessToken
+                }
+            }
+        }
+        myHeaders.append("Authorization", token ? `Bearer ${token}` : "");
+    }
     const requestOptions = {
         method: 'POST',
         headers: myHeaders,
-        body: graphql,
+        body: body,
         redirect: 'follow' as const
     };
     const data = await fetch("/api", requestOptions)
