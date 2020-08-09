@@ -218,13 +218,25 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 	if len(input.VideoURLs) > 0 && len(input.VideoURLs) != len(data) {
 		return nil, errors.New("移动端视频与已有视频数量不一致")
 	}
-	for i, d := range data {
-		err := models.Gorm.Model(d).Update(map[string]interface{}{
-			"mobile_url": input.VideoURLs[i],
-		}).Error
-		if err != nil {
-			tx.Rollback()
-			return nil, err
+	if len(input.VideoURLs) == 0 {
+		for _, d := range data {
+			err := models.Gorm.Model(d).Update(map[string]interface{}{
+				"mobile_url": "",
+			}).Error
+			if err != nil {
+				tx.Rollback()
+				return nil, err
+			}
+		}
+	} else {
+		for i, d := range data {
+			err := models.Gorm.Model(d).Update(map[string]interface{}{
+				"mobile_url": input.VideoURLs[i],
+			}).Error
+			if err != nil {
+				tx.Rollback()
+				return nil, err
+			}
 		}
 	}
 	tx.Commit()
