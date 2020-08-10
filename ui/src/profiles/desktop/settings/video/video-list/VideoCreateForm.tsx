@@ -46,7 +46,6 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
         maxNum = data.videos.edges[0].id + 1
     }
     const videoPathPrefix = "desktop/" + maxNum.toString() + "/"
-    console.log(videoPathPrefix)
     return (
         <Modal
             visible={visible}
@@ -158,5 +157,5 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

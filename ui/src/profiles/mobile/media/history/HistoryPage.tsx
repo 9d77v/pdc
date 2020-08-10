@@ -48,14 +48,14 @@ export default function HistoryPage() {
         </div>
 
     })
-    return (<div >
+    return (<div style={{ height: "100%", overflowY: "auto" }}>
         <NavBar
             mode="light"
             icon={<Icon type="left" />}
             onLeftClick={() => history.push("/app/media/videos")}
         >历史</NavBar>
-        <div style={{ overflowY: "scroll" }}>
+        <div >
             {options}
         </div>
-    </div>)
+    </div >)
 }
