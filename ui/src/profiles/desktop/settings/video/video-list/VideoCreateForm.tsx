@@ -26,7 +26,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
     const [url, setUrl] = useState("")
     const [videoURLs, setVideoURLs] = useState([])
     const [subtitles, setSubtitles] = useState([])
-    const { data } = useQuery(LIST_VIDEO,
+    const { data, refetch } = useQuery(LIST_VIDEO,
         {
             variables: {
                 page: 1,
@@ -35,8 +35,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     field: 'id',
                     isAsc: false
                 }]
-            },
-            fetchPolicy: "cache-and-network"
+            }
         })
     const layout = {
         labelCol: { span: 4 },
@@ -79,6 +78,7 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     .then((values: any) => {
                         form.resetFields();
                         onCreate(values);
+                        refetch()
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info);
@@ -157,5 +157,5 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

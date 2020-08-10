@@ -50,11 +50,11 @@ const GET_USER = gql`
 `;
 
 const LOGIN = gql`
-mutation login($username:String!,$password:String!){
-   login(username:$username,password:$password){
-      accessToken
-      refreshToken
-   }
+mutation login($username: String!, $password: String!) {
+  login(username: $username, password: $password) {
+    accessToken
+    refreshToken
+  }
 }
 `
 

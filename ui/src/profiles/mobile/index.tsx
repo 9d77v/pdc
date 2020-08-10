@@ -19,6 +19,7 @@ const HistoryPage = React.lazy(() => import('./media/history/HistoryPage'))
 
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
+    const [visible, setVisible] = useState(false)
     const history = useHistory();
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -29,6 +30,7 @@ export default function MobileIndex() {
 
     const location = useLocation();
     useEffect(() => {
+        let isHome = true
         switch (location.pathname) {
             case "/app/media/videos":
                 setSelectedTab("mediaTab")
@@ -36,11 +38,15 @@ export default function MobileIndex() {
             case "/app/user":
                 setSelectedTab("meTab")
                 break
-            default:
+            case "/app/home":
                 setSelectedTab("homeTab")
                 break
+            default:
+                isHome = false
         }
+        setVisible(isHome)
     }, [location])
+
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
             <Route exact path="/app/media/videos/:id"  >
@@ -59,6 +65,7 @@ export default function MobileIndex() {
                 unselectedTintColor="#949494"
                 tintColor="#33A3F4"
                 barTintColor="white"
+                hidden={!visible}
             >
                 <TabBar.Item
                     title="首页"

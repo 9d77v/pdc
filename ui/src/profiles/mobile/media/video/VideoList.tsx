@@ -55,10 +55,7 @@ export default function VideoList() {
         }
     }, [data, history])
     return (
-        <div style={{
-            width: "100%",
-            height: "100%",
-        }}>
+        <div >
             {cards}
         </div>
     )
