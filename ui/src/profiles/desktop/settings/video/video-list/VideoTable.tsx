@@ -195,7 +195,7 @@ export default function VideoTable() {
                     "id": currentVideoID,
                     "title": values.title,
                     "desc": values.desc,
-                    "cover": values.cover,
+                    "cover": values.cover === "" ? undefined : values.cover,
                     "pubDate": values.pubDate ? values.pubDate.unix() : 0,
                     "tags": values.tags || [],
                     "isShow": values.isShow,

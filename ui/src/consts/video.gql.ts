@@ -80,16 +80,19 @@ const LIST_VIDEO = gql`
 `;
 
 const LIST_VIDEO_CARD = gql`
- query videos(  $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   videos(page: $page, pageSize: $pageSize,sorts:$sorts){
+ query searchVideo($keyword:String,$tags:[String!],  $page: Int, $pageSize: Int) {
+   searchVideo(keyword:$keyword,tags:$tags,page: $page, pageSize: $pageSize){
        edges{
             id
             title
-            cover
             desc
-            episodes{
-              id
-            }
+            cover
+            totalNum
+       }
+       totalCount
+       aggResults{
+         key
+         value
        }
    }
   }
