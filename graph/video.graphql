@@ -163,3 +163,17 @@ input NewUpdateVideoSeriesItem{
   videoID: ID!
   alias: String!
 }
+
+type VideoIndex {
+  id: ID!
+	title: String!
+	desc: String!
+	cover: String!
+	totalNum: Int!
+}
+
+type VideoIndexConnection {
+  totalCount: Int!
+  edges:[VideoIndex!]!
+  aggResults:[AggResult!]
+}

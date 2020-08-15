@@ -1,16 +1,20 @@
 module github.com/9d77v/pdc
 
-go 1.13
+go 1.15
 
 require (
 	github.com/99designs/gqlgen v0.11.3
-	github.com/9d77v/go-lib v0.0.1
+	github.com/9d77v/go-lib v0.0.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis/v8 v8.0.0-beta.6
 	github.com/jinzhu/gorm v1.9.12
-	github.com/lib/pq v1.1.1
+	github.com/lib/pq v1.7.0
 	github.com/minio/minio-go/v7 v7.0.2
+	github.com/nats-io/nats-streaming-server v0.18.0 // indirect
+	github.com/nats-io/stan.go v0.7.0
+	github.com/olivere/elastic v6.2.16+incompatible
+	github.com/olivere/elastic/v7 v7.0.19 // indirect
 	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 )

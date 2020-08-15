@@ -136,6 +136,17 @@ func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, vide
 	return con, err
 }
 
+func (r *queryResolver) SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64) (*model.VideoIndexConnection, error) {
+	con := new(model.VideoIndexConnection)
+	scheme := middleware.ForSchemeContext(ctx)
+	total, data, aggResults, err := videoService.ListVideoIndex(ctx, keyword, tags,
+		page, pageSize, scheme)
+	con.TotalCount = total
+	con.Edges = data
+	con.AggResults = aggResults
+	return con, err
+}
+
 func (r *queryResolver) Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)

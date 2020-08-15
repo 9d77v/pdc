@@ -27,13 +27,14 @@ type GraphReq struct {
 
 var userService = services.UserService{}
 
-var publicOperationArr = []string{"login", "refreshToken"}
+var publicOperationArr = []string{"login", "refreshToken", "IntrospectionQuery"}
 var permissonMap = map[string][]int{
 	"presignedUrl":          {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"users":                 {models.RoleAdmin},
 	"userInfo":              {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"videos":                {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"videoSerieses":         {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"searchVideo":           {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"things":                {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"thingSeries":           {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"thingAnalyze":          {models.RoleAdmin, models.RoleManager, models.RoleUser},

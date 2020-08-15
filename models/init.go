@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/9d77v/go-lib/clients/config"
 	"github.com/9d77v/pdc/utils"
@@ -17,6 +18,8 @@ import (
 
 	//postgres driver
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+
+	stan "github.com/nats-io/stan.go"
 )
 
 //环境变量
@@ -58,6 +61,8 @@ var (
 	SecureMinioClient *minio.Client
 	//RedisClient ..
 	RedisClient *redis.Client
+	//NatsClient ..
+	NatsClient stan.Conn
 )
 
 //角色
@@ -73,11 +78,18 @@ const (
 	PrefixUser = "USER"
 )
 
+//mq constants
+const (
+	SubjectVideo = "video"
+	GroupVideo   = "video-group"
+)
+
 func init() {
 	initDB()
 	initDBData()
 	initMinio()
 	initRedis()
+	initNatsStreaming()
 }
 
 func initDB() {
@@ -227,4 +239,13 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 	db.DB().SetMaxIdleConns(int(config.MaxIdleConns))
 	db.DB().SetMaxOpenConns(int(config.MaxOpenConns))
 	return db, err
+}
+
+func initNatsStreaming() {
+	NatsClient, _ = stan.Connect("test-cluster",
+		fmt.Sprintf("client-%d", time.Now().Unix()),
+		stan.Pings(10, 5),
+		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
+			log.Fatalf("Connection lost, reason: %v", reason)
+		}))
 }

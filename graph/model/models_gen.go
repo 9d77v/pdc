@@ -2,6 +2,11 @@
 
 package model
 
+type AggResult struct {
+	Key   string `json:"key"`
+	Value int64  `json:"value"`
+}
+
 type Character struct {
 	CharacterName string `json:"characterName"`
 	OriginalName  string `json:"originalName"`
@@ -306,6 +311,20 @@ type Video struct {
 type VideoConnection struct {
 	TotalCount int64    `json:"totalCount"`
 	Edges      []*Video `json:"edges"`
+}
+
+type VideoIndex struct {
+	ID       int64  `json:"id"`
+	Title    string `json:"title"`
+	Desc     string `json:"desc"`
+	Cover    string `json:"cover"`
+	TotalNum int64  `json:"totalNum"`
+}
+
+type VideoIndexConnection struct {
+	TotalCount int64         `json:"totalCount"`
+	Edges      []*VideoIndex `json:"edges"`
+	AggResults []*AggResult  `json:"aggResults"`
 }
 
 type VideoSeries struct {

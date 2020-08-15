@@ -14,3 +14,8 @@ type PieLineSerieData{
     x2:[String!]!
     y:[Float!]!
 }
+
+type AggResult{
+    key: String!
+    value: Int!
+}

@@ -23,6 +23,31 @@ services:
     ports:
       - 9001:9000
     container_name: clickhouse-server
+  nats-streaming:
+    image: nats-streaming:0.18.0-alpine3.12
+    restart: always
+    ports:
+      - 4222:4222
+      - 8222:8222
+    container_name: nats-streaming
+  elasticsearch:
+    image: 9d77v/elasticsearch:7.8.1
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+    ports:
+      - 9200:9200
+      - 9300:9300
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./elasticsearch/analysis-ik/custom:/usr/share/elasticsearch/config/analysis-ik/custom
+      - ./elasticsearch/analysis:/usr/share/elasticsearch/config/analysis
+    container_name: elasticsearch
   db:
     image: postgres:12.1-alpine
     restart: always
