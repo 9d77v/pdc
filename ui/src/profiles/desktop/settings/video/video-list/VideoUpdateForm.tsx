@@ -39,14 +39,12 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
     }
     useEffect(() => {
         form.setFieldsValue({
-            "cover": data.cover,
             "title": data.title,
             "desc": data.desc,
             "tags": data.tags,
             "pubDate": moment(data.pubDate * 1000),
             "isShow": data.isShow
         })
-        setUrl(data.cover)
     }, [form, data]);
 
     return (

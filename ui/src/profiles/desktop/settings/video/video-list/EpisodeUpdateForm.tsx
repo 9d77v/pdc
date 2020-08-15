@@ -49,14 +49,10 @@ export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
         form.setFieldsValue({
             "id": data.id,
             "title": data.title,
-            "cover": data.cover,
-            "url": data.url,
             "desc": data.desc,
             "num": data.num,
             "subtitles": subtitles
         })
-        setUrl(data.url)
-        setCoverUrl(data.cover)
     }, [data, form])
 
     const layout = {
