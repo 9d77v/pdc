@@ -50,6 +50,8 @@ var (
 
 	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
+
+	natsURL = utils.GetEnvStr("NATS_URL", "nats://domain.local:4222")
 )
 
 var (
@@ -247,5 +249,7 @@ func initNatsStreaming() {
 		stan.Pings(10, 5),
 		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
 			log.Fatalf("Connection lost, reason: %v", reason)
-		}))
+		}),
+		stan.NatsURL(natsURL),
+	)
 }
