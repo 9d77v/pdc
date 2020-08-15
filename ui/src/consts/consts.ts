@@ -10,6 +10,13 @@ export interface Combo {
     text: string
 }
 
+export interface IVideoPagination {
+    keyword: string
+    page: number,
+    pageSize: number,
+    selectedTags: string[]
+}
+
 const RubbishCategoryMap = new Map<number, TagStyle>([
     [0, {
         color: 'black',
