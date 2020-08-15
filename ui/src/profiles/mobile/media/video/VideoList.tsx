@@ -7,17 +7,12 @@ import { LIST_VIDEO_CARD } from '../../../../consts/video.gql';
 import { Img } from "../../../../components/Img";
 import { SearchBar } from "antd-mobile";
 import CheckableTag from "antd/lib/tag/CheckableTag";
+import { IVideoPagination } from "../../../../consts/consts";
 
 
-interface IPagination {
-    keyword: string
-    page: number,
-    pageSize: number,
-    selectedTags: string[]
-}
 export default function VideoList() {
     const [cards, setCards] = useState(<div />)
-    const [pagination, setPagination] = useState<IPagination>({
+    const [pagination, setPagination] = useState<IVideoPagination>({
         keyword: "",
         page: 1,
         pageSize: 500,

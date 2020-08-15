@@ -8,22 +8,16 @@ import { LIST_VIDEO_CARD } from '../../../../consts/video.gql';
 import { Img } from "../../../../components/Img";
 import Search from "antd/lib/input/Search";
 import CheckableTag from "antd/lib/tag/CheckableTag";
+import { IVideoPagination } from "../../../../consts/consts";
 
-
-interface IPagination {
-    keyword: string
-    page: number,
-    pageSize: number,
-    selectedTags: string[]
-}
 
 export default function VideoList() {
 
     const [cards, setCards] = useState(<div />)
-    const [pagination, setPagination] = useState<IPagination>({
+    const [pagination, setPagination] = useState<IVideoPagination>({
         keyword: "",
         page: 1,
-        pageSize: 12,
+        pageSize: 14,
         selectedTags: []
     })
     const { error, data } = useQuery(LIST_VIDEO_CARD,
@@ -104,7 +98,7 @@ export default function VideoList() {
                     })}
                     enterButton />
             </div>
-            <div style={{ marginLeft: 20, marginTop: 6 }}>
+            <div style={{ marginLeft: 10, marginTop: 6 }}>
                 <div className={"pdc-button-selected"}
                     style={{ cursor: "pointer" }}
                     onClick={() => {
