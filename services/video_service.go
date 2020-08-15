@@ -2,17 +2,24 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	es2 "github.com/9d77v/go-lib/clients/elastic/v7"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/models/es"
 	"github.com/9d77v/pdc/utils"
+	"github.com/olivere/elastic"
+
 	"github.com/jinzhu/gorm"
 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -67,6 +74,7 @@ func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*m
 		}
 	}
 	tx.Commit()
+	sendMsgToUpdateES(int64(m.ID))
 	return &model.Video{ID: int64(m.ID)}, err
 }
 
@@ -104,6 +112,7 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 		updateMap["cover"] = ptrs.String(input.Cover)
 	}
 	err := models.Gorm.Model(video).Update(updateMap).Error
+	sendMsgToUpdateES(input.ID)
 	return &model.Video{ID: int64(video.ID)}, err
 }
 
@@ -123,6 +132,7 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 		Subtitles: cs,
 	}
 	err := models.Gorm.Create(e).Error
+	sendMsgToUpdateES(input.VideoID)
 	return &model.Episode{ID: int64(e.ID)}, err
 }
 
@@ -350,6 +360,7 @@ func (s VideoService) CreateVideoSeriesItem(ctx context.Context, input model.New
 	}
 	e.Num = maxItem.Num + 1
 	err = models.Gorm.Create(e).Error
+	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
 }
 
@@ -369,6 +380,7 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context, input model.New
 		"alias": input.Alias,
 	}
 	err := models.Gorm.Model(item).Update(updateMap).Error
+	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
 }
 
@@ -465,4 +477,90 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 		result = append(result, r)
 	}
 	return total, result, nil
+}
+
+func sendMsgToUpdateES(videoID int64) {
+	models.NatsClient.PublishAsync(models.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
+		utils.AckHandler)
+}
+
+//ListVideoIndex ..
+func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
+	boolQuery := elastic.NewBoolQuery()
+	keywordStr := strings.ReplaceAll(ptrs.String(keyword), " ", "")
+	if keywordStr != "" {
+		subBoolQuery := elastic.NewMultiMatchQuery(keywordStr, []string{
+			"title^10",
+			"series_name^5",
+			"series_alias^0.5",
+			"desc",
+			"title.ikmax^10",
+			"series_name.ikmax^5",
+			"series_alias.ikmax^0.5",
+			"title.sy_ikmax^10",
+			"series_name.sy_ikmax^5",
+			"series_alias.sy_ikmax^0.5",
+			"title.synonym^10",
+			"series_name.synonym^5",
+			"series_alias.synonym^0.5",
+		}...).
+			Type("cross_fields").
+			Operator("AND").
+			TieBreaker(0.3)
+
+		boolQuery.Must(subBoolQuery)
+	}
+	offset, limit := GetPageInfo(page, pageSize)
+	aggsParams := []*es2.AggsParam{
+		{Field: "tags", Size: 20},
+	}
+	filterQueries := make([]elastic.Query, 0)
+	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
+	if len(tags) > 0 {
+		for _, v := range tags {
+			filterQueries = append(filterQueries, elastic.NewTermQuery("tags", v))
+		}
+	}
+	filterQuery := elastic.NewBoolQuery().
+		Must(filterQueries...)
+	boolQuery.Filter(filterQuery)
+	searchService := es.ESClient.Search().
+		Index(es.AliasVideo).
+		Query(boolQuery).
+		From(int(offset)).
+		Size(int(limit)).
+		Sort("title.keyword", true)
+	searchService = es2.Aggs(searchService, aggsParams...)
+	result, err := searchService.Do(ctx)
+	vis := make([]*model.VideoIndex, 0)
+	aggResults := make([]*model.AggResult, 0)
+	if err != nil {
+		log.Println("err:", err)
+		return 0, vis, aggResults, nil
+	}
+	for _, v := range result.Hits.Hits {
+		vi := new(es.VideoIndex)
+		data, _ := v.Source.MarshalJSON()
+		json.Unmarshal(data, &vi)
+		vi.Cover = dtos.GetOSSPrefix(scheme) + vi.Cover
+		vis = append(vis, &model.VideoIndex{
+			ID:       int64(vi.ID),
+			Title:    vi.Title,
+			Desc:     vi.Desc,
+			Cover:    vi.Cover,
+			TotalNum: int64(vi.TotalNum),
+		})
+	}
+	for _, v := range aggsParams {
+		aggResult, found := result.Aggregations.Terms("group_by_" + v.Field)
+		if found {
+			for _, v := range aggResult.Buckets {
+				aggResults = append(aggResults, &model.AggResult{
+					Key:   v.Key.(string),
+					Value: v.DocCount,
+				})
+			}
+		}
+	}
+	return result.TotalHits(), vis, aggResults, nil
 }
