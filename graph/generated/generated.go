@@ -48,9 +48,57 @@ type ComplexityRoot struct {
 		Value func(childComplexity int) int
 	}
 
+	Attribute struct {
+		DeviceID  func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Key       func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		Value     func(childComplexity int) int
+	}
+
+	AttributeModel struct {
+		CreatedAt     func(childComplexity int) int
+		DeviceModelID func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Key           func(childComplexity int) int
+		Name          func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
 	Character struct {
 		CharacterName func(childComplexity int) int
 		OriginalName  func(childComplexity int) int
+	}
+
+	Device struct {
+		Attributes    func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		DeviceModelID func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Telemetries   func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+	}
+
+	DeviceConnection struct {
+		Edges      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	DeviceModel struct {
+		AttributeModels func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		Desc            func(childComplexity int) int
+		DeviceType      func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Name            func(childComplexity int) int
+		TelemetryModels func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
+	}
+
+	DeviceModelConnection struct {
+		Edges      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
 	}
 
 	Episode struct {
@@ -93,7 +141,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreateAttributeModel  func(childComplexity int, input model.NewAttributeModel) int
+		CreateDevice          func(childComplexity int, input model.NewDevice) int
+		CreateDeviceModel     func(childComplexity int, input model.NewDeviceModel) int
 		CreateEpisode         func(childComplexity int, input model.NewEpisode) int
+		CreateTelemetryModel  func(childComplexity int, input model.NewTelemetryModel) int
 		CreateThing           func(childComplexity int, input model.NewThing) int
 		CreateUser            func(childComplexity int, input model.NewUser) int
 		CreateVideo           func(childComplexity int, input model.NewVideo) int
@@ -102,11 +154,15 @@ type ComplexityRoot struct {
 		Login                 func(childComplexity int, username string, password string) int
 		RecordHistory         func(childComplexity int, input model.NewHistoryInput) int
 		RefreshToken          func(childComplexity int, refreshToken string) int
+		UpdateAttributeModel  func(childComplexity int, input model.NewUpdateAttributeModel) int
+		UpdateDevice          func(childComplexity int, input model.NewUpdateDevice) int
+		UpdateDeviceModel     func(childComplexity int, input model.NewUpdateDeviceModel) int
 		UpdateEpisode         func(childComplexity int, input model.NewUpdateEpisode) int
 		UpdateMobileVideo     func(childComplexity int, input *model.NewUpdateMobileVideos) int
 		UpdatePassword        func(childComplexity int, oldPassword string, newPassword string) int
 		UpdateProfile         func(childComplexity int, input model.NewUpdateProfile) int
 		UpdateSubtitle        func(childComplexity int, input model.NewUpdateSubtitles) int
+		UpdateTelemetryModel  func(childComplexity int, input model.NewUpdateTelemetryModel) int
 		UpdateThing           func(childComplexity int, input model.NewUpdateThing) int
 		UpdateUser            func(childComplexity int, input model.NewUpdateUser) int
 		UpdateVideo           func(childComplexity int, input model.NewUpdateVideo) int
@@ -121,6 +177,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		DeviceModels  func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
+		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64) int
 		Histories     func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
 		HistoryInfo   func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL  func(childComplexity int, bucketName string, objectName string) int
@@ -147,6 +205,27 @@ type ComplexityRoot struct {
 	Subtitle struct {
 		Name func(childComplexity int) int
 		URL  func(childComplexity int) int
+	}
+
+	Telemetry struct {
+		DeviceID  func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Key       func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		Value     func(childComplexity int) int
+	}
+
+	TelemetryModel struct {
+		CreatedAt     func(childComplexity int) int
+		DeviceModelID func(childComplexity int) int
+		Factor        func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Key           func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Scale         func(childComplexity int) int
+		Unit          func(childComplexity int) int
+		UnitName      func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
 	}
 
 	Thing struct {
@@ -270,6 +349,14 @@ type MutationResolver interface {
 	CreateThing(ctx context.Context, input model.NewThing) (*model.Thing, error)
 	UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error)
 	RecordHistory(ctx context.Context, input model.NewHistoryInput) (*model.History, error)
+	CreateDeviceModel(ctx context.Context, input model.NewDeviceModel) (*model.DeviceModel, error)
+	UpdateDeviceModel(ctx context.Context, input model.NewUpdateDeviceModel) (*model.DeviceModel, error)
+	CreateAttributeModel(ctx context.Context, input model.NewAttributeModel) (*model.AttributeModel, error)
+	UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error)
+	CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error)
+	UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error)
+	CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error)
+	UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error)
 }
 type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
@@ -283,6 +370,8 @@ type QueryResolver interface {
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
 	HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 	Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error)
+	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceModelConnection, error)
+	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64) (*model.DeviceModelConnection, error)
 }
 
 type executableSchema struct {
@@ -314,6 +403,83 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AggResult.Value(childComplexity), true
 
+	case "Attribute.deviceID":
+		if e.complexity.Attribute.DeviceID == nil {
+			break
+		}
+
+		return e.complexity.Attribute.DeviceID(childComplexity), true
+
+	case "Attribute.id":
+		if e.complexity.Attribute.ID == nil {
+			break
+		}
+
+		return e.complexity.Attribute.ID(childComplexity), true
+
+	case "Attribute.key":
+		if e.complexity.Attribute.Key == nil {
+			break
+		}
+
+		return e.complexity.Attribute.Key(childComplexity), true
+
+	case "Attribute.updatedAt":
+		if e.complexity.Attribute.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Attribute.UpdatedAt(childComplexity), true
+
+	case "Attribute.value":
+		if e.complexity.Attribute.Value == nil {
+			break
+		}
+
+		return e.complexity.Attribute.Value(childComplexity), true
+
+	case "AttributeModel.createdAt":
+		if e.complexity.AttributeModel.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.AttributeModel.CreatedAt(childComplexity), true
+
+	case "AttributeModel.deviceModelID":
+		if e.complexity.AttributeModel.DeviceModelID == nil {
+			break
+		}
+
+		return e.complexity.AttributeModel.DeviceModelID(childComplexity), true
+
+	case "AttributeModel.id":
+		if e.complexity.AttributeModel.ID == nil {
+			break
+		}
+
+		return e.complexity.AttributeModel.ID(childComplexity), true
+
+	case "AttributeModel.key":
+		if e.complexity.AttributeModel.Key == nil {
+			break
+		}
+
+		return e.complexity.AttributeModel.Key(childComplexity), true
+
+	case "AttributeModel.name":
+		if e.complexity.AttributeModel.Name == nil {
+			break
+		}
+
+		return e.complexity.AttributeModel.Name(childComplexity), true
+
+	case "AttributeModel.updatedAt":
+		if e.complexity.AttributeModel.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.AttributeModel.UpdatedAt(childComplexity), true
+
 	case "Character.characterName":
 		if e.complexity.Character.CharacterName == nil {
 			break
@@ -327,6 +493,139 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Character.OriginalName(childComplexity), true
+
+	case "Device.attributes":
+		if e.complexity.Device.Attributes == nil {
+			break
+		}
+
+		return e.complexity.Device.Attributes(childComplexity), true
+
+	case "Device.createdAt":
+		if e.complexity.Device.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Device.CreatedAt(childComplexity), true
+
+	case "Device.deviceModelID":
+		if e.complexity.Device.DeviceModelID == nil {
+			break
+		}
+
+		return e.complexity.Device.DeviceModelID(childComplexity), true
+
+	case "Device.id":
+		if e.complexity.Device.ID == nil {
+			break
+		}
+
+		return e.complexity.Device.ID(childComplexity), true
+
+	case "Device.name":
+		if e.complexity.Device.Name == nil {
+			break
+		}
+
+		return e.complexity.Device.Name(childComplexity), true
+
+	case "Device.telemetries":
+		if e.complexity.Device.Telemetries == nil {
+			break
+		}
+
+		return e.complexity.Device.Telemetries(childComplexity), true
+
+	case "Device.updatedAt":
+		if e.complexity.Device.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Device.UpdatedAt(childComplexity), true
+
+	case "DeviceConnection.edges":
+		if e.complexity.DeviceConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.DeviceConnection.Edges(childComplexity), true
+
+	case "DeviceConnection.totalCount":
+		if e.complexity.DeviceConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.DeviceConnection.TotalCount(childComplexity), true
+
+	case "DeviceModel.attributeModels":
+		if e.complexity.DeviceModel.AttributeModels == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.AttributeModels(childComplexity), true
+
+	case "DeviceModel.createdAt":
+		if e.complexity.DeviceModel.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.CreatedAt(childComplexity), true
+
+	case "DeviceModel.desc":
+		if e.complexity.DeviceModel.Desc == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.Desc(childComplexity), true
+
+	case "DeviceModel.deviceType":
+		if e.complexity.DeviceModel.DeviceType == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.DeviceType(childComplexity), true
+
+	case "DeviceModel.id":
+		if e.complexity.DeviceModel.ID == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.ID(childComplexity), true
+
+	case "DeviceModel.name":
+		if e.complexity.DeviceModel.Name == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.Name(childComplexity), true
+
+	case "DeviceModel.telemetryModels":
+		if e.complexity.DeviceModel.TelemetryModels == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.TelemetryModels(childComplexity), true
+
+	case "DeviceModel.updatedAt":
+		if e.complexity.DeviceModel.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.UpdatedAt(childComplexity), true
+
+	case "DeviceModelConnection.edges":
+		if e.complexity.DeviceModelConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.DeviceModelConnection.Edges(childComplexity), true
+
+	case "DeviceModelConnection.totalCount":
+		if e.complexity.DeviceModelConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.DeviceModelConnection.TotalCount(childComplexity), true
 
 	case "Episode.cover":
 		if e.complexity.Episode.Cover == nil {
@@ -517,6 +816,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.LoginResponse.RefreshToken(childComplexity), true
 
+	case "Mutation.createAttributeModel":
+		if e.complexity.Mutation.CreateAttributeModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createAttributeModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateAttributeModel(childComplexity, args["input"].(model.NewAttributeModel)), true
+
+	case "Mutation.createDevice":
+		if e.complexity.Mutation.CreateDevice == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createDevice_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateDevice(childComplexity, args["input"].(model.NewDevice)), true
+
+	case "Mutation.createDeviceModel":
+		if e.complexity.Mutation.CreateDeviceModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createDeviceModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateDeviceModel(childComplexity, args["input"].(model.NewDeviceModel)), true
+
 	case "Mutation.createEpisode":
 		if e.complexity.Mutation.CreateEpisode == nil {
 			break
@@ -528,6 +863,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateEpisode(childComplexity, args["input"].(model.NewEpisode)), true
+
+	case "Mutation.createTelemetryModel":
+		if e.complexity.Mutation.CreateTelemetryModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTelemetryModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTelemetryModel(childComplexity, args["input"].(model.NewTelemetryModel)), true
 
 	case "Mutation.createThing":
 		if e.complexity.Mutation.CreateThing == nil {
@@ -625,6 +972,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RefreshToken(childComplexity, args["refreshToken"].(string)), true
 
+	case "Mutation.updateAttributeModel":
+		if e.complexity.Mutation.UpdateAttributeModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateAttributeModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateAttributeModel(childComplexity, args["input"].(model.NewUpdateAttributeModel)), true
+
+	case "Mutation.updateDevice":
+		if e.complexity.Mutation.UpdateDevice == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateDevice_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateDevice(childComplexity, args["input"].(model.NewUpdateDevice)), true
+
+	case "Mutation.updateDeviceModel":
+		if e.complexity.Mutation.UpdateDeviceModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateDeviceModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateDeviceModel(childComplexity, args["input"].(model.NewUpdateDeviceModel)), true
+
 	case "Mutation.updateEpisode":
 		if e.complexity.Mutation.UpdateEpisode == nil {
 			break
@@ -684,6 +1067,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateSubtitle(childComplexity, args["input"].(model.NewUpdateSubtitles)), true
+
+	case "Mutation.updateTelemetryModel":
+		if e.complexity.Mutation.UpdateTelemetryModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateTelemetryModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateTelemetryModel(childComplexity, args["input"].(model.NewUpdateTelemetryModel)), true
 
 	case "Mutation.updateThing":
 		if e.complexity.Mutation.UpdateThing == nil {
@@ -765,6 +1160,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PieLineSerieData.Y(childComplexity), true
+
+	case "Query.deviceModels":
+		if e.complexity.Query.DeviceModels == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deviceModels_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeviceModels(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64)), true
+
+	case "Query.devices":
+		if e.complexity.Query.Devices == nil {
+			break
+		}
+
+		args, err := ec.field_Query_devices_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64)), true
 
 	case "Query.histories":
 		if e.complexity.Query.Histories == nil {
@@ -939,6 +1358,111 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subtitle.URL(childComplexity), true
+
+	case "Telemetry.deviceID":
+		if e.complexity.Telemetry.DeviceID == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.DeviceID(childComplexity), true
+
+	case "Telemetry.id":
+		if e.complexity.Telemetry.ID == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.ID(childComplexity), true
+
+	case "Telemetry.key":
+		if e.complexity.Telemetry.Key == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.Key(childComplexity), true
+
+	case "Telemetry.updatedAt":
+		if e.complexity.Telemetry.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.UpdatedAt(childComplexity), true
+
+	case "Telemetry.value":
+		if e.complexity.Telemetry.Value == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.Value(childComplexity), true
+
+	case "TelemetryModel.createdAt":
+		if e.complexity.TelemetryModel.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.CreatedAt(childComplexity), true
+
+	case "TelemetryModel.deviceModelID":
+		if e.complexity.TelemetryModel.DeviceModelID == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.DeviceModelID(childComplexity), true
+
+	case "TelemetryModel.factor":
+		if e.complexity.TelemetryModel.Factor == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.Factor(childComplexity), true
+
+	case "TelemetryModel.id":
+		if e.complexity.TelemetryModel.ID == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.ID(childComplexity), true
+
+	case "TelemetryModel.key":
+		if e.complexity.TelemetryModel.Key == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.Key(childComplexity), true
+
+	case "TelemetryModel.name":
+		if e.complexity.TelemetryModel.Name == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.Name(childComplexity), true
+
+	case "TelemetryModel.scale":
+		if e.complexity.TelemetryModel.Scale == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.Scale(childComplexity), true
+
+	case "TelemetryModel.unit":
+		if e.complexity.TelemetryModel.Unit == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.Unit(childComplexity), true
+
+	case "TelemetryModel.unitName":
+		if e.complexity.TelemetryModel.UnitName == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.UnitName(childComplexity), true
+
+	case "TelemetryModel.updatedAt":
+		if e.complexity.TelemetryModel.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.TelemetryModel.UpdatedAt(childComplexity), true
 
 	case "Thing.brandName":
 		if e.complexity.Thing.BrandName == nil {
@@ -1494,6 +2018,127 @@ type AggResult{
     key: String!
     value: Int!
 }`, BuiltIn: false},
+	&ast.Source{Name: "graph/device.graphql", Input: `type DeviceModel {
+  id: ID!
+  name: String!
+  deviceType:Int!
+  desc: String!
+  attributeModels: [AttributeModel!]
+  telemetryModels:[TelemetryModel]
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type AttributeModel {
+  id: ID!
+  deviceModelID: ID!
+  key: String!
+  name: String!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type TelemetryModel {
+  id: ID!
+  deviceModelID: ID!
+  key: String!
+  name: String!
+  factor: Float!
+  unit: String!
+  unitName: String!
+  scale: Int!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type DeviceModelConnection {
+  totalCount: Int!
+  edges:[DeviceModel!]!
+}
+
+input NewDeviceModel {
+  name: String!  
+  desc: String
+  deviceType: Int!
+}
+
+input NewAttributeModel {
+  deviceModelID: ID!
+  key: String!
+  name: String!
+}
+
+input NewTelemetryModel {
+  deviceModelID: ID!
+  key: String!
+  name: String!
+  factor: Float!
+  unit: String
+  unitName: String
+  scale: Int!
+}
+
+input NewUpdateDeviceModel {
+  id: ID!
+  name: String!  
+  desc: String!
+}
+
+input NewUpdateAttributeModel {
+  id: ID!
+  name: String!
+}
+
+input NewUpdateTelemetryModel {
+  id: ID!
+  name: String!
+  factor: Float!
+  unit: String!
+  unitName: String!
+  scale: Int!
+}
+
+type Device {
+  id: ID!
+  deviceModelID: ID!
+  name: String!
+  attributes: [Attribute!]
+  telemetries: [Telemetry!]
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type Attribute {
+  id: ID!
+  deviceID: ID!
+  key: String!
+  value: String!
+  updatedAt: Int!
+}
+
+
+type Telemetry {
+  id: ID!
+  deviceID: ID!
+  key: String!
+  value: Float!
+  updatedAt: Int!
+}
+
+type DeviceConnection {
+  totalCount: Int!
+  edges:[Device!]!
+}
+
+input NewDevice {
+  deviceModelID: ID!
+  name: String
+}
+
+input NewUpdateDevice {
+  id: ID!
+  name: String!  
+}`, BuiltIn: false},
 	&ast.Source{Name: "graph/history.graphql", Input: `type History {
 	uid: ID!
 	sourceType:Int!
@@ -1539,6 +2184,8 @@ type Query {
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
   historyInfo(sourceType:Int!,sourceID:ID!):History
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
+  deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceModelConnection!
+  devices(keyword:String,page:Int,pageSize:Int):DeviceModelConnection!
 } 
 
 type Mutation {
@@ -1564,6 +2211,15 @@ type Mutation {
   updateThing(input:NewUpdateThing!):Thing!
 
   recordHistory(input:NewHistoryInput!):History!  
+
+  createDeviceModel(input:NewDeviceModel!):DeviceModel!
+  updateDeviceModel(input:NewUpdateDeviceModel!):DeviceModel!
+  createAttributeModel(input:NewAttributeModel!):AttributeModel!
+  updateAttributeModel(input:NewUpdateAttributeModel!):AttributeModel!
+  createTelemetryModel(input:NewTelemetryModel!):TelemetryModel!
+  updateTelemetryModel(input:NewUpdateTelemetryModel!):TelemetryModel!
+  createDevice(input:NewDevice!):Device!
+  updateDevice(input:NewUpdateDevice!):Device!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "graph/thing.graphql", Input: `type Thing {
@@ -1870,12 +2526,68 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_createAttributeModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewAttributeModel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewAttributeModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewAttributeModel(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createDeviceModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewDeviceModel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewDeviceModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceModel(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createDevice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewDevice
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDevice(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createEpisode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.NewEpisode
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewEpisode(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTelemetryModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTelemetryModel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewTelemetryModel(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2004,6 +2716,48 @@ func (ec *executionContext) field_Mutation_refreshToken_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateAttributeModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateAttributeModel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateAttributeModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateAttributeModel(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateDeviceModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateDeviceModel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateDeviceModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateDeviceModel(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateDevice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateDevice
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateDevice(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateEpisode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2074,6 +2828,20 @@ func (ec *executionContext) field_Mutation_updateSubtitle_args(ctx context.Conte
 	var arg0 model.NewUpdateSubtitles
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateTelemetryModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUpdateTelemetryModel
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUpdateTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateTelemetryModel(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2163,6 +2931,74 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_deviceModels_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keyword"] = arg0
+	var arg1 *int64
+	if tmp, ok := rawArgs["page"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
+	var arg3 []int64
+	if tmp, ok := rawArgs["ids"]; ok {
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_devices_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keyword"] = arg0
+	var arg1 *int64
+	if tmp, ok := rawArgs["page"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["page"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg2
 	return args, nil
 }
 
@@ -2680,6 +3516,380 @@ func (ec *executionContext) _AggResult_value(ctx context.Context, field graphql.
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Attribute_id(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attribute_deviceID(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attribute_key(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attribute_value(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attribute_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttributeModel_id(ctx context.Context, field graphql.CollectedField, obj *model.AttributeModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AttributeModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttributeModel_deviceModelID(ctx context.Context, field graphql.CollectedField, obj *model.AttributeModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AttributeModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttributeModel_key(ctx context.Context, field graphql.CollectedField, obj *model.AttributeModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AttributeModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttributeModel_name(ctx context.Context, field graphql.CollectedField, obj *model.AttributeModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AttributeModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttributeModel_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.AttributeModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AttributeModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AttributeModel_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.AttributeModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "AttributeModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Character_characterName(ctx context.Context, field graphql.CollectedField, obj *model.Character) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2746,6 +3956,640 @@ func (ec *executionContext) _Character_originalName(ctx context.Context, field g
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_id(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_deviceModelID(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_name(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_attributes(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Attributes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Attribute)
+	fc.Result = res
+	return ec.marshalOAttribute2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_telemetries(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Telemetries, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Telemetry)
+	fc.Result = res
+	return ec.marshalOTelemetry2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.DeviceConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceConnection_edges(ctx context.Context, field graphql.CollectedField, obj *model.DeviceConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Device)
+	fc.Result = res
+	return ec.marshalNDevice2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_id(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_name(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_deviceType(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_desc(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Desc, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_attributeModels(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AttributeModels, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.AttributeModel)
+	fc.Result = res
+	return ec.marshalOAttributeModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModelᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_telemetryModels(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TelemetryModels, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.TelemetryModel)
+	fc.Result = res
+	return ec.marshalOTelemetryModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModelConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModelConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModelConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModelConnection_edges(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModelConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModelConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.DeviceModel)
+	fc.Result = res
+	return ec.marshalNDeviceModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Episode_id(ctx context.Context, field graphql.CollectedField, obj *model.Episode) (ret graphql.Marshaler) {
@@ -4445,6 +6289,334 @@ func (ec *executionContext) _Mutation_recordHistory(ctx context.Context, field g
 	return ec.marshalNHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistory(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_createDeviceModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createDeviceModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateDeviceModel(rctx, args["input"].(model.NewDeviceModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceModel)
+	fc.Result = res
+	return ec.marshalNDeviceModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateDeviceModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateDeviceModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateDeviceModel(rctx, args["input"].(model.NewUpdateDeviceModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceModel)
+	fc.Result = res
+	return ec.marshalNDeviceModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createAttributeModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createAttributeModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateAttributeModel(rctx, args["input"].(model.NewAttributeModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AttributeModel)
+	fc.Result = res
+	return ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateAttributeModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateAttributeModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateAttributeModel(rctx, args["input"].(model.NewUpdateAttributeModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AttributeModel)
+	fc.Result = res
+	return ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createTelemetryModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createTelemetryModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTelemetryModel(rctx, args["input"].(model.NewTelemetryModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TelemetryModel)
+	fc.Result = res
+	return ec.marshalNTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateTelemetryModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateTelemetryModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateTelemetryModel(rctx, args["input"].(model.NewUpdateTelemetryModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TelemetryModel)
+	fc.Result = res
+	return ec.marshalNTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createDevice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createDevice_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateDevice(rctx, args["input"].(model.NewDevice))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Device)
+	fc.Result = res
+	return ec.marshalNDevice2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDevice(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateDevice(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateDevice_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateDevice(rctx, args["input"].(model.NewUpdateDevice))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Device)
+	fc.Result = res
+	return ec.marshalNDevice2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDevice(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PieLineSerieData_x1(ctx context.Context, field graphql.CollectedField, obj *model.PieLineSerieData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4995,6 +7167,88 @@ func (ec *executionContext) _Query_histories(ctx context.Context, field graphql.
 	return ec.marshalNHistoryConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐHistoryConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_deviceModels(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_deviceModels_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().DeviceModels(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceModelConnection)
+	fc.Result = res
+	return ec.marshalNDeviceModelConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_devices_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceModelConnection)
+	fc.Result = res
+	return ec.marshalNDeviceModelConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelConnection(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5266,6 +7520,516 @@ func (ec *executionContext) _Subtitle_url(ctx context.Context, field graphql.Col
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_id(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_deviceID(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_key(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_value(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_id(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_deviceModelID(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_key(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_name(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_factor(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Factor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_unit(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Unit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_unitName(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnitName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_scale(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Scale, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _TelemetryModel_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.TelemetryModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "TelemetryModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Thing_id(ctx context.Context, field graphql.CollectedField, obj *model.Thing) (ret graphql.Marshaler) {
@@ -8568,6 +11332,36 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputNewAttributeModel(ctx context.Context, obj interface{}) (model.NewAttributeModel, error) {
+	var it model.NewAttributeModel
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "deviceModelID":
+			var err error
+			it.DeviceModelID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "key":
+			var err error
+			it.Key, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewCharacter(ctx context.Context, obj interface{}) (model.NewCharacter, error) {
 	var it model.NewCharacter
 	var asMap = obj.(map[string]interface{})
@@ -8583,6 +11377,60 @@ func (ec *executionContext) unmarshalInputNewCharacter(ctx context.Context, obj 
 		case "originalName":
 			var err error
 			it.OriginalName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewDevice(ctx context.Context, obj interface{}) (model.NewDevice, error) {
+	var it model.NewDevice
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "deviceModelID":
+			var err error
+			it.DeviceModelID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewDeviceModel(ctx context.Context, obj interface{}) (model.NewDeviceModel, error) {
+	var it model.NewDeviceModel
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "deviceType":
+			var err error
+			it.DeviceType, err = ec.unmarshalNInt2int64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8766,6 +11614,60 @@ func (ec *executionContext) unmarshalInputNewSubtitles(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewTelemetryModel(ctx context.Context, obj interface{}) (model.NewTelemetryModel, error) {
+	var it model.NewTelemetryModel
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "deviceModelID":
+			var err error
+			it.DeviceModelID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "key":
+			var err error
+			it.Key, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "factor":
+			var err error
+			it.Factor, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unit":
+			var err error
+			it.Unit, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unitName":
+			var err error
+			it.UnitName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scale":
+			var err error
+			it.Scale, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj interface{}) (model.NewThing, error) {
 	var it model.NewThing
 	var asMap = obj.(map[string]interface{})
@@ -8859,6 +11761,84 @@ func (ec *executionContext) unmarshalInputNewThing(ctx context.Context, obj inte
 		case "rubbishCategory":
 			var err error
 			it.RubbishCategory, err = ec.unmarshalOInt2ᚕint64ᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUpdateAttributeModel(ctx context.Context, obj interface{}) (model.NewUpdateAttributeModel, error) {
+	var it model.NewUpdateAttributeModel
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUpdateDevice(ctx context.Context, obj interface{}) (model.NewUpdateDevice, error) {
+	var it model.NewUpdateDevice
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUpdateDeviceModel(ctx context.Context, obj interface{}) (model.NewUpdateDeviceModel, error) {
+	var it model.NewUpdateDeviceModel
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+			it.Desc, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9003,6 +11983,54 @@ func (ec *executionContext) unmarshalInputNewUpdateSubtitles(ctx context.Context
 		case "subtitles":
 			var err error
 			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewUpdateTelemetryModel(ctx context.Context, obj interface{}) (model.NewUpdateTelemetryModel, error) {
+	var it model.NewUpdateTelemetryModel
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "factor":
+			var err error
+			it.Factor, err = ec.unmarshalNFloat2float64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unit":
+			var err error
+			it.Unit, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "unitName":
+			var err error
+			it.UnitName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scale":
+			var err error
+			it.Scale, err = ec.unmarshalNInt2int64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9538,6 +12566,105 @@ func (ec *executionContext) _AggResult(ctx context.Context, sel ast.SelectionSet
 	return out
 }
 
+var attributeImplementors = []string{"Attribute"}
+
+func (ec *executionContext) _Attribute(ctx context.Context, sel ast.SelectionSet, obj *model.Attribute) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, attributeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Attribute")
+		case "id":
+			out.Values[i] = ec._Attribute_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceID":
+			out.Values[i] = ec._Attribute_deviceID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "key":
+			out.Values[i] = ec._Attribute_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "value":
+			out.Values[i] = ec._Attribute_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Attribute_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var attributeModelImplementors = []string{"AttributeModel"}
+
+func (ec *executionContext) _AttributeModel(ctx context.Context, sel ast.SelectionSet, obj *model.AttributeModel) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, attributeModelImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AttributeModel")
+		case "id":
+			out.Values[i] = ec._AttributeModel_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceModelID":
+			out.Values[i] = ec._AttributeModel_deviceModelID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "key":
+			out.Values[i] = ec._AttributeModel_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._AttributeModel_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._AttributeModel_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._AttributeModel_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var characterImplementors = []string{"Character"}
 
 func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet, obj *model.Character) graphql.Marshaler {
@@ -9556,6 +12683,177 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 			}
 		case "originalName":
 			out.Values[i] = ec._Character_originalName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deviceImplementors = []string{"Device"}
+
+func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, obj *model.Device) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deviceImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Device")
+		case "id":
+			out.Values[i] = ec._Device_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceModelID":
+			out.Values[i] = ec._Device_deviceModelID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Device_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "attributes":
+			out.Values[i] = ec._Device_attributes(ctx, field, obj)
+		case "telemetries":
+			out.Values[i] = ec._Device_telemetries(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._Device_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Device_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deviceConnectionImplementors = []string{"DeviceConnection"}
+
+func (ec *executionContext) _DeviceConnection(ctx context.Context, sel ast.SelectionSet, obj *model.DeviceConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deviceConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeviceConnection")
+		case "totalCount":
+			out.Values[i] = ec._DeviceConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._DeviceConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deviceModelImplementors = []string{"DeviceModel"}
+
+func (ec *executionContext) _DeviceModel(ctx context.Context, sel ast.SelectionSet, obj *model.DeviceModel) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deviceModelImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeviceModel")
+		case "id":
+			out.Values[i] = ec._DeviceModel_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._DeviceModel_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceType":
+			out.Values[i] = ec._DeviceModel_deviceType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "desc":
+			out.Values[i] = ec._DeviceModel_desc(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "attributeModels":
+			out.Values[i] = ec._DeviceModel_attributeModels(ctx, field, obj)
+		case "telemetryModels":
+			out.Values[i] = ec._DeviceModel_telemetryModels(ctx, field, obj)
+		case "createdAt":
+			out.Values[i] = ec._DeviceModel_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._DeviceModel_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deviceModelConnectionImplementors = []string{"DeviceModelConnection"}
+
+func (ec *executionContext) _DeviceModelConnection(ctx context.Context, sel ast.SelectionSet, obj *model.DeviceModelConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deviceModelConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeviceModelConnection")
+		case "totalCount":
+			out.Values[i] = ec._DeviceModelConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._DeviceModelConnection_edges(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -9903,6 +13201,46 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createDeviceModel":
+			out.Values[i] = ec._Mutation_createDeviceModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateDeviceModel":
+			out.Values[i] = ec._Mutation_updateDeviceModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createAttributeModel":
+			out.Values[i] = ec._Mutation_createAttributeModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateAttributeModel":
+			out.Values[i] = ec._Mutation_updateAttributeModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createTelemetryModel":
+			out.Values[i] = ec._Mutation_createTelemetryModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateTelemetryModel":
+			out.Values[i] = ec._Mutation_updateTelemetryModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createDevice":
+			out.Values[i] = ec._Mutation_createDevice(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateDevice":
+			out.Values[i] = ec._Mutation_updateDevice(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10117,6 +13455,34 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "deviceModels":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_deviceModels(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "devices":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_devices(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -10214,6 +13580,125 @@ func (ec *executionContext) _Subtitle(ctx context.Context, sel ast.SelectionSet,
 			}
 		case "url":
 			out.Values[i] = ec._Subtitle_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var telemetryImplementors = []string{"Telemetry"}
+
+func (ec *executionContext) _Telemetry(ctx context.Context, sel ast.SelectionSet, obj *model.Telemetry) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, telemetryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Telemetry")
+		case "id":
+			out.Values[i] = ec._Telemetry_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceID":
+			out.Values[i] = ec._Telemetry_deviceID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "key":
+			out.Values[i] = ec._Telemetry_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "value":
+			out.Values[i] = ec._Telemetry_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Telemetry_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var telemetryModelImplementors = []string{"TelemetryModel"}
+
+func (ec *executionContext) _TelemetryModel(ctx context.Context, sel ast.SelectionSet, obj *model.TelemetryModel) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, telemetryModelImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TelemetryModel")
+		case "id":
+			out.Values[i] = ec._TelemetryModel_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceModelID":
+			out.Values[i] = ec._TelemetryModel_deviceModelID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "key":
+			out.Values[i] = ec._TelemetryModel_key(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._TelemetryModel_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "factor":
+			out.Values[i] = ec._TelemetryModel_factor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "unit":
+			out.Values[i] = ec._TelemetryModel_unit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "unitName":
+			out.Values[i] = ec._TelemetryModel_unitName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "scale":
+			out.Values[i] = ec._TelemetryModel_scale(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._TelemetryModel_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._TelemetryModel_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -11031,6 +14516,34 @@ func (ec *executionContext) marshalNAggResult2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgr
 	return ec._AggResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNAttribute2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttribute(ctx context.Context, sel ast.SelectionSet, v model.Attribute) graphql.Marshaler {
+	return ec._Attribute(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttribute2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttribute(ctx context.Context, sel ast.SelectionSet, v *model.Attribute) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Attribute(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAttributeModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx context.Context, sel ast.SelectionSet, v model.AttributeModel) graphql.Marshaler {
+	return ec._AttributeModel(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx context.Context, sel ast.SelectionSet, v *model.AttributeModel) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AttributeModel(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -11094,6 +14607,122 @@ func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgr
 		return graphql.Null
 	}
 	return ec._Character(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v model.Device) graphql.Marshaler {
+	return ec._Device(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDevice2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Device) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDevice2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDevice(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDevice2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v *model.Device) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Device(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeviceModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModel(ctx context.Context, sel ast.SelectionSet, v model.DeviceModel) graphql.Marshaler {
+	return ec._DeviceModel(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeviceModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DeviceModel) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDeviceModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModel(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNDeviceModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModel(ctx context.Context, sel ast.SelectionSet, v *model.DeviceModel) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeviceModel(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeviceModelConnection2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelConnection(ctx context.Context, sel ast.SelectionSet, v model.DeviceModelConnection) graphql.Marshaler {
+	return ec._DeviceModelConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeviceModelConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelConnection(ctx context.Context, sel ast.SelectionSet, v *model.DeviceModelConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeviceModelConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx context.Context, sel ast.SelectionSet, v model.Episode) graphql.Marshaler {
@@ -11297,6 +14926,10 @@ func (ec *executionContext) marshalNLoginResponse2ᚖgithubᚗcomᚋ9d77vᚋpdc�
 	return ec._LoginResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNNewAttributeModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewAttributeModel(ctx context.Context, v interface{}) (model.NewAttributeModel, error) {
+	return ec.unmarshalInputNewAttributeModel(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNNewCharacter2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacter(ctx context.Context, v interface{}) (model.NewCharacter, error) {
 	return ec.unmarshalInputNewCharacter(ctx, v)
 }
@@ -11307,6 +14940,14 @@ func (ec *executionContext) unmarshalNNewCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdc
 	}
 	res, err := ec.unmarshalNNewCharacter2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacter(ctx, v)
 	return &res, err
+}
+
+func (ec *executionContext) unmarshalNNewDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDevice(ctx context.Context, v interface{}) (model.NewDevice, error) {
+	return ec.unmarshalInputNewDevice(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewDeviceModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceModel(ctx context.Context, v interface{}) (model.NewDeviceModel, error) {
+	return ec.unmarshalInputNewDeviceModel(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewEpisode(ctx context.Context, v interface{}) (model.NewEpisode, error) {
@@ -11341,8 +14982,24 @@ func (ec *executionContext) unmarshalNNewSubtitle2ᚖgithubᚗcomᚋ9d77vᚋpdc�
 	return &res, err
 }
 
+func (ec *executionContext) unmarshalNNewTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewTelemetryModel(ctx context.Context, v interface{}) (model.NewTelemetryModel, error) {
+	return ec.unmarshalInputNewTelemetryModel(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNNewThing2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewThing(ctx context.Context, v interface{}) (model.NewThing, error) {
 	return ec.unmarshalInputNewThing(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateAttributeModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateAttributeModel(ctx context.Context, v interface{}) (model.NewUpdateAttributeModel, error) {
+	return ec.unmarshalInputNewUpdateAttributeModel(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateDevice(ctx context.Context, v interface{}) (model.NewUpdateDevice, error) {
+	return ec.unmarshalInputNewUpdateDevice(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateDeviceModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateDeviceModel(ctx context.Context, v interface{}) (model.NewUpdateDeviceModel, error) {
+	return ec.unmarshalInputNewUpdateDeviceModel(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewUpdateEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateEpisode(ctx context.Context, v interface{}) (model.NewUpdateEpisode, error) {
@@ -11355,6 +15012,10 @@ func (ec *executionContext) unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpd
 
 func (ec *executionContext) unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx context.Context, v interface{}) (model.NewUpdateSubtitles, error) {
 	return ec.unmarshalInputNewUpdateSubtitles(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewUpdateTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateTelemetryModel(ctx context.Context, v interface{}) (model.NewUpdateTelemetryModel, error) {
+	return ec.unmarshalInputNewUpdateTelemetryModel(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewUpdateThing2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateThing(ctx context.Context, v interface{}) (model.NewUpdateThing, error) {
@@ -11613,6 +15274,34 @@ func (ec *executionContext) marshalNSubtitle2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgra
 		return graphql.Null
 	}
 	return ec._Subtitle(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTelemetry2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetry(ctx context.Context, sel ast.SelectionSet, v model.Telemetry) graphql.Marshaler {
+	return ec._Telemetry(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTelemetry2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetry(ctx context.Context, sel ast.SelectionSet, v *model.Telemetry) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Telemetry(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx context.Context, sel ast.SelectionSet, v model.TelemetryModel) graphql.Marshaler {
+	return ec._TelemetryModel(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx context.Context, sel ast.SelectionSet, v *model.TelemetryModel) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._TelemetryModel(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNThing2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐThing(ctx context.Context, sel ast.SelectionSet, v model.Thing) graphql.Marshaler {
@@ -12257,6 +15946,86 @@ func (ec *executionContext) marshalOAggResult2ᚕᚖgithubᚗcomᚋ9d77vᚋpdc�
 	return ret
 }
 
+func (ec *executionContext) marshalOAttribute2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Attribute) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAttribute2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttribute(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOAttributeModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModelᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.AttributeModel) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	return graphql.UnmarshalBoolean(v)
 }
@@ -12581,6 +16350,97 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return ec.marshalOString2string(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalOTelemetry2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Telemetry) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTelemetry2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetry(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx context.Context, sel ast.SelectionSet, v model.TelemetryModel) graphql.Marshaler {
+	return ec._TelemetryModel(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalOTelemetryModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx context.Context, sel ast.SelectionSet, v []*model.TelemetryModel) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalOTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx context.Context, sel ast.SelectionSet, v *model.TelemetryModel) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._TelemetryModel(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

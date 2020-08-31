@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/generated"
@@ -97,6 +98,38 @@ func (r *mutationResolver) RecordHistory(ctx context.Context, input model.NewHis
 	return historyService.RecordHistory(ctx, input, user.ID)
 }
 
+func (r *mutationResolver) CreateDeviceModel(ctx context.Context, input model.NewDeviceModel) (*model.DeviceModel, error) {
+	return deviceService.CreateDeviceModel(ctx, input)
+}
+
+func (r *mutationResolver) UpdateDeviceModel(ctx context.Context, input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
+	return deviceService.UpdateDeviceModel(ctx, input)
+}
+
+func (r *mutationResolver) CreateAttributeModel(ctx context.Context, input model.NewAttributeModel) (*model.AttributeModel, error) {
+	return deviceService.CreateAttributeModel(ctx, input)
+}
+
+func (r *mutationResolver) UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error) {
+	return deviceService.UpdateAttributeModel(ctx, input)
+}
+
+func (r *mutationResolver) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
+	return deviceService.CreateTelemetryModel(ctx, input)
+}
+
+func (r *mutationResolver) UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
+	return deviceService.UpdateTelemetryModel(ctx, input)
+}
+
+func (r *mutationResolver) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
 	return commonService.PresignedURL(ctx, scheme, bucketName, objectName)
@@ -181,6 +214,18 @@ func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, page *
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
+}
+
+func (r *queryResolver) DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceModelConnection, error) {
+	con := new(model.DeviceModelConnection)
+	total, data, err := deviceService.ListDeviceModel(ctx, keyword, page, pageSize, ids)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
+}
+
+func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64) (*model.DeviceModelConnection, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

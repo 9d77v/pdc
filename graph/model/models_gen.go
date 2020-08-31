@@ -7,9 +7,57 @@ type AggResult struct {
 	Value int64  `json:"value"`
 }
 
+type Attribute struct {
+	ID        int64  `json:"id"`
+	DeviceID  int64  `json:"deviceID"`
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+	UpdatedAt int64  `json:"updatedAt"`
+}
+
+type AttributeModel struct {
+	ID            int64  `json:"id"`
+	DeviceModelID int64  `json:"deviceModelID"`
+	Key           string `json:"key"`
+	Name          string `json:"name"`
+	CreatedAt     int64  `json:"createdAt"`
+	UpdatedAt     int64  `json:"updatedAt"`
+}
+
 type Character struct {
 	CharacterName string `json:"characterName"`
 	OriginalName  string `json:"originalName"`
+}
+
+type Device struct {
+	ID            int64        `json:"id"`
+	DeviceModelID int64        `json:"deviceModelID"`
+	Name          string       `json:"name"`
+	Attributes    []*Attribute `json:"attributes"`
+	Telemetries   []*Telemetry `json:"telemetries"`
+	CreatedAt     int64        `json:"createdAt"`
+	UpdatedAt     int64        `json:"updatedAt"`
+}
+
+type DeviceConnection struct {
+	TotalCount int64     `json:"totalCount"`
+	Edges      []*Device `json:"edges"`
+}
+
+type DeviceModel struct {
+	ID              int64             `json:"id"`
+	Name            string            `json:"name"`
+	DeviceType      int64             `json:"deviceType"`
+	Desc            string            `json:"desc"`
+	AttributeModels []*AttributeModel `json:"attributeModels"`
+	TelemetryModels []*TelemetryModel `json:"telemetryModels"`
+	CreatedAt       int64             `json:"createdAt"`
+	UpdatedAt       int64             `json:"updatedAt"`
+}
+
+type DeviceModelConnection struct {
+	TotalCount int64          `json:"totalCount"`
+	Edges      []*DeviceModel `json:"edges"`
 }
 
 type Episode struct {
@@ -51,9 +99,26 @@ type LoginResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type NewAttributeModel struct {
+	DeviceModelID int64  `json:"deviceModelID"`
+	Key           string `json:"key"`
+	Name          string `json:"name"`
+}
+
 type NewCharacter struct {
 	CharacterName string `json:"characterName"`
 	OriginalName  string `json:"originalName"`
+}
+
+type NewDevice struct {
+	DeviceModelID int64   `json:"deviceModelID"`
+	Name          *string `json:"name"`
+}
+
+type NewDeviceModel struct {
+	Name       string  `json:"name"`
+	Desc       *string `json:"desc"`
+	DeviceType int64   `json:"deviceType"`
 }
 
 type NewEpisode struct {
@@ -90,6 +155,16 @@ type NewSubtitles struct {
 	Urls []string `json:"urls"`
 }
 
+type NewTelemetryModel struct {
+	DeviceModelID int64   `json:"deviceModelID"`
+	Key           string  `json:"key"`
+	Name          string  `json:"name"`
+	Factor        float64 `json:"factor"`
+	Unit          *string `json:"unit"`
+	UnitName      *string `json:"unitName"`
+	Scale         int64   `json:"scale"`
+}
+
 type NewThing struct {
 	Name                string   `json:"name"`
 	Num                 float64  `json:"num"`
@@ -106,6 +181,22 @@ type NewThing struct {
 	PurchasePlatform    *string  `json:"purchasePlatform"`
 	RefOrderID          *string  `json:"refOrderID"`
 	RubbishCategory     []int64  `json:"rubbishCategory"`
+}
+
+type NewUpdateAttributeModel struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type NewUpdateDevice struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type NewUpdateDeviceModel struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+	Desc string `json:"desc"`
 }
 
 type NewUpdateEpisode struct {
@@ -134,6 +225,15 @@ type NewUpdateProfile struct {
 type NewUpdateSubtitles struct {
 	ID        int64         `json:"id"`
 	Subtitles *NewSubtitles `json:"subtitles"`
+}
+
+type NewUpdateTelemetryModel struct {
+	ID       int64   `json:"id"`
+	Name     string  `json:"name"`
+	Factor   float64 `json:"factor"`
+	Unit     string  `json:"unit"`
+	UnitName string  `json:"unitName"`
+	Scale    int64   `json:"scale"`
 }
 
 type NewUpdateThing struct {
@@ -246,6 +346,27 @@ type Staff struct {
 type Subtitle struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
+}
+
+type Telemetry struct {
+	ID        int64   `json:"id"`
+	DeviceID  int64   `json:"deviceID"`
+	Key       string  `json:"key"`
+	Value     float64 `json:"value"`
+	UpdatedAt int64   `json:"updatedAt"`
+}
+
+type TelemetryModel struct {
+	ID            int64   `json:"id"`
+	DeviceModelID int64   `json:"deviceModelID"`
+	Key           string  `json:"key"`
+	Name          string  `json:"name"`
+	Factor        float64 `json:"factor"`
+	Unit          string  `json:"unit"`
+	UnitName      string  `json:"unitName"`
+	Scale         int64   `json:"scale"`
+	CreatedAt     int64   `json:"createdAt"`
+	UpdatedAt     int64   `json:"updatedAt"`
 }
 
 type Thing struct {

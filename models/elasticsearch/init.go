@@ -1,4 +1,4 @@
-package es
+package elasticsearch
 
 import (
 	"github.com/9d77v/go-lib/clients/config"

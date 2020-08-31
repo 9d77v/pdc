@@ -44,9 +44,8 @@ var (
 	secureMinioAddress   = utils.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
-
-	OssPrefix       = ""
-	SecureOssPrerix = ""
+	OssPrefix            = ""
+	SecureOssPrerix      = ""
 
 	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
@@ -119,6 +118,12 @@ func initDB() {
 		&User{},
 		&Thing{},
 		&History{},
+		&DeviceModel{},
+		&TelemetryModel{},
+		&AttributeModel{},
+		&Device{},
+		&Attribute{},
+		&Telemetry{},
 	)
 }
 
