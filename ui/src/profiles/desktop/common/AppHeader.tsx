@@ -19,7 +19,7 @@ export const AppHeader = (props: AppHeaderProps) => {
     }
 
     const gotoAdmin = () => {
-        history.push("/admin/videos/video-list")
+        history.push("/admin/user/user-list")
     }
 
     const gotoApp = () => {

@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react"
 
-import "./img.less"
+import "./index.less"
 import { Modal, Progress } from "antd"
-import useIntersectionObserver from "../hooks/use-intersection-observer"
+import useIntersectionObserver from "../../hooks/use-intersection-observer"
 interface ImageProps {
     src: string
     width?: number | string
@@ -10,7 +10,7 @@ interface ImageProps {
     percent?: number
 }
 
-export const Img: React.FC<ImageProps> = ({
+const Img: React.FC<ImageProps> = ({
     src,
     width,
     height,
@@ -53,3 +53,4 @@ export const Img: React.FC<ImageProps> = ({
         ) : "暂无图片"}
     </div>)
 }
+export default Img

@@ -4,7 +4,7 @@ import { useQuery } from "@apollo/react-hooks";
 import { LIST_HISTORY } from "../../../../consts/history.gpl";
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
-import { Img } from "../../../../components/Img";
+import Img from "../../../../components/img";
 import { formatTime, formatRelativeTime } from "../../../../utils/util";
 import { NavBar, Icon } from "antd-mobile";
 
@@ -52,7 +52,7 @@ export default function HistoryPage() {
         <NavBar
             mode="light"
             icon={<Icon type="left" />}
-            onLeftClick={() => history.push("/app/media/videos")}
+            onLeftClick={() => history.goBack()}
         >历史</NavBar>
         <div >
             {options}

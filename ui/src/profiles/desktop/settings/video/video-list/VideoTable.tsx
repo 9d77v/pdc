@@ -13,7 +13,7 @@ import moment from 'moment';
 import { VideoPlayer } from '../../../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateForm';
 import { EpisodeUpdateForm } from './EpisodeUpdateForm';
-import { Img } from '../../../../../components/Img';
+import Img from '../../../../../components/img';
 import TextArea from 'antd/lib/input/TextArea';
 import { TablePaginationConfig } from 'antd/lib/table';
 import { PlaySquareTwoTone } from '@ant-design/icons';

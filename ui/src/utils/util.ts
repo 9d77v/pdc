@@ -15,6 +15,11 @@ function formatTime(t: number): string {
     return m.format('HH:mm:ss')
 }
 
+function formatDetailTime(t: number): string {
+    const m = moment(t * 1000)
+    return m.format('YYYY-MM-DD HH:mm:ss')
+}
+
 function formatRelativeTime(t: number): string {
     const m = moment(t * 1000)
     const day = m.format("YYYY-MM-DD")
@@ -27,4 +32,4 @@ function formatRelativeTime(t: number): string {
     return day
 }
 
-export { isMobile, formatTime, formatRelativeTime, isIPhone }
+export { isMobile, formatTime, formatDetailTime, formatRelativeTime, isIPhone }

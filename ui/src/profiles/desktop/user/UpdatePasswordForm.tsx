@@ -8,10 +8,6 @@ import { client } from '../../../utils/client';
 
 export default function UpdatePasswordForm() {
     const history = useHistory();
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        history.push('/login')
-    }
 
     const [loading, setLoading] = useState(false)
     const [updatePassword] = useMutation(UPDATE_PASSWORD)

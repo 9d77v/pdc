@@ -7,7 +7,7 @@ import { ThingCreateForm } from './ThingCreateForm';
 import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 import { ThingUpdateForm } from './ThingUpdateForm';
-import { Img } from '../../../components/Img';
+import Img from '../../../components/img';
 import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/consts';
 import { TablePaginationConfig } from 'antd/lib/table';
 import Search from 'antd/lib/input/Search';

@@ -39,21 +39,36 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-analysis']
     }],
-    ["/admin/videos", {
-        "defaultOpenKeys": ["settings", "settings-videos"],
+    ["/admin/video", {
+        "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-list']
     }],
-    ["/admin/videos/video-list", {
-        "defaultOpenKeys": ["settings", "settings-videos"],
+    ["/admin/video/video-list", {
+        "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-list']
     }],
-    ["/admin/videos/video-series-list", {
-        "defaultOpenKeys": ["settings", "settings-videos"],
+    ["/admin/video/video-series-list", {
+        "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-series-list']
     }],
-    ["/admin/users", {
-        "defaultOpenKeys": ["settings"],
-        "defaultSelectedKeys": ['settings-users']
+    ["/admin/device", {
+        "defaultOpenKeys": ["settings-device"],
+        "defaultSelectedKeys": ['device-list']
+    }],
+    ["/admin/device/device-list", {
+        "defaultOpenKeys": ["settings-device"],
+        "defaultSelectedKeys": ['device-list']
+    }],
+    ["/admin/device/device-model-list", {
+        "defaultOpenKeys": ["settings-device"],
+        "defaultSelectedKeys": ['device-model-list']
+    }],
+    ["/admin/user", {
+        "defaultOpenKeys": ["settings-user"],
+        "defaultSelectedKeys": ['user-list']
+    }], ["/admin/user/user-list", {
+        "defaultOpenKeys": ["settings-user"],
+        "defaultSelectedKeys": ['user-list']
     }]
 ])
 
@@ -143,7 +158,21 @@ const AdminMenu = (props: AppHeaderProps) => {
             style={{ height: '100%', borderRight: 0 }}
         >
             <SubMenu
-                key="settings-videos"
+                key="settings-user"
+                style={{ display: (roleID === 1) ? "block" : "none" }}
+                title={
+                    <span>
+                        <UserOutlined />
+                        <span>用户管理</span>
+                    </span>
+                }
+            >
+                <Menu.Item key="user-list" >
+                    <Link to="/admin/user/user-list">用户列表</Link>
+                </Menu.Item>
+            </SubMenu>
+            <SubMenu
+                key="settings-video"
                 style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
                 title={
                     <span>
@@ -153,17 +182,28 @@ const AdminMenu = (props: AppHeaderProps) => {
                 }
             >
                 <Menu.Item key="video-list" >
-                    <Link to="/admin/videos/video-list">视频列表</Link>
+                    <Link to="/admin/video/video-list">视频列表</Link>
                 </Menu.Item>
                 <Menu.Item key="video-series-list" >
-                    <Link to="/admin/videos/video-series-list">视频系列列表</Link>
+                    <Link to="/admin/video/video-series-list">视频系列列表</Link>
                 </Menu.Item>
             </SubMenu>
-            <Menu.Item key="settings-users"
-                style={{ display: roleID === 1 ? "block" : "none" }}
+            <SubMenu
+                key="settings-device"
+                style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
+                title={
+                    <span>
+                        <span>设备管理</span>
+                    </span>
+                }
             >
-                <Link to="/admin/users">用户管理</Link>
-            </Menu.Item>
+                <Menu.Item key="device-list" >
+                    <Link to="/admin/device/device-list">设备列表</Link>
+                </Menu.Item>
+                <Menu.Item key="device-model-list" >
+                    <Link to="/admin/device/device-model-list">设备模板列表</Link>
+                </Menu.Item>
+            </SubMenu>
         </Menu>
     )
 }

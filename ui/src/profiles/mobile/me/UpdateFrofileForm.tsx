@@ -16,10 +16,6 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     user
 }) => {
     const history = useHistory();
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        history.push('/login')
-    }
 
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
@@ -55,7 +51,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         setLoading(false);
         if (!data.errors) {
             message.success("更新个人资料成功")
-            history.push("/app/user")
+            history.goBack()
         }
     };
 
@@ -89,7 +85,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
-                onLeftClick={() => history.push("/app/user")}
+                onLeftClick={() => history.goBack()}
             >修改个人资料</NavBar>
             <Form
                 {...layout}

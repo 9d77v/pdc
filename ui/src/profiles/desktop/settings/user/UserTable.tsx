@@ -7,7 +7,7 @@ import { UserCreateForm } from './UserCreateForm';
 import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 import { UserUpdateForm } from './UserUpdateForm';
-import { Img } from '../../../../components/Img';
+import Img from '../../../../components/img';
 import { GenderMap, FullRoleMap } from '../../../../consts/consts';
 import { TablePaginationConfig } from 'antd/lib/table';
 import Search from 'antd/lib/input/Search';
