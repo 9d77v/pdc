@@ -15,12 +15,7 @@ const tailLayout = {
 
 export const Login = () => {
 
-    const token = localStorage.getItem('accessToken');
     const history = useHistory();
-    if (token) {
-        history.push('/app/home')
-    }
-
     const [login, { data }] = useMutation(LOGIN);
 
     useEffect(() => {
@@ -30,6 +25,14 @@ export const Login = () => {
             history.push('/app/home')
         }
     }, [data, history])
+
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            history.push('/app/home')
+        }
+    }, [history])
+
     const onFinish = async (values: any) => {
         await login({
             variables: {

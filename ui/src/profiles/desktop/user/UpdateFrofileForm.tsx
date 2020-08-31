@@ -1,4 +1,3 @@
-import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, Select, DatePicker, message } from 'antd';
 import React, { useState, useEffect } from 'react';
 import { GenderMap } from "../../../consts/consts";
@@ -14,12 +13,6 @@ interface UpdateProfileFormProps {
 export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     user
 }) => {
-    const history = useHistory();
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        history.push('/login')
-    }
-
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     Route, useHistory,
 } from "react-router-dom";
@@ -29,12 +29,17 @@ const VideoDetail = React.lazy(() => import('./media/video/VideoDetail'))
 
 const HistoryPage = React.lazy(() => import("./media/history/HistoryPage"))
 
+
+const DeviceModelIndex = React.lazy(() => import('./settings/device/device-model-list/index'))
+
 export default function DesktopIndex() {
     const history = useHistory();
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        history.push('/login')
-    }
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            history.push('/login')
+        }
+    }, [history])
 
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
@@ -79,13 +84,16 @@ export default function DesktopIndex() {
                         <Route exact path="/app/thing/analysis">
                             <ThingAnalysis />
                         </Route>
-                        <Route exact path="/admin/videos/video-list">
+                        <Route exact path="/admin/video/video-list">
                             <VideoTable />
                         </Route>
-                        <Route exact path="/admin/videos/video-series-list">
+                        <Route exact path="/admin/video/video-series-list">
                             <VideoSeriesTable />
                         </Route>
-                        <Route exact path="/admin/users">
+                        <Route exact path="/admin/device/device-model-list">
+                            <DeviceModelIndex />
+                        </Route>
+                        <Route exact path="/admin/user/user-list">
                             <UserTable />
                         </Route>
                     </div>

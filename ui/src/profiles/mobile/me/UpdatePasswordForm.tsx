@@ -9,11 +9,6 @@ import { NavBar, Icon } from 'antd-mobile';
 
 export default function UpdatePasswordForm() {
     const history = useHistory();
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-        history.push('/login')
-    }
-
     const [loading, setLoading] = useState(false)
     const [updatePassword] = useMutation(UPDATE_PASSWORD)
 
@@ -68,7 +63,7 @@ export default function UpdatePasswordForm() {
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
-                onLeftClick={() => history.push("/app/user")}
+                onLeftClick={() => history.goBack()}
             >修改密码</NavBar>
             <Form
                 {...layout}

@@ -4,7 +4,7 @@ import { message } from "antd"
 import "../../../../style/button.less"
 import { useQuery } from "@apollo/react-hooks";
 import { LIST_VIDEO_CARD } from '../../../../consts/video.gql';
-import { Img } from "../../../../components/Img";
+import Img from "../../../../components/img";
 import { SearchBar } from "antd-mobile";
 import CheckableTag from "antd/lib/tag/CheckableTag";
 import { IVideoPagination } from "../../../../consts/consts";

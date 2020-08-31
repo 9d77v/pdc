@@ -17,6 +17,15 @@ export interface IVideoPagination {
     selectedTags: string[]
 }
 
+export interface IDeviceModel {
+    id: number
+    name: string
+    desc: string
+    deviceType: number
+    createdAt: number
+    updatedAt: number
+}
+
 const RubbishCategoryMap = new Map<number, TagStyle>([
     [0, {
         color: 'black',
@@ -100,7 +109,13 @@ const FullRoleMap = new Map<number, string>([
 ])
 
 const ThingStatusArr = ['待采购', '使用中', '已收纳', '故障', '维修中', '待清理', '已清理']
+
+const DeviceTypeMap = new Map<number, string>([
+    [0, "默认"]
+])
+
+
 export {
     RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr,
-    GenderMap, RoleMap, FullRoleMap
+    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap
 }

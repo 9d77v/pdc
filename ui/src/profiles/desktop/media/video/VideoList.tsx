@@ -5,7 +5,7 @@ import "../../../../style/video.less"
 import "../../../../style/button.less"
 import { useQuery } from "@apollo/react-hooks";
 import { LIST_VIDEO_CARD } from '../../../../consts/video.gql';
-import { Img } from "../../../../components/Img";
+import Img from "../../../../components/img";
 import Search from "antd/lib/input/Search";
 import CheckableTag from "antd/lib/tag/CheckableTag";
 import { IVideoPagination } from "../../../../consts/consts";

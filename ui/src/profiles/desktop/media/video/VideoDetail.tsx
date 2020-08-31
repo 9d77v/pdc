@@ -3,14 +3,15 @@ import { message } from "antd"
 import "../../../../style/button.less"
 import { useQuery } from "@apollo/react-hooks";
 import { GET_VIDEO } from '../../../../consts/video.gql';
-import { Img } from "../../../../components/Img";
+import Img from "../../../../components/img";
 import { VideoPlayer } from "../../../../components/VideoPlayer";
-import { useRouteMatch, useHistory } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import TextArea from "antd/lib/input/TextArea";
+import VideoSelect from "../../../common/media/VideoSelect";
+import VideoSeriesSelect from "../../../common/media/VideoSeriesSelect";
 
 export default function VideoDetail() {
     const match = useRouteMatch('/app/media/videos/:id');
-    const history = useHistory()
     const [episodeItem, setEpisodeItem] = useState({
         id: 0,
         url: "",
@@ -45,9 +46,6 @@ export default function VideoDetail() {
         desc: "",
         episodes: []
     }
-    let buttons: any = []
-    let seriesName: string = ""
-    let seriesButtons: any = []
     let video: any = null
     if (data) {
         if (data.videos.edges) {
@@ -61,32 +59,13 @@ export default function VideoDetail() {
                     desc: video.desc,
                     episodes: video.episodes
                 })
-                if (video.episodes && video.episodes.length > 0) {
-                    buttons = video.episodes.map((value: any, index: number) => {
-                        if (index === num) {
-                            return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"} >{value.num}</div>
-                        }
-                        return <div key={"pdc-button-" + value.id} className={"pdc-button"}
-                            onClick={() => { setNum(index) }} >{value.num}</div>
-                    })
-                }
             }
         }
-        if (data.videoSerieses.edges && data.videoSerieses.edges.length > 0 && data.videoSerieses.edges[0].items) {
-            const items = data.videoSerieses.edges[0].items
-            seriesName = data.videoSerieses.edges[0].name
-            seriesButtons = items.map((value: any, index: number) => {
-                if (Number(params.id) === Number(value.videoID)) {
-                    return <div key={"pdc-button-" + value.videoID} className={"pdc-button-selected"} >{value.alias}</div>
-                }
-                return <div key={"pdc-button-" + value.videoID} className={"pdc-button"}
-                    onClick={() => { history.push('/app/media/videos/' + value.videoID) }} >{value.alias}</div>
-            })
-        }
+
     }
 
     useEffect(() => {
-        if (data && data.historyInfo && data.videos.edges) {
+        if (data && data.videos.edges) {
             const videos = data.videos.edges
             const video = videos.length > 0 ? videos[0] : null
             if (video && video.episodes && video.episodes.length > 0) {
@@ -95,13 +74,13 @@ export default function VideoDetail() {
                     episodeNumMap.set(value.id, index)
                     return value
                 })
-                setNum(episodeNumMap.get(data.historyInfo.subSourceID) || 0)
+                setNum(episodeNumMap.get(data.historyInfo?.subSourceID) || 0)
             }
         }
     }, [data])
 
     useEffect(() => {
-        if (video) {
+        if (video && video.episodes && num < video.episodes.length) {
             setEpisodeItem({
                 id: video.episodes[num].id,
                 url: video.episodes[num].url,
@@ -147,13 +126,11 @@ export default function VideoDetail() {
                 </div>
             </div>
             <div style={{ margin: 20, display: "flex", flexDirection: 'column', width: 350 }}>
-                <span style={{ textAlign: 'left', paddingLeft: 10, marginBottom: 10 }}>选集</span>
-                <div>{buttons}</div>
+                <VideoSelect data={video?.episodes} num={num} setNum={setNum} />
                 <br />
-                <span style={{ textAlign: "left", marginBottom: 10 }}>{seriesName === "" ? "" : seriesName + "系列"}</span>
-                <div>{seriesButtons}</div>
-            </div>
-            <div style={{ flex: 1 }}>
+                <VideoSeriesSelect
+                    data={data?.videoSerieses.edges}
+                    videoID={Number(params.id)} />
             </div>
         </div>)
 }
