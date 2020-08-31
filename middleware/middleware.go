@@ -57,6 +57,13 @@ var permissonMap = map[string][]int{
 	"recordHistory":         {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"historyInfo":           {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"histories":             {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"createDeviceModel":     {models.RoleAdmin, models.RoleManager},
+	"updateDeviceModel":     {models.RoleAdmin, models.RoleManager},
+	"createAttributeModel":  {models.RoleAdmin, models.RoleManager},
+	"updateAttributeModel":  {models.RoleAdmin, models.RoleManager},
+	"createTelemetryModel":  {models.RoleAdmin, models.RoleManager},
+	"updateTelemetryModel":  {models.RoleAdmin, models.RoleManager},
+	"deviceModels":          {models.RoleAdmin, models.RoleManager},
 }
 
 //Auth ..

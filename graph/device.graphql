@@ -1,0 +1,121 @@
+type DeviceModel {
+  id: ID!
+  name: String!
+  deviceType:Int!
+  desc: String!
+  attributeModels: [AttributeModel!]
+  telemetryModels:[TelemetryModel]
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type AttributeModel {
+  id: ID!
+  deviceModelID: ID!
+  key: String!
+  name: String!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type TelemetryModel {
+  id: ID!
+  deviceModelID: ID!
+  key: String!
+  name: String!
+  factor: Float!
+  unit: String!
+  unitName: String!
+  scale: Int!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type DeviceModelConnection {
+  totalCount: Int!
+  edges:[DeviceModel!]!
+}
+
+input NewDeviceModel {
+  name: String!  
+  desc: String
+  deviceType: Int!
+}
+
+input NewAttributeModel {
+  deviceModelID: ID!
+  key: String!
+  name: String!
+}
+
+input NewTelemetryModel {
+  deviceModelID: ID!
+  key: String!
+  name: String!
+  factor: Float!
+  unit: String
+  unitName: String
+  scale: Int!
+}
+
+input NewUpdateDeviceModel {
+  id: ID!
+  name: String!  
+  desc: String!
+}
+
+input NewUpdateAttributeModel {
+  id: ID!
+  name: String!
+}
+
+input NewUpdateTelemetryModel {
+  id: ID!
+  name: String!
+  factor: Float!
+  unit: String!
+  unitName: String!
+  scale: Int!
+}
+
+type Device {
+  id: ID!
+  deviceModelID: ID!
+  name: String!
+  attributes: [Attribute!]
+  telemetries: [Telemetry!]
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type Attribute {
+  id: ID!
+  deviceID: ID!
+  key: String!
+  value: String!
+  updatedAt: Int!
+}
+
+
+type Telemetry {
+  id: ID!
+  deviceID: ID!
+  key: String!
+  value: Float!
+  updatedAt: Int!
+}
+
+type DeviceConnection {
+  totalCount: Int!
+  edges:[Device!]!
+}
+
+input NewDevice {
+  deviceModelID: ID!
+  name: String
+}
+
+input NewUpdateDevice {
+  id: ID!
+  name: String!  
+}

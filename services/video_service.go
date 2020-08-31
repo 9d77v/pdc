@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
-	es2 "github.com/9d77v/go-lib/clients/elastic/v7"
+	es "github.com/9d77v/go-lib/clients/elastic/v7"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
-	"github.com/9d77v/pdc/models/es"
+	"github.com/9d77v/pdc/models/elasticsearch"
 	"github.com/9d77v/pdc/utils"
 	"github.com/olivere/elastic"
 
@@ -287,12 +287,11 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 			}
 		}
 		if edgeFieldMap["episodes"] {
-			err = subBuilder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
+			subBuilder = subBuilder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
-			}).Find(&data).Error
-		} else {
-			err = subBuilder.Find(&data).Error
+			})
 		}
+		err = subBuilder.Find(&data).Error
 		if err != nil {
 			return 0, result, err
 		}
@@ -511,7 +510,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 		boolQuery.Must(subBoolQuery)
 	}
 	offset, limit := GetPageInfo(page, pageSize)
-	aggsParams := []*es2.AggsParam{
+	aggsParams := []*es.AggsParam{
 		{Field: "tags", Size: 20},
 	}
 	filterQueries := make([]elastic.Query, 0)
@@ -524,13 +523,13 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 	filterQuery := elastic.NewBoolQuery().
 		Must(filterQueries...)
 	boolQuery.Filter(filterQuery)
-	searchService := es.ESClient.Search().
-		Index(es.AliasVideo).
+	searchService := elasticsearch.ESClient.Search().
+		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
 		From(int(offset)).
 		Size(int(limit)).
 		Sort("title.keyword", true)
-	searchService = es2.Aggs(searchService, aggsParams...)
+	searchService = es.Aggs(searchService, aggsParams...)
 	result, err := searchService.Do(ctx)
 	vis := make([]*model.VideoIndex, 0)
 	aggResults := make([]*model.AggResult, 0)
@@ -539,7 +538,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 		return 0, vis, aggResults, nil
 	}
 	for _, v := range result.Hits.Hits {
-		vi := new(es.VideoIndex)
+		vi := new(elasticsearch.VideoIndex)
 		data, _ := v.Source.MarshalJSON()
 		json.Unmarshal(data, &vi)
 		vi.Cover = dtos.GetOSSPrefix(scheme) + vi.Cover

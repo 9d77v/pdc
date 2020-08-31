@@ -16,5 +16,6 @@ require (
 	github.com/olivere/elastic/v7 v7.0.19 // indirect
 	github.com/onsi/ginkgo v1.14.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.0.1
+	gobot.io/x/gobot v1.14.0
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 )

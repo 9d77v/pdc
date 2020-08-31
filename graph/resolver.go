@@ -16,4 +16,5 @@ var (
 	thingService   = services.ThingService{}
 	userService    = services.UserService{}
 	historyService = services.HistoryService{}
+	deviceService  = services.DeviceService{}
 )
