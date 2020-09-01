@@ -492,7 +492,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 			"title^10",
 			"series_name^5",
 			"series_alias^0.5",
-			"desc",
+			"desc^0.1",
 			"title.ikmax^10",
 			"series_name.ikmax^5",
 			"series_alias.ikmax^0.5",
@@ -511,7 +511,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 	}
 	offset, limit := GetPageInfo(page, pageSize)
 	aggsParams := []*es.AggsParam{
-		{Field: "tags", Size: 20},
+		{Field: "tags", Size: 50},
 	}
 	filterQueries := make([]elastic.Query, 0)
 	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
@@ -528,6 +528,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 		Query(boolQuery).
 		From(int(offset)).
 		Size(int(limit)).
+		Sort("_score", false).
 		Sort("title.keyword", true)
 	searchService = es.Aggs(searchService, aggsParams...)
 	result, err := searchService.Do(ctx)
