@@ -10,6 +10,7 @@ http://domain.local:7000 {
         output file         access.log
         format single_field common_log
     }
+    header /static/* Cache-Control max-age=31536000
 }
 
 http://oss.domain.local:7000 {

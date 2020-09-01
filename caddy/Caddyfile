@@ -6,6 +6,7 @@ domain.local {
         output file         access.log
         format single_field common_log
     }
+    header /static/* Cache-Control max-age=31536000
 }
 
 oss.domain.local {
