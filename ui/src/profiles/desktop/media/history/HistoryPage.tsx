@@ -37,7 +37,7 @@ export default function HistoryPage() {
                 <div style={{ margin: 10, marginLeft: 20, marginRight: 20, padding: 10, cursor: "pointer" }}
                     onClick={() => history.push('/app/media/videos/' + value.sourceID)}>
                     <Img src={value.cover} width={160} height={100}
-                        percent={value.currentTime / (value.currentTime + value.remainingTime) * 100} />
+                        currentTime={value.currentTime} remainingTime={value.remainingTime} />
                 </div>
                 <div style={{ borderBottom: "1px solid #e5e9ef", width: "100%" }}>
                     <div style={{ fontSize: 14, color: "#222", marginTop: 20, cursor: "pointer" }}
@@ -46,7 +46,7 @@ export default function HistoryPage() {
                     <div style={{ position: "absolute", bottom: 0 }}>
                         {value.deviceType === "desktop" ? <DesktopOutlined /> : <MobileOutlined />} {value.remainingTime === 0 ? "第" + value.num + "话" +
                             value.subTitle + " 已看完" : "看到第" + value.num + "话 " +
-                            value.subTitle + " " + formatTime(value.currentTime)}
+                            value.subTitle}
                     </div>
                 </div>
             </div>

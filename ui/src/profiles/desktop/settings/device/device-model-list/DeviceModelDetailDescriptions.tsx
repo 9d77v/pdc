@@ -15,7 +15,10 @@ export const DeviceModelDetailDescriptions: React.FC<IDeviceModel> = ({
         <Descriptions
             title="设备详情"
             bordered column={1}
-            style={{ textAlign: "left", paddingLeft: 12 }}>
+            style={{
+                textAlign: "left",
+                padding: "0px 10px 10px 10px",
+            }}>
             <Descriptions.Item label="ID">{id}</Descriptions.Item>
             <Descriptions.Item label="名称">{name}</Descriptions.Item>
             <Descriptions.Item label="描述">{desc}</Descriptions.Item>
