@@ -88,7 +88,7 @@ export default function VideoList() {
                 maxLength={8} />
             <div >
                 <div className={"pdc-button-selected"}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", width: 66 }}
                     onClick={() => {
                         setPagination({
                             keyword: pagination.keyword,

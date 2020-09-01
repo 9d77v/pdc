@@ -17,7 +17,7 @@ export default function VideoList() {
     const [pagination, setPagination] = useState<IVideoPagination>({
         keyword: "",
         page: 1,
-        pageSize: 14,
+        pageSize: 12,
         selectedTags: []
     })
     const { error, data } = useQuery(LIST_VIDEO_CARD,
@@ -80,27 +80,41 @@ export default function VideoList() {
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", padding: 12 }}>
-            <div style={{
-                display: "flex",
-                width: 300,
-                margin: "auto",
-                justifyContent: "center",
-                alignItems: "center"
-            }}>
-                <Search
-                    placeholder="搜索"
-                    onSearch={(value: any) => setPagination({
-                        keyword: value,
-                        page: 1,
-                        pageSize: pagination.pageSize,
-                        selectedTags: pagination.selectedTags
-                    })}
-                    enterButton />
+        <div style={{ display: "flex", flexDirection: "row", padding: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column", width: 1394 }}>
+                <div style={{
+                    display: "flex",
+                    width: 300,
+                    margin: "auto",
+                    justifyContent: "center",
+                    alignItems: "center"
+                }}>
+                    <Search
+                        placeholder="搜索"
+                        onSearch={(value: any) => setPagination({
+                            keyword: value,
+                            page: 1,
+                            pageSize: pagination.pageSize,
+                            selectedTags: pagination.selectedTags
+                        })}
+                        enterButton />
+                </div>
+                <div>{cards}</div>
+                <div>
+                    <Pagination
+                        style={{ float: "right", marginRight: 20 }}
+                        showQuickJumper
+                        onChange={onChange}
+                        current={pagination.page}
+                        pageSize={pagination.pageSize}
+                        total={data?.searchVideo.totalCount}
+                        showTotal={showTotal}
+                    />
+                </div>
             </div>
-            <div style={{ marginLeft: 10, marginTop: 6 }}>
+            <div style={{ marginLeft: 10, marginTop: 38, display: "flex" }}>
                 <div className={"pdc-button-selected"}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", width: 66 }}
                     onClick={() => {
                         setPagination({
                             keyword: pagination.keyword,
@@ -109,26 +123,21 @@ export default function VideoList() {
                             selectedTags: []
                         })
                     }}>全部</div>
-                {data?.searchVideo.aggResults.map((tag: any) => (
-                    <CheckableTag
-                        className={pagination.selectedTags.indexOf(tag.key) > -1 ? "pdc-button-selected" : "pdc-button"}
-                        key={tag.key}
-                        checked={pagination.selectedTags.indexOf(tag.key) > -1}
-                        onChange={checked => onTagChange(tag.key, checked)}
-                    >
-                        {tag.key + "(" + tag.value + ")"}
-                    </CheckableTag>
-                ))}
+                <div style={{ flex: 1 }}>
+                    <div style={{ maxWidth: 304 }}>
+                        {data?.searchVideo.aggResults.map((tag: any) => (
+                            <CheckableTag
+                                className={pagination.selectedTags.indexOf(tag.key) > -1 ? "pdc-button-selected" : "pdc-button"}
+                                key={tag.key}
+                                checked={pagination.selectedTags.indexOf(tag.key) > -1}
+                                onChange={checked => onTagChange(tag.key, checked)}
+                            >
+                                {tag.key + "(" + tag.value + ")"}
+                            </CheckableTag>
+                        ))}
+                    </div>
+                </div>
             </div>
-            <div>{cards}</div>
-            <Pagination
-                showQuickJumper
-                onChange={onChange}
-                current={pagination.page}
-                pageSize={pagination.pageSize}
-                total={data?.searchVideo.totalCount}
-                showTotal={showTotal}
-            />
         </div>
     )
 }

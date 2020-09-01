@@ -3,18 +3,21 @@ import React, { useState, useRef } from "react"
 import "./index.less"
 import { Modal, Progress } from "antd"
 import useIntersectionObserver from "../../hooks/use-intersection-observer"
+import { formatTime } from "../../utils/util"
 interface ImageProps {
     src: string
     width?: number | string
     height?: number | string
-    percent?: number
+    currentTime?: number,
+    remainingTime?: number
 }
 
 const Img: React.FC<ImageProps> = ({
     src,
     width,
     height,
-    percent
+    currentTime,
+    remainingTime
 }) => {
     const [visible, setVisible] = useState(false)
     const ref: any = useRef();
@@ -35,7 +38,8 @@ const Img: React.FC<ImageProps> = ({
         className={"img-box"}
         style={{
             height: height ? height : 214,
-            width: width ? width : 160
+            width: width ? width : 160,
+            position: "relative"
         }}>
         <Modal
             title="查看图片"
@@ -47,8 +51,23 @@ const Img: React.FC<ImageProps> = ({
         >
             {src ? <img src={src} alt="图片不存在" /> : "暂无图片"}
         </Modal>
-        {src ? isVisible && (<div style={{ width: "100%", height: "100%" }}><img src={src} alt="图片不存在" onClick={() => setVisible(true)} />
-            {percent ? <Progress percent={percent} showInfo={false} /> : ''}
+        {src ? isVisible && (<div style={{ width: "100%", height: "100%" }}>
+            <img src={src}
+                alt="图片不存在"
+                onClick={() => setVisible(true)} />
+            {currentTime ?
+                <div>
+                    <Progress percent={currentTime / (currentTime + (remainingTime || 0)) * 100} showInfo={false} />
+                    <div style={{
+                        position: "absolute",
+                        bottom: 10,
+                        right: 10,
+                        color: "white",
+                        opacity: 0.5,
+                        backgroundColor: "black"
+                    }}>{formatTime(currentTime)}/{formatTime(currentTime + (remainingTime || 0))}</div>
+                </div> : ''}
+
         </div>
         ) : "暂无图片"}
     </div>)

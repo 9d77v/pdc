@@ -5,7 +5,7 @@ import { LIST_HISTORY } from "../../../../consts/history.gpl";
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
 import Img from "../../../../components/img";
-import { formatTime, formatRelativeTime } from "../../../../utils/util";
+import { formatTime, formatRelativeTime, formatDetailTime } from "../../../../utils/util";
 import { NavBar, Icon } from "antd-mobile";
 
 export default function HistoryPage() {
@@ -33,16 +33,17 @@ export default function HistoryPage() {
             <div style={{ marginLeft: 20, marginRight: 20, padding: 10, cursor: "pointer" }}
                 onClick={() => history.push('/app/media/videos/' + value.sourceID)}>
                 <Img src={value.cover} width={160} height={100}
-                    percent={value.currentTime / (value.currentTime + value.remainingTime) * 100} />
+                    currentTime={value.currentTime} remainingTime={value.remainingTime} />
             </div>
             <div style={{ borderBottom: "1px solid #e5e9ef", position: "relative", width: "100%" }}>
                 <div style={{ fontSize: 14, color: "#222", marginTop: 20, cursor: "pointer" }}
                     onClick={() => history.push('/app/media/videos/' + value.sourceID)}
                 >{value.title}</div>
                 <div style={{ position: "absolute", bottom: 0 }}>
-                    {value.deviceType === "desktop" ? <DesktopOutlined /> : <MobileOutlined />}  {formatRelativeTime(value.updatedAt)} {value.remainingTime === 0 ? "第" + value.num + "话" +
+                    <div>  {value.deviceType === "desktop" ? <DesktopOutlined /> : <MobileOutlined />}  {formatDetailTime(value.updatedAt)}</div>
+                    <div> {value.remainingTime === 0 ? "第" + value.num + "话" +
                         value.subTitle + " 已看完" : "看到第" + value.num + "话 " +
-                        value.subTitle + " " + formatTime(value.currentTime)}
+                        value.subTitle}</div>
                 </div>
             </div>
         </div>
