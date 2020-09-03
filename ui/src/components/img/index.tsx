@@ -3,7 +3,7 @@ import React, { useState, useRef } from "react"
 import "./index.less"
 import { Modal, Progress } from "antd"
 import useIntersectionObserver from "../../hooks/use-intersection-observer"
-import { formatTime } from "../../utils/util"
+import { formatTimeLength } from "../../utils/util"
 interface ImageProps {
     src: string
     width?: number | string
@@ -32,7 +32,6 @@ const Img: React.FC<ImageProps> = ({
             }
         }
     })
-
     return (<div
         ref={ref}
         className={"img-box"}
@@ -65,7 +64,7 @@ const Img: React.FC<ImageProps> = ({
                         color: "white",
                         opacity: 0.5,
                         backgroundColor: "black"
-                    }}>{formatTime(currentTime)}/{formatTime(currentTime + (remainingTime || 0))}</div>
+                    }}>{formatTimeLength(currentTime)}/{formatTimeLength(currentTime + (remainingTime || 0))}</div>
                 </div> : ''}
 
         </div>

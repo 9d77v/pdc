@@ -118,5 +118,5 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

@@ -5,7 +5,7 @@ import { LIST_HISTORY } from "../../../../consts/history.gpl";
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
 import Img from "../../../../components/img";
-import { formatTime, formatRelativeTime } from "../../../../utils/util";
+import { formatRelativeTime } from "../../../../utils/util";
 
 export default function HistoryPage() {
 

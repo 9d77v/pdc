@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
 import "video.js/dist/video-js.css"
 import "./VideoPlayer.less"
+import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import { useLocation } from 'react-router-dom'
 import { recordHistory } from '../consts/http'
 
+const lang: any = video_zhCN
+lang["Picture-in-Picture"] = "画中画"
+videojs.addLanguage('zh-CN', lang);
 export interface SubtitleProps {
     name: string
     url: string
@@ -50,8 +54,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             src: url,
             type: 'video/mp4',
         }],
+        language: "zh-CN",
         controls: true,
-        playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+        playbackRates: [0.5, 1, 2, 4, 16],
         loop: false,
     };
 
@@ -120,6 +125,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 minWidth: minWidth, minHeight: minHeight
             }} >
             <video id={videoKey}
+                playsInline
                 ref={(node: any) => setVideoNode(node)}
                 className="video-js vjs-big-play-centered"
                 crossOrigin="anonymous"

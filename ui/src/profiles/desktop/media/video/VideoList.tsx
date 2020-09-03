@@ -17,7 +17,7 @@ export default function VideoList() {
     const [pagination, setPagination] = useState<IVideoPagination>({
         keyword: "",
         page: 1,
-        pageSize: 12,
+        pageSize: 10,
         selectedTags: []
     })
     const { error, data } = useQuery(LIST_VIDEO_CARD,
@@ -81,7 +81,7 @@ export default function VideoList() {
 
     return (
         <div style={{ display: "flex", flexDirection: "row", padding: 12 }}>
-            <div style={{ display: "flex", flexDirection: "column", width: 1394 }}>
+            <div style={{ display: "flex", flexDirection: "column", width: 1162 }}>
                 <div style={{
                     display: "flex",
                     width: 300,
@@ -109,6 +109,7 @@ export default function VideoList() {
                         pageSize={pagination.pageSize}
                         total={data?.searchVideo.totalCount}
                         showTotal={showTotal}
+                        showSizeChanger={false}
                     />
                 </div>
             </div>

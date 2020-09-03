@@ -81,5 +81,5 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

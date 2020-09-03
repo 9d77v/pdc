@@ -200,5 +200,5 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

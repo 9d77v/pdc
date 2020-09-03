@@ -1,10 +1,11 @@
-import { ApolloClient } from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { from } from 'apollo-link';
-import { setContext } from 'apollo-link-context';
-
-import { onError } from 'apollo-link-error';
+import {
+    from,
+    ApolloClient,
+    InMemoryCache,
+    HttpLink
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { onError } from "@apollo/client/link/error";
 import jwt_decode from 'jwt-decode';
 import moment from 'moment';
 import { getRefreshToken } from '../consts/http';
@@ -71,13 +72,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         }
     };
 })
-
 export const client = new ApolloClient({
     link: from([
         errorLink,
         authLink,
         httpLink,
-
     ]),
     cache: new InMemoryCache()
 });

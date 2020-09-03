@@ -7,12 +7,16 @@ function isIPhone(): boolean {
     return /iPhone|iPod/i.test(navigator.userAgent)
 }
 
-function formatTime(t: number): string {
+function formatTimeLength(t: number): string {
     const m = moment(t * 1000)
     if (t < 3600) {
         return m.format('mm:ss')
     }
-    return m.format('HH:mm:ss')
+    const h = parseInt((t / 3600).toString(), 10)
+    if (h < 10) {
+        return "0" + h + ":" + m.format('mm:ss')
+    }
+    return h + ":" + m.format('mm:ss')
 }
 
 function formatDetailTime(t: number): string {
@@ -32,4 +36,4 @@ function formatRelativeTime(t: number): string {
     return day
 }
 
-export { isMobile, formatTime, formatDetailTime, formatRelativeTime, isIPhone }
+export { isMobile, formatTimeLength, formatDetailTime, formatRelativeTime, isIPhone }

@@ -46,6 +46,5 @@ export default function ThingDashboard() {
                 <Pie title="现存物品数量" name="物品类别" data={data ? data.series4.map(mapFunc) : []} style={chartStyle} unit={'件'} />
             </div>
         </div>
-
     )
 }

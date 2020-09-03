@@ -1,35 +1,41 @@
 import { Modal, Form, Input } from 'antd';
-import React from 'react'
+import React, { useEffect } from 'react'
 
-interface Values {
-    title: string;
-    description: string;
+export interface IUpdateDevice {
+    id: number
+    name: string
 }
 
-interface VideoSeriesCreateFormProps {
+interface DeviceUpdateFormProps {
+    data: IUpdateDevice
     visible: boolean;
-    onCreate: (values: Values) => void;
+    onUpdate: (values: IUpdateDevice) => void;
     onCancel: () => void;
 }
 
-export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
+export const DeviceUpdateForm: React.FC<DeviceUpdateFormProps> = ({
+    data,
     visible,
-    onCreate,
+    onUpdate,
     onCancel,
 }) => {
     const [form] = Form.useForm();
-
     const layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 16 },
+        labelCol: { span: 5 },
+        wrapperCol: { span: 15 },
     }
+    useEffect(() => {
+        form.setFieldsValue({
+            "id": data.id,
+            "name": data.name
+        })
+    }, [form, data]);
     return (
         <Modal
             visible={visible}
-            title="新增视频系列"
+            title="修改设备"
             okText="确定"
             cancelText="取消"
-            destroyOnClose
             onCancel={
                 () => {
                     onCancel()
@@ -42,7 +48,7 @@ export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
                     .validateFields()
                     .then((values: any) => {
                         form.resetFields();
-                        onCreate(values);
+                        onUpdate(values);
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info);
@@ -54,13 +60,20 @@ export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
                 {...layout}
                 form={form}
                 layout="horizontal"
-                name="videoSeriesCreateForm"
-                initialValues={{ isShow: true, subtitle_lang: "简体中文" }}
+                name="deviceUpdateForm"
+                style={{ maxHeight: 600 }}
+                initialValues={{ deviceType: 0 }}
             >
+                <Form.Item
+                    name="id"
+                    noStyle
+                >
+                    <Input hidden />
+                </Form.Item>
                 <Form.Item
                     name="name"
                     label="名称"
-                    rules={[{ required: true, message: '请输入系列名称!' }]}
+                    rules={[{ required: true, message: '请输入名称!' }]}
                 >
                     <Input />
                 </Form.Item>
