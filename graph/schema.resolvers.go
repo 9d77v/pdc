@@ -6,7 +6,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/generated"
@@ -123,11 +122,11 @@ func (r *mutationResolver) UpdateTelemetryModel(ctx context.Context, input model
 }
 
 func (r *mutationResolver) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
-	panic(fmt.Errorf("not implemented"))
+	return deviceService.CreateDevice(ctx, input)
 }
 
 func (r *mutationResolver) UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error) {
-	panic(fmt.Errorf("not implemented"))
+	return deviceService.UpdateDevice(ctx, input)
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
@@ -224,8 +223,12 @@ func (r *queryResolver) DeviceModels(ctx context.Context, keyword *string, page 
 	return con, err
 }
 
-func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64) (*model.DeviceModelConnection, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceConnection, error) {
+	con := new(model.DeviceConnection)
+	total, data, err := deviceService.ListDevice(ctx, keyword, page, pageSize, ids)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
 }
 
 // Mutation returns generated.MutationResolver implementation.

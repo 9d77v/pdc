@@ -11,13 +11,13 @@ import (
 	"github.com/9d77v/go-lib/clients/config"
 	"github.com/9d77v/pdc/utils"
 	redis "github.com/go-redis/redis/v8"
-	"github.com/jinzhu/gorm"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"golang.org/x/crypto/bcrypt"
-
-	//postgres driver
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 
 	stan "github.com/nats-io/stan.go"
 )
@@ -111,13 +111,16 @@ func initDB() {
 		log.Printf("Could not initialize gorm: %s", err.Error())
 	}
 	Gorm.AutoMigrate(
-		&Video{},
-		&Episode{},
-		&VideoSeries{},
-		&VideoSeriesItem{},
 		&User{},
 		&Thing{},
+		//media
+		&Video{},
+		&Episode{},
+		&Subtitle{},
+		&VideoSeries{},
+		&VideoSeriesItem{},
 		&History{},
+		//device
 		&DeviceModel{},
 		&TelemetryModel{},
 		&AttributeModel{},
@@ -210,41 +213,43 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 		return nil, errors.New("unsupport driver,now only support postgres")
 	}
 	//auto create database
-	dbURL := fmt.Sprintf("host=%s port=%d user=%s sslmode=disable password=%s",
+	dsnInit := fmt.Sprintf("host=%s port=%d user=%s sslmode=disable password=%s",
 		config.Host, config.Port, config.User, config.Password)
-	dbInit, err := gorm.Open(config.Driver, dbURL)
+	dbInit, err := gorm.Open(postgres.Open(dsnInit), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-	defer dbInit.Close()
 	initSQL := fmt.Sprintf("CREATE DATABASE \"%s\" WITH  OWNER =%s ENCODING = 'UTF8' CONNECTION LIMIT=-1;",
 		config.Name, config.User)
 	err = dbInit.Exec(initSQL).Error
 	if err != nil && !strings.Contains(err.Error(), "already exists") {
 		return nil, err
 	}
-	dbWithNameURL := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
+	sqlDBInit, err := dbInit.DB()
+	defer sqlDBInit.Close()
+
+	dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
 		config.Host, config.Port, config.User, config.Name, config.Password)
 	//global database connection
-	db, err := gorm.Open(config.Driver, dbWithNameURL)
+	gormConfig := &gorm.Config{
+		SkipDefaultTransaction: true,
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   DBPrefix + "_", // table name prefix, table for `User` would be `t_users`
+			SingularTable: true,
+		},
+	}
+	if DEBUG {
+		gormConfig.Logger = logger.Default.LogMode(logger.Info)
+	} else {
+		gormConfig.DisableForeignKeyConstraintWhenMigrating = true
+	}
+	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
 	if err != nil {
 		return nil, err
 	}
-
-	//设置表名称的前缀
-	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return fmt.Sprintf("%s_%s", DBPrefix, defaultTableName)
-	}
-
-	db.SingularTable(true)
-	db.LogMode(config.EnableLog)
-	useHstoreSQL := fmt.Sprintf("CREATE EXTENSION hstore;")
-	err = db.Exec(useHstoreSQL).Error
-	if err != nil {
-		log.Println("create extension hstore failed:", err.Error())
-	}
-	db.DB().SetMaxIdleConns(int(config.MaxIdleConns))
-	db.DB().SetMaxOpenConns(int(config.MaxOpenConns))
+	sqlDB, err := db.DB()
+	sqlDB.SetMaxIdleConns(int(config.MaxIdleConns))
+	sqlDB.SetMaxOpenConns(int(config.MaxOpenConns))
 	return db, err
 }
 

@@ -1,8 +1,6 @@
 package dtos
 
 import (
-	"strings"
-
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
 )
@@ -12,10 +10,10 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 	es := make([]*model.Episode, 0, len(m.Episodes))
 	for _, e := range m.Episodes {
 		sArr := make([]*model.Subtitle, 0, len(e.Subtitles))
-		for k, v := range e.Subtitles {
+		for _, v := range e.Subtitles {
 			sArr = append(sArr, &model.Subtitle{
-				Name: k,
-				URL:  GetOSSPrefix(scheme) + *v,
+				Name: v.Name,
+				URL:  GetOSSPrefix(scheme) + v.URL,
 			})
 		}
 		cover := ""
@@ -43,37 +41,21 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 			UpdatedAt: e.UpdatedAt.Unix(),
 		})
 	}
-	cArr := make([]*model.Character, 0, len(m.Characters))
-	for k, v := range m.Characters {
-		cArr = append(cArr, &model.Character{
-			CharacterName: k,
-			OriginalName:  *v,
-		})
-	}
-	sArr := make([]*model.Staff, 0, len(m.Staffs))
-	for k, v := range m.Staffs {
-		sArr = append(sArr, &model.Staff{
-			Job:     k,
-			Persons: strings.Split(*v, ","),
-		})
-	}
 	cover := ""
 	if m.Cover != "" {
 		cover = GetOSSPrefix(scheme) + m.Cover
 	}
 	return &model.Video{
-		ID:         int64(m.ID),
-		Title:      m.Title,
-		Desc:       m.Desc,
-		PubDate:    m.PubDate.Unix(),
-		Episodes:   es,
-		Cover:      cover,
-		Characters: cArr,
-		Staffs:     sArr,
-		Tags:       m.Tags,
-		IsShow:     m.IsShow,
-		CreatedAt:  m.CreatedAt.Unix(),
-		UpdatedAt:  m.UpdatedAt.Unix(),
+		ID:        int64(m.ID),
+		Title:     m.Title,
+		Desc:      m.Desc,
+		PubDate:   m.PubDate.Unix(),
+		Episodes:  es,
+		Cover:     cover,
+		Tags:      m.Tags,
+		IsShow:    m.IsShow,
+		CreatedAt: m.CreatedAt.Unix(),
+		UpdatedAt: m.UpdatedAt.Unix(),
 	}
 }
 

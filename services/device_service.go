@@ -10,7 +10,7 @@ import (
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/utils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 //DeviceService ..
@@ -44,9 +44,9 @@ func (s DeviceService) UpdateDeviceModel(ctx context.Context, input model.NewUpd
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
-		"desc": input.Desc,
+		"desc": ptrs.String(input.Desc),
 	}
-	err := models.Gorm.Model(m).Update(updateMap).Error
+	err := models.Gorm.Model(m).Updates(updateMap).Error
 	return &model.DeviceModel{ID: int64(m.ID)}, err
 }
 
@@ -79,7 +79,7 @@ func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.New
 		"name": input.Name,
 	}
 	fmt.Println(updateMap)
-	err := models.Gorm.Model(m).Update(updateMap).Error
+	err := models.Gorm.Model(m).Updates(updateMap).Error
 	return &model.AttributeModel{ID: int64(m.ID)}, err
 }
 
@@ -119,7 +119,7 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 		"unit_name": input.UnitName,
 		"scale":     input.Scale,
 	}
-	err := models.Gorm.Model(m).Update(updateMap).Error
+	err := models.Gorm.Model(m).Updates(updateMap).Error
 	return &model.TelemetryModel{ID: int64(m.ID)}, err
 }
 
@@ -129,39 +129,14 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 	result := make([]*model.DeviceModel, 0)
 	data := make([]*models.DeviceModel, 0)
 	offset, limit := GetPageInfo(page, pageSize)
-	filedMap, _ := utils.GetFieldData(ctx, "")
+	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
-	if filedMap["edges"] {
-		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename", "attributeModels", "telemetryModels"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		subBuilder := builder.Order("id desc")
-		if limit > 0 {
-			subBuilder = subBuilder.Offset(offset).Limit(limit)
-		}
-		if edgeFieldMap["attributeModels"] {
-			subBuilder = subBuilder.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
-				return models.Gorm.Model(&models.AttributeModel{})
-			})
-		}
-		if edgeFieldMap["telemetryModels"] {
-			subBuilder = subBuilder.Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
-				return models.Gorm.Model(&models.TelemetryModel{})
-			})
-		}
-		err = subBuilder.Find(&data).Error
-		if err != nil {
-			return 0, result, err
-		}
-	}
 	var total int64
-	if filedMap["totalCount"] {
+	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
@@ -171,8 +146,152 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 			}
 		}
 	}
+	if fieldMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename", "attributeModels", "telemetryModels"))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		builder = builder.Order("id desc")
+		if limit > 0 {
+			builder = builder.Offset(offset).Limit(limit)
+		}
+		if edgeFieldMap["attributeModels"] {
+			builder = builder.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
+				return models.Gorm.Model(&models.AttributeModel{})
+			})
+		}
+		if edgeFieldMap["telemetryModels"] {
+			builder = builder.Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
+				return models.Gorm.Model(&models.TelemetryModel{})
+			})
+		}
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
+		}
+	}
 	for _, m := range data {
 		r := dtos.ToDeviceModelDto(m)
+		result = append(result, r)
+	}
+	return total, result, nil
+}
+
+//CreateDevice  ..
+func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
+	m := &models.Device{
+		DeviceModelID: uint(input.DeviceModelID),
+		Name:          input.Name,
+	}
+	deviceModel := new(models.DeviceModel)
+	if err := models.Gorm.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
+		return models.Gorm.Model(&models.AttributeModel{})
+	}).Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
+		return models.Gorm.Model(&models.TelemetryModel{})
+	}).First(deviceModel, "id=?", input.DeviceModelID).Error; err != nil {
+		return nil, err
+	}
+	tx := models.Gorm.Begin()
+	err := tx.Create(m).Error
+	if err != nil {
+		tx.Rollback()
+		return &model.Device{}, err
+	}
+	attributes := make([]*models.Attribute, 0, len(deviceModel.AttributeModels))
+	for _, v := range deviceModel.AttributeModels {
+		attributes = append(attributes, &models.Attribute{
+			DeviceID:         m.ID,
+			AttributeModelID: v.ID,
+			Key:              v.Key,
+		})
+	}
+	err = tx.Create(&attributes).Error
+	if err != nil {
+		tx.Rollback()
+		return &model.Device{}, err
+	}
+	telemetries := make([]*models.Telemetry, 0, len(deviceModel.TelemetryModels))
+	for _, v := range deviceModel.TelemetryModels {
+		telemetries = append(telemetries, &models.Telemetry{
+			DeviceID:         m.ID,
+			Key:              v.Key,
+			TelemetryModelID: v.ID,
+		})
+
+	}
+	err = tx.Create(&telemetries).Error
+	if err != nil {
+		tx.Rollback()
+		return &model.Device{}, err
+	}
+	tx.Commit()
+	return &model.Device{ID: int64(m.ID)}, err
+}
+
+//UpdateDevice ..
+func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error) {
+	m := new(models.Device)
+	if err := models.Gorm.Select("id").First(m, "id=?", input.ID).Error; err != nil {
+		return nil, err
+	}
+	updateMap := map[string]interface{}{
+		"name": input.Name,
+	}
+	err := models.Gorm.Model(m).Updates(updateMap).Error
+	return &model.Device{ID: int64(m.ID)}, err
+}
+
+//ListDevice ..
+func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
+	page, pageSize *int64, ids []int64) (int64, []*model.Device, error) {
+	result := make([]*model.Device, 0)
+	data := make([]*models.Device, 0)
+	offset, limit := GetPageInfo(page, pageSize)
+	fieldMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	builder := models.Gorm
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
+	}
+	var total int64
+	if fieldMap["totalCount"] {
+		if limit == -1 {
+			total = int64(len(data))
+		} else {
+			err = builder.Model(&models.Device{}).Count(&total).Error
+			if err != nil {
+				return 0, result, err
+			}
+		}
+	}
+	if fieldMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields,
+			"__typename", "attributes", "telemetries", "deviceModelName", "deviceModelDesc"))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		builder = builder.Order("id desc")
+		if limit > 0 {
+			builder = builder.Offset(offset).Limit(limit)
+		}
+		if edgeFieldMap["attributes"] {
+			builder = builder.Preload("Attributes").Preload("Attributes.AttributeModel")
+		}
+		if edgeFieldMap["telemetries"] {
+			builder = builder.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
+		}
+		if edgeFieldMap["deviceModelName"] || edgeFieldMap["deviceModelDesc"] {
+			builder = builder.Preload("DeviceModel")
+		}
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
+		}
+	}
+	for _, m := range data {
+		r := dtos.ToDeviceDto(m)
 		result = append(result, r)
 	}
 	return total, result, nil

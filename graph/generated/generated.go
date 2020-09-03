@@ -49,9 +49,11 @@ type ComplexityRoot struct {
 	}
 
 	Attribute struct {
+		CreatedAt func(childComplexity int) int
 		DeviceID  func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Key       func(childComplexity int) int
+		Name      func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		Value     func(childComplexity int) int
 	}
@@ -71,13 +73,15 @@ type ComplexityRoot struct {
 	}
 
 	Device struct {
-		Attributes    func(childComplexity int) int
-		CreatedAt     func(childComplexity int) int
-		DeviceModelID func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Name          func(childComplexity int) int
-		Telemetries   func(childComplexity int) int
-		UpdatedAt     func(childComplexity int) int
+		Attributes      func(childComplexity int) int
+		CreatedAt       func(childComplexity int) int
+		DeviceModelDesc func(childComplexity int) int
+		DeviceModelID   func(childComplexity int) int
+		DeviceModelName func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Name            func(childComplexity int) int
+		Telemetries     func(childComplexity int) int
+		UpdatedAt       func(childComplexity int) int
 	}
 
 	DeviceConnection struct {
@@ -178,7 +182,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		DeviceModels  func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
-		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64) int
+		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
 		Histories     func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
 		HistoryInfo   func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL  func(childComplexity int, bucketName string, objectName string) int
@@ -208,9 +212,11 @@ type ComplexityRoot struct {
 	}
 
 	Telemetry struct {
+		CreatedAt func(childComplexity int) int
 		DeviceID  func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Key       func(childComplexity int) int
+		Name      func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		Value     func(childComplexity int) int
 	}
@@ -274,18 +280,16 @@ type ComplexityRoot struct {
 	}
 
 	Video struct {
-		Characters func(childComplexity int) int
-		Cover      func(childComplexity int) int
-		CreatedAt  func(childComplexity int) int
-		Desc       func(childComplexity int) int
-		Episodes   func(childComplexity int) int
-		ID         func(childComplexity int) int
-		IsShow     func(childComplexity int) int
-		PubDate    func(childComplexity int) int
-		Staffs     func(childComplexity int) int
-		Tags       func(childComplexity int) int
-		Title      func(childComplexity int) int
-		UpdatedAt  func(childComplexity int) int
+		Cover     func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		Desc      func(childComplexity int) int
+		Episodes  func(childComplexity int) int
+		ID        func(childComplexity int) int
+		IsShow    func(childComplexity int) int
+		PubDate   func(childComplexity int) int
+		Tags      func(childComplexity int) int
+		Title     func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	VideoConnection struct {
@@ -371,7 +375,7 @@ type QueryResolver interface {
 	HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 	Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error)
 	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceModelConnection, error)
-	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64) (*model.DeviceModelConnection, error)
+	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceConnection, error)
 }
 
 type executableSchema struct {
@@ -403,6 +407,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AggResult.Value(childComplexity), true
 
+	case "Attribute.createdAt":
+		if e.complexity.Attribute.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Attribute.CreatedAt(childComplexity), true
+
 	case "Attribute.deviceID":
 		if e.complexity.Attribute.DeviceID == nil {
 			break
@@ -423,6 +434,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Attribute.Key(childComplexity), true
+
+	case "Attribute.name":
+		if e.complexity.Attribute.Name == nil {
+			break
+		}
+
+		return e.complexity.Attribute.Name(childComplexity), true
 
 	case "Attribute.updatedAt":
 		if e.complexity.Attribute.UpdatedAt == nil {
@@ -508,12 +526,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Device.CreatedAt(childComplexity), true
 
+	case "Device.deviceModelDesc":
+		if e.complexity.Device.DeviceModelDesc == nil {
+			break
+		}
+
+		return e.complexity.Device.DeviceModelDesc(childComplexity), true
+
 	case "Device.deviceModelID":
 		if e.complexity.Device.DeviceModelID == nil {
 			break
 		}
 
 		return e.complexity.Device.DeviceModelID(childComplexity), true
+
+	case "Device.deviceModelName":
+		if e.complexity.Device.DeviceModelName == nil {
+			break
+		}
+
+		return e.complexity.Device.DeviceModelName(childComplexity), true
 
 	case "Device.id":
 		if e.complexity.Device.ID == nil {
@@ -1183,7 +1215,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64)), true
+		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64)), true
 
 	case "Query.histories":
 		if e.complexity.Query.Histories == nil {
@@ -1359,6 +1391,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subtitle.URL(childComplexity), true
 
+	case "Telemetry.createdAt":
+		if e.complexity.Telemetry.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.CreatedAt(childComplexity), true
+
 	case "Telemetry.deviceID":
 		if e.complexity.Telemetry.DeviceID == nil {
 			break
@@ -1379,6 +1418,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Telemetry.Key(childComplexity), true
+
+	case "Telemetry.name":
+		if e.complexity.Telemetry.Name == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.Name(childComplexity), true
 
 	case "Telemetry.updatedAt":
 		if e.complexity.Telemetry.UpdatedAt == nil {
@@ -1695,13 +1741,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserConnection.TotalCount(childComplexity), true
 
-	case "Video.characters":
-		if e.complexity.Video.Characters == nil {
-			break
-		}
-
-		return e.complexity.Video.Characters(childComplexity), true
-
 	case "Video.cover":
 		if e.complexity.Video.Cover == nil {
 			break
@@ -1750,13 +1789,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.PubDate(childComplexity), true
-
-	case "Video.staffs":
-		if e.complexity.Video.Staffs == nil {
-			break
-		}
-
-		return e.complexity.Video.Staffs(childComplexity), true
 
 	case "Video.tags":
 		if e.complexity.Video.Tags == nil {
@@ -2081,7 +2113,7 @@ input NewTelemetryModel {
 input NewUpdateDeviceModel {
   id: ID!
   name: String!  
-  desc: String!
+  desc: String
 }
 
 input NewUpdateAttributeModel {
@@ -2102,6 +2134,8 @@ type Device {
   id: ID!
   deviceModelID: ID!
   name: String!
+  deviceModelName:String!
+  deviceModelDesc:String!
   attributes: [Attribute!]
   telemetries: [Telemetry!]
   createdAt: Int!
@@ -2112,7 +2146,9 @@ type Attribute {
   id: ID!
   deviceID: ID!
   key: String!
+  name: String!
   value: String!
+  createdAt: Int!
   updatedAt: Int!
 }
 
@@ -2121,7 +2157,9 @@ type Telemetry {
   id: ID!
   deviceID: ID!
   key: String!
+  name: String!
   value: Float!
+  createdAt: Int!
   updatedAt: Int!
 }
 
@@ -2132,7 +2170,7 @@ type DeviceConnection {
 
 input NewDevice {
   deviceModelID: ID!
-  name: String
+  name: String!
 }
 
 input NewUpdateDevice {
@@ -2185,7 +2223,7 @@ type Query {
   historyInfo(sourceType:Int!,sourceID:ID!):History
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
   deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceModelConnection!
-  devices(keyword:String,page:Int,pageSize:Int):DeviceModelConnection!
+  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceConnection!
 } 
 
 type Mutation {
@@ -2346,8 +2384,6 @@ type LoginResponse{
   pubDate: Int!
   cover: String!
   episodes: [Episode!]!
-  characters: [Character!]!
-  staffs: [Staff!]!
   tags: [String!]
   isShow: Boolean!
   createdAt: Int!
@@ -2388,16 +2424,6 @@ type VideoConnection {
   edges:[Video!]!
 }
 
-input NewCharacter{
-    characterName: String!
-    originalName: String! 
-}
-
-input NewStaff{
-  job: String!
-  persons: [String!]!
-}
-
 input NewSubtitles{
   name:String!
   urls:[String!]!
@@ -2408,8 +2434,6 @@ input NewVideo {
   desc: String
   pubDate: Int
   cover: String
-  characters: [NewCharacter!]
-  staffs: [NewStaff!]
   tags: [String!]
   isShow: Boolean!
   videoURLs:[String!]!
@@ -2437,8 +2461,6 @@ input NewUpdateVideo{
   desc: String
   pubDate: Int
   cover: String
-  characters: [NewCharacter!]
-  staffs: [NewStaff!]
   tags: [String!]
   isShow: Boolean 
 }
@@ -2999,6 +3021,14 @@ func (ec *executionContext) field_Query_devices_args(ctx context.Context, rawArg
 		}
 	}
 	args["pageSize"] = arg2
+	var arg3 []int64
+	if tmp, ok := rawArgs["ids"]; ok {
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg3
 	return args, nil
 }
 
@@ -3618,6 +3648,40 @@ func (ec *executionContext) _Attribute_key(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Attribute_name(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Attribute_value(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3650,6 +3714,40 @@ func (ec *executionContext) _Attribute_value(ctx context.Context, field graphql.
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Attribute_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Attribute",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Attribute_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Attribute) (ret graphql.Marshaler) {
@@ -4044,6 +4142,74 @@ func (ec *executionContext) _Device_name(ctx context.Context, field graphql.Coll
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_deviceModelName(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_deviceModelDesc(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelDesc, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7232,7 +7398,7 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64))
+		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7244,9 +7410,9 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.DeviceModelConnection)
+	res := resTmp.(*model.DeviceConnection)
 	fc.Result = res
-	return ec.marshalNDeviceModelConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModelConnection(ctx, field.Selections, res)
+	return ec.marshalNDeviceConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7624,6 +7790,40 @@ func (ec *executionContext) _Telemetry_key(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Telemetry_name(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Telemetry_value(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7656,6 +7856,40 @@ func (ec *executionContext) _Telemetry_value(ctx context.Context, field graphql.
 	res := resTmp.(float64)
 	fc.Result = res
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Telemetry_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
@@ -9329,74 +9563,6 @@ func (ec *executionContext) _Video_episodes(ctx context.Context, field graphql.C
 	res := resTmp.([]*model.Episode)
 	fc.Result = res
 	return ec.marshalNEpisode2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisodeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Video_characters(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Video",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Characters, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Character)
-	fc.Result = res
-	return ec.marshalNCharacter2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐCharacterᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Video_staffs(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Video",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Staffs, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Staff)
-	fc.Result = res
-	return ec.marshalNStaff2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaffᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Video_tags(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
@@ -11362,30 +11528,6 @@ func (ec *executionContext) unmarshalInputNewAttributeModel(ctx context.Context,
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewCharacter(ctx context.Context, obj interface{}) (model.NewCharacter, error) {
-	var it model.NewCharacter
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "characterName":
-			var err error
-			it.CharacterName, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "originalName":
-			var err error
-			it.OriginalName, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewDevice(ctx context.Context, obj interface{}) (model.NewDevice, error) {
 	var it model.NewDevice
 	var asMap = obj.(map[string]interface{})
@@ -11400,7 +11542,7 @@ func (ec *executionContext) unmarshalInputNewDevice(ctx context.Context, obj int
 			}
 		case "name":
 			var err error
-			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11533,30 +11675,6 @@ func (ec *executionContext) unmarshalInputNewHistoryInput(ctx context.Context, o
 		case "remainingTime":
 			var err error
 			it.RemainingTime, err = ec.unmarshalNFloat2float64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputNewStaff(ctx context.Context, obj interface{}) (model.NewStaff, error) {
-	var it model.NewStaff
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "job":
-			var err error
-			it.Job, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "persons":
-			var err error
-			it.Persons, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11838,7 +11956,7 @@ func (ec *executionContext) unmarshalInputNewUpdateDeviceModel(ctx context.Conte
 			}
 		case "desc":
 			var err error
-			it.Desc, err = ec.unmarshalNString2string(ctx, v)
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12244,18 +12362,6 @@ func (ec *executionContext) unmarshalInputNewUpdateVideo(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "characters":
-			var err error
-			it.Characters, err = ec.unmarshalONewCharacter2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacterᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "staffs":
-			var err error
-			it.Staffs, err = ec.unmarshalONewStaff2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaffᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "tags":
 			var err error
 			it.Tags, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -12409,18 +12515,6 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 		case "cover":
 			var err error
 			it.Cover, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "characters":
-			var err error
-			it.Characters, err = ec.unmarshalONewCharacter2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacterᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "staffs":
-			var err error
-			it.Staffs, err = ec.unmarshalONewStaff2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaffᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12592,8 +12686,18 @@ func (ec *executionContext) _Attribute(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "name":
+			out.Values[i] = ec._Attribute_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "value":
 			out.Values[i] = ec._Attribute_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Attribute_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -12720,6 +12824,16 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "name":
 			out.Values[i] = ec._Device_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceModelName":
+			out.Values[i] = ec._Device_deviceModelName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceModelDesc":
+			out.Values[i] = ec._Device_deviceModelDesc(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -13620,8 +13734,18 @@ func (ec *executionContext) _Telemetry(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "name":
+			out.Values[i] = ec._Telemetry_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "value":
 			out.Values[i] = ec._Telemetry_value(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Telemetry_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -13977,16 +14101,6 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "episodes":
 			out.Values[i] = ec._Video_episodes(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "characters":
-			out.Values[i] = ec._Video_characters(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "staffs":
-			out.Values[i] = ec._Video_staffs(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -14558,57 +14672,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCharacter2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐCharacter(ctx context.Context, sel ast.SelectionSet, v model.Character) graphql.Marshaler {
-	return ec._Character(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCharacter2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐCharacterᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Character) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐCharacter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐCharacter(ctx context.Context, sel ast.SelectionSet, v *model.Character) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Character(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v model.Device) graphql.Marshaler {
 	return ec._Device(ctx, sel, &v)
 }
@@ -14658,6 +14721,20 @@ func (ec *executionContext) marshalNDevice2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraph
 		return graphql.Null
 	}
 	return ec._Device(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeviceConnection2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceConnection(ctx context.Context, sel ast.SelectionSet, v model.DeviceConnection) graphql.Marshaler {
+	return ec._DeviceConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeviceConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceConnection(ctx context.Context, sel ast.SelectionSet, v *model.DeviceConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeviceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeviceModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceModel(ctx context.Context, sel ast.SelectionSet, v model.DeviceModel) graphql.Marshaler {
@@ -14930,18 +15007,6 @@ func (ec *executionContext) unmarshalNNewAttributeModel2githubᚗcomᚋ9d77vᚋp
 	return ec.unmarshalInputNewAttributeModel(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNNewCharacter2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacter(ctx context.Context, v interface{}) (model.NewCharacter, error) {
-	return ec.unmarshalInputNewCharacter(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNNewCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacter(ctx context.Context, v interface{}) (*model.NewCharacter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNNewCharacter2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacter(ctx, v)
-	return &res, err
-}
-
 func (ec *executionContext) unmarshalNNewDevice2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDevice(ctx context.Context, v interface{}) (model.NewDevice, error) {
 	return ec.unmarshalInputNewDevice(ctx, v)
 }
@@ -14956,18 +15021,6 @@ func (ec *executionContext) unmarshalNNewEpisode2githubᚗcomᚋ9d77vᚋpdcᚋgr
 
 func (ec *executionContext) unmarshalNNewHistoryInput2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewHistoryInput(ctx context.Context, v interface{}) (model.NewHistoryInput, error) {
 	return ec.unmarshalInputNewHistoryInput(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNNewStaff2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaff(ctx context.Context, v interface{}) (model.NewStaff, error) {
-	return ec.unmarshalInputNewStaff(ctx, v)
-}
-
-func (ec *executionContext) unmarshalNNewStaff2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaff(ctx context.Context, v interface{}) (*model.NewStaff, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalNNewStaff2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaff(ctx, v)
-	return &res, err
 }
 
 func (ec *executionContext) unmarshalNNewSubtitle2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitle(ctx context.Context, v interface{}) (model.NewSubtitle, error) {
@@ -15129,57 +15182,6 @@ func (ec *executionContext) unmarshalNSort2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraph
 	}
 	res, err := ec.unmarshalNSort2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSort(ctx, v)
 	return &res, err
-}
-
-func (ec *executionContext) marshalNStaff2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaff(ctx context.Context, sel ast.SelectionSet, v model.Staff) graphql.Marshaler {
-	return ec._Staff(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNStaff2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaffᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Staff) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNStaff2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaff(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
-func (ec *executionContext) marshalNStaff2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐStaff(ctx context.Context, sel ast.SelectionSet, v *model.Staff) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._Staff(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -16191,46 +16193,6 @@ func (ec *executionContext) marshalOInt2ᚖint64(ctx context.Context, sel ast.Se
 		return graphql.Null
 	}
 	return ec.marshalOInt2int64(ctx, sel, *v)
-}
-
-func (ec *executionContext) unmarshalONewCharacter2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacterᚄ(ctx context.Context, v interface{}) ([]*model.NewCharacter, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.NewCharacter, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNNewCharacter2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewCharacter(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalONewStaff2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaffᚄ(ctx context.Context, v interface{}) ([]*model.NewStaff, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]*model.NewStaff, len(vSlice))
-	for i := range vSlice {
-		res[i], err = ec.unmarshalNNewStaff2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewStaff(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
 }
 
 func (ec *executionContext) unmarshalONewSubtitle2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitleᚄ(ctx context.Context, v interface{}) ([]*model.NewSubtitle, error) {

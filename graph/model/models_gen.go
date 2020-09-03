@@ -11,7 +11,9 @@ type Attribute struct {
 	ID        int64  `json:"id"`
 	DeviceID  int64  `json:"deviceID"`
 	Key       string `json:"key"`
+	Name      string `json:"name"`
 	Value     string `json:"value"`
+	CreatedAt int64  `json:"createdAt"`
 	UpdatedAt int64  `json:"updatedAt"`
 }
 
@@ -30,13 +32,15 @@ type Character struct {
 }
 
 type Device struct {
-	ID            int64        `json:"id"`
-	DeviceModelID int64        `json:"deviceModelID"`
-	Name          string       `json:"name"`
-	Attributes    []*Attribute `json:"attributes"`
-	Telemetries   []*Telemetry `json:"telemetries"`
-	CreatedAt     int64        `json:"createdAt"`
-	UpdatedAt     int64        `json:"updatedAt"`
+	ID              int64        `json:"id"`
+	DeviceModelID   int64        `json:"deviceModelID"`
+	Name            string       `json:"name"`
+	DeviceModelName string       `json:"deviceModelName"`
+	DeviceModelDesc string       `json:"deviceModelDesc"`
+	Attributes      []*Attribute `json:"attributes"`
+	Telemetries     []*Telemetry `json:"telemetries"`
+	CreatedAt       int64        `json:"createdAt"`
+	UpdatedAt       int64        `json:"updatedAt"`
 }
 
 type DeviceConnection struct {
@@ -105,14 +109,9 @@ type NewAttributeModel struct {
 	Name          string `json:"name"`
 }
 
-type NewCharacter struct {
-	CharacterName string `json:"characterName"`
-	OriginalName  string `json:"originalName"`
-}
-
 type NewDevice struct {
-	DeviceModelID int64   `json:"deviceModelID"`
-	Name          *string `json:"name"`
+	DeviceModelID int64  `json:"deviceModelID"`
+	Name          string `json:"name"`
 }
 
 type NewDeviceModel struct {
@@ -138,11 +137,6 @@ type NewHistoryInput struct {
 	DeviceType    string  `json:"deviceType"`
 	CurrentTime   float64 `json:"currentTime"`
 	RemainingTime float64 `json:"remainingTime"`
-}
-
-type NewStaff struct {
-	Job     string   `json:"job"`
-	Persons []string `json:"persons"`
 }
 
 type NewSubtitle struct {
@@ -194,9 +188,9 @@ type NewUpdateDevice struct {
 }
 
 type NewUpdateDeviceModel struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	Desc string `json:"desc"`
+	ID   int64   `json:"id"`
+	Name string  `json:"name"`
+	Desc *string `json:"desc"`
 }
 
 type NewUpdateEpisode struct {
@@ -267,15 +261,13 @@ type NewUpdateUser struct {
 }
 
 type NewUpdateVideo struct {
-	ID         int64           `json:"id"`
-	Title      *string         `json:"title"`
-	Desc       *string         `json:"desc"`
-	PubDate    *int64          `json:"pubDate"`
-	Cover      *string         `json:"cover"`
-	Characters []*NewCharacter `json:"characters"`
-	Staffs     []*NewStaff     `json:"staffs"`
-	Tags       []string        `json:"tags"`
-	IsShow     *bool           `json:"isShow"`
+	ID      int64    `json:"id"`
+	Title   *string  `json:"title"`
+	Desc    *string  `json:"desc"`
+	PubDate *int64   `json:"pubDate"`
+	Cover   *string  `json:"cover"`
+	Tags    []string `json:"tags"`
+	IsShow  *bool    `json:"isShow"`
 }
 
 type NewUpdateVideoSeries struct {
@@ -300,16 +292,14 @@ type NewUser struct {
 }
 
 type NewVideo struct {
-	Title      string          `json:"title"`
-	Desc       *string         `json:"desc"`
-	PubDate    *int64          `json:"pubDate"`
-	Cover      *string         `json:"cover"`
-	Characters []*NewCharacter `json:"characters"`
-	Staffs     []*NewStaff     `json:"staffs"`
-	Tags       []string        `json:"tags"`
-	IsShow     bool            `json:"isShow"`
-	VideoURLs  []string        `json:"videoURLs"`
-	Subtitles  *NewSubtitles   `json:"subtitles"`
+	Title     string        `json:"title"`
+	Desc      *string       `json:"desc"`
+	PubDate   *int64        `json:"pubDate"`
+	Cover     *string       `json:"cover"`
+	Tags      []string      `json:"tags"`
+	IsShow    bool          `json:"isShow"`
+	VideoURLs []string      `json:"videoURLs"`
+	Subtitles *NewSubtitles `json:"subtitles"`
 }
 
 type NewVideoSeries struct {
@@ -352,7 +342,9 @@ type Telemetry struct {
 	ID        int64   `json:"id"`
 	DeviceID  int64   `json:"deviceID"`
 	Key       string  `json:"key"`
+	Name      string  `json:"name"`
 	Value     float64 `json:"value"`
+	CreatedAt int64   `json:"createdAt"`
 	UpdatedAt int64   `json:"updatedAt"`
 }
 
@@ -415,18 +407,16 @@ type UserConnection struct {
 }
 
 type Video struct {
-	ID         int64        `json:"id"`
-	Title      string       `json:"title"`
-	Desc       string       `json:"desc"`
-	PubDate    int64        `json:"pubDate"`
-	Cover      string       `json:"cover"`
-	Episodes   []*Episode   `json:"episodes"`
-	Characters []*Character `json:"characters"`
-	Staffs     []*Staff     `json:"staffs"`
-	Tags       []string     `json:"tags"`
-	IsShow     bool         `json:"isShow"`
-	CreatedAt  int64        `json:"createdAt"`
-	UpdatedAt  int64        `json:"updatedAt"`
+	ID        int64      `json:"id"`
+	Title     string     `json:"title"`
+	Desc      string     `json:"desc"`
+	PubDate   int64      `json:"pubDate"`
+	Cover     string     `json:"cover"`
+	Episodes  []*Episode `json:"episodes"`
+	Tags      []string   `json:"tags"`
+	IsShow    bool       `json:"isShow"`
+	CreatedAt int64      `json:"createdAt"`
+	UpdatedAt int64      `json:"updatedAt"`
 }
 
 type VideoConnection struct {
