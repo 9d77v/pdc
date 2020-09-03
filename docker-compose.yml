@@ -71,7 +71,7 @@ services:
         - ./redis/data:/data
     container_name: redis
   pdc:
-    image: 9d77v/pdc:2020-09-01_0930e26
+    image: 9d77v/pdc:2020-09-03_71d6857
     restart: always
     ports: 
       - 8080:8080
