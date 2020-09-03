@@ -61,7 +61,7 @@ input NewTelemetryModel {
 input NewUpdateDeviceModel {
   id: ID!
   name: String!  
-  desc: String!
+  desc: String
 }
 
 input NewUpdateAttributeModel {
@@ -82,6 +82,8 @@ type Device {
   id: ID!
   deviceModelID: ID!
   name: String!
+  deviceModelName:String!
+  deviceModelDesc:String!
   attributes: [Attribute!]
   telemetries: [Telemetry!]
   createdAt: Int!
@@ -92,7 +94,9 @@ type Attribute {
   id: ID!
   deviceID: ID!
   key: String!
+  name: String!
   value: String!
+  createdAt: Int!
   updatedAt: Int!
 }
 
@@ -101,7 +105,9 @@ type Telemetry {
   id: ID!
   deviceID: ID!
   key: String!
+  name: String!
   value: Float!
+  createdAt: Int!
   updatedAt: Int!
 }
 
@@ -112,7 +118,7 @@ type DeviceConnection {
 
 input NewDevice {
   deviceModelID: ID!
-  name: String
+  name: String!
 }
 
 input NewUpdateDevice {

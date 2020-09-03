@@ -3,9 +3,8 @@ package models
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
-	"github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 //Episode 分集
@@ -18,21 +17,27 @@ type Episode struct {
 	Cover     string `gorm:"size:500;NOT NULL;"`
 	URL       string `gorm:"size:500;NOT NULL;"`
 	MobileURL string `gorm:"size:500;"`
-	Subtitles postgres.Hstore
+	Subtitles []*Subtitle
+}
+
+//Subtitle 字幕
+type Subtitle struct {
+	gorm.Model
+	EpisodeID uint   `gorm:"unique_index:subtitle_uix"`
+	Name      string `gorm:"unique_index:subtitle_uix;size:50;NOT NULL;"`
+	URL       string `gorm:"size:500;NOT NULL;"`
 }
 
 //Video 视频
 type Video struct {
 	gorm.Model
-	Title      string `gorm:"size:50;NOT NULL;"`
-	Desc       string `gorm:"size:5000;NOT NULL;"`
-	PubDate    time.Time
-	Cover      string `gorm:"size:500;NOT NULL;"`
-	Episodes   []*Episode
-	Characters postgres.Hstore
-	Staffs     postgres.Hstore
-	Tags       pq.StringArray `gorm:"type:varchar(10)[]"`
-	IsShow     bool
+	Title    string `gorm:"size:50;NOT NULL;"`
+	Desc     string `gorm:"size:5000;NOT NULL;"`
+	PubDate  time.Time
+	Cover    string `gorm:"size:500;NOT NULL;"`
+	Episodes []*Episode
+	Tags     pq.StringArray `gorm:"type:varchar(10)[]"`
+	IsShow   bool
 }
 
 //VideoSeriesItem 视频系列视频列表

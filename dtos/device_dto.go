@@ -44,3 +44,39 @@ func ToDeviceModelDto(m *models.DeviceModel) *model.DeviceModel {
 		UpdatedAt:       m.UpdatedAt.Unix(),
 	}
 }
+
+//ToDeviceDto ...
+func ToDeviceDto(m *models.Device) *model.Device {
+	as := make([]*model.Attribute, 0, len(m.Attributes))
+	for _, v := range m.Attributes {
+		as = append(as, &model.Attribute{
+			ID:        int64(v.ID),
+			Key:       v.Key,
+			Name:      v.AttributeModel.Name,
+			Value:     v.Value,
+			CreatedAt: v.CreatedAt.Unix(),
+			UpdatedAt: v.UpdatedAt.Unix(),
+		})
+	}
+	ts := make([]*model.Telemetry, 0, len(m.Telemetries))
+	for _, v := range m.Telemetries {
+		ts = append(ts, &model.Telemetry{
+			ID:        int64(v.ID),
+			Key:       v.Key,
+			Name:      v.TelemetryModel.Name,
+			CreatedAt: v.CreatedAt.Unix(),
+			UpdatedAt: v.UpdatedAt.Unix(),
+		})
+	}
+	return &model.Device{
+		ID:              int64(m.ID),
+		Name:            m.Name,
+		DeviceModelID:   int64(m.DeviceModelID),
+		DeviceModelName: m.DeviceModel.Name,
+		DeviceModelDesc: m.DeviceModel.Desc,
+		Attributes:      as,
+		Telemetries:     ts,
+		CreatedAt:       m.CreatedAt.Unix(),
+		UpdatedAt:       m.UpdatedAt.Unix(),
+	}
+}

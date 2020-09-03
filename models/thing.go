@@ -3,8 +3,8 @@ package models
 import (
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 //Thing 物品

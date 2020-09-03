@@ -74,7 +74,7 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 	if len(input.Pics) > 0 {
 		updateMap["pics"] = input.Pics
 	}
-	err := models.Gorm.Model(thing).Update(updateMap).Error
+	err := models.Gorm.Model(thing).Updates(updateMap).Error
 	return &model.Thing{ID: int64(thing.ID)}, err
 }
 
@@ -85,37 +85,15 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string,
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
 	offset, limit := GetPageInfo(page, pageSize)
-	filedMap, _ := utils.GetFieldData(ctx, "")
+	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	builder := models.Gorm
 	builder = builder.Where("uid=?", uid)
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
-	if filedMap["edges"] {
-		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		subBuilder := builder
-		if limit > 0 {
-			subBuilder = subBuilder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			if v.IsAsc {
-				subBuilder = subBuilder.Order(v.Field + " ASC")
-			} else {
-				subBuilder = subBuilder.Order(v.Field + " DESC")
-			}
-		}
-		err = subBuilder.Find(&data).Error
-		if err != nil {
-			return 0, result, err
-		}
-	}
 	var total int64
-	if filedMap["totalCount"] {
+	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
@@ -123,6 +101,27 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string,
 			if err != nil {
 				return 0, result, err
 			}
+		}
+	}
+	if fieldMap["edges"] {
+		_, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		if limit > 0 {
+			builder = builder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				builder = builder.Order(v.Field + " ASC")
+			} else {
+				builder = builder.Order(v.Field + " DESC")
+			}
+		}
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
 		}
 	}
 	for _, m := range data {

@@ -64,6 +64,9 @@ var permissonMap = map[string][]int{
 	"createTelemetryModel":  {models.RoleAdmin, models.RoleManager},
 	"updateTelemetryModel":  {models.RoleAdmin, models.RoleManager},
 	"deviceModels":          {models.RoleAdmin, models.RoleManager},
+	"createDevice":          {models.RoleAdmin, models.RoleManager},
+	"updateDevice":          {models.RoleAdmin, models.RoleManager},
+	"devices":               {models.RoleAdmin, models.RoleManager},
 }
 
 //Auth ..

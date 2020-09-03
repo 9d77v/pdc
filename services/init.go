@@ -3,7 +3,7 @@ package services
 import "github.com/9d77v/go-lib/ptrs"
 
 //GetPageInfo 获取分页信息
-func GetPageInfo(page, pageSize *int64) (int64, int64) {
+func GetPageInfo(page, pageSize *int64) (int, int) {
 	offset := ptrs.Int64(page)
 	limit := ptrs.Int64(pageSize)
 	if offset < 1 {
@@ -19,5 +19,5 @@ func GetPageInfo(page, pageSize *int64) (int64, int64) {
 		limit = 100
 	}
 	offset = (offset - 1) * limit
-	return offset, limit
+	return int(offset), int(limit)
 }

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 //DeviceModel 设备模型
@@ -37,9 +37,9 @@ type TelemetryModel struct {
 //Device 设备
 type Device struct {
 	gorm.Model
-	DeviceModelID uint         //设备模型id
+	DeviceModelID uint //设备模型id
+	DeviceModel   DeviceModel
 	Name          string       `gorm:"size:50"` //设备名称
-	Sn            string       `gorm:"size:50"` //设备编号
 	Attributes    []*Attribute //属性，由采集程序启动时注册
 	Telemetries   []*Telemetry //遥测，由采集程序按一定频率上传
 }
@@ -47,14 +47,20 @@ type Device struct {
 //Attribute 属性
 type Attribute struct {
 	gorm.Model
-	DeviceID uint   `gorm:"unique_index:attribute_uix"`         //设备模型id
-	Key      string `gorm:"unique_index:attribute_uix;size:50"` //属性key
-	Value    string `gorm:"size:50"`                            //属性值
+	DeviceID         uint `gorm:"unique_index:attribute_uix"` //设备模型id
+	AttributeModelID uint
+	AttributeModel   AttributeModel
+	Key              string `gorm:"unique_index:attribute_uix;size:50"` //属性key
+	Name             string `gorm:"-"`
+	Value            string `gorm:"size:50"` //属性值
 }
 
 //Telemetry 遥测
 type Telemetry struct {
 	gorm.Model
-	DeviceID uint   `gorm:"unique_index:telemetry_uix"`         //设备id
-	Key      string `gorm:"unique_index:telemetry_uix;size:50"` //遥测key
+	DeviceID         uint `gorm:"unique_index:telemetry_uix"` //设备id
+	TelemetryModelID uint
+	TelemetryModel   TelemetryModel
+	Key              string `gorm:"unique_index:telemetry_uix;size:50"` //遥测key
+	Name             string `gorm:"-"`
 }

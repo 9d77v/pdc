@@ -19,9 +19,7 @@ import (
 	"github.com/9d77v/pdc/models/elasticsearch"
 	"github.com/9d77v/pdc/utils"
 	"github.com/olivere/elastic"
-
-	"github.com/jinzhu/gorm"
-	"github.com/jinzhu/gorm/dialects/postgres"
+	"gorm.io/gorm"
 )
 
 //VideoService ..
@@ -30,24 +28,13 @@ type VideoService struct {
 
 //CreateVideo ..
 func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
-	cs := make(postgres.Hstore, len(input.Characters))
-	for _, v := range input.Characters {
-		cs[v.CharacterName] = &v.OriginalName
-	}
-	ss := make(postgres.Hstore, len(input.Staffs))
-	for _, v := range input.Staffs {
-		staffs := strings.Join(v.Persons, ",")
-		ss[v.Job] = &staffs
-	}
 	m := &models.Video{
-		Title:      input.Title,
-		Desc:       ptrs.String(input.Desc),
-		PubDate:    time.Unix(ptrs.Int64(input.PubDate), 0),
-		Cover:      ptrs.String(input.Cover),
-		Characters: cs,
-		Staffs:     ss,
-		Tags:       input.Tags,
-		IsShow:     input.IsShow,
+		Title:   input.Title,
+		Desc:    ptrs.String(input.Desc),
+		PubDate: time.Unix(ptrs.Int64(input.PubDate), 0),
+		Cover:   ptrs.String(input.Cover),
+		Tags:    input.Tags,
+		IsShow:  input.IsShow,
 	}
 	tx := models.Gorm.Begin()
 	err := tx.Create(m).Error
@@ -55,19 +42,29 @@ func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*m
 		tx.Rollback()
 		return &model.Video{}, err
 	}
+	episodes := make([]*models.Episode, 0, len(input.VideoURLs))
 	for i, url := range input.VideoURLs {
-		e := &models.Episode{
+		episodes = append(episodes, &models.Episode{
 			Num:     float64(i + 1),
 			VideoID: int64(m.ID),
 			URL:     url,
+		})
+	}
+	err = tx.Create(&episodes).Error
+	if err != nil {
+		tx.Rollback()
+		return &model.Video{}, err
+	}
+	if input.Subtitles != nil && len(input.Subtitles.Urls) > 0 {
+		subtitles := make([]*models.Subtitle, 0, len(input.Subtitles.Urls))
+		for i, v := range episodes {
+			subtitles = append(subtitles, &models.Subtitle{
+				EpisodeID: v.ID,
+				Name:      input.Subtitles.Name,
+				URL:       input.Subtitles.Urls[i],
+			})
 		}
-		cs := make(postgres.Hstore, len(input.VideoURLs))
-
-		if input.Subtitles != nil && len(input.Subtitles.Urls) > 0 {
-			cs[input.Subtitles.Name] = &input.Subtitles.Urls[i]
-			e.Subtitles = cs
-		}
-		err := models.Gorm.Create(e).Error
+		err = tx.Create(&subtitles).Error
 		if err != nil {
 			tx.Rollback()
 			return &model.Video{}, err
@@ -90,48 +87,51 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 		First(video, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
-	cs := make(postgres.Hstore, len(input.Characters))
-	for _, v := range input.Characters {
-		cs[v.CharacterName] = &v.OriginalName
-	}
-	ss := make(postgres.Hstore, len(input.Staffs))
-	for _, v := range input.Staffs {
-		staffs := strings.Join(v.Persons, ",")
-		ss[v.Job] = &staffs
-	}
 	updateMap := map[string]interface{}{
-		"title":      ptrs.String(input.Title),
-		"pub_date":   time.Unix(ptrs.Int64(input.PubDate), 0),
-		"desc":       ptrs.String(input.Desc),
-		"characters": cs,
-		"staffs":     ss,
-		"tags":       input.Tags,
-		"is_show":    ptrs.Bool(input.IsShow),
+		"title":    ptrs.String(input.Title),
+		"pub_date": time.Unix(ptrs.Int64(input.PubDate), 0),
+		"desc":     ptrs.String(input.Desc),
+		"tags":     input.Tags,
+		"is_show":  ptrs.Bool(input.IsShow),
 	}
 	if input.Cover != nil {
 		updateMap["cover"] = ptrs.String(input.Cover)
 	}
-	err := models.Gorm.Model(video).Update(updateMap).Error
+	err := models.Gorm.Model(video).Updates(updateMap).Error
 	sendMsgToUpdateES(input.ID)
 	return &model.Video{ID: int64(video.ID)}, err
 }
 
 //CreateEpisode ..
 func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error) {
-	cs := make(postgres.Hstore, len(input.Subtitles))
-	for _, v := range input.Subtitles {
-		cs[v.Name] = &v.URL
-	}
 	e := &models.Episode{
-		Num:       input.Num,
-		VideoID:   input.VideoID,
-		Title:     ptrs.String(input.Title),
-		Desc:      ptrs.String(input.Desc),
-		Cover:     ptrs.String(input.Cover),
-		URL:       input.URL,
-		Subtitles: cs,
+		Num:     input.Num,
+		VideoID: input.VideoID,
+		Title:   ptrs.String(input.Title),
+		Desc:    ptrs.String(input.Desc),
+		Cover:   ptrs.String(input.Cover),
+		URL:     input.URL,
 	}
-	err := models.Gorm.Create(e).Error
+	tx := models.Gorm.Begin()
+	err := tx.Create(e).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	subtitles := make([]*models.Subtitle, 0, len(input.Subtitles))
+	for _, v := range input.Subtitles {
+		subtitles = append(subtitles, &models.Subtitle{
+			EpisodeID: e.ID,
+			Name:      v.Name,
+			URL:       v.URL,
+		})
+	}
+	err = tx.Create(&subtitles).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	tx.Commit()
 	sendMsgToUpdateES(input.VideoID)
 	return &model.Episode{ID: int64(e.ID)}, err
 }
@@ -139,23 +139,34 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 //UpdateEpisode ..
 func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
-	varibales := graphql.GetRequestContext(ctx).Variables
-	fields := make([]string, 0)
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
-	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(episode, "id=?", input.ID).Error; err != nil {
+	if err := models.Gorm.Select("id").First(episode, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
-	cs := make(postgres.Hstore, len(input.Subtitles))
-	for _, v := range input.Subtitles {
-		cs[v.Name] = &v.URL
-	}
 	updateMap := map[string]interface{}{
-		"num":       ptrs.Float64(input.Num),
-		"title":     ptrs.String(input.Title),
-		"desc":      ptrs.String(input.Desc),
-		"subtitles": cs,
+		"num":   ptrs.Float64(input.Num),
+		"title": ptrs.String(input.Title),
+		"desc":  ptrs.String(input.Desc),
+	}
+	tx := models.Gorm.Begin()
+	err := tx.Where("episode_id=?", episode.ID).Delete(&models.Subtitle{}).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if len(input.Subtitles) > 0 {
+		subtitles := make([]*models.Subtitle, 0, len(input.Subtitles))
+		for _, v := range input.Subtitles {
+			subtitles = append(subtitles, &models.Subtitle{
+				EpisodeID: episode.ID,
+				Name:      v.Name,
+				URL:       v.URL,
+			})
+		}
+		err := tx.Create(&subtitles).Error
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
 	}
 	if input.Cover != nil {
 		updateMap["cover"] = ptrs.String(input.Cover)
@@ -163,58 +174,55 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 	if input.URL != "" {
 		updateMap["url"] = input.URL
 	}
-	err := models.Gorm.Model(episode).Update(updateMap).Error
+	err = tx.Model(episode).Updates(updateMap).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	tx.Commit()
 	return &model.Episode{ID: int64(episode.ID)}, err
 }
 
 //UpdateSubtitle ..
 func (s VideoService) UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error) {
 	data := make([]*models.Episode, 0)
-	if err := models.Gorm.Select("id,subtitles").Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
+	if err := models.Gorm.Select("id").Preload("Subtitles", "name=?", input.Subtitles.Name).
+		Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
 		return nil, err
 	}
-	tx := models.Gorm.Begin()
 	if len(input.Subtitles.Urls) == 0 {
-		for _, d := range data {
-			if d.Subtitles == nil {
-				continue
-			}
-			cs := make(postgres.Hstore, len(d.Subtitles))
-			for k, v := range d.Subtitles {
-				if k != input.Subtitles.Name {
-					cs[k] = v
-				}
-			}
-			err := models.Gorm.Model(d).Update(map[string]interface{}{
-				"subtitles": cs,
-			}).Error
-			if err != nil {
-				tx.Rollback()
-				return nil, err
-			}
+		ids := make([]uint, 0, len(data))
+		for _, v := range data {
+			ids = append(ids, v.ID)
+		}
+		err := models.Gorm.Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).Delete(&models.Subtitle{}).Error
+		if err != nil {
+			return nil, err
 		}
 	} else {
 		if len(input.Subtitles.Urls) != len(data) {
 			return nil, errors.New("视频与字幕数量不一致")
 		}
+		subtitles := make([]*models.Subtitle, 0, 0)
 		for i, d := range data {
-			if d.Subtitles == nil {
-				cs := make(postgres.Hstore, len(d.Subtitles))
-				cs[input.Subtitles.Name] = &input.Subtitles.Urls[i]
-				d.Subtitles = cs
+			if len(d.Subtitles) == 0 {
+				subtitles = append(subtitles, &models.Subtitle{
+					EpisodeID: d.ID,
+					Name:      input.Subtitles.Name,
+					URL:       input.Subtitles.Urls[i],
+				})
 			} else {
-				d.Subtitles[input.Subtitles.Name] = &input.Subtitles.Urls[i]
-			}
-			err := models.Gorm.Model(d).Update(map[string]interface{}{
-				"subtitles": d.Subtitles,
-			}).Error
-			if err != nil {
-				tx.Rollback()
-				return nil, err
+				if d.Subtitles[0].URL != input.Subtitles.Urls[i] {
+					d.Subtitles[0].URL = input.Subtitles.Urls[i]
+					subtitles = append(subtitles, d.Subtitles[0])
+				}
 			}
 		}
+		err := models.Gorm.Save(&subtitles).Error
+		if err != nil {
+			return nil, err
+		}
 	}
-	tx.Commit()
 	return &model.Video{ID: int64(input.ID)}, nil
 }
 
@@ -230,7 +238,7 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 	}
 	if len(input.VideoURLs) == 0 {
 		for _, d := range data {
-			err := models.Gorm.Model(d).Update(map[string]interface{}{
+			err := models.Gorm.Model(d).Updates(map[string]interface{}{
 				"mobile_url": "",
 			}).Error
 			if err != nil {
@@ -240,7 +248,7 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 		}
 	} else {
 		for i, d := range data {
-			err := models.Gorm.Model(d).Update(map[string]interface{}{
+			err := models.Gorm.Model(d).Updates(map[string]interface{}{
 				"mobile_url": input.VideoURLs[i],
 			}).Error
 			if err != nil {
@@ -269,33 +277,6 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	if ptrs.Bool(isCombo) {
 		builder = builder.Where("NOT EXISTS (select video_id from " + models.DBPrefix + "_video_series_item where video_id=id)")
 	}
-	if fieldMap["edges"] {
-		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		subBuilder := builder
-		if limit > 0 {
-			subBuilder = subBuilder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			if v.IsAsc {
-				subBuilder = subBuilder.Order(v.Field + " ASC")
-			} else {
-				subBuilder = subBuilder.Order(v.Field + " DESC")
-			}
-		}
-		if edgeFieldMap["episodes"] {
-			subBuilder = subBuilder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
-				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
-			})
-		}
-		err = subBuilder.Find(&data).Error
-		if err != nil {
-			return 0, result, err
-		}
-	}
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
@@ -305,6 +286,32 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 			if err != nil {
 				return 0, result, err
 			}
+		}
+	}
+	if fieldMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		if limit > 0 {
+			builder = builder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				builder = builder.Order(v.Field + " ASC")
+			} else {
+				builder = builder.Order(v.Field + " DESC")
+			}
+		}
+		if edgeFieldMap["episodes"] {
+			builder = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
+				return models.Gorm.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
+			}).Preload("Episodes.Subtitles")
+		}
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
 		}
 	}
 	for _, m := range data {
@@ -341,7 +348,7 @@ func (s VideoService) UpdateVideoSeries(ctx context.Context, input model.NewUpda
 	updateMap := map[string]interface{}{
 		"name": input.Name,
 	}
-	err := models.Gorm.Model(videoSeries).Update(updateMap).Error
+	err := models.Gorm.Model(videoSeries).Updates(updateMap).Error
 	return &model.VideoSeries{ID: int64(videoSeries.ID)}, err
 }
 
@@ -378,7 +385,7 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context, input model.New
 	updateMap := map[string]interface{}{
 		"alias": input.Alias,
 	}
-	err := models.Gorm.Model(item).Update(updateMap).Error
+	err := models.Gorm.Model(item).Updates(updateMap).Error
 	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
 }
@@ -404,24 +411,34 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
+	var total int64
+	if fieldMap["totalCount"] {
+		if limit == -1 {
+			total = int64(len(data))
+		} else {
+			err = builder.Model(&models.VideoSeries{}).Count(&total).Error
+			if err != nil {
+				return 0, result, err
+			}
+		}
+	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder = builder.Select(utils.ToDBFields(edgeFields, "items", "__typename"))
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
-		subBuilder := builder
 		if limit > 0 {
-			subBuilder = subBuilder.Offset(offset).Limit(limit)
+			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
 			if v.IsAsc {
-				subBuilder = subBuilder.Order(v.Field + " ASC")
+				builder = builder.Order(v.Field + " ASC")
 			} else {
-				subBuilder = subBuilder.Order(v.Field + " DESC")
+				builder = builder.Order(v.Field + " DESC")
 			}
 		}
-		err = subBuilder.Find(&data).Error
+		err = builder.Find(&data).Error
 		if err != nil {
 			return 0, result, err
 		}
@@ -457,17 +474,6 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 			}
 			for _, v := range data {
 				v.Items = itemMap[v.ID]
-			}
-		}
-	}
-	var total int64
-	if fieldMap["totalCount"] {
-		if limit == -1 {
-			total = int64(len(data))
-		} else {
-			err = builder.Model(&models.VideoSeries{}).Count(&total).Error
-			if err != nil {
-				return 0, result, err
 			}
 		}
 	}
