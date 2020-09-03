@@ -73,5 +73,5 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

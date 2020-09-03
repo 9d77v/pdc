@@ -29,13 +29,28 @@ export default function ThingAnalysis() {
             message.error("接口请求失败！")
         }
     }, [error])
+    let series1: any = {
+        x1: [],
+        x2: [],
+        y: []
+    }
+    let series2: any = {
+        x1: [],
+        x2: [],
+        y: []
+    }
     if (data) {
-        data.series1.x2 = data.series1.x2.map((value: string) => {
+        series1.x1 = data.series1.x1
+        series1.x2 = data.series1.x2.map((value: string) => {
             return ConsumerExpenditureMap.get(value) || ThingStatusMap.get(parseInt(value))?.text || value
         })
-        data.series2.x2 = data.series2.x2.map((value: string) => {
+        series1.y = data.series1.y
+
+        series2.x1 = data.series2.x1
+        series2.x2 = data.series2.x2.map((value: string) => {
             return ConsumerExpenditureMap.get(value) || ThingStatusMap.get(parseInt(value))?.text || value
         })
+        series2.y = data.series2.y
     }
     const chartStyle = { width: 800, height: 700, padding: 10 }
     return (
@@ -59,8 +74,8 @@ export default function ThingAnalysis() {
                 style={{ width: 136, justifyContent: 'center' }} />}
             </span>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: 10, overflowX: "scroll" }}>
-                <PieLine title={"物品金额"} start={start} data={data ? data.series1 : undefined} style={chartStyle} unit={'￥'} group={group || ""} />
-                <PieLine title={"物品数量"} start={start} data={data ? data.series2 : undefined} style={chartStyle} unit={'件'} group={group || ""} />
+                <PieLine title={"物品金额"} start={start} data={series1} style={chartStyle} unit={'￥'} group={group || ""} />
+                <PieLine title={"物品数量"} start={start} data={series2} style={chartStyle} unit={'件'} group={group || ""} />
             </div>
         </div>
     )

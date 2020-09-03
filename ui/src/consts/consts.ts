@@ -26,6 +26,18 @@ export interface IDeviceModel {
     updatedAt: number
 }
 
+
+export interface IDevice {
+    id: number
+    name: string
+    deviceModelName: string,
+    deviceModelDesc: string,
+    deviceModelID: number
+    deviceType: number
+    createdAt: number
+    updatedAt: number
+}
+
 const RubbishCategoryMap = new Map<number, TagStyle>([
     [0, {
         color: 'black',

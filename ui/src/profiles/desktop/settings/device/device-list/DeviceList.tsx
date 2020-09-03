@@ -1,32 +1,31 @@
 import { List, Button, Tag } from 'antd';
 import React, { useState } from 'react';
-import { DeviceModelCreateForm, INewDeviceModel } from './DeviceModelCreateForm';
-import { ADD_DEVICE_MODEL, LIST_DEVICE_MODEL, UPDATE_DEVICE_MODEL } from '../../../../../consts/device.gql';
+import { DeviceCreateForm, INewDevice } from './DeviceCreateForm';
+import { ADD_DEVICE, LIST_DEVICE, UPDATE_DEVICE } from '../../../../../consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { DeviceTypeMap, IDeviceModel } from '../../../../../consts/consts';
+import { IDevice } from '../../../../../consts/consts';
 import "../../../../../style/card.less"
 import { DeleteOutlined } from '@ant-design/icons';
-import { IUpdateDeviceModel, DeviceModelUpdateForm } from './DeviceModelUpdateForm';
+import { IUpdateDevice, DeviceUpdateForm } from './DeviceUpdateForm';
 
-interface IDeviceModelListProps {
+interface IDeviceListProps {
     currentSelectID: number
-    setCurrentSelectItem: (item: IDeviceModel) => void
+    setCurrentSelectItem: (item: IDevice) => void
 }
 
-export const DeviceModelList = (props: IDeviceModelListProps) => {
-    const [deviceModelCreateFormVisible, setDeviceModelCreateFormVisible] = useState(false)
-    const [deviceModelUpdateFormVisible, setDeviceModelUpdateFormVisible] = useState(false)
-    const [updateDeviceModelData, setUpdateDeviceModelData] = useState({
+export const DeviceList = (props: IDeviceListProps) => {
+    const [deviceCreateFormVisible, setDeviceCreateFormVisible] = useState(false)
+    const [deviceUpdateFormVisible, setDeviceUpdateFormVisible] = useState(false)
+    const [updateDeviceData, setUpdateDeviceData] = useState({
         id: 0,
-        name: "",
-        desc: ""
+        name: ""
     })
-    const [addDeviceModel] = useMutation(ADD_DEVICE_MODEL);
-    const [updateDeviceModel] = useMutation(UPDATE_DEVICE_MODEL);
+    const [addDevice] = useMutation(ADD_DEVICE);
+    const [updateDevice] = useMutation(UPDATE_DEVICE);
     const [pagination, setPagination] = useState({
         current: 1,
     })
-    const { loading, data, refetch, } = useQuery(LIST_DEVICE_MODEL,
+    const { loading, data, refetch, } = useQuery(LIST_DEVICE,
         {
             variables: {
                 page: pagination.current,
@@ -39,31 +38,29 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
             fetchPolicy: "cache-and-network"
         });
 
-    const onDeviceModelCreate = async (values: INewDeviceModel) => {
-        await addDeviceModel({
+    const onDeviceCreate = async (values: INewDevice) => {
+        await addDevice({
             variables: {
                 "input": {
                     "name": values.name,
-                    "deviceType": values.deviceType || 0,
-                    "desc": values.desc,
+                    "deviceModelID": values.deviceModelID
                 }
             }
         });
-        setDeviceModelCreateFormVisible(false);
+        setDeviceCreateFormVisible(false);
         await refetch()
     };
 
-    const onDeviceModelUpdate = async (values: IUpdateDeviceModel) => {
-        await updateDeviceModel({
+    const onDeviceUpdate = async (values: IUpdateDevice) => {
+        await updateDevice({
             variables: {
                 "input": {
                     "id": values.id,
-                    "name": values.name,
-                    "desc": values.desc,
+                    "name": values.name
                 }
             }
         });
-        setDeviceModelUpdateFormVisible(false);
+        setDeviceUpdateFormVisible(false);
         await refetch()
     };
     return (
@@ -71,7 +68,7 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
             <Button
                 type="primary"
                 onClick={() => {
-                    setDeviceModelCreateFormVisible(true)
+                    setDeviceCreateFormVisible(true)
                 }}
                 style={{
                     float: 'left',
@@ -81,21 +78,21 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
                     width: 120
                 }}
             >
-                新增设备模型
+                新增设备
             </Button>
-            <DeviceModelCreateForm
-                visible={deviceModelCreateFormVisible}
-                onCreate={onDeviceModelCreate}
+            <DeviceCreateForm
+                visible={deviceCreateFormVisible}
+                onCreate={onDeviceCreate}
                 onCancel={() => {
-                    setDeviceModelCreateFormVisible(false);
+                    setDeviceCreateFormVisible(false);
                 }}
             />
-            <DeviceModelUpdateForm
-                data={updateDeviceModelData}
-                visible={deviceModelUpdateFormVisible}
-                onUpdate={onDeviceModelUpdate}
+            <DeviceUpdateForm
+                data={updateDeviceData}
+                visible={deviceUpdateFormVisible}
+                onUpdate={onDeviceUpdate}
                 onCancel={() => {
-                    setDeviceModelUpdateFormVisible(false);
+                    setDeviceUpdateFormVisible(false);
                 }}
             />
             <List
@@ -109,21 +106,20 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
                         })
                     },
                     pageSize: 7,
-                    total: data?.deviceModels.totalCount
+                    total: data?.devices.totalCount
                 }}
-                dataSource={data?.deviceModels.edges}
-                renderItem={(item: any) => (
+                dataSource={data?.devices.edges}
+                renderItem={(item: IDevice) => (
                     <List.Item
                         key={item.id}
                         actions={[
                             <div onClick={
                                 () => {
-                                    setUpdateDeviceModelData({
+                                    setUpdateDeviceData({
                                         "id": item.id,
-                                        "name": item.name,
-                                        "desc": item.desc
+                                        "name": item.name
                                     })
-                                    setDeviceModelUpdateFormVisible(true)
+                                    setDeviceUpdateFormVisible(true)
                                 }
                             }><DeleteOutlined />编辑</div>
                         ]}
@@ -131,16 +127,16 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
                     >
                         <div style={{ display: "flex", flexDirection: "column", textAlign: "left" }}
                             onClick={() => props.setCurrentSelectItem(item)}>
-                            <Tag color="geekblue" style={{ width: "fit-content" }}>{DeviceTypeMap.get(item.deviceType)}</Tag>
+                            <Tag color="geekblue" style={{ width: "fit-content" }}>{item.deviceModelName}</Tag>
                             <div style={{ display: "flex", flexDirection: "row", marginTop: 10 }}>
                                 <div style={{ width: 60 }}>ID：{item.id} </div>
                                 <div >名称：{item.name}</div>
                             </div>
                         </div>
+
                     </List.Item>
                 )
                 }
             />
         </div >)
-
 }

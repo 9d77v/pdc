@@ -1,25 +1,35 @@
-import { Modal, Form, Input, Select } from 'antd'
-import React, { useState, useEffect } from 'react'
+import { Modal, Form, Input, Select } from 'antd';
+import React, { useState } from 'react'
 import { useQuery } from '@apollo/react-hooks';
-import { VIDEO_COMBO } from '../../../../../consts/video.gql';
+import { DEVICE_MODEL_COMBO } from '../../../../../consts/device.gql';
 
-interface VideoSeriesItemCreateFormProps {
-    visible: boolean
-    onCreate: (values: any) => void
-    onCancel: () => void
-    video_series_id: number,
+
+export interface INewDevice {
+    name: string
+    deviceModelID: number
+}
+
+interface DeviceCreateFormProps {
+    visible: boolean;
+    onCreate: (values: INewDevice) => void;
+    onCancel: () => void;
 }
 const { Option } = Select;
-export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps> = ({
+
+export const DeviceCreateForm: React.FC<DeviceCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
-    video_series_id
 }) => {
-    const [form] = Form.useForm()
-    const [value, setValue] = useState(0)
+
+    const [form] = Form.useForm();
+    const layout = {
+        labelCol: { span: 5 },
+        wrapperCol: { span: 15 },
+    }
     const [keyword, setKeyword] = useState("")
-    const { data } = useQuery(VIDEO_COMBO,
+    const [value, setValue] = useState(0)
+    const { data } = useQuery(DEVICE_MODEL_COMBO,
         {
             variables: {
                 page: 1,
@@ -32,20 +42,6 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
             },
             fetchPolicy: "cache-and-network"
         })
-    const onFinish = (values: any) => {
-        console.log('Finish:', values)
-    }
-    useEffect(() => {
-        form.setFieldsValue({
-            "videoSeriesID": video_series_id,
-        })
-    }, [form, video_series_id])
-
-    const layout = {
-        labelCol: { span: 4 },
-        wrapperCol: { span: 16 },
-    }
-
     let timer: any
     const handleSearch = (value: string) => {
         clearTimeout(timer)
@@ -57,18 +53,18 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
     const handleChange = (value: number) => {
         setValue(value)
     }
-    const options = data === undefined ? null : data.videos.edges.map((d: any) =>
+    const options = data === undefined ? null : data.deviceModels.edges.map((d: any) =>
         <Option key={d.value} value={d.value}>{d.text}</Option>);
     return (
         <Modal
             visible={visible}
-            title="新增视频"
+            title="新增设备"
             okText="确定"
             cancelText="取消"
             onCancel={
                 () => {
                     onCancel()
-                    form.resetFields(["videoID", "alias"])
+                    form.resetFields()
                 }
             }
             getContainer={false}
@@ -76,12 +72,12 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
                 form
                     .validateFields()
                     .then((values: any) => {
-                        onCreate(values)
-                        form.resetFields(["videoID", "alias"])
+                        form.resetFields();
+                        onCreate(values);
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info)
-                    })
+                        console.log('Validate Failed:', info);
+                    });
             }}
             maskClosable={false}
         >
@@ -89,20 +85,21 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
                 {...layout}
                 form={form}
                 layout="horizontal"
-                name="videoSeriesItemCreateForm"
-                onFinish={onFinish}
+                name="deviceCreateForm"
+                style={{ maxHeight: 600 }}
+                initialValues={{ deviceType: 0 }}
             >
                 <Form.Item
-                    name="videoSeriesID"
-                    label="视频系列"
-                    noStyle
+                    name="name"
+                    label="名称"
+                    rules={[{ required: true, message: '请输入名称!' }]}
                 >
-                    <Input hidden />
+                    <Input />
                 </Form.Item>
                 <Form.Item
-                    name="videoID"
-                    label="视频"
-                    rules={[{ required: true, message: '请选择视频!' }]}
+                    name="deviceModelID"
+                    label="设备模型"
+                    rules={[{ required: true, message: '请选择设备模型!' }]}
                 >
                     <Select
                         showSearch
@@ -117,14 +114,7 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
                         {options}
                     </Select>
                 </Form.Item>
-                <Form.Item
-                    name="alias"
-                    label="别名"
-                    rules={[{ required: true, message: '请设置视频别名!' }]}
-                >
-                    <Input />
-                </Form.Item>
             </Form>
-        </Modal >
+        </Modal>
     )
 }

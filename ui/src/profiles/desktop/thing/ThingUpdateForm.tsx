@@ -248,5 +248,5 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

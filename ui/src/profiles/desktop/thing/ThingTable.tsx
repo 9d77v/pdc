@@ -296,5 +296,5 @@ export default function ThingTable() {
                 dataSource={data ? data.things.edges : []}
             />
         </div>
-    );
+    )
 }

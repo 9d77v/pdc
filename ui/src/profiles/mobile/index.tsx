@@ -1,6 +1,6 @@
 import { TabBar } from 'antd-mobile';
 import React, { useState, useEffect } from 'react';
-import { UserOutlined, HomeOutlined } from '@ant-design/icons';
+import { UserOutlined, HomeOutlined, PlaySquareOutlined } from '@ant-design/icons';
 
 import "./index.less"
 import { useHistory, Route, useLocation } from 'react-router-dom';
@@ -87,7 +87,7 @@ export default function MobileIndex() {
                     title="多媒体"
                     key="media"
                     icon={<HomeOutlined />}
-                    selectedIcon={<HomeOutlined style={{ color: "#85dbf5" }} />}
+                    selectedIcon={<PlaySquareOutlined style={{ color: "#85dbf5" }} />}
                     selected={selectedTab === 'mediaTab'}
                     onPress={() => {
                         setSelectedTab('mediaTab')

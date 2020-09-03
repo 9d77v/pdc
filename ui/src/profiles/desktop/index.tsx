@@ -31,6 +31,7 @@ const HistoryPage = React.lazy(() => import("./media/history/HistoryPage"))
 
 
 const DeviceModelIndex = React.lazy(() => import('./settings/device/device-model-list/index'))
+const DeviceIndex = React.lazy(() => import('./settings/device/device-list/index'))
 
 export default function DesktopIndex() {
     const history = useHistory();
@@ -92,6 +93,9 @@ export default function DesktopIndex() {
                         </Route>
                         <Route exact path="/admin/device/device-model-list">
                             <DeviceModelIndex />
+                        </Route>
+                        <Route exact path="/admin/device/device-list">
+                            <DeviceIndex />
                         </Route>
                         <Route exact path="/admin/user/user-list">
                             <UserTable />
