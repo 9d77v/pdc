@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Select } from 'antd';
+import { Modal, Form, Input, Select, InputNumber } from 'antd';
 import React, { useState } from 'react'
 import { useQuery } from '@apollo/react-hooks';
 import { DEVICE_MODEL_COMBO } from '../../../../../consts/device.gql';
@@ -7,6 +7,8 @@ import { DEVICE_MODEL_COMBO } from '../../../../../consts/device.gql';
 export interface INewDevice {
     name: string
     deviceModelID: number
+    ip: string
+    port: number
 }
 
 interface DeviceCreateFormProps {
@@ -95,6 +97,18 @@ export const DeviceCreateForm: React.FC<DeviceCreateFormProps> = ({
                     rules={[{ required: true, message: '请输入名称!' }]}
                 >
                     <Input />
+                </Form.Item>
+                <Form.Item
+                    name="ip"
+                    label="IP地址"
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="port"
+                    label="端口"
+                >
+                    <InputNumber />
                 </Form.Item>
                 <Form.Item
                     name="deviceModelID"

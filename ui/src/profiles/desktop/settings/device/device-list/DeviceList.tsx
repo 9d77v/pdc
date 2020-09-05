@@ -18,7 +18,9 @@ export const DeviceList = (props: IDeviceListProps) => {
     const [deviceUpdateFormVisible, setDeviceUpdateFormVisible] = useState(false)
     const [updateDeviceData, setUpdateDeviceData] = useState({
         id: 0,
-        name: ""
+        name: "",
+        ip: "",
+        port: 0
     })
     const [addDevice] = useMutation(ADD_DEVICE);
     const [updateDevice] = useMutation(UPDATE_DEVICE);
@@ -43,7 +45,9 @@ export const DeviceList = (props: IDeviceListProps) => {
             variables: {
                 "input": {
                     "name": values.name,
-                    "deviceModelID": values.deviceModelID
+                    "deviceModelID": values.deviceModelID,
+                    "ip": values.ip,
+                    "port": values.port
                 }
             }
         });
@@ -56,7 +60,9 @@ export const DeviceList = (props: IDeviceListProps) => {
             variables: {
                 "input": {
                     "id": values.id,
-                    "name": values.name
+                    "name": values.name,
+                    "ip": values.ip,
+                    "port": values.port
                 }
             }
         });
@@ -117,7 +123,9 @@ export const DeviceList = (props: IDeviceListProps) => {
                                 () => {
                                     setUpdateDeviceData({
                                         "id": item.id,
-                                        "name": item.name
+                                        "name": item.name,
+                                        "ip": item.ip,
+                                        "port": item.port
                                     })
                                     setDeviceUpdateFormVisible(true)
                                 }

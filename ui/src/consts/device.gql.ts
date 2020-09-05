@@ -135,6 +135,8 @@ query devices($keyword: String, $page: Int, $pageSize: Int) {
       name
       deviceModelID
       deviceModelName
+      ip
+      port
     }
   }
 }
@@ -146,6 +148,8 @@ query devices($ids:[ID!]) {
     edges {
       id
       name
+      ip
+      port
       deviceModelID
       deviceModelName
       deviceModelDesc
@@ -162,6 +166,7 @@ query devices($ids:[ID!]) {
         key
         name
         value
+        unit
         createdAt
         updatedAt
       }

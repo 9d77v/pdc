@@ -14,7 +14,11 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         { title: 'id', dataIndex: 'id', key: 'id' },
         { title: '键', dataIndex: 'key', key: 'key' },
         { title: '名称', dataIndex: 'name', key: 'name' },
-        { title: '值', dataIndex: 'value', key: 'value' },
+        {
+            title: '值', dataIndex: 'value', key: 'value', render: (value?: number) =>
+                value ? value : "-"
+        },
+        { title: '单位', dataIndex: 'unit', key: 'unit' },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
