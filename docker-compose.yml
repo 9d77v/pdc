@@ -14,7 +14,7 @@ services:
     command: minio server /data
     container_name: minio
   clickhouse-server:
-    image: 9d77v/clickhouse-server:arm64.2020-08-05
+    image: 9d77v/clickhouse-server:arm64.2020-09-05
     restart: always
     volumes: 
       - ./clickhouse/data:/var/lib/clickhouse

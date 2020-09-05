@@ -64,6 +64,7 @@ func ToDeviceDto(m *models.Device) *model.Device {
 			ID:        int64(v.ID),
 			Key:       v.Key,
 			Name:      v.TelemetryModel.Name,
+			Unit:      v.TelemetryModel.Unit,
 			CreatedAt: v.CreatedAt.Unix(),
 			UpdatedAt: v.UpdatedAt.Unix(),
 		})
@@ -71,6 +72,8 @@ func ToDeviceDto(m *models.Device) *model.Device {
 	return &model.Device{
 		ID:              int64(m.ID),
 		Name:            m.Name,
+		IP:              m.IP,
+		Port:            int64(m.Port),
 		DeviceModelID:   int64(m.DeviceModelID),
 		DeviceModelName: m.DeviceModel.Name,
 		DeviceModelDesc: m.DeviceModel.Desc,

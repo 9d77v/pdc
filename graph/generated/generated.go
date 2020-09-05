@@ -79,7 +79,9 @@ type ComplexityRoot struct {
 		DeviceModelID   func(childComplexity int) int
 		DeviceModelName func(childComplexity int) int
 		ID              func(childComplexity int) int
+		IP              func(childComplexity int) int
 		Name            func(childComplexity int) int
+		Port            func(childComplexity int) int
 		Telemetries     func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
 	}
@@ -217,6 +219,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		Key       func(childComplexity int) int
 		Name      func(childComplexity int) int
+		Unit      func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		Value     func(childComplexity int) int
 	}
@@ -554,12 +557,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Device.ID(childComplexity), true
 
+	case "Device.ip":
+		if e.complexity.Device.IP == nil {
+			break
+		}
+
+		return e.complexity.Device.IP(childComplexity), true
+
 	case "Device.name":
 		if e.complexity.Device.Name == nil {
 			break
 		}
 
 		return e.complexity.Device.Name(childComplexity), true
+
+	case "Device.port":
+		if e.complexity.Device.Port == nil {
+			break
+		}
+
+		return e.complexity.Device.Port(childComplexity), true
 
 	case "Device.telemetries":
 		if e.complexity.Device.Telemetries == nil {
@@ -1426,6 +1443,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Telemetry.Name(childComplexity), true
 
+	case "Telemetry.unit":
+		if e.complexity.Telemetry.Unit == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.Unit(childComplexity), true
+
 	case "Telemetry.updatedAt":
 		if e.complexity.Telemetry.UpdatedAt == nil {
 			break
@@ -2134,6 +2158,8 @@ type Device {
   id: ID!
   deviceModelID: ID!
   name: String!
+  ip: String!
+  port: Int!
   deviceModelName:String!
   deviceModelDesc:String!
   attributes: [Attribute!]
@@ -2158,7 +2184,8 @@ type Telemetry {
   deviceID: ID!
   key: String!
   name: String!
-  value: Float!
+  value: Float
+  unit: String!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -2171,11 +2198,15 @@ type DeviceConnection {
 input NewDevice {
   deviceModelID: ID!
   name: String!
+  ip: String
+  port: Int
 }
 
 input NewUpdateDevice {
   id: ID!
   name: String!  
+  ip: String
+  port: Int
 }`, BuiltIn: false},
 	&ast.Source{Name: "graph/history.graphql", Input: `type History {
 	uid: ID!
@@ -4156,6 +4187,74 @@ func (ec *executionContext) _Device_name(ctx context.Context, field graphql.Coll
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_ip(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IP, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_port(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Port, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Device_deviceModelName(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
@@ -7848,14 +7947,45 @@ func (ec *executionContext) _Telemetry_value(ctx context.Context, field graphql.
 		return graphql.Null
 	}
 	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_unit(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Unit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	res := resTmp.(float64)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Telemetry_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
@@ -11546,6 +11676,18 @@ func (ec *executionContext) unmarshalInputNewDevice(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "ip":
+			var err error
+			it.IP, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "port":
+			var err error
+			it.Port, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -11927,6 +12069,18 @@ func (ec *executionContext) unmarshalInputNewUpdateDevice(ctx context.Context, o
 		case "name":
 			var err error
 			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "ip":
+			var err error
+			it.IP, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "port":
+			var err error
+			it.Port, err = ec.unmarshalOInt2ᚖint64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12824,6 +12978,16 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "name":
 			out.Values[i] = ec._Device_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "ip":
+			out.Values[i] = ec._Device_ip(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "port":
+			out.Values[i] = ec._Device_port(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -13741,6 +13905,8 @@ func (ec *executionContext) _Telemetry(ctx context.Context, sel ast.SelectionSet
 			}
 		case "value":
 			out.Values[i] = ec._Telemetry_value(ctx, field, obj)
+		case "unit":
+			out.Values[i] = ec._Telemetry_unit(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

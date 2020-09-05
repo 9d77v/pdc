@@ -1,0 +1,32 @@
+syntax = "proto3";
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+enum DeviceAction {
+  GET_DEVICE_INFO = 0;
+  SET_ATTRIBUTES = 1;
+  UPLOAD_TELEMETRIES = 2;
+}
+
+message DeviceMSG {
+  uint32 DeviceID = 1;
+  google.protobuf.Timestamp ActionTime = 2;
+  DeviceAction DeviceAction = 3;
+  DeviceInfo DeviceInfo = 4;
+  map<string, string> AttributeMap = 5;
+  map<string, double> TelemetryMap = 6;
+  repeated Telemetry Telemetries = 7;
+}
+
+message DeviceInfo {
+  uint32 DeviceID = 1;
+  string IP = 2;
+  uint32 port = 3;
+}
+
+message Telemetry {
+  google.protobuf.Timestamp ActionTime = 1;
+  uint32 ID = 2;
+  double value = 3;
+}
