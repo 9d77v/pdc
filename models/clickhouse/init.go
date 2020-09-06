@@ -59,10 +59,10 @@ func init() {
 			device_id UInt32,
 			telemetry_id UInt32,
 			action_time  DateTime CODEC(DoubleDelta),
-			action_time_nano_second UInt32,
+			action_time_nanos UInt32,
 			value        Float64 CODEC(Gorilla),
 			created_at   DateTime CODEC(DoubleDelta),
-			created_at_nano_second UInt32
+			created_at_nanos UInt32
 		) engine=MergeTree()
 		ORDER BY (device_id,telemetry_id,action_time)
 		PARTITION BY (device_id)

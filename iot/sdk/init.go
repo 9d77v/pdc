@@ -20,17 +20,12 @@ var (
 
 //mq constantsb
 const (
-	subjectDevice = "device"
-	groupDevice   = "device"
+	subjectDevice                = "device.config"
+	subjectDeviceData            = "device.data"
+	subjectDeviceTelemetryPrefix = "device.telemetry"
 
-	subjectDeviceFilter = "device-filter"
-	groupDeviceFilter   = "group-device-filter"
-
-	subjectDeviceData  = "device-data"
-	groupDeviceSave    = "group-save-device-data"
-	groupDevicePublish = "group-publish-device-data"
-
-	subjectTelemetryPrefix = "telemetry"
+	groupDevice     = "group.device"
+	groupDeviceData = "group.device.data"
 )
 
 func init() {

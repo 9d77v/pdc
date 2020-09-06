@@ -56,29 +56,32 @@ func main() {
 		Addr:    ":" + port,
 		Handler: mux,
 	}
-	qsub1, _ := nats.Client.QueueSubscribe(nats.SubjectVideo,
+	qsub1, err := nats.Client.QueueSubscribe(nats.SubjectVideo,
 		nats.GroupVideo, consumers.HandleVideoMSG)
+	if err != nil {
+		log.Panicln("QueueSubscribe error:", err)
+	}
 	defer func() {
 		qsub1.Unsubscribe()
 		qsub1.Close()
 	}()
 	iotsdk := sdk.NewIotSDK()
-	qsub2, _ := iotsdk.NatsSubscribe(consumers.ReplyDeviceMSG)
+	qsub2, err := iotsdk.NatsSubscribe(consumers.ReplyDeviceMSG)
+	if err != nil {
+		log.Panicln("NatsSubscribe error:", err)
+	}
 	defer func() {
 		qsub2.Unsubscribe()
 	}()
-
-	qsub3, _ := iotsdk.SubscribeDeviceFilter(consumers.FilterDeviceMSG)
+	qsub3, err := iotsdk.SubscribeDeviceData(consumers.HandleDeviceMSG)
+	if err != nil {
+		log.Panicln("SubscribeDeviceAttribute error:", err)
+	}
 	defer func() {
 		qsub3.Unsubscribe()
 		qsub3.Close()
 	}()
-	qsub4, _ := iotsdk.SubscribeSaveDeviceData(consumers.SaveDeviceData)
-	defer func() {
-		qsub4.Unsubscribe()
-		qsub4.Close()
-	}()
-
+	go consumers.SaveTelemetry()
 	go func() {
 		errc <- srv.ListenAndServe()
 		log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

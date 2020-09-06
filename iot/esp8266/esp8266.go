@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/9d77v/pdc/iot/sdk"
+	"github.com/golang/protobuf/ptypes"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 	"gobot.io/x/gobot/platforms/firmata"
@@ -26,7 +27,7 @@ func CollectData(ctx context.Context) {
 	addresses := strings.Split(addr, ",")
 	for _, v := range addresses {
 		deviceID, _ := strconv.Atoi(v)
-		go Sht3x(ctx, deviceID)
+		go Sht3x(ctx, uint32(deviceID))
 	}
 
 	ticker := time.NewTicker(500 * time.Second)
@@ -41,12 +42,22 @@ func CollectData(ctx context.Context) {
 }
 
 //Sht3x get temperature and humidity
-func Sht3x(ctx context.Context, deviceID int) {
+func Sht3x(ctx context.Context, deviceID uint32) {
 	device, err := iotSDK.GetDeviceInfo(deviceID)
 	if err != nil {
 		log.Println("GetDeviceInfo Failed:", err)
 		return
 	}
+	iotSDK.SetTelemetryConfig(device.TelemetryConfig)
+	qsub, err := iotSDK.SubscribeDeviceInfo(deviceID)
+	if err != nil {
+		log.Panicln("SubscribeDeviceInfo error:", err)
+	}
+	defer func() {
+		qsub.Unsubscribe()
+		qsub.Close()
+	}()
+
 	r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.IP, device.Port))
 	sht3x := i2c.NewSHT3xDriver(r)
 	work := func() {
@@ -57,22 +68,43 @@ func Sht3x(ctx context.Context, deviceID int) {
 			log.Println("get sht3x serial number error:", err)
 			return
 		}
-		samplingFrequency := 5
-		attributeMap := map[string]string{
-			"sht30_sn": fmt.Sprintf("0x%08x", sn),
-			"sht30_hz": fmt.Sprintf("%dHz", samplingFrequency/5),
+		attributeMap := make(map[uint32]string, 0)
+		sht30SN := device.AttributeConfig["sht30_sn"]
+		if sht30SN != 0 {
+			attributeMap[sht30SN] = fmt.Sprintf("0x%08x", sn)
 		}
-		iotSDK.SetDeviceAttributes(deviceID, attributeMap)
+		samplingFrequency := 5
+		sht30Hz := device.AttributeConfig["sht30_hz"]
+		if sht30Hz != 0 {
+			attributeMap[sht30Hz] = fmt.Sprintf("%.2fHz", 1.0/float64(samplingFrequency))
+		}
+		if len(attributeMap) > 0 {
+			iotSDK.SetDeviceAttributes(deviceID, attributeMap)
+		}
 		gobot.Every(time.Duration(samplingFrequency)*time.Second, func() {
 			temp, rh, err := sht3x.Sample()
 			if err != nil {
 				log.Println("get sht3x telemetries error:", err)
 			} else {
-				telemetryMap := map[string]float64{
-					"temperature": float64(temp),
-					"humidity":    float64(rh),
+				telemetryRawMap := make(map[uint32]float64, 0)
+				telemetryMap := make(map[uint32]float64, 0)
+				temperature := iotSDK.GetTelemetryConfig()["temperature"]
+				if temperature != nil {
+					telemetryRawMap[temperature.ID] = float64(temp)
+					formatTemp, _ := strconv.ParseFloat(strconv.FormatFloat(float64(temp)*temperature.Factor, 'f', int(temperature.Scale), 64), 64)
+					telemetryMap[temperature.ID] = formatTemp
 				}
-				iotSDK.UploadDeviceTelemetries(deviceID, telemetryMap)
+				humidity := iotSDK.GetTelemetryConfig()["humidity"]
+				if humidity != nil {
+					telemetryRawMap[humidity.ID] = float64(rh)
+					formatHumidity, _ := strconv.ParseFloat(strconv.FormatFloat(float64(rh)*humidity.Factor, 'f', int(humidity.Scale), 64), 64)
+					telemetryMap[temperature.ID] = formatHumidity
+				}
+				if len(telemetryRawMap) > 0 {
+					now := ptypes.TimestampNow()
+					iotSDK.UploadDeviceTelemetries(deviceID, telemetryRawMap, now)
+					iotSDK.PublishDeviceTelemetries(deviceID, telemetryMap, now)
+				}
 			}
 		})
 
