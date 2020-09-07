@@ -30,6 +30,8 @@ export interface IDeviceModel {
 export interface IDevice {
     id: number
     name: string
+    ip: string
+    port: number
     deviceModelName: string,
     deviceModelDesc: string,
     deviceModelID: number

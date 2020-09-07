@@ -1,9 +1,11 @@
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input, InputNumber } from 'antd';
 import React, { useEffect } from 'react'
 
 export interface IUpdateDevice {
     id: number
     name: string
+    ip: string
+    port: number
 }
 
 interface DeviceUpdateFormProps {
@@ -27,7 +29,9 @@ export const DeviceUpdateForm: React.FC<DeviceUpdateFormProps> = ({
     useEffect(() => {
         form.setFieldsValue({
             "id": data.id,
-            "name": data.name
+            "name": data.name,
+            "ip": data.ip,
+            "port": data.port
         })
     }, [form, data]);
     return (
@@ -76,6 +80,18 @@ export const DeviceUpdateForm: React.FC<DeviceUpdateFormProps> = ({
                     rules={[{ required: true, message: '请输入名称!' }]}
                 >
                     <Input />
+                </Form.Item>
+                <Form.Item
+                    name="ip"
+                    label="IP地址"
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="port"
+                    label="端口"
+                >
+                    <InputNumber />
                 </Form.Item>
             </Form>
         </Modal>

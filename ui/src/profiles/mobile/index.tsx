@@ -86,7 +86,7 @@ export default function MobileIndex() {
                 <TabBar.Item
                     title="多媒体"
                     key="media"
-                    icon={<HomeOutlined />}
+                    icon={<PlaySquareOutlined />}
                     selectedIcon={<PlaySquareOutlined style={{ color: "#85dbf5" }} />}
                     selected={selectedTab === 'mediaTab'}
                     onPress={() => {

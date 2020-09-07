@@ -6,6 +6,8 @@ import { formatDetailTime } from '../../../../../utils/util';
 export const DeviceDetailDescriptions: React.FC<IDevice> = ({
     id,
     name,
+    ip,
+    port,
     deviceModelName,
     deviceModelDesc,
     createdAt,
@@ -21,6 +23,8 @@ export const DeviceDetailDescriptions: React.FC<IDevice> = ({
             }}>
             <Descriptions.Item label="ID">{id}</Descriptions.Item>
             <Descriptions.Item label="名称">{name}</Descriptions.Item>
+            <Descriptions.Item label="IP">{ip}</Descriptions.Item>
+            <Descriptions.Item label="端口">{port}</Descriptions.Item>
             <Descriptions.Item label="设备模板名称">{deviceModelName}</Descriptions.Item>
             <Descriptions.Item label="设备模板描述">{deviceModelDesc}</Descriptions.Item>
             <Descriptions.Item label="创建时间">{formatDetailTime(createdAt)}</Descriptions.Item>
