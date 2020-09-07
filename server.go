@@ -14,7 +14,6 @@ import (
 	"github.com/9d77v/pdc/consumers"
 	"github.com/9d77v/pdc/graph"
 	"github.com/9d77v/pdc/graph/generated"
-	"github.com/9d77v/pdc/iot/esp8266"
 	"github.com/9d77v/pdc/iot/sdk"
 	"github.com/9d77v/pdc/middleware"
 	"github.com/9d77v/pdc/models"
@@ -87,10 +86,7 @@ func main() {
 		log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	}()
 
-	ctx, cancel := context.WithCancel(context.Background())
-	go esp8266.CollectData(ctx)
 	log.Printf("exiting (%v)", <-errc)
-	cancel()
 	srvCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	srv.Shutdown(srvCtx)

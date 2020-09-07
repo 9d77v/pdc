@@ -162,7 +162,7 @@ func (sdk *IotSDK) SubscribeDeviceData(handler func(m *stan.Msg)) (stan.Subscrip
 func (sdk *IotSDK) SubscribeDeviceTelemetry(deviceID uint32, telemetryID uint, handler func(m *nats.Msg)) (*nats.Subscription, error) {
 	subject := ""
 	if deviceID == 0 {
-		subject = fmt.Sprintf("%s.*", subjectDeviceTelemetryPrefix)
+		subject = fmt.Sprintf("%s.>", subjectDeviceTelemetryPrefix)
 	} else if telemetryID == 0 {
 		subject = fmt.Sprintf("%s.%d.*", subjectDeviceTelemetryPrefix, deviceID)
 	} else {

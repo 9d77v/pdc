@@ -1,10 +1,10 @@
-package esp8266
+package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"time"
@@ -18,31 +18,23 @@ import (
 
 var iotSDK *sdk.IotSDK = sdk.NewIotSDK()
 
-//CollectData ...
-func CollectData(ctx context.Context) {
+func main() {
 	addr := os.Getenv("DEVICE_ESP8266")
 	if len(addr) == 0 {
 		return
 	}
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
 	addresses := strings.Split(addr, ",")
 	for _, v := range addresses {
 		deviceID, _ := strconv.Atoi(v)
-		go Sht3x(ctx, uint32(deviceID))
+		go sht3x(uint32(deviceID))
 	}
-
-	ticker := time.NewTicker(500 * time.Second)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-		}
-	}
+	log.Printf("exiting (%v)", <-c)
 }
 
-//Sht3x get temperature and humidity
-func Sht3x(ctx context.Context, deviceID uint32) {
+//sht3x get temperature and humidity
+func sht3x(deviceID uint32) {
 	device, err := iotSDK.GetDeviceInfo(deviceID)
 	if err != nil {
 		log.Println("GetDeviceInfo Failed:", err)
