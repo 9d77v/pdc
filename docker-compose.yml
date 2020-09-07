@@ -14,7 +14,7 @@ services:
     command: minio server /data
     container_name: minio
   clickhouse-server:
-    image: 9d77v/clickhouse-server:arm64.2020-08-05
+    image: 9d77v/clickhouse-server:arm64.2020-09-05
     restart: always
     volumes: 
       - ./clickhouse/data:/var/lib/clickhouse
@@ -78,6 +78,12 @@ services:
     env_file:
       - pdc.env
     container_name: pdc
+  device-esp8266:
+      image: 9d77v/device-esp8266:2020-09-07_463ac9b
+      restart: always
+      env_file:
+        - pdc.env
+      container_name: device-esp8266
   caddy:
     image: 9d77v/caddy:2.1.1-alpine
     restart: always

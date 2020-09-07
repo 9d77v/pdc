@@ -17,6 +17,7 @@ import (
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/models/elasticsearch"
+	"github.com/9d77v/pdc/models/nats"
 	"github.com/9d77v/pdc/utils"
 	"github.com/olivere/elastic"
 	"gorm.io/gorm"
@@ -485,7 +486,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 }
 
 func sendMsgToUpdateES(videoID int64) {
-	models.NatsClient.PublishAsync(models.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
+	nats.Client.PublishAsync(nats.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
 		utils.AckHandler)
 }
 

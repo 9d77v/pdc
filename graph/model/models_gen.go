@@ -35,6 +35,8 @@ type Device struct {
 	ID              int64        `json:"id"`
 	DeviceModelID   int64        `json:"deviceModelID"`
 	Name            string       `json:"name"`
+	IP              string       `json:"ip"`
+	Port            int64        `json:"port"`
 	DeviceModelName string       `json:"deviceModelName"`
 	DeviceModelDesc string       `json:"deviceModelDesc"`
 	Attributes      []*Attribute `json:"attributes"`
@@ -110,8 +112,10 @@ type NewAttributeModel struct {
 }
 
 type NewDevice struct {
-	DeviceModelID int64  `json:"deviceModelID"`
-	Name          string `json:"name"`
+	DeviceModelID int64   `json:"deviceModelID"`
+	Name          string  `json:"name"`
+	IP            *string `json:"ip"`
+	Port          *int64  `json:"port"`
 }
 
 type NewDeviceModel struct {
@@ -183,8 +187,10 @@ type NewUpdateAttributeModel struct {
 }
 
 type NewUpdateDevice struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	ID   int64   `json:"id"`
+	Name string  `json:"name"`
+	IP   *string `json:"ip"`
+	Port *int64  `json:"port"`
 }
 
 type NewUpdateDeviceModel struct {
@@ -339,13 +345,14 @@ type Subtitle struct {
 }
 
 type Telemetry struct {
-	ID        int64   `json:"id"`
-	DeviceID  int64   `json:"deviceID"`
-	Key       string  `json:"key"`
-	Name      string  `json:"name"`
-	Value     float64 `json:"value"`
-	CreatedAt int64   `json:"createdAt"`
-	UpdatedAt int64   `json:"updatedAt"`
+	ID        int64    `json:"id"`
+	DeviceID  int64    `json:"deviceID"`
+	Key       string   `json:"key"`
+	Name      string   `json:"name"`
+	Value     *float64 `json:"value"`
+	Unit      string   `json:"unit"`
+	CreatedAt int64    `json:"createdAt"`
+	UpdatedAt int64    `json:"updatedAt"`
 }
 
 type TelemetryModel struct {

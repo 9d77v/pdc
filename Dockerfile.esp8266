@@ -1,15 +1,14 @@
 FROM 9d77v/pdc-base:0.0.7
 COPY . /app
 
-ENV APP_NAME=pdc
+ENV APP_NAME=pdc-device
 RUN cd /app \
-    && go build -o $APP_NAME -ldflags "-s -w" \
+    && go build  -o $APP_NAME -ldflags "-s -w" iot/esp8266/main.go \
     && upx -9 $APP_NAME
 
 FROM scratch
-ENV APP_NAME=pdc
+ENV APP_NAME=pdc-device
 COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
-COPY ./ui/build /app/ui/build
 
 WORKDIR /app
-CMD [ "pdc" ]
+CMD [ "device-esp8266" ]

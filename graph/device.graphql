@@ -82,6 +82,8 @@ type Device {
   id: ID!
   deviceModelID: ID!
   name: String!
+  ip: String!
+  port: Int!
   deviceModelName:String!
   deviceModelDesc:String!
   attributes: [Attribute!]
@@ -106,7 +108,8 @@ type Telemetry {
   deviceID: ID!
   key: String!
   name: String!
-  value: Float!
+  value: Float
+  unit: String!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -119,9 +122,13 @@ type DeviceConnection {
 input NewDevice {
   deviceModelID: ID!
   name: String!
+  ip: String
+  port: Int
 }
 
 input NewUpdateDevice {
   id: ID!
   name: String!  
+  ip: String
+  port: Int
 }

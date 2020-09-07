@@ -183,6 +183,8 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 	m := &models.Device{
 		DeviceModelID: uint(input.DeviceModelID),
 		Name:          input.Name,
+		IP:            ptrs.String(input.IP),
+		Port:          uint16(ptrs.Int64(input.Port)),
 	}
 	deviceModel := new(models.DeviceModel)
 	if err := models.Gorm.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
@@ -237,6 +239,8 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
+		"ip":   ptrs.String(input.IP),
+		"port": uint(ptrs.Int64(input.Port)),
 	}
 	err := models.Gorm.Model(m).Updates(updateMap).Error
 	return &model.Device{ID: int64(m.ID)}, err

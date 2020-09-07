@@ -39,7 +39,9 @@ type Device struct {
 	gorm.Model
 	DeviceModelID uint //设备模型id
 	DeviceModel   DeviceModel
-	Name          string       `gorm:"size:50"` //设备名称
+	Name          string       `gorm:"size:50;NOT NULL;"` //设备名称
+	IP            string       `gorm:"size:50;NOT NULL;"` //设备ip
+	Port          uint16       //设备端口
 	Attributes    []*Attribute //属性，由采集程序启动时注册
 	Telemetries   []*Telemetry //遥测，由采集程序按一定频率上传
 }
@@ -52,7 +54,7 @@ type Attribute struct {
 	AttributeModel   AttributeModel
 	Key              string `gorm:"unique_index:attribute_uix;size:50"` //属性key
 	Name             string `gorm:"-"`
-	Value            string `gorm:"size:50"` //属性值
+	Value            string `gorm:"size:50;NOT NULL;"`
 }
 
 //Telemetry 遥测
