@@ -18,6 +18,7 @@ import (
 	"github.com/9d77v/pdc/middleware"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/models/nats"
+	"github.com/9d77v/wspush/redishub"
 )
 
 const defaultPort = "8080"
@@ -33,7 +34,7 @@ func main() {
 		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
 	}
 	mux.Handle("/api", middleware.Auth()(apiHandler))
-
+	mux.HandleFunc("/ws/iot", redishub.Hub.HandlerDynamicChannel())
 	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "ui/build/index.html")
 	})

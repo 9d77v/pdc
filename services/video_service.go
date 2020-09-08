@@ -19,7 +19,7 @@ import (
 	"github.com/9d77v/pdc/models/elasticsearch"
 	"github.com/9d77v/pdc/models/nats"
 	"github.com/9d77v/pdc/utils"
-	"github.com/olivere/elastic"
+	elastic "github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
 )
 

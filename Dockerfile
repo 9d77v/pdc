@@ -1,4 +1,4 @@
-FROM 9d77v/pdc-base:0.0.7
+FROM 9d77v/pdc-base:0.0.8
 COPY . /app
 
 ENV APP_NAME=pdc

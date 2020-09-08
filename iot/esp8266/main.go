@@ -80,13 +80,14 @@ func sht3x(deviceID uint32) {
 			} else {
 				telemetryRawMap := make(map[uint32]float64, 0)
 				telemetryMap := make(map[uint32]float64, 0)
-				temperature := iotSDK.GetTelemetryConfig()["temperature"]
+				config := iotSDK.GetTelemetryConfig()
+				temperature := config["temperature"]
 				if temperature != nil {
 					telemetryRawMap[temperature.ID] = float64(temp)
 					formatTemp, _ := strconv.ParseFloat(strconv.FormatFloat(float64(temp)*temperature.Factor, 'f', int(temperature.Scale), 64), 64)
 					telemetryMap[temperature.ID] = formatTemp
 				}
-				humidity := iotSDK.GetTelemetryConfig()["humidity"]
+				humidity := config["humidity"]
 				if humidity != nil {
 					telemetryRawMap[humidity.ID] = float64(rh)
 					formatHumidity, _ := strconv.ParseFloat(strconv.FormatFloat(float64(rh)*humidity.Factor, 'f', int(humidity.Scale), 64), 64)
