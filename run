@@ -1,6 +1,6 @@
 #!/bin/sh
 app='pdc'
-version="0.0.7"
+version="0.0.8"
 sudo=""
 if command -v sudo >/dev/null 2>&1; then
     sudo="sudo"
@@ -32,9 +32,9 @@ case $1 in
         ;;
     esp8266)
         IMAGE_TAG=`git log --pretty=format:"%ad_%h" -1 --date=short`
-        echo "build device-esp8266"
-        $sudo docker build -t 9d77v/device-esp8266:$IMAGE_TAG -f Dockerfile.esp8266 .
-        $sudo docker push 9d77v/device-esp8266:$IMAGE_TAG   
+        echo "build pdc-device-esp8266"
+        $sudo docker build -t 9d77v/pdc-device-esp8266:$IMAGE_TAG -f Dockerfile.esp8266 .
+        $sudo docker push 9d77v/pdc-device-esp8266:$IMAGE_TAG   
         ;;
 esac  
 

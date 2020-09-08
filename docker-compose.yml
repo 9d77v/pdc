@@ -71,19 +71,19 @@ services:
         - ./redis/data:/data
     container_name: redis
   pdc:
-    image: 9d77v/pdc:2020-09-03_71d6857
+    image: 9d77v/pdc:2020-09-07_3e02317
     restart: always
     ports: 
       - 8080:8080
     env_file:
       - pdc.env
     container_name: pdc
-  device-esp8266:
-      image: 9d77v/device-esp8266:2020-09-07_463ac9b
+  pdc-device-esp8266:
+      image: 9d77v/pdc-device-esp8266:2020-09-07_3e02317
       restart: always
       env_file:
         - pdc.env
-      container_name: device-esp8266
+      container_name: pdc-device-esp8266
   caddy:
     image: 9d77v/caddy:2.1.1-alpine
     restart: always
