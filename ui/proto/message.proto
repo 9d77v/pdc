@@ -1,0 +1,10 @@
+syntax = "proto3";
+package pb;
+import "google/protobuf/timestamp.proto";
+
+message Telemetry {
+  uint32 DeviceID = 1;
+  google.protobuf.Timestamp ActionTime = 2;
+  uint32 ID = 3;
+  double value = 4;
+}
