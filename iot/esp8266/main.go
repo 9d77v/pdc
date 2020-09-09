@@ -96,7 +96,6 @@ func sht3x(deviceID uint32) {
 				if len(telemetryRawMap) > 0 {
 					now := ptypes.TimestampNow()
 					iotSDK.UploadDeviceTelemetries(deviceID, telemetryRawMap, now)
-					iotSDK.PublishDeviceTelemetries(deviceID, telemetryMap, now)
 				}
 			}
 		})

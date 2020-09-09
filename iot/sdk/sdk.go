@@ -1,14 +1,12 @@
 package sdk
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"sync"
 	"time"
 
 	"github.com/9d77v/pdc/iot/sdk/pb"
-	redis "github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
@@ -18,8 +16,7 @@ import (
 
 //IotSDK IotSDK
 type IotSDK struct {
-	natsClient      stan.Conn
-	redisClient     *redis.Client
+	conn            stan.Conn
 	telemetryConfig map[string]*pb.Telemetry
 	mutex           *sync.Mutex
 	telemetryMap    map[uint32]float64
@@ -28,8 +25,7 @@ type IotSDK struct {
 //NewIotSDK init iot sdk
 func NewIotSDK() *IotSDK {
 	return &IotSDK{
-		natsClient:      natsClient,
-		redisClient:     redisClient,
+		conn:            natsConn,
 		telemetryConfig: make(map[string]*pb.Telemetry),
 		mutex:           new(sync.Mutex),
 	}
@@ -75,7 +71,7 @@ func (sdk *IotSDK) GetDeviceInfo(deviceID uint32) (*pb.DeviceInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg, err := sdk.natsClient.NatsConn().Request(subjectDevice, requestMsg, 5*time.Second)
+	msg, err := sdk.conn.NatsConn().Request(subjectDevice, requestMsg, 5*time.Second)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +89,7 @@ func (sdk *IotSDK) ReplyDeviceInfo(replySubject string, deviceMsg *pb.DeviceMSG)
 	if marshalError != nil {
 		log.Println("unmarshal deviceMSG error:", marshalError)
 	}
-	err := sdk.natsClient.NatsConn().Publish(replySubject, reply)
+	err := sdk.conn.NatsConn().Publish(replySubject, reply)
 	if err != nil {
 		log.Println("publish error:", err)
 	}
@@ -111,7 +107,7 @@ func (sdk *IotSDK) SetDeviceAttributes(deviceID uint32, attributes map[uint32]st
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.natsClient.PublishAsync(subjectDeviceData, requestMsg, ackHandler)
+	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, ackHandler)
 	if err != nil {
 		log.Printf("publish error,id:%s,err:%v/n", msg, err)
 	}
@@ -129,51 +125,20 @@ func (sdk *IotSDK) UploadDeviceTelemetries(deviceID uint32, telemetries map[uint
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.natsClient.PublishAsync(subjectDeviceData, requestMsg, ackHandler)
+	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, ackHandler)
 	if err != nil {
 		log.Printf("publish error,id:%s,err:%v/n", msg, err)
 	}
 }
 
-//PublishDeviceTelemetries Publish device telemetries
-func (sdk *IotSDK) PublishDeviceTelemetries(deviceID uint32, telemetries map[uint32]float64, now *timestamppb.Timestamp) {
-	telemetryMap := sdk.GetTelemetryMap()
-	tempMap := make(map[uint32]float64, 0)
-	for k, v := range telemetries {
-		request := &pb.Telemetry{
-			DeviceID:   deviceID,
-			ActionTime: now,
-			ID:         k,
-			Value:      v,
-		}
-		requestMsg, err := proto.Marshal(request)
-		if err != nil {
-			log.Println("proto marshal error:", err)
-			return
-		}
-		tempMap[k] = v
-		if telemetryMap[k] != v {
-			err = sdk.redisClient.Publish(context.Background(), fmt.Sprintf("%s.%d.%d", subjectDeviceChangeTelemetryPrefix, deviceID, k), requestMsg).Err()
-			if err != nil {
-				log.Printf("publish error,err:%v/n", err)
-			}
-		}
-		err = sdk.redisClient.Publish(context.Background(), fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceID, k), requestMsg).Err()
-		if err != nil {
-			log.Printf("publish error,err:%v/n", err)
-		}
-	}
-	sdk.SetTelemetryMap(tempMap)
-}
-
 //NatsSubscribe ..
 func (sdk *IotSDK) NatsSubscribe(handler func(m *nats.Msg)) (*nats.Subscription, error) {
-	return sdk.natsClient.NatsConn().QueueSubscribe(subjectDevice, groupDevice, handler)
+	return sdk.conn.NatsConn().QueueSubscribe(subjectDevice, groupDevice, handler)
 }
 
 //SubscribeDeviceInfo ..
 func (sdk *IotSDK) SubscribeDeviceInfo(deviceID uint32) (stan.Subscription, error) {
-	return sdk.natsClient.Subscribe(fmt.Sprintf("%s.%d", subjectDevice, deviceID), func(m *stan.Msg) {
+	return sdk.conn.Subscribe(fmt.Sprintf("%s.%d", subjectDevice, deviceID), func(m *stan.Msg) {
 		deviceMsg := new(pb.DeviceMSG)
 		err := proto.Unmarshal(m.Data, deviceMsg)
 		if err != nil {
@@ -184,7 +149,12 @@ func (sdk *IotSDK) SubscribeDeviceInfo(deviceID uint32) (stan.Subscription, erro
 	})
 }
 
-//SubscribeDeviceData ..
-func (sdk *IotSDK) SubscribeDeviceData(handler func(m *stan.Msg)) (stan.Subscription, error) {
-	return sdk.natsClient.QueueSubscribe(subjectDeviceData, groupDeviceData, handler, stan.DurableName("dur"))
+//SubscribeSaveDeviceData ..
+func (sdk *IotSDK) SubscribeSaveDeviceData(handler func(m *stan.Msg)) (stan.Subscription, error) {
+	return sdk.conn.QueueSubscribe(subjectDeviceData, groupSaveDeviceData, handler, stan.DurableName("dur"))
+}
+
+//SubscribePublishTelemetry ..
+func (sdk *IotSDK) SubscribePublishTelemetry(handler func(m *stan.Msg)) (stan.Subscription, error) {
+	return sdk.conn.QueueSubscribe(subjectDeviceData, groupPublishDeviceData, handler, stan.DurableName("dur"))
 }

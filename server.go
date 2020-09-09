@@ -73,13 +73,21 @@ func main() {
 	defer func() {
 		qsub2.Unsubscribe()
 	}()
-	qsub3, err := iotsdk.SubscribeDeviceData(consumers.HandleDeviceMSG)
+	qsub3, err := iotsdk.SubscribeSaveDeviceData(consumers.HandleDeviceMSG)
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	defer func() {
 		qsub3.Unsubscribe()
 		qsub3.Close()
+	}()
+	qsub4, err := iotsdk.SubscribePublishTelemetry(consumers.PublishTelemetry)
+	if err != nil {
+		log.Panicln("SubscribeDeviceAttribute error:", err)
+	}
+	defer func() {
+		qsub4.Unsubscribe()
+		qsub4.Close()
 	}()
 	go consumers.SaveTelemetry()
 	go func() {

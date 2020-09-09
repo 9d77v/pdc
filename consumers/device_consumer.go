@@ -1,6 +1,8 @@
 package consumers
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -81,6 +83,39 @@ func HandleDeviceMSG(m *stan.Msg) {
 				Value:      v,
 			}
 			telemetryChan <- telemetry
+		}
+	}
+}
+
+const ubjectDeviceTelemetryPrefix = "device.telemetry"
+
+//PublishTelemetry push telemetry to redis
+func PublishTelemetry(m *stan.Msg) {
+	deviceMsg := new(pb.DeviceMSG)
+	err := proto.Unmarshal(m.Data, deviceMsg)
+	if err != nil {
+		log.Println("unmarshal data error")
+		return
+	}
+	switch deviceMsg.Action {
+	case pb.DeviceAction_SetTelemetries:
+		for k, v := range deviceMsg.TelemetryMap {
+			telemetry := &pb.Telemetry{
+				DeviceID:   deviceMsg.DeviceID,
+				ActionTime: deviceMsg.ActionTime,
+				ID:         k,
+				Value:      v,
+			}
+			requestMsg, err := proto.Marshal(telemetry)
+			if err != nil {
+				log.Println("proto marshal error:", err)
+				return
+			}
+			err = models.RedisClient.Publish(context.Background(),
+				fmt.Sprintf("%s.%d.%d", ubjectDeviceTelemetryPrefix, deviceMsg.DeviceID, k), requestMsg).Err()
+			if err != nil {
+				log.Printf("publish error,err:%v/n", err)
+			}
 		}
 	}
 }

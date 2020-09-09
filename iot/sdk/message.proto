@@ -4,7 +4,7 @@ package pb;
 import "google/protobuf/timestamp.proto";
 
 message DeviceMSG {
-  DeviceAction action = 1;
+  DeviceAction Action = 1;
   uint32 DeviceID = 2;
   google.protobuf.Timestamp ActionTime = 3;
   DeviceInfo DeviceInfo = 4;
@@ -19,16 +19,16 @@ enum DeviceAction {
 
 message DeviceInfo {
   string IP = 1;
-  uint32 port = 2;
-  map<string, uint32> attributeConfig = 3;
-  map<string, Telemetry> telemetryConfig = 4;
+  uint32 Port = 2;
+  map<string, uint32> AttributeConfig = 3;
+  map<string, Telemetry> TelemetryConfig = 4;
 }
 
 message Telemetry {
   uint32 DeviceID = 1;
   google.protobuf.Timestamp ActionTime = 2;
   uint32 ID = 3;
-  double value = 4;
-  double factor = 5;
-  uint32 scale = 6;
+  double Value = 4;
+  double Factor = 5;
+  uint32 Scale = 6;
 }
