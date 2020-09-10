@@ -1,7 +1,7 @@
 import React from "react"
 import { Layout, Dropdown, Avatar, Button } from 'antd';
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { client } from "../../../utils/client";
+import { apolloClient } from "../../../utils/apollo_client";
 const { Header } = Layout;
 
 interface AppHeaderProps {
@@ -14,7 +14,7 @@ export const AppHeader = (props: AppHeaderProps) => {
     const history = useHistory();
     const logout = () => {
         localStorage.clear()
-        client.resetStore()
+        apolloClient.resetStore()
         history.push("/login")
     }
 

@@ -1,20 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Spin, ConfigProvider } from 'antd';
 import { ApolloProvider } from '@apollo/react-hooks';
 import zhCN from 'antd/es/locale/zh_CN';
-import { client } from './utils/client';
+import { apolloClient } from './utils/apollo_client';
 import { isMobile } from './utils/util';
 import {
   BrowserRouter as Router,
-  Switch, Route, Redirect
+  Switch, Route, Redirect, useHistory
 } from 'react-router-dom';
 import { Login } from './profiles/login/Login';
 const DesktopIndex = React.lazy(() => import('./profiles/desktop/index'))
 const MobileIndex = React.lazy(() => import('./profiles/mobile/index'))
 
 export default function App() {
+  const history = useHistory();
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      history.push('/login')
+    }
+  }, [history])
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={apolloClient}>
       <React.Suspense fallback={<Spin />}>
         <ConfigProvider locale={zhCN}>
           <Router>

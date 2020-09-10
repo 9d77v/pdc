@@ -1,7 +1,7 @@
 import React from "react"
 import { Avatar } from 'antd';
 import { useHistory } from "react-router-dom";
-import { client } from "../../../utils/client";
+import { apolloClient } from "../../../utils/apollo_client";
 import "../../../style/button.less"
 
 interface AppHeaderProps {
@@ -13,7 +13,7 @@ export default function MeIndex(props: AppHeaderProps) {
     const history = useHistory();
     const logout = () => {
         localStorage.clear()
-        client.resetStore()
+        apolloClient.resetStore()
         history.push("/login")
     }
     return (

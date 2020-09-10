@@ -21,12 +21,6 @@ export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
     const [visible, setVisible] = useState(false)
     const history = useHistory();
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            history.push('/login')
-        }
-    }, [history])
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
 
