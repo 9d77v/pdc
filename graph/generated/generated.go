@@ -216,10 +216,13 @@ type ComplexityRoot struct {
 	Telemetry struct {
 		CreatedAt func(childComplexity int) int
 		DeviceID  func(childComplexity int) int
+		Factor    func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Key       func(childComplexity int) int
 		Name      func(childComplexity int) int
+		Scale     func(childComplexity int) int
 		Unit      func(childComplexity int) int
+		UnitName  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		Value     func(childComplexity int) int
 	}
@@ -1422,6 +1425,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Telemetry.DeviceID(childComplexity), true
 
+	case "Telemetry.factor":
+		if e.complexity.Telemetry.Factor == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.Factor(childComplexity), true
+
 	case "Telemetry.id":
 		if e.complexity.Telemetry.ID == nil {
 			break
@@ -1443,12 +1453,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Telemetry.Name(childComplexity), true
 
+	case "Telemetry.scale":
+		if e.complexity.Telemetry.Scale == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.Scale(childComplexity), true
+
 	case "Telemetry.unit":
 		if e.complexity.Telemetry.Unit == nil {
 			break
 		}
 
 		return e.complexity.Telemetry.Unit(childComplexity), true
+
+	case "Telemetry.unitName":
+		if e.complexity.Telemetry.UnitName == nil {
+			break
+		}
+
+		return e.complexity.Telemetry.UnitName(childComplexity), true
 
 	case "Telemetry.updatedAt":
 		if e.complexity.Telemetry.UpdatedAt == nil {
@@ -2185,7 +2209,10 @@ type Telemetry {
   key: String!
   name: String!
   value: Float
+  factor: Float!
+  scale: Int!
   unit: String!
+  unitName: String!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -7954,6 +7981,74 @@ func (ec *executionContext) _Telemetry_value(ctx context.Context, field graphql.
 	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Telemetry_factor(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Factor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_scale(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Scale, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Telemetry_unit(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7972,6 +8067,40 @@ func (ec *executionContext) _Telemetry_unit(ctx context.Context, field graphql.C
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Unit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Telemetry_unitName(ctx context.Context, field graphql.CollectedField, obj *model.Telemetry) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Telemetry",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UnitName, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13905,8 +14034,23 @@ func (ec *executionContext) _Telemetry(ctx context.Context, sel ast.SelectionSet
 			}
 		case "value":
 			out.Values[i] = ec._Telemetry_value(ctx, field, obj)
+		case "factor":
+			out.Values[i] = ec._Telemetry_factor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "scale":
+			out.Values[i] = ec._Telemetry_scale(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "unit":
 			out.Values[i] = ec._Telemetry_unit(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "unitName":
+			out.Values[i] = ec._Telemetry_unitName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

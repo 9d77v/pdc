@@ -65,6 +65,9 @@ func ToDeviceDto(m *models.Device) *model.Device {
 			Key:       v.Key,
 			Name:      v.TelemetryModel.Name,
 			Unit:      v.TelemetryModel.Unit,
+			UnitName:  v.TelemetryModel.UnitName,
+			Factor:    v.TelemetryModel.Factor,
+			Scale:     int64(v.TelemetryModel.Scale),
 			CreatedAt: v.CreatedAt.Unix(),
 			UpdatedAt: v.UpdatedAt.Unix(),
 		})

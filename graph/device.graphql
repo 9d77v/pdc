@@ -109,7 +109,10 @@ type Telemetry {
   key: String!
   name: String!
   value: Float
+  factor: Float!
+  scale: Int!
   unit: String!
+  unitName: String!
   createdAt: Int!
   updatedAt: Int!
 }
