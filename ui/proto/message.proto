@@ -6,5 +6,5 @@ message Telemetry {
   uint32 DeviceID = 1;
   google.protobuf.Timestamp ActionTime = 2;
   uint32 ID = 3;
-  double value = 4;
+  double Value = 4;
 }

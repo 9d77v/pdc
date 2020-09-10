@@ -65,14 +65,14 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         const err: any = networkError
         if (err.statusCode === 401) {
             localStorage.clear()
-            client.resetStore()
+            apolloClient.resetStore()
             message.error("token失效，请刷新页面")
         } else if (err.statusCode === 403) {
             message.error("无操作权限")
         }
     };
 })
-export const client = new ApolloClient({
+export const apolloClient = new ApolloClient({
     link: from([
         errorLink,
         authLink,

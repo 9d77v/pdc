@@ -167,11 +167,31 @@ query devices($ids:[ID!]) {
         name
         value
         unit
+        factor
+        scale
         createdAt
         updatedAt
       }
       createdAt
       updatedAt
+    }
+  }
+}
+`;
+
+const GET_MOBILE_HOME_DEVICES = gql`
+query devices($ids:[ID!]) {
+  devices(ids:$ids) {
+    edges {
+      id
+      telemetries{
+        id
+        name
+        value
+        factor
+        scale
+        unit
+      }
     }
   }
 }
@@ -183,5 +203,5 @@ export {
   ADD_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL,
   ADD_TELEMETRY_MODEL, UPDATE_TELEMETRY_MODEL,
   ADD_DEVICE, UPDATE_DEVICE,
-  LIST_DEVICE, GET_DEVICE
+  LIST_DEVICE, GET_DEVICE, GET_MOBILE_HOME_DEVICES
 }

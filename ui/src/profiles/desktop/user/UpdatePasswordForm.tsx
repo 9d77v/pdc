@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { GenderMap } from "../../../consts/consts";
 import { UPDATE_PASSWORD } from '../../../consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
-import { client } from '../../../utils/client';
+import { apolloClient } from '../../../utils/apollo_client';
 
 export default function UpdatePasswordForm() {
     const history = useHistory();
@@ -37,7 +37,7 @@ export default function UpdatePasswordForm() {
         });
         setLoading(false);
         if (!data.errors) {
-            client.resetStore()
+            apolloClient.resetStore()
             localStorage.clear()
             history.push('/login')
         }

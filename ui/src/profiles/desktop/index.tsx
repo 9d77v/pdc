@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
-    Route, useHistory,
+    Route,
 } from "react-router-dom";
 import { Layout } from 'antd';
 import "./index.less"
@@ -34,14 +34,6 @@ const DeviceModelIndex = React.lazy(() => import('./settings/device/device-model
 const DeviceIndex = React.lazy(() => import('./settings/device/device-list/index'))
 
 export default function DesktopIndex() {
-    const history = useHistory();
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            history.push('/login')
-        }
-    }, [history])
-
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
     return (

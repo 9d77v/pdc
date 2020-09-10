@@ -1,22 +1,27 @@
 import { Table } from 'antd';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import moment from 'moment';
+import useWebSocket from 'react-use-websocket';
+import { deviceTelemetryPrefix, socketUrl } from '../../../../../utils/ws_client';
+import { pb } from '../../../../../pb/compiled';
 interface ITelemetryTableProps {
     id: number
     data: any[]
 }
 
 export default function TelemetryTable(props: ITelemetryTableProps) {
-    const { data } = props
-
+    const { id, data } = props
+    const [dataResource, setDataResource] = useState<any[]>([])
     const columns = [
         { title: 'id', dataIndex: 'id', key: 'id' },
         { title: '键', dataIndex: 'key', key: 'key' },
         { title: '名称', dataIndex: 'name', key: 'name' },
         {
-            title: '值', dataIndex: 'value', key: 'value', render: (value?: number) =>
-                value ? value : "-"
+            title: '值', dataIndex: 'value', key: 'value', render: (value: number, record: any) => {
+                return value ? (record.factor * value).toFixed(record.scale) : "-"
+            }
+
         },
         { title: '单位', dataIndex: 'unit', key: 'unit' },
         {
@@ -25,9 +30,58 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => value === null ? "-" : moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         }
     ];
+
+    useEffect(() => {
+        const newDataResource: any[] = []
+        for (let element of data) {
+            let t: any = {
+                createdAt: element.createdAt,
+                id: element.id,
+                key: element.key,
+                name: element.name,
+                unit: element.unit,
+                factor: element.factor,
+                scale: element.scale,
+                updatedAt: null,
+                value: element.value
+            }
+            newDataResource.push(t)
+        }
+        setDataResource(newDataResource)
+    }, [data])
+
+    const {
+        sendMessage,
+        lastMessage,
+    } = useWebSocket(socketUrl, {
+        onOpen: () => () => {
+            console.log('opened')
+
+        },
+        shouldReconnect: (closeEvent) => true,
+        share: true,
+    });
+    useEffect(() => {
+        sendMessage(deviceTelemetryPrefix + "." + id.toString() + ".*");
+    }, [id, sendMessage])
+
+    useEffect(() => {
+        if (lastMessage) {
+            lastMessage.data.arrayBuffer().then((d: any) => {
+                const msg = pb.Telemetry.decode(new Uint8Array(d))
+                for (let element of dataResource) {
+                    if (Number(element.id) === msg.ID) {
+                        element.value = msg.Value
+                        element.updatedAt = msg.ActionTime?.seconds
+                        break
+                    }
+                }
+            })
+        }
+    }, [lastMessage, dataResource])
     return (
         <div style={{
             display: "flex",
@@ -42,9 +96,9 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
                 bordered
                 pagination={{
                     pageSize: 5,
-                    total: data.length
+                    total: dataResource.length
                 }}
-                dataSource={data}
+                dataSource={dataResource}
             />
         </div>
     )
