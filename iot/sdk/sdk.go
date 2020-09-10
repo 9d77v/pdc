@@ -17,49 +17,32 @@ import (
 //IotSDK IotSDK
 type IotSDK struct {
 	conn            stan.Conn
-	telemetryConfig map[string]*pb.Telemetry
+	telemetryConfig map[uint32]map[string]*pb.Telemetry
 	mutex           *sync.Mutex
-	telemetryMap    map[uint32]float64
 }
 
 //NewIotSDK init iot sdk
 func NewIotSDK() *IotSDK {
 	return &IotSDK{
 		conn:            natsConn,
-		telemetryConfig: make(map[string]*pb.Telemetry),
+		telemetryConfig: make(map[uint32]map[string]*pb.Telemetry),
 		mutex:           new(sync.Mutex),
 	}
 }
 
 //GetTelemetryConfig ..
-func (sdk *IotSDK) GetTelemetryConfig() map[string]*pb.Telemetry {
+func (sdk *IotSDK) GetTelemetryConfig(deviceID uint32) map[string]*pb.Telemetry {
 	sdk.mutex.Lock()
 	defer sdk.mutex.Unlock()
-	return sdk.telemetryConfig
+	return sdk.telemetryConfig[deviceID]
 }
 
 //SetTelemetryConfig ..
-func (sdk *IotSDK) SetTelemetryConfig(telemetryMap map[string]*pb.Telemetry) {
+func (sdk *IotSDK) SetTelemetryConfig(deviceID uint32, telemetryMap map[string]*pb.Telemetry) {
 	sdk.mutex.Lock()
 	defer sdk.mutex.Unlock()
 	if telemetryMap != nil {
-		sdk.telemetryConfig = telemetryMap
-	}
-}
-
-//GetTelemetryMap ..
-func (sdk *IotSDK) GetTelemetryMap() map[uint32]float64 {
-	sdk.mutex.Lock()
-	defer sdk.mutex.Unlock()
-	return sdk.telemetryMap
-}
-
-//SetTelemetryMap ..
-func (sdk *IotSDK) SetTelemetryMap(telemetryMap map[uint32]float64) {
-	sdk.mutex.Lock()
-	defer sdk.mutex.Unlock()
-	if telemetryMap != nil {
-		sdk.telemetryMap = telemetryMap
+		sdk.telemetryConfig[deviceID] = telemetryMap
 	}
 }
 
@@ -145,7 +128,7 @@ func (sdk *IotSDK) SubscribeDeviceInfo(deviceID uint32) (stan.Subscription, erro
 			log.Println("unmarshal data error")
 			return
 		}
-		sdk.SetTelemetryConfig(deviceMsg.DeviceInfo.TelemetryConfig)
+		sdk.SetTelemetryConfig(deviceID, deviceMsg.DeviceInfo.TelemetryConfig)
 	})
 }
 

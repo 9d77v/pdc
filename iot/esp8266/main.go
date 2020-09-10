@@ -40,7 +40,7 @@ func sht3x(deviceID uint32) {
 		log.Println("GetDeviceInfo Failed:", err)
 		return
 	}
-	iotSDK.SetTelemetryConfig(device.TelemetryConfig)
+	iotSDK.SetTelemetryConfig(deviceID, device.TelemetryConfig)
 	qsub, err := iotSDK.SubscribeDeviceInfo(deviceID)
 	if err != nil {
 		log.Panicln("SubscribeDeviceInfo error:", err)
@@ -80,7 +80,7 @@ func sht3x(deviceID uint32) {
 			} else {
 				telemetryRawMap := make(map[uint32]float64, 0)
 				telemetryMap := make(map[uint32]float64, 0)
-				config := iotSDK.GetTelemetryConfig()
+				config := iotSDK.GetTelemetryConfig(deviceID)
 				temperature := config["temperature"]
 				if temperature != nil {
 					telemetryRawMap[temperature.ID] = float64(temp)

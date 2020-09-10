@@ -350,7 +350,10 @@ type Telemetry struct {
 	Key       string   `json:"key"`
 	Name      string   `json:"name"`
 	Value     *float64 `json:"value"`
+	Factor    float64  `json:"factor"`
+	Scale     int64    `json:"scale"`
 	Unit      string   `json:"unit"`
+	UnitName  string   `json:"unitName"`
 	CreatedAt int64    `json:"createdAt"`
 	UpdatedAt int64    `json:"updatedAt"`
 }
