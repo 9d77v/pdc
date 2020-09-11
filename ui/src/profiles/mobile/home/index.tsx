@@ -3,7 +3,7 @@ import { Route, useLocation } from "react-router-dom";
 import { GET_MOBILE_HOME_DEVICES } from "../../../consts/device.gql";
 import { useQuery } from "@apollo/react-hooks";
 import useWebSocket from "react-use-websocket";
-import { socketUrl, deviceTelemetryPrefix } from "../../../utils/ws_client";
+import { deviceTelemetryPrefix, iotSocketURL } from "../../../utils/ws_client";
 import { pb } from "../../../pb/compiled";
 import "../../../style/card.less"
 
@@ -19,7 +19,7 @@ export default function HomeIndex() {
     const { data } = useQuery(GET_MOBILE_HOME_DEVICES,
         {
             variables: {
-                ids: [3, 4]
+                ids: [1, 2]
             },
             fetchPolicy: "cache-and-network"
         })
@@ -54,7 +54,7 @@ export default function HomeIndex() {
     const {
         sendMessage,
         lastMessage,
-    } = useWebSocket(socketUrl, {
+    } = useWebSocket(iotSocketURL, {
         onOpen: () => () => {
             console.log('opened')
 

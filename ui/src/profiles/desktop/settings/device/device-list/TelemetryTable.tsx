@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import moment from 'moment';
 import useWebSocket from 'react-use-websocket';
-import { deviceTelemetryPrefix, socketUrl } from '../../../../../utils/ws_client';
+import { deviceTelemetryPrefix, iotSocketURL } from '../../../../../utils/ws_client';
 import { pb } from '../../../../../pb/compiled';
 interface ITelemetryTableProps {
     id: number
@@ -56,11 +56,8 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
     const {
         sendMessage,
         lastMessage,
-    } = useWebSocket(socketUrl, {
-        onOpen: () => () => {
-            console.log('opened')
-
-        },
+    } = useWebSocket(iotSocketURL, {
+        onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
         share: true,
     });
