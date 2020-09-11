@@ -17,7 +17,9 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (!token) {
-      history.push('/login')
+      if (history) {
+        history.push('/login')
+      }
     }
   }, [history])
   return (
