@@ -6,6 +6,7 @@ import useWebSocket from "react-use-websocket";
 import { deviceTelemetryPrefix, iotSocketURL } from "../../../utils/ws_client";
 import { pb } from "../../../pb/compiled";
 import "../../../style/card.less"
+import { blobToArrayBuffer } from "../../../utils/file";
 
 export default function HomeIndex() {
     const location = useLocation();
@@ -55,10 +56,7 @@ export default function HomeIndex() {
         sendMessage,
         lastMessage,
     } = useWebSocket(iotSocketURL, {
-        onOpen: () => () => {
-            console.log('opened')
-
-        },
+        onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
         share: true,
     });
@@ -68,7 +66,7 @@ export default function HomeIndex() {
 
     useEffect(() => {
         if (lastMessage) {
-            lastMessage.data.arrayBuffer().then((d: any) => {
+            blobToArrayBuffer(lastMessage.data).then((d: any) => {
                 const msg = pb.Telemetry.decode(new Uint8Array(d))
                 for (let element of dataResource) {
                     if (Number(element.id) === msg.DeviceID) {

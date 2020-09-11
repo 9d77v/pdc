@@ -1,5 +1,4 @@
 const getSocketURL = (path: string) => {
-    console.log(document.location)
     let protocol = "wss:"
     if (document.location.protocol === "http:") {
         protocol = "ws:"

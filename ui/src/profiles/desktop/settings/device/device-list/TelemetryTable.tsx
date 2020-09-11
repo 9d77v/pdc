@@ -5,6 +5,7 @@ import moment from 'moment';
 import useWebSocket from 'react-use-websocket';
 import { deviceTelemetryPrefix, iotSocketURL } from '../../../../../utils/ws_client';
 import { pb } from '../../../../../pb/compiled';
+import { blobToArrayBuffer } from '../../../../../utils/file';
 interface ITelemetryTableProps {
     id: number
     data: any[]
@@ -67,7 +68,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
 
     useEffect(() => {
         if (lastMessage) {
-            lastMessage.data.arrayBuffer().then((d: any) => {
+            blobToArrayBuffer(lastMessage.data).then((d: any) => {
                 const msg = pb.Telemetry.decode(new Uint8Array(d))
                 for (let element of dataResource) {
                     if (Number(element.id) === msg.ID) {
