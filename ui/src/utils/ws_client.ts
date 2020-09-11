@@ -1,6 +1,13 @@
-
-const socketUrl = 'ws://192.168.50.251:8080/ws/iot';
+const getSocketURL = (path: string) => {
+    console.log(document.location)
+    let protocol = "wss:"
+    if (document.location.protocol === "http:") {
+        protocol = "ws:"
+    }
+    return `${protocol}//${document.location.host}${path}`
+}
 
 const deviceTelemetryPrefix = "device.telemetry"
+const iotSocketURL = getSocketURL("/ws/iot")
 
-export { socketUrl, deviceTelemetryPrefix }
+export { deviceTelemetryPrefix, iotSocketURL }
