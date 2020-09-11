@@ -1,5 +1,5 @@
 import { Table } from 'antd';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 import moment from 'moment';
 import useWebSocket from 'react-use-websocket';
@@ -14,6 +14,8 @@ interface ITelemetryTableProps {
 export default function TelemetryTable(props: ITelemetryTableProps) {
     const { id, data } = props
     const [dataResource, setDataResource] = useState<any[]>([])
+    const [telemetryMap, setTelemetryMap] = useState<Map<number, pb.Telemetry>>(new Map<number, pb.Telemetry>())
+    const updateTelemetryCallback: any = useRef();
     const columns = [
         { title: 'id', dataIndex: 'id', key: 'id' },
         { title: '键', dataIndex: 'key', key: 'key' },
@@ -70,16 +72,36 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         if (lastMessage) {
             blobToArrayBuffer(lastMessage.data).then((d: any) => {
                 const msg = pb.Telemetry.decode(new Uint8Array(d))
-                for (let element of dataResource) {
-                    if (Number(element.id) === msg.ID) {
-                        element.value = msg.Value
-                        element.updatedAt = msg.ActionTime?.seconds
-                        break
-                    }
-                }
+                setTelemetryMap(t => t.set(msg.ID, msg))
             })
         }
-    }, [lastMessage, dataResource])
+    }, [lastMessage])
+
+    const callBack = () => {
+        for (let element of dataResource) {
+            const msg = telemetryMap.get(Number(element.id))
+            if (msg) {
+                element.value = msg.Value
+                element.updatedAt = msg.ActionTime?.seconds
+            }
+        }
+        setTelemetryMap(new Map<number, pb.Telemetry>())
+    }
+
+    useEffect(() => {
+        updateTelemetryCallback.current = callBack;
+        return () => { };
+    })
+
+    useEffect(() => {
+        const tick = () => {
+            updateTelemetryCallback.current()
+        }
+        const timer: NodeJS.Timeout = setInterval(tick, 1000)
+        return () => {
+            clearInterval(timer);
+        }
+    }, [])
     return (
         <div style={{
             display: "flex",
