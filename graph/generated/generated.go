@@ -183,8 +183,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		DeviceModels  func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
-		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
+		DeviceModels  func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Histories     func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
 		HistoryInfo   func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL  func(childComplexity int, bucketName string, objectName string) int
@@ -380,8 +380,8 @@ type QueryResolver interface {
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
 	HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 	Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error)
-	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceModelConnection, error)
-	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceConnection, error)
+	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceModelConnection, error)
+	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceConnection, error)
 }
 
 type executableSchema struct {
@@ -1223,7 +1223,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.DeviceModels(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64)), true
+		return e.complexity.Query.DeviceModels(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.devices":
 		if e.complexity.Query.Devices == nil {
@@ -1235,7 +1235,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64)), true
+		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.histories":
 		if e.complexity.Query.Histories == nil {
@@ -2280,8 +2280,8 @@ type Query {
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
   historyInfo(sourceType:Int!,sourceID:ID!):History
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
-  deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceModelConnection!
-  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceConnection!
+  deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
+  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceConnection!
 } 
 
 type Mutation {
@@ -3049,6 +3049,14 @@ func (ec *executionContext) field_Query_deviceModels_args(ctx context.Context, r
 		}
 	}
 	args["ids"] = arg3
+	var arg4 []*model.Sort
+	if tmp, ok := rawArgs["sorts"]; ok {
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -3087,6 +3095,14 @@ func (ec *executionContext) field_Query_devices_args(ctx context.Context, rawArg
 		}
 	}
 	args["ids"] = arg3
+	var arg4 []*model.Sort
+	if tmp, ok := rawArgs["sorts"]; ok {
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -7483,7 +7499,7 @@ func (ec *executionContext) _Query_deviceModels(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().DeviceModels(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64))
+		return ec.resolvers.Query().DeviceModels(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7524,7 +7540,7 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64))
+		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
