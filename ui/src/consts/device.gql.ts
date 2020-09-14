@@ -66,8 +66,8 @@ mutation deleteTelemetryModel($id:Int!){
 `
 
 const LIST_DEVICE_MODEL = gql`
-query deviceModels($keyword: String, $page: Int, $pageSize: Int) {
-  deviceModels(keyword: $keyword, page: $page, pageSize: $pageSize) {
+query deviceModels($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+  deviceModels(keyword: $keyword, page: $page, pageSize: $pageSize, sorts: $sorts) {
     totalCount
     edges {
       id
@@ -143,8 +143,8 @@ mutation updateDevice($input:NewUpdateDevice!){
 
 
 const LIST_DEVICE = gql`
-query devices($keyword: String, $page: Int, $pageSize: Int) {
-  devices(keyword: $keyword, page: $page, pageSize: $pageSize) {
+query devices($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+  devices(keyword: $keyword, page: $page, pageSize: $pageSize, sorts: $sorts) {
     totalCount
     edges {
       id
