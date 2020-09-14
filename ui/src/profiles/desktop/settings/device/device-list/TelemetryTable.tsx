@@ -22,7 +22,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         { title: '名称', dataIndex: 'name', key: 'name' },
         {
             title: '值', dataIndex: 'value', key: 'value', render: (value: number, record: any) => {
-                return value ? (record.factor * value).toFixed(record.scale) : "-"
+                return value === undefined ? "-" : (record.factor * value).toFixed(record.scale)
             }
 
         },
