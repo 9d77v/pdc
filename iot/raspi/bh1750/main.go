@@ -13,13 +13,13 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
-	"gobot.io/x/gobot/platforms/firmata"
+	"gobot.io/x/gobot/platforms/raspi"
 )
 
 var iotSDK *sdk.IotSDK = sdk.NewIotSDK()
 
 func main() {
-	addr := sdk.GetEnvStr("DEVICE_ESP8266_BH1750", "")
+	addr := sdk.GetEnvStr("DEVICE_RASPI_BH1750", "")
 	if len(addr) == 0 {
 		return
 	}
@@ -49,8 +49,7 @@ func bh1750(deviceID uint32) {
 		qsub.Unsubscribe()
 		qsub.Close()
 	}()
-
-	r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.IP, device.Port))
+	r := raspi.NewAdaptor()
 	bh1750 := i2c.NewBH1750Driver(r)
 	work := func() {
 		bh1750.Start()

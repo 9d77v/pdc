@@ -19,7 +19,7 @@ import (
 var iotSDK *sdk.IotSDK = sdk.NewIotSDK()
 
 func main() {
-	addr := os.Getenv("DEVICE_ESP8266")
+	addr := os.Getenv("DEVICE_ESP8266_SHT3X")
 	if len(addr) == 0 {
 		return
 	}

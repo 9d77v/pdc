@@ -36,11 +36,11 @@ case $1 in
         $sudo docker build -t 9d77v/pdc-device-esp8266-sht3x:$IMAGE_TAG -f Dockerfile.esp8266.sht3x .
         $sudo docker push 9d77v/pdc-device-esp8266-sht3x:$IMAGE_TAG   
         ;;
-    esp8266-bh1750)
+    raspi-bh1750)
         IMAGE_TAG=`git log --pretty=format:"%ad_%h" -1 --date=short`
-        echo "build pdc-device-esp8266-bh1750"
-        $sudo docker build -t 9d77v/pdc-device-esp8266-bh1750:$IMAGE_TAG -f Dockerfile.esp8266.bh1750 .
-        $sudo docker push 9d77v/pdc-device-esp8266-bh1750:$IMAGE_TAG   
+        echo "build pdc-device-raspi-bh1750"
+        $sudo docker build -t 9d77v/pdc-device-raspi-bh1750:$IMAGE_TAG -f Dockerfile.raspi.bh1750 .
+        $sudo docker push 9d77v/pdc-device-raspi-bh1750:$IMAGE_TAG   
         ;;
 esac  
 
