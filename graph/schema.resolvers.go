@@ -113,12 +113,20 @@ func (r *mutationResolver) UpdateAttributeModel(ctx context.Context, input model
 	return deviceService.UpdateAttributeModel(ctx, input)
 }
 
+func (r *mutationResolver) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
+	return deviceService.DeleteAttributeModel(ctx, id)
+}
+
 func (r *mutationResolver) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
 	return deviceService.CreateTelemetryModel(ctx, input)
 }
 
 func (r *mutationResolver) UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
 	return deviceService.UpdateTelemetryModel(ctx, input)
+}
+
+func (r *mutationResolver) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
+	return deviceService.DeleteTelemetryModel(ctx, id)
 }
 
 func (r *mutationResolver) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
@@ -215,17 +223,17 @@ func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, page *
 	return con, err
 }
 
-func (r *queryResolver) DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceModelConnection, error) {
+func (r *queryResolver) DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceModelConnection, error) {
 	con := new(model.DeviceModelConnection)
-	total, data, err := deviceService.ListDeviceModel(ctx, keyword, page, pageSize, ids)
+	total, data, err := deviceService.ListDeviceModel(ctx, keyword, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceConnection, error) {
+func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceConnection, error) {
 	con := new(model.DeviceConnection)
-	total, data, err := deviceService.ListDevice(ctx, keyword, page, pageSize, ids)
+	total, data, err := deviceService.ListDevice(ctx, keyword, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

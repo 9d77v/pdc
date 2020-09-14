@@ -83,6 +83,14 @@ func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.New
 	return &model.AttributeModel{ID: int64(m.ID)}, err
 }
 
+//DeleteAttributeModel ..
+func (s DeviceService) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
+	m := new(models.AttributeModel)
+	m.ID = uint(id)
+	err := models.Gorm.Delete(m).Error
+	return &model.AttributeModel{ID: int64(m.ID)}, err
+}
+
 //CreateTelemetryModel  ..
 func (s DeviceService) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
 	m := &models.TelemetryModel{
@@ -123,9 +131,17 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 	return &model.TelemetryModel{ID: int64(m.ID)}, err
 }
 
+//DeleteTelemetryModel ..
+func (s DeviceService) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
+	m := new(models.TelemetryModel)
+	m.ID = uint(id)
+	err := models.Gorm.Delete(m).Error
+	return &model.TelemetryModel{ID: int64(m.ID)}, err
+}
+
 //ListDeviceModel ..
 func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64) (int64, []*model.DeviceModel, error) {
+	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceModel, error) {
 	result := make([]*model.DeviceModel, 0)
 	data := make([]*models.DeviceModel, 0)
 	offset, limit := GetPageInfo(page, pageSize)
@@ -152,9 +168,15 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
-		builder = builder.Order("id desc")
 		if limit > 0 {
 			builder = builder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				builder = builder.Order(v.Field + " ASC")
+			} else {
+				builder = builder.Order(v.Field + " DESC")
+			}
 		}
 		if edgeFieldMap["attributeModels"] {
 			builder = builder.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
@@ -248,7 +270,7 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 
 //ListDevice ..
 func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64) (int64, []*model.Device, error) {
+	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Device, error) {
 	result := make([]*model.Device, 0)
 	data := make([]*models.Device, 0)
 	offset, limit := GetPageInfo(page, pageSize)
@@ -276,9 +298,15 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
-		builder = builder.Order("id desc")
 		if limit > 0 {
 			builder = builder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				builder = builder.Order(v.Field + " ASC")
+			} else {
+				builder = builder.Order(v.Field + " DESC")
+			}
 		}
 		if edgeFieldMap["attributes"] {
 			builder = builder.Preload("Attributes").Preload("Attributes.AttributeModel")

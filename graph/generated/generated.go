@@ -157,6 +157,8 @@ type ComplexityRoot struct {
 		CreateVideo           func(childComplexity int, input model.NewVideo) int
 		CreateVideoSeries     func(childComplexity int, input model.NewVideoSeries) int
 		CreateVideoSeriesItem func(childComplexity int, input model.NewVideoSeriesItem) int
+		DeleteAttributeModel  func(childComplexity int, id int64) int
+		DeleteTelemetryModel  func(childComplexity int, id int64) int
 		Login                 func(childComplexity int, username string, password string) int
 		RecordHistory         func(childComplexity int, input model.NewHistoryInput) int
 		RefreshToken          func(childComplexity int, refreshToken string) int
@@ -183,8 +185,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		DeviceModels  func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
-		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64) int
+		DeviceModels  func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Devices       func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Histories     func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
 		HistoryInfo   func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL  func(childComplexity int, bucketName string, objectName string) int
@@ -363,8 +365,10 @@ type MutationResolver interface {
 	UpdateDeviceModel(ctx context.Context, input model.NewUpdateDeviceModel) (*model.DeviceModel, error)
 	CreateAttributeModel(ctx context.Context, input model.NewAttributeModel) (*model.AttributeModel, error)
 	UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error)
+	DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error)
 	CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error)
 	UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error)
+	DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error)
 	CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error)
 	UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error)
 }
@@ -380,8 +384,8 @@ type QueryResolver interface {
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
 	HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 	Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error)
-	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceModelConnection, error)
-	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64) (*model.DeviceConnection, error)
+	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceModelConnection, error)
+	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceConnection, error)
 }
 
 type executableSchema struct {
@@ -988,6 +992,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateVideoSeriesItem(childComplexity, args["input"].(model.NewVideoSeriesItem)), true
 
+	case "Mutation.deleteAttributeModel":
+		if e.complexity.Mutation.DeleteAttributeModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAttributeModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAttributeModel(childComplexity, args["id"].(int64)), true
+
+	case "Mutation.deleteTelemetryModel":
+		if e.complexity.Mutation.DeleteTelemetryModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTelemetryModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTelemetryModel(childComplexity, args["id"].(int64)), true
+
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
 			break
@@ -1223,7 +1251,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.DeviceModels(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64)), true
+		return e.complexity.Query.DeviceModels(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.devices":
 		if e.complexity.Query.Devices == nil {
@@ -1235,7 +1263,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64)), true
+		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.histories":
 		if e.complexity.Query.Histories == nil {
@@ -2280,8 +2308,8 @@ type Query {
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
   historyInfo(sourceType:Int!,sourceID:ID!):History
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
-  deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceModelConnection!
-  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!]):DeviceConnection!
+  deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
+  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceConnection!
 } 
 
 type Mutation {
@@ -2312,12 +2340,13 @@ type Mutation {
   updateDeviceModel(input:NewUpdateDeviceModel!):DeviceModel!
   createAttributeModel(input:NewAttributeModel!):AttributeModel!
   updateAttributeModel(input:NewUpdateAttributeModel!):AttributeModel!
+  deleteAttributeModel(id:Int!):AttributeModel!
   createTelemetryModel(input:NewTelemetryModel!):TelemetryModel!
   updateTelemetryModel(input:NewUpdateTelemetryModel!):TelemetryModel!
+  deleteTelemetryModel(id:Int!):TelemetryModel!
   createDevice(input:NewDevice!):Device!
   updateDevice(input:NewUpdateDevice!):Device!
-}
-`, BuiltIn: false},
+}`, BuiltIn: false},
 	&ast.Source{Name: "graph/thing.graphql", Input: `type Thing {
   id: ID!
   uid: ID!
@@ -2746,6 +2775,34 @@ func (ec *executionContext) field_Mutation_createVideo_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteAttributeModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTelemetryModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3049,6 +3106,14 @@ func (ec *executionContext) field_Query_deviceModels_args(ctx context.Context, r
 		}
 	}
 	args["ids"] = arg3
+	var arg4 []*model.Sort
+	if tmp, ok := rawArgs["sorts"]; ok {
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -3087,6 +3152,14 @@ func (ec *executionContext) field_Query_devices_args(ctx context.Context, rawArg
 		}
 	}
 	args["ids"] = arg3
+	var arg4 []*model.Sort
+	if tmp, ok := rawArgs["sorts"]; ok {
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -6745,6 +6818,47 @@ func (ec *executionContext) _Mutation_updateAttributeModel(ctx context.Context, 
 	return ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_deleteAttributeModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteAttributeModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAttributeModel(rctx, args["id"].(int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AttributeModel)
+	fc.Result = res
+	return ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createTelemetryModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6811,6 +6925,47 @@ func (ec *executionContext) _Mutation_updateTelemetryModel(ctx context.Context, 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateTelemetryModel(rctx, args["input"].(model.NewUpdateTelemetryModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TelemetryModel)
+	fc.Result = res
+	return ec.marshalNTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteTelemetryModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteTelemetryModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTelemetryModel(rctx, args["id"].(int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7483,7 +7638,7 @@ func (ec *executionContext) _Query_deviceModels(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().DeviceModels(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64))
+		return ec.resolvers.Query().DeviceModels(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7524,7 +7679,7 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64))
+		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13628,6 +13783,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteAttributeModel":
+			out.Values[i] = ec._Mutation_deleteAttributeModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createTelemetryModel":
 			out.Values[i] = ec._Mutation_createTelemetryModel(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -13635,6 +13795,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateTelemetryModel":
 			out.Values[i] = ec._Mutation_updateTelemetryModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteTelemetryModel":
+			out.Values[i] = ec._Mutation_deleteTelemetryModel(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

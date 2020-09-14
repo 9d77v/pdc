@@ -79,36 +79,36 @@ func (sdk *IotSDK) ReplyDeviceInfo(replySubject string, deviceMsg *pb.DeviceMSG)
 }
 
 //SetDeviceAttributes set device attributes
-func (sdk *IotSDK) SetDeviceAttributes(deviceID uint32, attributes map[uint32]string) {
+func (sdk *IotSDK) SetDeviceAttributes(deviceID uint32, attributeMap map[uint32]string) {
 	request := new(pb.DeviceMSG)
 	request.Action = pb.DeviceAction_SetAttributes
 	request.DeviceID = deviceID
-	request.AttributeMap = attributes
+	request.AttributeMap = attributeMap
 	request.ActionTime = ptypes.TimestampNow()
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, ackHandler)
+	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, AckHandler)
 	if err != nil {
 		log.Printf("publish error,id:%s,err:%v/n", msg, err)
 	}
 }
 
 //UploadDeviceTelemetries upload device telemetries
-func (sdk *IotSDK) UploadDeviceTelemetries(deviceID uint32, telemetries map[uint32]float64, now *timestamppb.Timestamp) {
+func (sdk *IotSDK) UploadDeviceTelemetries(deviceID uint32, telemetryMap map[uint32]float64, now *timestamppb.Timestamp) {
 	request := new(pb.DeviceMSG)
 	request.Action = pb.DeviceAction_SetTelemetries
 	request.DeviceID = deviceID
-	request.TelemetryMap = telemetries
+	request.TelemetryMap = telemetryMap
 	request.ActionTime = now
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, ackHandler)
+	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, AckHandler)
 	if err != nil {
 		log.Printf("publish error,id:%s,err:%v/n", msg, err)
 	}
