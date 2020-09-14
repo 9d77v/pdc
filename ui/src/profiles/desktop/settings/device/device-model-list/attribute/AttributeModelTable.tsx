@@ -1,10 +1,10 @@
-import { Table, Button } from 'antd';
+import { Table, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react'
 
 import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 import { AttributeModelCreateForm, INewAttributeModel } from './AttributeModelCreateForm';
-import { ADD_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL } from '../../../../../../consts/device.gql';
+import { ADD_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL } from '../../../../../../consts/device.gql';
 import { IUpdateAttributeModel, AttributeModelUpdateForm } from './AttributeModelUpdateForm';
 
 
@@ -25,6 +25,7 @@ export default function AttributeModelTable(props: IAttributeModelTableProps) {
     })
     const [addAttributeModel] = useMutation(ADD_ATTRIBUTE_MODEL);
     const [updateAttributeModel] = useMutation(UPDATE_ATTRIBUTE_MODEL)
+    const [deleteAttributeModel] = useMutation(DELETE_ATTRIBUTE_MODEL)
 
     const onAttributeModelCreate = async (values: INewAttributeModel) => {
         await addAttributeModel({
@@ -67,7 +68,8 @@ export default function AttributeModelTable(props: IAttributeModelTableProps) {
         {
             title: '操作', dataIndex: 'operation', key: 'operation', fixed: "right" as const,
             render: (value: any, record: any) =>
-                <span><Button
+                <div><Button
+                    style={{ marginBottom: 8 }}
                     onClick={() => {
                         setUpdateAttributeModelData({
                             "id": record.id,
@@ -76,7 +78,25 @@ export default function AttributeModelTable(props: IAttributeModelTableProps) {
                         })
                         setAttributeModelUpdateFormVisible(true)
                     }}>编辑属性</Button>
-                </span >
+                    <Popconfirm
+                        title="确定要删除该属性吗?"
+                        onConfirm={async () => {
+                            await deleteAttributeModel({
+                                variables: {
+                                    "id": record.id
+                                }
+                            })
+                            refetch()
+                        }}
+                        onCancel={() => { }}
+                        okText="是"
+                        cancelText="否"
+                    >
+                        <Button
+                            danger
+                        >删除属性</Button>
+                    </Popconfirm>
+                </div >
         },
     ];
     return (

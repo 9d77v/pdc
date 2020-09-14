@@ -33,6 +33,14 @@ mutation updateAttributeModel($input:NewUpdateAttributeModel!){
 }
 `
 
+const DELETE_ATTRIBUTE_MODEL = gql`
+mutation deleteAttributeModel($id:Int!){
+   deleteAttributeModel(id:$id){
+     id
+   }
+}
+`
+
 const ADD_TELEMETRY_MODEL = gql`
 mutation createTelemetryModel($input:NewTelemetryModel!){
    createTelemetryModel(input:$input){
@@ -44,6 +52,14 @@ mutation createTelemetryModel($input:NewTelemetryModel!){
 const UPDATE_TELEMETRY_MODEL = gql`
 mutation updateTelemetryModel($input:NewUpdateTelemetryModel!){
    updateTelemetryModel(input:$input){
+     id
+   }
+}
+`
+
+const DELETE_TELEMETRY_MODEL = gql`
+mutation deleteTelemetryModel($id:Int!){
+   deleteTelemetryModel(id:$id){
      id
    }
 }
@@ -200,8 +216,8 @@ export {
   ADD_DEVICE_MODEL, UPDATE_DEVICE_MODEL,
   DEVICE_MODEL_COMBO,
   LIST_DEVICE_MODEL, GET_DEVICE_MODEL,
-  ADD_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL,
-  ADD_TELEMETRY_MODEL, UPDATE_TELEMETRY_MODEL,
+  ADD_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL,
+  ADD_TELEMETRY_MODEL, UPDATE_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL,
   ADD_DEVICE, UPDATE_DEVICE,
   LIST_DEVICE, GET_DEVICE, GET_MOBILE_HOME_DEVICES
 }
