@@ -78,12 +78,21 @@ services:
     env_file:
       - pdc.env
     container_name: pdc
-  pdc-device-esp8266:
-      image: 9d77v/pdc-device-esp8266:2020-09-09_d5f0a62
-      restart: always
-      env_file:
-        - pdc.env
-      container_name: pdc-device-esp8266
+  # pdc-device-esp8266:
+  #   image: 9d77v/pdc-device-esp8266:2020-09-09_d5f0a62
+  #   restart: always
+  #   env_file:
+  #     - pdc.env
+  #   container_name: pdc-device-esp8266
+  # pdc-device-raspi-bh1750:
+  #   image: 9d77v/pdc-device-raspi-bh1750:2020-09-14_57072f1
+  #   user: pi
+  #   restart: always
+  #   env_file:
+  #     - pdc.env
+  #   volumes:
+  #     - /dev/i2c-1:/dev/i2c-1
+  #   container_name: pdc-device-raspi-bh1750
   caddy:
     image: 9d77v/caddy:2.1.1-alpine
     restart: always
