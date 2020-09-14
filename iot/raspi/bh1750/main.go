@@ -49,13 +49,10 @@ func bh1750(deviceID uint32) {
 		qsub.Unsubscribe()
 		qsub.Close()
 	}()
-	fmt.Println("device config", device)
 	r := raspi.NewAdaptor()
 	bh1750 := i2c.NewBH1750Driver(r)
 	work := func() {
-		log.Println("bh1750 start")
 		bh1750.Start()
-		log.Println("bh1750 started")
 		attributeMap := make(map[uint32]string, 0)
 		samplingFrequency := 1
 		bh1750Hz := device.AttributeConfig["bh1750_hz"]
