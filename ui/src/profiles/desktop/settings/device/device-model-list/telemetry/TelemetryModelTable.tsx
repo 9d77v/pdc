@@ -1,10 +1,10 @@
-import { Table, Button } from 'antd';
+import { Table, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react'
 
 import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 import { TelemetryModelCreateForm, INewTelemetryModel } from './TelemetryModelCreateForm';
-import { UPDATE_TELEMETRY_MODEL, ADD_TELEMETRY_MODEL } from '../../../../../../consts/device.gql';
+import { UPDATE_TELEMETRY_MODEL, ADD_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL } from '../../../../../../consts/device.gql';
 import { IUpdateTelemetryModel, TelemetryModelUpdateForm } from './TelemetryModelUpdateForm';
 
 
@@ -29,6 +29,7 @@ export default function TelemetryModelTable(props: ITelemetryModelTableProps) {
     })
     const [addTelemetryModel] = useMutation(ADD_TELEMETRY_MODEL);
     const [updateTelemetryModel] = useMutation(UPDATE_TELEMETRY_MODEL)
+    const [deleteTelemetryModel] = useMutation(DELETE_TELEMETRY_MODEL)
 
     const onTelemetryModelCreate = async (values: INewTelemetryModel) => {
         await addTelemetryModel({
@@ -83,7 +84,8 @@ export default function TelemetryModelTable(props: ITelemetryModelTableProps) {
         {
             title: '操作', dataIndex: 'operation', key: 'operation', fixed: "right" as const,
             render: (value: any, record: any) =>
-                <span><Button
+                <div><Button
+                    style={{ marginBottom: 8 }}
                     onClick={() => {
                         setUpdateTelemetryModelData({
                             "id": record.id,
@@ -96,7 +98,25 @@ export default function TelemetryModelTable(props: ITelemetryModelTableProps) {
                         })
                         setTelemetryModelUpdateFormVisible(true)
                     }}>编辑遥测</Button>
-                </span>
+                    <Popconfirm
+                        title="确定要删除该遥测吗?"
+                        onConfirm={async () => {
+                            await deleteTelemetryModel({
+                                variables: {
+                                    "id": record.id
+                                }
+                            })
+                            refetch()
+                        }}
+                        onCancel={() => { }}
+                        okText="是"
+                        cancelText="否"
+                    >
+                        <Button
+                            danger
+                        >删除遥测</Button>
+                    </Popconfirm>
+                </div>
         },
     ];
     return (
