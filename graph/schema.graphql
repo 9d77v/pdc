@@ -15,14 +15,7 @@ type Query {
   historyInfo(sourceType:Int!,sourceID:ID!):History
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
   deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
-  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[S
-  
-  
-  
-  
-  
-  
-  +`ort!]):DeviceConnection!
+  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceConnection!
 } 
 
 type Mutation {
@@ -53,9 +46,10 @@ type Mutation {
   updateDeviceModel(input:NewUpdateDeviceModel!):DeviceModel!
   createAttributeModel(input:NewAttributeModel!):AttributeModel!
   updateAttributeModel(input:NewUpdateAttributeModel!):AttributeModel!
+  deleteAttributeModel(id:Int!):AttributeModel!
   createTelemetryModel(input:NewTelemetryModel!):TelemetryModel!
   updateTelemetryModel(input:NewUpdateTelemetryModel!):TelemetryModel!
+  deleteTelemetryModel(id:Int!):TelemetryModel!
   createDevice(input:NewDevice!):Device!
   updateDevice(input:NewUpdateDevice!):Device!
-}!3/552312/`  1qQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ
-a12/
+}

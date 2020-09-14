@@ -83,6 +83,14 @@ func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.New
 	return &model.AttributeModel{ID: int64(m.ID)}, err
 }
 
+//DeleteAttributeModel ..
+func (s DeviceService) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
+	m := new(models.AttributeModel)
+	m.ID = uint(id)
+	err := models.Gorm.Delete(m).Error
+	return &model.AttributeModel{ID: int64(m.ID)}, err
+}
+
 //CreateTelemetryModel  ..
 func (s DeviceService) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
 	m := &models.TelemetryModel{
@@ -120,6 +128,14 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 		"scale":     input.Scale,
 	}
 	err := models.Gorm.Model(m).Updates(updateMap).Error
+	return &model.TelemetryModel{ID: int64(m.ID)}, err
+}
+
+//DeleteTelemetryModel ..
+func (s DeviceService) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
+	m := new(models.TelemetryModel)
+	m.ID = uint(id)
+	err := models.Gorm.Delete(m).Error
 	return &model.TelemetryModel{ID: int64(m.ID)}, err
 }
 

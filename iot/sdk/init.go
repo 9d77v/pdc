@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	natsURL = getEnvStr("NATS_URL", "domain.local:4222")
+	natsURL = GetEnvStr("NATS_URL", "domain.local:4222")
 )
 
 var (
@@ -37,7 +37,8 @@ func init() {
 	)
 }
 
-func getEnvStr(key, value string) string {
+//GetEnvStr ..
+func GetEnvStr(key, value string) string {
 	data := os.Getenv(key)
 	if data == "" {
 		return value
@@ -45,8 +46,8 @@ func getEnvStr(key, value string) string {
 	return data
 }
 
-//ackHandler for nats ack
-func ackHandler(ackedNuid string, err error) {
+//AckHandler for nats ack
+func AckHandler(ackedNuid string, err error) {
 	if err != nil {
 		log.Printf("Warning: error publishing msg id %s: %v\n", ackedNuid, err.Error())
 	} else {

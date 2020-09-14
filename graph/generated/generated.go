@@ -157,6 +157,8 @@ type ComplexityRoot struct {
 		CreateVideo           func(childComplexity int, input model.NewVideo) int
 		CreateVideoSeries     func(childComplexity int, input model.NewVideoSeries) int
 		CreateVideoSeriesItem func(childComplexity int, input model.NewVideoSeriesItem) int
+		DeleteAttributeModel  func(childComplexity int, id int64) int
+		DeleteTelemetryModel  func(childComplexity int, id int64) int
 		Login                 func(childComplexity int, username string, password string) int
 		RecordHistory         func(childComplexity int, input model.NewHistoryInput) int
 		RefreshToken          func(childComplexity int, refreshToken string) int
@@ -363,8 +365,10 @@ type MutationResolver interface {
 	UpdateDeviceModel(ctx context.Context, input model.NewUpdateDeviceModel) (*model.DeviceModel, error)
 	CreateAttributeModel(ctx context.Context, input model.NewAttributeModel) (*model.AttributeModel, error)
 	UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error)
+	DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error)
 	CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error)
 	UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error)
+	DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error)
 	CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error)
 	UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error)
 }
@@ -987,6 +991,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateVideoSeriesItem(childComplexity, args["input"].(model.NewVideoSeriesItem)), true
+
+	case "Mutation.deleteAttributeModel":
+		if e.complexity.Mutation.DeleteAttributeModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAttributeModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAttributeModel(childComplexity, args["id"].(int64)), true
+
+	case "Mutation.deleteTelemetryModel":
+		if e.complexity.Mutation.DeleteTelemetryModel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteTelemetryModel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteTelemetryModel(childComplexity, args["id"].(int64)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -2312,12 +2340,13 @@ type Mutation {
   updateDeviceModel(input:NewUpdateDeviceModel!):DeviceModel!
   createAttributeModel(input:NewAttributeModel!):AttributeModel!
   updateAttributeModel(input:NewUpdateAttributeModel!):AttributeModel!
+  deleteAttributeModel(id:Int!):AttributeModel!
   createTelemetryModel(input:NewTelemetryModel!):TelemetryModel!
   updateTelemetryModel(input:NewUpdateTelemetryModel!):TelemetryModel!
+  deleteTelemetryModel(id:Int!):TelemetryModel!
   createDevice(input:NewDevice!):Device!
   updateDevice(input:NewUpdateDevice!):Device!
-}
-`, BuiltIn: false},
+}`, BuiltIn: false},
 	&ast.Source{Name: "graph/thing.graphql", Input: `type Thing {
   id: ID!
   uid: ID!
@@ -2743,6 +2772,34 @@ func (ec *executionContext) field_Mutation_createVideo_args(ctx context.Context,
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAttributeModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteTelemetryModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["id"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -6761,6 +6818,47 @@ func (ec *executionContext) _Mutation_updateAttributeModel(ctx context.Context, 
 	return ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_deleteAttributeModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteAttributeModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAttributeModel(rctx, args["id"].(int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.AttributeModel)
+	fc.Result = res
+	return ec.marshalNAttributeModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐAttributeModel(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_createTelemetryModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -6827,6 +6925,47 @@ func (ec *executionContext) _Mutation_updateTelemetryModel(ctx context.Context, 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateTelemetryModel(rctx, args["input"].(model.NewUpdateTelemetryModel))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TelemetryModel)
+	fc.Result = res
+	return ec.marshalNTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteTelemetryModel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteTelemetryModel_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteTelemetryModel(rctx, args["id"].(int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13644,6 +13783,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteAttributeModel":
+			out.Values[i] = ec._Mutation_deleteAttributeModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createTelemetryModel":
 			out.Values[i] = ec._Mutation_createTelemetryModel(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -13651,6 +13795,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateTelemetryModel":
 			out.Values[i] = ec._Mutation_updateTelemetryModel(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteTelemetryModel":
+			out.Values[i] = ec._Mutation_deleteTelemetryModel(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

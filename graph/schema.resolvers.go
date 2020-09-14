@@ -113,12 +113,20 @@ func (r *mutationResolver) UpdateAttributeModel(ctx context.Context, input model
 	return deviceService.UpdateAttributeModel(ctx, input)
 }
 
+func (r *mutationResolver) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
+	return deviceService.DeleteAttributeModel(ctx, id)
+}
+
 func (r *mutationResolver) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
 	return deviceService.CreateTelemetryModel(ctx, input)
 }
 
 func (r *mutationResolver) UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
 	return deviceService.UpdateTelemetryModel(ctx, input)
+}
+
+func (r *mutationResolver) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
+	return deviceService.DeleteTelemetryModel(ctx, id)
 }
 
 func (r *mutationResolver) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
