@@ -81,7 +81,7 @@ func main() {
 		qsub3.Unsubscribe()
 		qsub3.Close()
 	}()
-	qsub4, err := iotsdk.SubscribePublishTelemetry(consumers.PublishTelemetry)
+	qsub4, err := iotsdk.SubscribePublishDeviceData(consumers.PublishDeviceData)
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
@@ -89,7 +89,8 @@ func main() {
 		qsub4.Unsubscribe()
 		qsub4.Close()
 	}()
-	go consumers.SaveTelemetry()
+	go consumers.SaveDeviceTelemetry()
+	go consumers.SaveDeviceHealth()
 	go func() {
 		errc <- srv.ListenAndServe()
 		log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)

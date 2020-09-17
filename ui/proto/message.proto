@@ -8,3 +8,9 @@ message Telemetry {
   uint32 ID = 3;
   double Value = 4;
 }
+
+message Health {
+  uint32 DeviceID = 1;
+  google.protobuf.Timestamp ActionTime = 2;
+  uint32 Value = 3;
+}

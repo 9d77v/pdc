@@ -32,6 +32,7 @@ func ReplyDeviceMSG(m *nats.Msg) {
 	device := new(models.Device)
 	err = models.Gorm.Preload("Attributes").Preload("Telemetries").Where("id=?", replyDeviceMsg.DeviceID).First(device).Error
 	if err != nil {
+		log.Println("get device failed,err", err)
 		iotsdk.ReplyDeviceInfo(m.Reply, replyDeviceMsg)
 		return
 	}
@@ -39,27 +40,24 @@ func ReplyDeviceMSG(m *nats.Msg) {
 	for _, v := range device.Attributes {
 		attributeConfig[v.Key] = uint32(v.ID)
 	}
-	telemetryConfig := make(map[string]*pb.Telemetry)
+	telemetryConfig := make(map[string]uint32)
 	for _, v := range device.Telemetries {
-		telemetryConfig[v.Key] = &pb.Telemetry{
-			ID:     uint32(v.ID),
-			Factor: v.TelemetryModel.Factor,
-			Scale:  uint32(v.TelemetryModel.Scale),
-		}
+		telemetryConfig[v.Key] = uint32(v.ID)
 	}
-	deviceInfo := &pb.DeviceInfo{
+	replyDeviceMsg.DeviceInfo = &pb.DeviceInfo{
+		ID:              deviceMsg.DeviceID,
 		IP:              device.IP,
 		Port:            uint32(device.Port),
 		AttributeConfig: attributeConfig,
 		TelemetryConfig: telemetryConfig,
 	}
-	replyDeviceMsg.DeviceInfo = deviceInfo
 	iotsdk.ReplyDeviceInfo(m.Reply, replyDeviceMsg)
 }
 
 var (
 	batchSize     = 1000
 	telemetryChan = make(chan *pb.Telemetry, batchSize)
+	healthChan    = make(chan *pb.Health, batchSize)
 	duration      = 1 * time.Second
 )
 
@@ -84,13 +82,21 @@ func HandleDeviceMSG(m *stan.Msg) {
 			}
 			telemetryChan <- telemetry
 		}
+	case pb.DeviceAction_SetHealth:
+		health := &pb.Health{
+			DeviceID:   deviceMsg.DeviceID,
+			ActionTime: deviceMsg.ActionTime,
+			Value:      deviceMsg.DeviceHealth,
+		}
+		healthChan <- health
 	}
 }
 
-const ubjectDeviceTelemetryPrefix = "device.telemetry"
+const subjectDeviceTelemetryPrefix = "device.telemetry"
+const subjectDeviceHealthPrefix = "device.health"
 
-//PublishTelemetry push telemetry to redis
-func PublishTelemetry(m *stan.Msg) {
+//PublishDeviceData push device data to redis
+func PublishDeviceData(m *stan.Msg) {
 	deviceMsg := new(pb.DeviceMSG)
 	err := proto.Unmarshal(m.Data, deviceMsg)
 	if err != nil {
@@ -112,10 +118,26 @@ func PublishTelemetry(m *stan.Msg) {
 				return
 			}
 			err = models.RedisClient.Publish(context.Background(),
-				fmt.Sprintf("%s.%d.%d", ubjectDeviceTelemetryPrefix, deviceMsg.DeviceID, k), requestMsg).Err()
+				fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceMsg.DeviceID, k), requestMsg).Err()
 			if err != nil {
 				log.Printf("publish error,err:%v/n", err)
 			}
+		}
+	case pb.DeviceAction_SetHealth:
+		health := &pb.Health{
+			DeviceID:   deviceMsg.DeviceID,
+			ActionTime: deviceMsg.ActionTime,
+			Value:      deviceMsg.DeviceHealth,
+		}
+		requestMsg, err := proto.Marshal(health)
+		if err != nil {
+			log.Println("proto marshal error:", err)
+			return
+		}
+		err = models.RedisClient.Publish(context.Background(),
+			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceID), requestMsg).Err()
+		if err != nil {
+			log.Printf("publish error,err:%v/n", err)
 		}
 	}
 }
@@ -131,8 +153,8 @@ func setAttributes(deviceMsg *pb.DeviceMSG) {
 	}
 }
 
-//SaveTelemetry ...
-func SaveTelemetry() {
+//SaveDeviceTelemetry ...
+func SaveDeviceTelemetry() {
 	var telemetries []*pb.Telemetry
 	timer := time.NewTimer(0)
 	if !timer.Stop() {
@@ -164,7 +186,7 @@ func SaveTelemetry() {
 //batchSaveTelemetry ..
 func batchSaveTelemetry(telemetries []*pb.Telemetry) {
 	tx, _ := clickhouse.Client.Begin()
-	stmt, _ := tx.Prepare("INSERT INTO telemetry (device_id,telemetry_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
+	stmt, _ := tx.Prepare("INSERT INTO device_telemetry (device_id,telemetry_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
 	defer stmt.Close()
 	now := time.Now()
 	for _, v := range telemetries {
@@ -172,6 +194,62 @@ func batchSaveTelemetry(telemetries []*pb.Telemetry) {
 		if _, err := stmt.Exec(
 			v.DeviceID,
 			v.ID,
+			actionTime,
+			actionTime.Nanosecond(),
+			v.Value,
+			now,
+			now.Nanosecond(),
+		); err != nil {
+			log.Println(err)
+			tx.Rollback()
+			return
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		log.Println("commit failed:", err)
+	}
+}
+
+//SaveDeviceHealth ...
+func SaveDeviceHealth() {
+	var healths []*pb.Health
+	timer := time.NewTimer(0)
+	if !timer.Stop() {
+		<-timer.C
+	}
+	defer timer.Stop()
+	for {
+		select {
+		case health := <-healthChan:
+			healths = append(healths, health)
+			if len(healths) != batchSize {
+				if len(healths) == 1 {
+					timer.Reset(duration)
+				}
+				break
+			}
+			batchSaveHealth(healths)
+			if !timer.Stop() {
+				<-timer.C
+			}
+			healths = healths[0:0]
+		case <-timer.C:
+			batchSaveHealth(healths)
+			healths = healths[0:0]
+		}
+	}
+}
+
+//batchSaveHealth ..
+func batchSaveHealth(healths []*pb.Health) {
+	tx, _ := clickhouse.Client.Begin()
+	stmt, _ := tx.Prepare("INSERT INTO device_health (device_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
+	defer stmt.Close()
+	now := time.Now()
+	for _, v := range healths {
+		actionTime, _ := ptypes.Timestamp(v.ActionTime)
+		if _, err := stmt.Exec(
+			v.DeviceID,
 			actionTime,
 			actionTime.Nanosecond(),
 			v.Value,

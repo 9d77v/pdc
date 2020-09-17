@@ -42,5 +42,11 @@ case $1 in
         $sudo docker build -t 9d77v/pdc-device-raspi-bh1750:$IMAGE_TAG -f Dockerfile.raspi.bh1750 .
         $sudo docker push 9d77v/pdc-device-raspi-bh1750:$IMAGE_TAG   
         ;;
+    ping)
+        IMAGE_TAG=`git log --pretty=format:"%ad_%h" -1 --date=short`
+        echo "build pdc-ping"
+        $sudo docker build -t 9d77v/pdc-ping:$IMAGE_TAG -f Dockerfile.ping .
+        $sudo docker push 9d77v/pdc-ping:$IMAGE_TAG   
+        ;;
 esac  
 
