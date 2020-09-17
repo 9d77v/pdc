@@ -55,7 +55,7 @@ func init() {
 	}
 
 	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS telemetry (
+		CREATE TABLE IF NOT EXISTS device_telemetry (
 			device_id UInt32,
 			telemetry_id UInt32,
 			action_time  DateTime CODEC(DoubleDelta),
@@ -65,6 +65,21 @@ func init() {
 			created_at_nanos UInt32
 		) engine=MergeTree()
 		ORDER BY (device_id,telemetry_id,action_time)
+		PARTITION BY (device_id)
+	`)
+	if err != nil {
+		log.Panicln("create table error:", err)
+	}
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS device_health (
+			device_id UInt32,
+			action_time  DateTime CODEC(DoubleDelta),
+			action_time_nanos UInt32,
+			value        UInt32,
+			created_at   DateTime CODEC(DoubleDelta),
+			created_at_nanos UInt32
+		) engine=MergeTree()
+		ORDER BY (device_id,action_time)
 		PARTITION BY (device_id)
 	`)
 	if err != nil {

@@ -1,0 +1,14 @@
+FROM 9d77v/pdc-base:0.0.8
+COPY . /app
+
+ENV APP_NAME=pdc-ping
+RUN cd /app \
+    && go build  -o $APP_NAME -ldflags "-s -w" iot/ping/main.go \
+    && upx -9 $APP_NAME
+
+FROM alpine:3.12
+ENV APP_NAME=pdc-ping
+COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
+
+WORKDIR /app
+CMD [ "pdc-ping" ]

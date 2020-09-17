@@ -71,7 +71,7 @@ services:
         - ./redis/data:/data
     container_name: redis
   pdc:
-    image: 9d77v/pdc:2020-09-12_d1bca3e
+    image: 9d77v/pdc:2020-09-14_6377f7e
     restart: always
     ports: 
       - 8080:8080
@@ -79,20 +79,32 @@ services:
       - pdc.env
     container_name: pdc
   # pdc-device-esp8266-sht3x:
-  #   image: 9d77v/pdc-device-esp8266-sht3x:2020-09-14_9572f81
+  #   image: 9d77v/pdc-device-esp8266-sht3x:2020-09-17_aa9fdfd
   #   restart: always
   #   env_file:
   #     - pdc.env
+  #   depends:
+  #     - pdc
   #   container_name: pdc-device-esp8266-sht3x
   # pdc-device-raspi-bh1750:
-  #   image: 9d77v/pdc-device-raspi-bh1750:2020-09-14_9572f81
+  #   image: 9d77v/pdc-device-raspi-bh1750:2020-09-17_aa9fdfd
   #   user: pi
   #   restart: always
   #   env_file:
   #     - pdc.env
+  #   depends:cd 
+  #     - pdc
   #   volumes:
-  #     - /dev/i2c-1:/dev/i2c-1
+  #     - /dev/i2c-1
   #   container_name: pdc-device-raspi-bh1750
+  # pdc-ping:
+  #   image: 9d77v/pdc-ping:2020-09-17_aa9fdfd
+  #   restart: always
+  #   env_file:
+  #     - pdc.env
+  #   depends:
+  #     - pdc
+  #   container_name: pdc-ping
   caddy:
     image: 9d77v/caddy:2.1.1-alpine
     restart: always

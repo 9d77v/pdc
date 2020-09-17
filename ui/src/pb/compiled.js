@@ -1,15 +1,15 @@
 /*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
+"use strict";
+
 var $protobuf = require("protobufjs/minimal");
 
 // Common aliases
-var $Reader = $protobuf.Reader,
-    $Writer = $protobuf.Writer,
-    $util = $protobuf.util;
+var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
 
 // Exported root namespace
 var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-$root.pb = (function () {
+$root.pb = (function() {
 
     /**
      * Namespace pb.
@@ -18,7 +18,7 @@ $root.pb = (function () {
      */
     var pb = {};
 
-    pb.Telemetry = (function () {
+    pb.Telemetry = (function() {
 
         /**
          * Properties of a Telemetry.
@@ -102,13 +102,13 @@ $root.pb = (function () {
             if (!writer)
                 writer = $Writer.create();
             if (message.DeviceID != null && Object.hasOwnProperty.call(message, "DeviceID"))
-                writer.uint32( /* id 1, wireType 0 =*/ 8).uint32(message.DeviceID);
+                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.DeviceID);
             if (message.ActionTime != null && Object.hasOwnProperty.call(message, "ActionTime"))
-                $root.google.protobuf.Timestamp.encode(message.ActionTime, writer.uint32( /* id 2, wireType 2 =*/ 18).fork()).ldelim();
+                $root.google.protobuf.Timestamp.encode(message.ActionTime, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             if (message.ID != null && Object.hasOwnProperty.call(message, "ID"))
-                writer.uint32( /* id 3, wireType 0 =*/ 24).uint32(message.ID);
+                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.ID);
             if (message.Value != null && Object.hasOwnProperty.call(message, "Value"))
-                writer.uint32( /* id 4, wireType 1 =*/ 33).double(message.Value);
+                writer.uint32(/* id 4, wireType 1 =*/33).double(message.Value);
             return writer;
         };
 
@@ -139,26 +139,25 @@ $root.pb = (function () {
         Telemetry.decode = function decode(reader, length) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length,
-                message = new $root.pb.Telemetry();
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pb.Telemetry();
             while (reader.pos < end) {
                 var tag = reader.uint32();
                 switch (tag >>> 3) {
-                    case 1:
-                        message.DeviceID = reader.uint32();
-                        break;
-                    case 2:
-                        message.ActionTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
-                        break;
-                    case 3:
-                        message.ID = reader.uint32();
-                        break;
-                    case 4:
-                        message.Value = reader.double();
-                        break;
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
+                case 1:
+                    message.DeviceID = reader.uint32();
+                    break;
+                case 2:
+                    message.ActionTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                    break;
+                case 3:
+                    message.ID = reader.uint32();
+                    break;
+                case 4:
+                    message.Value = reader.double();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
                 }
             }
             return message;
@@ -278,10 +277,247 @@ $root.pb = (function () {
         return Telemetry;
     })();
 
+    pb.Health = (function() {
+
+        /**
+         * Properties of a Health.
+         * @memberof pb
+         * @interface IHealth
+         * @property {number|null} [DeviceID] Health DeviceID
+         * @property {google.protobuf.ITimestamp|null} [ActionTime] Health ActionTime
+         * @property {number|null} [Value] Health Value
+         */
+
+        /**
+         * Constructs a new Health.
+         * @memberof pb
+         * @classdesc Represents a Health.
+         * @implements IHealth
+         * @constructor
+         * @param {pb.IHealth=} [properties] Properties to set
+         */
+        function Health(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Health DeviceID.
+         * @member {number} DeviceID
+         * @memberof pb.Health
+         * @instance
+         */
+        Health.prototype.DeviceID = 0;
+
+        /**
+         * Health ActionTime.
+         * @member {google.protobuf.ITimestamp|null|undefined} ActionTime
+         * @memberof pb.Health
+         * @instance
+         */
+        Health.prototype.ActionTime = null;
+
+        /**
+         * Health Value.
+         * @member {number} Value
+         * @memberof pb.Health
+         * @instance
+         */
+        Health.prototype.Value = 0;
+
+        /**
+         * Creates a new Health instance using the specified properties.
+         * @function create
+         * @memberof pb.Health
+         * @static
+         * @param {pb.IHealth=} [properties] Properties to set
+         * @returns {pb.Health} Health instance
+         */
+        Health.create = function create(properties) {
+            return new Health(properties);
+        };
+
+        /**
+         * Encodes the specified Health message. Does not implicitly {@link pb.Health.verify|verify} messages.
+         * @function encode
+         * @memberof pb.Health
+         * @static
+         * @param {pb.IHealth} message Health message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Health.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.DeviceID != null && Object.hasOwnProperty.call(message, "DeviceID"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.DeviceID);
+            if (message.ActionTime != null && Object.hasOwnProperty.call(message, "ActionTime"))
+                $root.google.protobuf.Timestamp.encode(message.ActionTime, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+            if (message.Value != null && Object.hasOwnProperty.call(message, "Value"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.Value);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Health message, length delimited. Does not implicitly {@link pb.Health.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof pb.Health
+         * @static
+         * @param {pb.IHealth} message Health message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Health.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Health message from the specified reader or buffer.
+         * @function decode
+         * @memberof pb.Health
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {pb.Health} Health
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Health.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.pb.Health();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.DeviceID = reader.uint32();
+                    break;
+                case 2:
+                    message.ActionTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                    break;
+                case 3:
+                    message.Value = reader.uint32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Health message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof pb.Health
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {pb.Health} Health
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Health.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Health message.
+         * @function verify
+         * @memberof pb.Health
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Health.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.DeviceID != null && message.hasOwnProperty("DeviceID"))
+                if (!$util.isInteger(message.DeviceID))
+                    return "DeviceID: integer expected";
+            if (message.ActionTime != null && message.hasOwnProperty("ActionTime")) {
+                var error = $root.google.protobuf.Timestamp.verify(message.ActionTime);
+                if (error)
+                    return "ActionTime." + error;
+            }
+            if (message.Value != null && message.hasOwnProperty("Value"))
+                if (!$util.isInteger(message.Value))
+                    return "Value: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a Health message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof pb.Health
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {pb.Health} Health
+         */
+        Health.fromObject = function fromObject(object) {
+            if (object instanceof $root.pb.Health)
+                return object;
+            var message = new $root.pb.Health();
+            if (object.DeviceID != null)
+                message.DeviceID = object.DeviceID >>> 0;
+            if (object.ActionTime != null) {
+                if (typeof object.ActionTime !== "object")
+                    throw TypeError(".pb.Health.ActionTime: object expected");
+                message.ActionTime = $root.google.protobuf.Timestamp.fromObject(object.ActionTime);
+            }
+            if (object.Value != null)
+                message.Value = object.Value >>> 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Health message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof pb.Health
+         * @static
+         * @param {pb.Health} message Health
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Health.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.DeviceID = 0;
+                object.ActionTime = null;
+                object.Value = 0;
+            }
+            if (message.DeviceID != null && message.hasOwnProperty("DeviceID"))
+                object.DeviceID = message.DeviceID;
+            if (message.ActionTime != null && message.hasOwnProperty("ActionTime"))
+                object.ActionTime = $root.google.protobuf.Timestamp.toObject(message.ActionTime, options);
+            if (message.Value != null && message.hasOwnProperty("Value"))
+                object.Value = message.Value;
+            return object;
+        };
+
+        /**
+         * Converts this Health to JSON.
+         * @function toJSON
+         * @memberof pb.Health
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Health.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return Health;
+    })();
+
     return pb;
 })();
 
-$root.google = (function () {
+$root.google = (function() {
 
     /**
      * Namespace google.
@@ -290,7 +526,7 @@ $root.google = (function () {
      */
     var google = {};
 
-    google.protobuf = (function () {
+    google.protobuf = (function() {
 
         /**
          * Namespace protobuf.
@@ -299,7 +535,7 @@ $root.google = (function () {
          */
         var protobuf = {};
 
-        protobuf.Timestamp = (function () {
+        protobuf.Timestamp = (function() {
 
             /**
              * Properties of a Timestamp.
@@ -330,7 +566,7 @@ $root.google = (function () {
              * @memberof google.protobuf.Timestamp
              * @instance
              */
-            Timestamp.prototype.seconds = $util.Long ? $util.Long.fromBits(0, 0, false) : 0;
+            Timestamp.prototype.seconds = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
 
             /**
              * Timestamp nanos.
@@ -365,9 +601,9 @@ $root.google = (function () {
                 if (!writer)
                     writer = $Writer.create();
                 if (message.seconds != null && Object.hasOwnProperty.call(message, "seconds"))
-                    writer.uint32( /* id 1, wireType 0 =*/ 8).int64(message.seconds);
+                    writer.uint32(/* id 1, wireType 0 =*/8).int64(message.seconds);
                 if (message.nanos != null && Object.hasOwnProperty.call(message, "nanos"))
-                    writer.uint32( /* id 2, wireType 0 =*/ 16).int32(message.nanos);
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.nanos);
                 return writer;
             };
 
@@ -398,20 +634,19 @@ $root.google = (function () {
             Timestamp.decode = function decode(reader, length) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length,
-                    message = new $root.google.protobuf.Timestamp();
+                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.google.protobuf.Timestamp();
                 while (reader.pos < end) {
                     var tag = reader.uint32();
                     switch (tag >>> 3) {
-                        case 1:
-                            message.seconds = reader.int64();
-                            break;
-                        case 2:
-                            message.nanos = reader.int32();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
+                    case 1:
+                        message.seconds = reader.int64();
+                        break;
+                    case 2:
+                        message.nanos = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
                     }
                 }
                 return message;
@@ -469,11 +704,11 @@ $root.google = (function () {
                     if ($util.Long)
                         (message.seconds = $util.Long.fromValue(object.seconds)).unsigned = false;
                     else if (typeof object.seconds === "string")
-                    message.seconds = parseInt(object.seconds, 10);
-                else if (typeof object.seconds === "number")
-                    message.seconds = object.seconds;
-                else if (typeof object.seconds === "object")
-                    message.seconds = new $util.LongBits(object.seconds.low >>> 0, object.seconds.high >>> 0).toNumber();
+                        message.seconds = parseInt(object.seconds, 10);
+                    else if (typeof object.seconds === "number")
+                        message.seconds = object.seconds;
+                    else if (typeof object.seconds === "object")
+                        message.seconds = new $util.LongBits(object.seconds.low >>> 0, object.seconds.high >>> 0).toNumber();
                 if (object.nanos != null)
                     message.nanos = object.nanos | 0;
                 return message;

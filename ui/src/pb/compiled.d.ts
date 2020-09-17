@@ -109,6 +109,108 @@ export namespace pb {
          */
         public toJSON(): { [k: string]: any };
     }
+
+    /** Properties of a Health. */
+    interface IHealth {
+
+        /** Health DeviceID */
+        DeviceID?: (number|null);
+
+        /** Health ActionTime */
+        ActionTime?: (google.protobuf.ITimestamp|null);
+
+        /** Health Value */
+        Value?: (number|null);
+    }
+
+    /** Represents a Health. */
+    class Health implements IHealth {
+
+        /**
+         * Constructs a new Health.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: pb.IHealth);
+
+        /** Health DeviceID. */
+        public DeviceID: number;
+
+        /** Health ActionTime. */
+        public ActionTime?: (google.protobuf.ITimestamp|null);
+
+        /** Health Value. */
+        public Value: number;
+
+        /**
+         * Creates a new Health instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Health instance
+         */
+        public static create(properties?: pb.IHealth): pb.Health;
+
+        /**
+         * Encodes the specified Health message. Does not implicitly {@link pb.Health.verify|verify} messages.
+         * @param message Health message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: pb.IHealth, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Health message, length delimited. Does not implicitly {@link pb.Health.verify|verify} messages.
+         * @param message Health message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: pb.IHealth, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Health message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Health
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): pb.Health;
+
+        /**
+         * Decodes a Health message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Health
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): pb.Health;
+
+        /**
+         * Verifies a Health message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Health message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Health
+         */
+        public static fromObject(object: { [k: string]: any }): pb.Health;
+
+        /**
+         * Creates a plain object from a Health message. Also converts values to other types if specified.
+         * @param message Health
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: pb.Health, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Health to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
 }
 
 /** Namespace google. */
