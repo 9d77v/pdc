@@ -7,6 +7,7 @@ const getSocketURL = (path: string) => {
 }
 
 const deviceTelemetryPrefix = "device.telemetry"
+const deviceHealthPrefix = "device.health"
 const iotSocketURL = getSocketURL("/ws/iot")
 
-export { deviceTelemetryPrefix, iotSocketURL }
+export { deviceTelemetryPrefix, deviceHealthPrefix, iotSocketURL }

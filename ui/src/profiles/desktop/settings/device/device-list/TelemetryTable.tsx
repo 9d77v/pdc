@@ -22,11 +22,12 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         { title: '名称', dataIndex: 'name', key: 'name' },
         {
             title: '值', dataIndex: 'value', key: 'value', render: (value: number, record: any) => {
-                return value === undefined ? "-" : (record.factor * value).toFixed(record.scale)
+                return value === null ? "-" : (record.factor * value).toFixed(record.scale)
             }
 
         },
         { title: '单位', dataIndex: 'unit', key: 'unit' },
+        { title: '单位名称', dataIndex: 'unitName', key: 'unitName' },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
             render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
@@ -46,6 +47,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
                 key: element.key,
                 name: element.name,
                 unit: element.unit,
+                unitName: element.unitName,
                 factor: element.factor,
                 scale: element.scale,
                 updatedAt: null,
@@ -62,7 +64,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
     } = useWebSocket(iotSocketURL, {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
-        share: true,
+        share: false,
     });
     useEffect(() => {
         sendMessage(deviceTelemetryPrefix + "." + id.toString() + ".*");
@@ -78,14 +80,16 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
     }, [lastMessage])
 
     const callBack = () => {
-        for (let element of dataResource) {
-            const msg = telemetryMap.get(Number(element.id))
-            if (msg) {
-                element.value = msg.Value
-                element.updatedAt = msg.ActionTime?.seconds
+        if (telemetryMap.size > 0) {
+            for (let element of dataResource) {
+                const msg = telemetryMap.get(Number(element.id))
+                if (msg) {
+                    element.value = msg.Value
+                    element.updatedAt = msg.ActionTime?.seconds
+                }
             }
+            setTelemetryMap(new Map<number, pb.Telemetry>())
         }
-        setTelemetryMap(new Map<number, pb.Telemetry>())
     }
 
     useEffect(() => {

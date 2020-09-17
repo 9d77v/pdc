@@ -36,6 +36,7 @@ export interface IDevice {
     deviceModelDesc: string,
     deviceModelID: number
     deviceType: number
+    health?: number
     createdAt: number
     updatedAt: number
 }

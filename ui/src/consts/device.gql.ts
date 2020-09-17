@@ -183,6 +183,7 @@ query devices($ids:[ID!]) {
         name
         value
         unit
+        unitName
         factor
         scale
         createdAt
