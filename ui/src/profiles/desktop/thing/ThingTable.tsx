@@ -5,7 +5,7 @@ import { LIST_THING, ADD_THING, UPDATE_THING } from '../../../consts/thing.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { ThingCreateForm } from './ThingCreateForm';
 import { useMutation } from '@apollo/react-hooks';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { ThingUpdateForm } from './ThingUpdateForm';
 import Img from '../../../components/img';
 import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from '../../../consts/consts';
@@ -182,7 +182,7 @@ export default function ThingTable() {
         },
         {
             title: '购买日期', dataIndex: 'purchaseDate', key: 'purchaseDate', width: 150,
-            render: (value: number) => moment(value * 1000).format("YYYY年MM月DD日")
+            render: (value: number) => dayjs(value * 1000).format("YYYY年MM月DD日")
         },
         {
             title: '购买平台', dataIndex: 'purchasePlatform', key: 'purchasePlatform', width: 100,
@@ -193,11 +193,11 @@ export default function ThingTable() {
 
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 160,
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt', width: 160,
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '垃圾分类', dataIndex: 'rubbishCategory', key: 'rubbishCategory',

@@ -7,7 +7,7 @@ import {
 import { setContext } from '@apollo/client/link/context';
 import { onError } from "@apollo/client/link/error";
 import jwt_decode from 'jwt-decode';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { getRefreshToken } from '../consts/http';
 import { message as msg, message } from 'antd'
 const httpLink = new HttpLink({ uri: '/api' });
@@ -23,7 +23,7 @@ const authLink = setContext(
             }
         }
         const accessToken: any = jwt_decode(token)
-        if (Number(accessToken.exp) - moment().unix() > 0) {
+        if (Number(accessToken.exp) - dayjs().unix() > 0) {
             return {
                 headers: {
                     Authorization: token ? `Bearer ${token}` : "",

@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { PieLineSerieData } from "../consts/chart"
 import ReactEchartsCore from 'echarts-for-react/lib/core';
-import moment from "moment";
+import dayjs from 'dayjs'
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/pie';
 import 'echarts/lib/chart/line';
@@ -10,7 +10,7 @@ import 'echarts/lib/component/title';
 import 'echarts/lib/component/legend';
 interface PieProps {
     title: string
-    start: moment.Moment
+    start: dayjs.Dayjs
     group: string
     data: PieLineSerieData
     unit: string
@@ -73,7 +73,7 @@ export const PieLine: React.FC<PieProps> = ({
     />)
 }
 
-const FormatData = (data: PieLineSerieData, start: moment.Moment, unit: string, group: string | undefined) => {
+const FormatData = (data: PieLineSerieData, start: dayjs.Dayjs, unit: string, group: string | undefined) => {
     if (!data || (data.x1.length === 0 && group === "")) {
         return {
             sereis: [],
@@ -125,7 +125,7 @@ const FormatData = (data: PieLineSerieData, start: moment.Moment, unit: string, 
     const rawRow: string[] = []
     switch (group) {
         case "month":
-            const days = Number(moment(start.format("YYYY-MM-DD")).endOf("month").format("DD"))
+            const days = Number(dayjs(start.format("YYYY-MM-DD")).endOf("month").format("DD"))
             for (let i = 1; i <= days; i++) {
                 const day = i < 10 ? "0" + i.toString() : i.toString()
                 row.push(day + "日")

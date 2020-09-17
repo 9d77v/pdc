@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react"
 
-import { message, Select, Radio, DatePicker } from "antd"
+import { message, Select, Radio } from "antd"
 import { useQuery } from "@apollo/react-hooks";
 import { THING_ANALYZE } from "../../../consts/thing.gql";
-import moment from "moment";
+import dayjs from "dayjs";
 import { ConsumerExpenditureMap, ThingStatusMap } from "../../../consts/consts";
 import { RadioChangeEvent } from "antd/lib/radio";
 import { PieLine } from "../../../components/PieLine";
+import DatePicker from "../../../components/DatePicker";
 
 
 export default function ThingAnalysis() {
     const [dynamicDimension, setDynamicDimension] = useState("consumer_expenditure")
     const [group, setGroup] = useState<"year" | "month" | "week" | "quarter" | "date" | "time" | undefined>("month")
-    const [start, setStart] = useState(moment().startOf("month"))
+    const [start, setStart] = useState(dayjs().startOf("month"))
     const { error, data } = useQuery(THING_ANALYZE,
         {
             variables: {
@@ -68,7 +69,7 @@ export default function ThingAnalysis() {
                 </Radio.Button>
             </Radio.Group>
             <span>{group === undefined ? "" : <DatePicker
-                onChange={(value: moment.Moment | null) => { setStart(value === null ? moment() : value) }}
+                onChange={(value: dayjs.Dayjs | null) => { setStart(value === null ? dayjs() : value) }}
                 picker={group}
                 defaultValue={start}
                 style={{ width: 136, justifyContent: 'center' }} />}

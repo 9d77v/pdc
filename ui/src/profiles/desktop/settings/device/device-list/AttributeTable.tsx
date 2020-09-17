@@ -1,6 +1,6 @@
 import { Table } from 'antd';
 import React from 'react'
-import moment from 'moment';
+import dayjs from 'dayjs';
 interface IAttributeTableProps {
     id: number
     data: any[]
@@ -16,11 +16,11 @@ export default function AttributeTable(props: IAttributeTableProps) {
         { title: '值', dataIndex: 'value', key: 'value' },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         }
     ];
     return (

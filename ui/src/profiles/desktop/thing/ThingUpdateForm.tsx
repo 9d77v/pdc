@@ -1,7 +1,7 @@
 import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd';
 import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../../components/Uploader';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from '../../../consts/consts';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
@@ -62,7 +62,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
             "consumerExpenditure": data.consumerExpenditure,
             "location": data.location,
             "status": data.status,
-            "purchaseDate": moment(data.purchaseDate * 1000),
+            "purchaseDate": dayjs(data.purchaseDate * 1000),
             "purchasePlatform": data.purchasePlatform,
             "refOrderID": data.refOrderID,
             "rubbishCategory": data.rubbishCategory
