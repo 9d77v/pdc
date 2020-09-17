@@ -2,7 +2,7 @@ import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'an
 import React, { useState } from 'react'
 import { Uploader } from '../../../components/Uploader';
 import { ConsumerExpenditureMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from '../../../consts/consts';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
 
@@ -77,7 +77,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 layout="horizontal"
                 name="thingCreateForm"
                 style={{ maxHeight: 600, overflowY: 'scroll' }}
-                initialValues={{ num: 1, unitPrice: 0, consumerExpenditure: "01", category: 0, status: 1, purchaseDate: moment() }}
+                initialValues={{ num: 1, unitPrice: 0, consumerExpenditure: "01", category: 0, status: 1, purchaseDate: dayjs() }}
             >
                 <Form.Item
                     name="name"

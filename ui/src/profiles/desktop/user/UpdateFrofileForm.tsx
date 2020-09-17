@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { GenderMap } from "../../../consts/consts";
 import { Uploader } from "../../../components/Uploader";
 import { NewUser } from '../settings/user/UserCreateForm';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { UPDATE_PROFILE } from '../../../consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
 
@@ -72,7 +72,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         form.setFieldsValue({
             name: user?.name,
             gender: user?.gender,
-            birthDate: moment(user?.birthDate * 1000),
+            birthDate: dayjs(user?.birthDate * 1000),
             ip: user?.ip
         })
     }, [form, user]);

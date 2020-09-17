@@ -5,7 +5,7 @@ import { LIST_USER, ADD_USER, UPDATE_USER } from '../../../../consts/user.gpl';
 import { useQuery } from '@apollo/react-hooks';
 import { UserCreateForm } from './UserCreateForm';
 import { useMutation } from '@apollo/react-hooks';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { UserUpdateForm } from './UserUpdateForm';
 import Img from '../../../../components/img';
 import { GenderMap, FullRoleMap } from '../../../../consts/consts';
@@ -134,18 +134,18 @@ export default function UserTable() {
         },
         {
             title: '出生日期', dataIndex: 'birthDate', key: 'birthDate', width: 150,
-            render: (value: number) => moment(value * 1000).format("YYYY年MM月DD日")
+            render: (value: number) => dayjs(value * 1000).format("YYYY年MM月DD日")
         },
         {
             title: 'ip', dataIndex: 'ip', key: 'ip', width: 100,
         },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 160,
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt', width: 160,
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作', dataIndex: 'operation', key: 'operation', fixed: "right" as const, width: 120,

@@ -2,7 +2,7 @@ import { Table, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react'
 
 import { useMutation } from '@apollo/react-hooks';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { TelemetryModelCreateForm, INewTelemetryModel } from './TelemetryModelCreateForm';
 import { UPDATE_TELEMETRY_MODEL, ADD_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL } from '../../../../../../consts/device.gql';
 import { IUpdateTelemetryModel, TelemetryModelUpdateForm } from './TelemetryModelUpdateForm';
@@ -75,11 +75,11 @@ export default function TelemetryModelTable(props: ITelemetryModelTableProps) {
         { title: '小数位数', dataIndex: 'scale', key: 'scale' },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作', dataIndex: 'operation', key: 'operation', fixed: "right" as const,

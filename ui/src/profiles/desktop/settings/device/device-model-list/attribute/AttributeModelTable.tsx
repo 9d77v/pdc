@@ -2,7 +2,7 @@ import { Table, Button, Popconfirm } from 'antd';
 import React, { useState } from 'react'
 
 import { useMutation } from '@apollo/react-hooks';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { AttributeModelCreateForm, INewAttributeModel } from './AttributeModelCreateForm';
 import { ADD_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL } from '../../../../../../consts/device.gql';
 import { IUpdateAttributeModel, AttributeModelUpdateForm } from './AttributeModelUpdateForm';
@@ -59,11 +59,11 @@ export default function AttributeModelTable(props: IAttributeModelTableProps) {
         { title: '名称', dataIndex: 'name', key: 'name' },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作', dataIndex: 'operation', key: 'operation', fixed: "right" as const,

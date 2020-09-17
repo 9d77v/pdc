@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Switch, DatePicker, Select } from 'antd';
 import React, { useState, useEffect } from 'react'
 import { Uploader } from '../../../../../components/Uploader';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 
@@ -42,7 +42,7 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
             "title": data.title,
             "desc": data.desc,
             "tags": data.tags,
-            "pubDate": moment(data.pubDate * 1000),
+            "pubDate": dayjs(data.pubDate * 1000),
             "isShow": data.isShow
         })
     }, [form, data]);

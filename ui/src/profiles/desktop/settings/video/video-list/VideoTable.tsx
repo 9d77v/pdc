@@ -9,7 +9,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { VideoCreateForm } from './VideoCreateForm';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateForm';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { VideoPlayer } from '../../../../../components/VideoPlayer';
 import { VideoUpdateForm } from './VideoUpdateForm';
 import { EpisodeUpdateForm } from './EpisodeUpdateForm';
@@ -55,11 +55,11 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
         },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作',
@@ -335,7 +335,7 @@ export default function VideoTable() {
         },
         {
             title: '上映时间', dataIndex: 'pubDate', key: 'pubDate',
-            render: (value: number) => moment(value * 1000).format("YYYY年MM月DD日")
+            render: (value: number) => dayjs(value * 1000).format("YYYY年MM月DD日")
         },
         {
             title: '总话数', dataIndex: 'total', key: 'total',
@@ -363,11 +363,11 @@ export default function VideoTable() {
         },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt',
-            render: (value: number) => moment(value * 1000).format("YYYY-MM-DD HH:mm:ss")
+            render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作', key: 'operation', width: 120, render: (value: any, record: any) =>

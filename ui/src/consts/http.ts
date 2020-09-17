@@ -1,6 +1,6 @@
 import { isMobile } from "../utils/util";
 import jwt_decode from "jwt-decode";
-import moment from "moment";
+import dayjs from "dayjs";
 
 //getUploadURL 获取minio上传地址
 export const getUploadURL = async (bucketName: String, fileName: String) => {
@@ -68,7 +68,7 @@ const request = async (body: string, needToken?: boolean): Promise<any> => {
         let token = localStorage.getItem('accessToken') || "";
         if (token !== "") {
             const accessToken: any = jwt_decode(token)
-            if (Number(accessToken.exp) - moment().unix() <= 0) {
+            if (Number(accessToken.exp) - dayjs().unix() <= 0) {
                 const refreshToken = localStorage.getItem('refreshToken') || "";
                 const data = await getRefreshToken(refreshToken)
                 if (data.data) {

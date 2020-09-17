@@ -2,7 +2,7 @@ import { Modal, Form, Input, Select, DatePicker } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { GenderMap, RoleMap, FullRoleMap } from '../../../../consts/consts';
 import { Uploader } from '../../../../components/Uploader';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 interface UpdateUserProps {
     id: number
@@ -41,7 +41,7 @@ export const UserUpdateForm: React.FC<UserUpdateFormProps> = ({
             "password": data.password,
             "roleID": data.roleID,
             "gender": data.gender,
-            "birthDate": moment(data.birthDate * 1000),
+            "birthDate": dayjs(data.birthDate * 1000),
             "ip": data.ip,
         })
     }, [form, data]);
