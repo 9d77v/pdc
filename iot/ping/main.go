@@ -17,7 +17,7 @@ import (
 var iotSDK *sdk.IotSDK = sdk.NewIotSDK()
 
 func main() {
-	addr := sdk.GetEnvStr("DEVICE_PING", "")
+	addr := sdk.GetEnvStr("DEVICE_PING", "1")
 	if len(addr) == 0 {
 		return
 	}
@@ -63,7 +63,10 @@ func ping(ip string) bool {
 	cmd := exec.Command("ping", "-i", "1", "-c", "3", ip)
 	cmd.Stdout = &buf
 	cmd.Stderr = &errorBuf
-	cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		log.Println("ping failed:", err)
+	}
 	if buf.String() != "" {
 		data := buf.String()
 		dataArr := strings.Split(data, "\n")
@@ -72,13 +75,10 @@ func ping(ip string) bool {
 		}
 		statisticsStr := dataArr[6]
 		statisticsArr := strings.Split(statisticsStr, ",")
-		if len(statisticsArr) != 4 {
+		if len(statisticsArr) < 3 {
 			return false
 		}
-		if statisticsArr[2] != " 0% packet loss" {
-			return false
-		}
-		return true
+		return statisticsArr[2] == " 0% packet loss"
 	}
 	return false
 }

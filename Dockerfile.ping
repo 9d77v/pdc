@@ -6,7 +6,7 @@ RUN cd /app \
     && go build  -o $APP_NAME -ldflags "-s -w" iot/ping/main.go \
     && upx -9 $APP_NAME
 
-FROM scratch
+FROM alpine:3.12
 ENV APP_NAME=pdc-ping
 COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
 
