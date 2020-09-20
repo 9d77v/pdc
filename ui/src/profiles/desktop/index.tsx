@@ -4,6 +4,8 @@ import {
 } from "react-router-dom";
 import { Layout } from 'antd';
 import "./index.less"
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/es/locale/zh_CN';
 import { AppHeader } from './common/AppHeader';
 import { AppSlider } from './common/AppSlider';
 import { AppNavigator } from './common/AppNavigator';
@@ -37,64 +39,66 @@ export default function DesktopIndex() {
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
     return (
-        <Layout style={{ textAlign: "center" }}>
-            <AppHeader
-                name={user ? user.name.toString() : ""}
-                avatar={user ? user.avatar.toString() : ""}
-                roleID={user ? user.roleID : 0} />
-            <Layout style={{
-                overflow: 'auto',
-                height: 'calc(100vh - 64px)',
-            }}>
-                <AppSlider roleID={user ? user.roleID : 0} />
-                <Layout style={{ padding: '10px' }}>
-                    <AppNavigator />
-                    <div className={"wall"}>
-                        <Route exact path="/app/home">
-                            欢迎使用{document.title}
-                        </Route>
-                        <Route exact path="/app/media/videos/:id"  >
-                            <VideoDetail />
-                        </Route>
-                        <Route exact path="/app/media/videos">
-                            <VideoList />
-                        </Route>
-                        <Route exact path="/app/media/history">
-                            <HistoryPage />
-                        </Route>
-                        <Route exact path="/app/thing/dashboard">
-                            <ThingDashboard />
-                        </Route>
-                        <Route exact path="/app/thing/things">
-                            <ThingTable />
-                        </Route>
-                        <Route exact path="/app/user/profile">
-                            <UpdateProfileForm user={user} />
-                        </Route>
-                        <Route exact path="/app/user/account">
-                            <UpdatePasswordForm />
-                        </Route>
-                        <Route exact path="/app/thing/analysis">
-                            <ThingAnalysis />
-                        </Route>
-                        <Route exact path="/admin/video/video-list">
-                            <VideoTable />
-                        </Route>
-                        <Route exact path="/admin/video/video-series-list">
-                            <VideoSeriesTable />
-                        </Route>
-                        <Route exact path="/admin/device/device-model-list">
-                            <DeviceModelIndex />
-                        </Route>
-                        <Route exact path="/admin/device/device-list">
-                            <DeviceIndex />
-                        </Route>
-                        <Route exact path="/admin/user/user-list">
-                            <UserTable />
-                        </Route>
-                    </div>
+        <ConfigProvider locale={zhCN}>
+            <Layout style={{ textAlign: "center" }}>
+                <AppHeader
+                    name={user ? user.name.toString() : ""}
+                    avatar={user ? user.avatar.toString() : ""}
+                    roleID={user ? user.roleID : 0} />
+                <Layout style={{
+                    overflow: 'auto',
+                    height: 'calc(100vh - 64px)',
+                }}>
+                    <AppSlider roleID={user ? user.roleID : 0} />
+                    <Layout style={{ padding: '10px' }}>
+                        <AppNavigator />
+                        <div className={"wall"}>
+                            <Route exact path="/app/home">
+                                欢迎使用{document.title}
+                            </Route>
+                            <Route exact path="/app/media/videos/:id"  >
+                                <VideoDetail />
+                            </Route>
+                            <Route exact path="/app/media/videos">
+                                <VideoList />
+                            </Route>
+                            <Route exact path="/app/media/history">
+                                <HistoryPage />
+                            </Route>
+                            <Route exact path="/app/thing/dashboard">
+                                <ThingDashboard />
+                            </Route>
+                            <Route exact path="/app/thing/things">
+                                <ThingTable />
+                            </Route>
+                            <Route exact path="/app/user/profile">
+                                <UpdateProfileForm user={user} />
+                            </Route>
+                            <Route exact path="/app/user/account">
+                                <UpdatePasswordForm />
+                            </Route>
+                            <Route exact path="/app/thing/analysis">
+                                <ThingAnalysis />
+                            </Route>
+                            <Route exact path="/admin/video/video-list">
+                                <VideoTable />
+                            </Route>
+                            <Route exact path="/admin/video/video-series-list">
+                                <VideoSeriesTable />
+                            </Route>
+                            <Route exact path="/admin/device/device-model-list">
+                                <DeviceModelIndex />
+                            </Route>
+                            <Route exact path="/admin/device/device-list">
+                                <DeviceIndex />
+                            </Route>
+                            <Route exact path="/admin/user/user-list">
+                                <UserTable />
+                            </Route>
+                        </div>
+                    </Layout>
                 </Layout>
             </Layout>
-        </Layout>
+        </ConfigProvider>
     )
 }

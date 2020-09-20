@@ -17,7 +17,7 @@ export default function VideoNavBar() {
     const onSelect = (opt: any) => {
         setVisible(false)
         switch (opt.props.children) {
-            case "历史":
+            case "最近播放":
                 history.push("/app/media/history")
                 break
         }
@@ -28,7 +28,7 @@ export default function VideoNavBar() {
             <Popover mask
                 visible={visible}
                 overlay={[
-                    (<Item key="1" icon={<HistoryOutlined />} >历史</Item>),
+                    (<Item key="1" icon={<HistoryOutlined />} >最近播放</Item>),
                 ]}
                 align={{
                     overflow: { adjustY: 0, adjustX: 0 },

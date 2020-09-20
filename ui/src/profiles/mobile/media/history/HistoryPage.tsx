@@ -54,7 +54,7 @@ export default function HistoryPage() {
             mode="light"
             icon={<Icon type="left" />}
             onLeftClick={() => history.goBack()}
-        >历史</NavBar>
+        >最近播放</NavBar>
         <div >
             {options}
         </div>

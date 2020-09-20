@@ -65,6 +65,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
         share: false,
+        reconnectAttempts: 720
     });
     useEffect(() => {
         sendMessage(deviceTelemetryPrefix + "." + id.toString() + ".*");
@@ -101,7 +102,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
         const tick = () => {
             updateTelemetryCallback.current()
         }
-        const timer: NodeJS.Timeout = setInterval(tick, 1000)
+        const timer: any = setInterval(tick, 1000)
         return () => {
             clearInterval(timer);
         }

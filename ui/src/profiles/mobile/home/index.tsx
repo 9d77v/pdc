@@ -109,7 +109,7 @@ export default function HomeIndex() {
             return <div key={item.id}>{item.name}: {value}{item.unit}</div>
         })
         return <div key={v.id}
-            className="pdc-card-default"
+            className="pdc-card-home"
             style={{
                 width: "50%",
                 display: "flex",
@@ -127,6 +127,9 @@ export default function HomeIndex() {
                 display: 'flex',
                 alignItems: 'center',
                 height: "100%",
+                opacity: 0.7,
+                background: "#fff",
+                border: 1,
                 justifyContent: 'center',
                 backgroundColor: '#eee'
             }}>

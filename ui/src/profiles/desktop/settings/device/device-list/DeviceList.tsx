@@ -102,6 +102,7 @@ export const DeviceList = (props: IDeviceListProps) => {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
         share: false,
+        reconnectAttempts: 720
     });
     useEffect(() => {
         const tempData = data?.devices.edges || []
@@ -145,7 +146,7 @@ export const DeviceList = (props: IDeviceListProps) => {
         const tick = () => {
             updateHealthCallback.current()
         }
-        const timer: NodeJS.Timeout = setInterval(tick, 1000)
+        const timer: any = setInterval(tick, 1000)
         return () => {
             clearInterval(timer);
         }

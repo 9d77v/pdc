@@ -2323,10 +2323,10 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
     "@types/color-name" "^1.1.1"
     color-convert "^2.0.1"
 
-antd-mobile@^2.3.3:
-  version "2.3.3"
-  resolved "https://registry.npm.taobao.org/antd-mobile/download/antd-mobile-2.3.3.tgz#550591e4be91b52090c8b88156c457fbd99c6a2e"
-  integrity sha1-VQWR5L6RtSCQyLiBVsRX+9mcai4=
+antd-mobile@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.npm.taobao.org/antd-mobile/download/antd-mobile-2.3.4.tgz#8f584707b30343d102f3ca10fdaf677e2a5d1cc8"
+  integrity sha1-j1hHB7MDQ9EC88oQ/a9nfipdHMg=
   dependencies:
     array-tree-filter "~2.1.0"
     babel-runtime "6.x"
@@ -9530,7 +9530,7 @@ raw-body@2.4.0:
 
 rc-align@^2.4.0:
   version "2.4.5"
-  resolved "https://registry.npm.taobao.org/rc-align/download/rc-align-2.4.5.tgz?cache=0&sync_timestamp=1598004438562&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-align%2Fdownload%2Frc-align-2.4.5.tgz#c941a586f59d1017f23a428f0b468663fb7102ab"
+  resolved "https://registry.npm.taobao.org/rc-align/download/rc-align-2.4.5.tgz#c941a586f59d1017f23a428f0b468663fb7102ab"
   integrity sha1-yUGlhvWdEBfyOkKPC0aGY/txAqs=
   dependencies:
     babel-runtime "^6.26.0"
@@ -9602,7 +9602,7 @@ rc-checkbox@~2.3.0:
 
 rc-collapse@~1.9.1:
   version "1.9.3"
-  resolved "https://registry.npm.taobao.org/rc-collapse/download/rc-collapse-1.9.3.tgz#d9741db06a823353e1fd1aec3ba4c0f9d8af4b26"
+  resolved "https://registry.npm.taobao.org/rc-collapse/download/rc-collapse-1.9.3.tgz?cache=0&sync_timestamp=1600493542211&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-collapse%2Fdownload%2Frc-collapse-1.9.3.tgz#d9741db06a823353e1fd1aec3ba4c0f9d8af4b26"
   integrity sha1-2XQdsGqCM1Ph/RrsO6TA+divSyY=
   dependencies:
     classnames "2.x"
@@ -9817,7 +9817,7 @@ rc-select@~11.2.0:
 
 rc-slider@~8.2.0:
   version "8.2.0"
-  resolved "https://registry.npm.taobao.org/rc-slider/download/rc-slider-8.2.0.tgz#ae37d17144cad60e1da6eac0ee4ffcfea0b0a6e8"
+  resolved "https://registry.npm.taobao.org/rc-slider/download/rc-slider-8.2.0.tgz?cache=0&sync_timestamp=1600355673836&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frc-slider%2Fdownload%2Frc-slider-8.2.0.tgz#ae37d17144cad60e1da6eac0ee4ffcfea0b0a6e8"
   integrity sha1-rjfRcUTK1g4dpurA7k/8/qCwpug=
   dependencies:
     babel-runtime "6.x"
