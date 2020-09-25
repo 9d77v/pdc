@@ -156,7 +156,23 @@ query devices($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
     }
   }
 }
-`;
+`
+
+const LIST_DEVICE_SELECTOR = gql`
+query devices( $sorts: [Sort!]) {
+  devices(sorts: $sorts) {
+    edges {
+      id
+      name
+      telemetries{
+        id
+        key
+        name
+      }
+    }
+  }
+}
+`
 
 const GET_DEVICE = gql`
 query devices($ids:[ID!]) {
@@ -194,15 +210,17 @@ query devices($ids:[ID!]) {
     }
   }
 }
-`;
+`
 
 const GET_MOBILE_HOME_DEVICES = gql`
-query devices($ids:[ID!]) {
-  devices(ids:$ids) {
+query deviceDashboards($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+  deviceDashboards(keyword: $keyword, page: $page, pageSize: $pageSize, sorts: $sorts) {
     edges {
       id
+      name
       telemetries{
-        id
+        telemetryID
+        deviceID
         name
         value
         factor
@@ -212,7 +230,71 @@ query devices($ids:[ID!]) {
     }
   }
 }
-`;
+`
+
+const ADD_DEVICE_DASHBOARD = gql`
+mutation createDeviceDashboard($input:NewDeviceDashboard!){
+   createDeviceDashboard(input:$input){
+     id
+   }
+}
+`
+
+const UPDATE_DEVICE_DASHBOARD = gql`
+mutation updateDeviceDashboard($input:NewUpdateDeviceDashboard!){
+   updateDeviceDashboard(input:$input){
+     id
+   }
+}
+`
+
+const DELETE_DEVICE_DASHBOARD = gql`
+mutation deleteDeviceDashboard($id:Int!){
+   deleteDeviceDashboard(id:$id){
+     id
+   }
+}
+`
+const LIST_DEVICE_DASHBOARD = gql`
+query deviceDashboards($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
+  deviceDashboards(keyword: $keyword, page: $page, pageSize: $pageSize, sorts: $sorts) {
+    totalCount
+    edges {
+      id
+      name
+      isVisible
+      telemetries{
+        id
+        deviceID
+        deviceName
+        telemetryID
+        name
+        value
+        factor
+        scale
+        unit
+      }
+    }
+  }
+}
+`
+
+const ADD_DEVICE_DASHBOARD_TELEMETRY = gql`
+mutation addDeviceDashboardTelemetry($input:NewDeviceDashboardTelemetry!){
+  addDeviceDashboardTelemetry(input:$input){
+     id
+   }
+}
+`
+
+const REMOVE_DEVICE_DASHBOARD_TELEMETRY = gql`
+mutation removeDeviceDashboardTelemetry($ids:[Int!]!){
+   removeDeviceDashboardTelemetry(ids:$ids){
+     id
+   }
+}
+`
+
 export {
   ADD_DEVICE_MODEL, UPDATE_DEVICE_MODEL,
   DEVICE_MODEL_COMBO,
@@ -220,5 +302,8 @@ export {
   ADD_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL,
   ADD_TELEMETRY_MODEL, UPDATE_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL,
   ADD_DEVICE, UPDATE_DEVICE,
-  LIST_DEVICE, GET_DEVICE, GET_MOBILE_HOME_DEVICES
+  LIST_DEVICE, LIST_DEVICE_SELECTOR, GET_DEVICE, GET_MOBILE_HOME_DEVICES,
+  ADD_DEVICE_DASHBOARD, UPDATE_DEVICE_DASHBOARD, DELETE_DEVICE_DASHBOARD,
+  LIST_DEVICE_DASHBOARD,
+  ADD_DEVICE_DASHBOARD_TELEMETRY, REMOVE_DEVICE_DASHBOARD_TELEMETRY
 }

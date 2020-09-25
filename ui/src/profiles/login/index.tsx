@@ -1,4 +1,4 @@
-import "./Login.less"
+import "./index.less"
 import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 import React, { useEffect } from 'react';
@@ -13,7 +13,7 @@ const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
 };
 
-export const Login = () => {
+export default function Login() {
 
     const history = useHistory();
     const [login, { data }] = useMutation(LOGIN);

@@ -63,6 +63,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-model-list']
     }],
+    ["/admin/device/device-dashboard-list", {
+        "defaultOpenKeys": ["settings-device"],
+        "defaultSelectedKeys": ['device-dashboard-list']
+    }],
     ["/admin/user", {
         "defaultOpenKeys": ["settings-user"],
         "defaultSelectedKeys": ['user-list']
@@ -104,7 +108,7 @@ const AppMenu = (props: AppHeaderProps) => {
                     <Link to="/app/media/videos">视频</Link>
                 </Menu.Item>
                 <Menu.Item key="media-history">
-                    <Link to="/app/media/history">历史</Link>
+                    <Link to="/app/media/history">最近播放</Link>
                 </Menu.Item>
             </SubMenu>
             <SubMenu
@@ -202,6 +206,9 @@ const AdminMenu = (props: AppHeaderProps) => {
                 </Menu.Item>
                 <Menu.Item key="device-model-list" >
                     <Link to="/admin/device/device-model-list">设备模板列表</Link>
+                </Menu.Item>
+                <Menu.Item key="device-dashboard-list" >
+                    <Link to="/admin/device/device-dashboard-list">设备仪表盘</Link>
                 </Menu.Item>
             </SubMenu>
         </Menu>

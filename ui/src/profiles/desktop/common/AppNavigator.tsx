@@ -9,7 +9,7 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/app/user/profile', '个人资料'],
     ['/app/user/account', '账号安全'],
     ['/app/media', '媒体库'],
-    ['/app/media/history', '历史'],
+    ['/app/media/history', '最近播放'],
     ['/app/media/videos', '视频'],
     ['/app/media/videos/:id', '播放页'],
     ['/app/thing', '物品'],
@@ -22,6 +22,7 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/admin/device', '设备管理'],
     ['/admin/device/device-list', '设备列表'],
     ['/admin/device/device-model-list', '设备模板列表'],
+    ['/admin/device/device-dashboard-list', '设备仪表盘'],
     ['/admin/user', '用户管理'],
     ['/admin/user/user-list', '用户列表'],
 ])
