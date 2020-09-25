@@ -1,4 +1,4 @@
-FROM 9d77v/pdc-base:0.0.8
+FROM 9d77v/pdc-base:0.0.9
 COPY . /app
 
 ENV APP_NAME=pdc-ping

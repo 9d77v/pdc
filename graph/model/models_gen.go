@@ -50,6 +50,37 @@ type DeviceConnection struct {
 	Edges      []*Device `json:"edges"`
 }
 
+type DeviceDashboard struct {
+	ID          int64                       `json:"id"`
+	Name        string                      `json:"name"`
+	IsVisible   bool                        `json:"isVisible"`
+	Telemetries []*DeviceDashboardTelemetry `json:"telemetries"`
+	CreatedAt   int64                       `json:"createdAt"`
+	UpdatedAt   int64                       `json:"updatedAt"`
+}
+
+type DeviceDashboardConnection struct {
+	TotalCount int64              `json:"totalCount"`
+	Edges      []*DeviceDashboard `json:"edges"`
+}
+
+type DeviceDashboardTelemetry struct {
+	ID                int64    `json:"id"`
+	DeviceDashboardID int64    `json:"deviceDashboardID"`
+	DeviceID          int64    `json:"deviceID"`
+	DeviceName        string   `json:"deviceName"`
+	TelemetryID       int64    `json:"telemetryID"`
+	Key               string   `json:"key"`
+	Name              string   `json:"name"`
+	Value             *float64 `json:"value"`
+	Factor            float64  `json:"factor"`
+	Scale             int64    `json:"scale"`
+	Unit              string   `json:"unit"`
+	UnitName          string   `json:"unitName"`
+	CreatedAt         int64    `json:"createdAt"`
+	UpdatedAt         int64    `json:"updatedAt"`
+}
+
 type DeviceModel struct {
 	ID              int64             `json:"id"`
 	Name            string            `json:"name"`
@@ -116,6 +147,16 @@ type NewDevice struct {
 	Name          string  `json:"name"`
 	IP            *string `json:"ip"`
 	Port          *int64  `json:"port"`
+}
+
+type NewDeviceDashboard struct {
+	Name      string `json:"name"`
+	IsVisible bool   `json:"isVisible"`
+}
+
+type NewDeviceDashboardTelemetry struct {
+	DeviceDashboardID int64   `json:"deviceDashboardID"`
+	TelemetryIDs      []int64 `json:"telemetryIDs"`
 }
 
 type NewDeviceModel struct {
@@ -191,6 +232,12 @@ type NewUpdateDevice struct {
 	Name string  `json:"name"`
 	IP   *string `json:"ip"`
 	Port *int64  `json:"port"`
+}
+
+type NewUpdateDeviceDashboard struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	IsVisible bool   `json:"isVisible"`
 }
 
 type NewUpdateDeviceModel struct {

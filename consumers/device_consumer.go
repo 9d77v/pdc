@@ -30,7 +30,9 @@ func ReplyDeviceMSG(m *nats.Msg) {
 		DeviceID: deviceMsg.DeviceID,
 	}
 	device := new(models.Device)
-	err = models.Gorm.Preload("Attributes").Preload("Telemetries").Where("id=?", replyDeviceMsg.DeviceID).First(device).Error
+	err = models.Gorm.Preload("Attributes").Preload("Attributes.AttributeModel").
+		Preload("Telemetries").Preload("Telemetries.TelemetryModel").
+		Where("id=?", replyDeviceMsg.DeviceID).First(device).Error
 	if err != nil {
 		log.Println("get device failed,err", err)
 		iotsdk.ReplyDeviceInfo(m.Reply, replyDeviceMsg)
@@ -38,11 +40,11 @@ func ReplyDeviceMSG(m *nats.Msg) {
 	}
 	attributeConfig := make(map[string]uint32, 0)
 	for _, v := range device.Attributes {
-		attributeConfig[v.Key] = uint32(v.ID)
+		attributeConfig[v.AttributeModel.Key] = uint32(v.ID)
 	}
 	telemetryConfig := make(map[string]uint32)
 	for _, v := range device.Telemetries {
-		telemetryConfig[v.Key] = uint32(v.ID)
+		telemetryConfig[v.TelemetryModel.Key] = uint32(v.ID)
 	}
 	replyDeviceMsg.DeviceInfo = &pb.DeviceInfo{
 		ID:              deviceMsg.DeviceID,

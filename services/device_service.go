@@ -227,7 +227,6 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 		attributes = append(attributes, &models.Attribute{
 			DeviceID:         m.ID,
 			AttributeModelID: v.ID,
-			Key:              v.Key,
 		})
 	}
 	err = tx.Create(&attributes).Error
@@ -239,7 +238,6 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 	for _, v := range deviceModel.TelemetryModels {
 		telemetries = append(telemetries, &models.Telemetry{
 			DeviceID:         m.ID,
-			Key:              v.Key,
 			TelemetryModelID: v.ID,
 		})
 
@@ -324,6 +322,134 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 	}
 	for _, m := range data {
 		r := dtos.ToDeviceDto(m)
+		result = append(result, r)
+	}
+	return total, result, nil
+}
+
+//CreateDeviceDashboard  ..
+func (s DeviceService) CreateDeviceDashboard(ctx context.Context, input model.NewDeviceDashboard) (*model.DeviceDashboard, error) {
+	m := &models.DeviceDashboard{
+		Name:      input.Name,
+		IsVisible: input.IsVisible,
+	}
+	err := models.Gorm.Create(m).Error
+	if err != nil {
+		return &model.DeviceDashboard{}, err
+	}
+	return &model.DeviceDashboard{ID: int64(m.ID)}, err
+}
+
+//UpdateDeviceDashboard ..
+func (s DeviceService) UpdateDeviceDashboard(ctx context.Context, input model.NewUpdateDeviceDashboard) (*model.DeviceDashboard, error) {
+	m := new(models.DeviceDashboard)
+	varibales := graphql.GetRequestContext(ctx).Variables
+	fields := make([]string, 0)
+	for k := range varibales["input"].(map[string]interface{}) {
+		fields = append(fields, k)
+	}
+	if err := models.Gorm.Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+		return nil, err
+	}
+	updateMap := map[string]interface{}{
+		"name":       input.Name,
+		"is_visible": input.IsVisible,
+	}
+	err := models.Gorm.Model(m).Updates(updateMap).Error
+	return &model.DeviceDashboard{ID: int64(m.ID)}, err
+}
+
+//DeleteDeviceDashboard ..
+func (s DeviceService) DeleteDeviceDashboard(ctx context.Context, id int64) (*model.DeviceDashboard, error) {
+	m := new(models.DeviceDashboard)
+	m.ID = uint(id)
+	err := models.Gorm.Delete(m).Error
+	return &model.DeviceDashboard{ID: int64(m.ID)}, err
+}
+
+//AddDeviceDashboardTelemetry  ..
+func (s DeviceService) AddDeviceDashboardTelemetry(ctx context.Context, input model.NewDeviceDashboardTelemetry) (*model.DeviceDashboard, error) {
+	if len(input.TelemetryIDs) == 0 {
+		return &model.DeviceDashboard{}, nil
+	}
+	data := make([]*models.DeviceDashboardTelemetry, 0, len(input.TelemetryIDs))
+	for _, v := range input.TelemetryIDs {
+		m := &models.DeviceDashboardTelemetry{
+			DeviceDashboardID: uint(input.DeviceDashboardID),
+			TelemetryID:       uint(v),
+		}
+		data = append(data, m)
+	}
+	err := models.Gorm.Create(data).Error
+	if err != nil {
+		return &model.DeviceDashboard{}, err
+	}
+	return &model.DeviceDashboard{ID: input.DeviceDashboardID}, err
+}
+
+//RemoveDeviceDashboardTelemetry ..
+func (s DeviceService) RemoveDeviceDashboardTelemetry(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
+	m := new(models.DeviceDashboardTelemetry)
+	err := models.Gorm.Delete(m, ids).Error
+	return &model.DeviceDashboard{ID: int64(m.ID)}, err
+}
+
+//ListDeviceDashboards ..
+func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string,
+	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceDashboard, error) {
+	result := make([]*model.DeviceDashboard, 0)
+	data := make([]*models.DeviceDashboard, 0)
+	offset, limit := GetPageInfo(page, pageSize)
+	fieldMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	builder := models.Gorm
+	if keyword != nil && ptrs.String(keyword) != "" {
+		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
+	}
+	var total int64
+	if fieldMap["totalCount"] {
+		if limit == -1 {
+			total = int64(len(data))
+		} else {
+			err = builder.Model(&models.DeviceDashboard{}).Count(&total).Error
+			if err != nil {
+				return 0, result, err
+			}
+		}
+	}
+	if fieldMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields,
+			"__typename", "telemetries"))
+		if len(ids) > 0 {
+			builder = builder.Where("id in (?)", ids)
+		}
+		if limit > 0 {
+			builder = builder.Offset(offset).Limit(limit)
+		}
+		for _, v := range sorts {
+			if v.IsAsc {
+				builder = builder.Order(v.Field + " ASC")
+			} else {
+				builder = builder.Order(v.Field + " DESC")
+			}
+		}
+		if edgeFieldMap["telemetries"] {
+			builder = builder.Preload("Telemetries").
+				Preload("Telemetries.Telemetry").
+				Preload("Telemetries.Telemetry.TelemetryModel")
+			telemetryFieldMap, _ := utils.GetFieldData(ctx, "edges.telemetries.")
+			if telemetryFieldMap["deviceName"] {
+				builder = builder.Preload("Telemetries.Telemetry.Device")
+			}
+		}
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
+		}
+	}
+	for _, m := range data {
+		r := dtos.ToDeviceDashboardDto(m)
 		result = append(result, r)
 	}
 	return total, result, nil

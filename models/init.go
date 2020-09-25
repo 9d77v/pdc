@@ -113,6 +113,8 @@ func initDB() {
 		&Device{},
 		&Attribute{},
 		&Telemetry{},
+		&DeviceDashboard{},
+		&DeviceDashboardTelemetry{},
 	)
 }
 

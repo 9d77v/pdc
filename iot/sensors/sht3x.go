@@ -13,11 +13,12 @@ import (
 )
 
 //SHT3x get temperature and humidity
-func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor) {
-	sht3x := i2c.NewSHT3xDriver(r)
+func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
+	sht3x := i2c.NewSHT3xDriver(r, i2c.WithBus(getBus(bus...)))
 	work := func() {
 		sht3x.Units = "C"
 		sht3x.Start()
+		samplingFrequency := 5
 		sn, err := sht3x.SerialNumber()
 		if err != nil {
 			log.Println("get sht3x serial number error:", err)
@@ -28,7 +29,7 @@ func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor) {
 		if sht30SN != 0 {
 			attributeMap[sht30SN] = fmt.Sprintf("0x%08x", sn)
 		}
-		samplingFrequency := 5
+
 		sht30Hz := device.AttributeConfig["sht30_hz"]
 		if sht30Hz != 0 {
 			attributeMap[sht30Hz] = fmt.Sprintf("%.2fHz", 1.0/float64(samplingFrequency))
@@ -38,6 +39,7 @@ func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor) {
 		}
 		gobot.Every(time.Duration(samplingFrequency)*time.Second, func() {
 			temp, rh, err := sht3x.Sample()
+			log.Printf("温度：%f,湿度：%f\n", temp, rh)
 			if err != nil {
 				log.Println("get sht3x telemetries error:", err)
 			} else {

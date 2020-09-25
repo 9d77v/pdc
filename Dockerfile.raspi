@@ -1,15 +1,14 @@
 FROM 9d77v/pdc-base:0.0.9
 COPY . /app
 
-ENV APP_NAME=pdc
+ENV APP_NAME=pdc-device-raspi
 RUN cd /app \
-    && go build -o $APP_NAME -ldflags "-s -w" \
+    && go build  -o $APP_NAME -ldflags "-s -w" iot/raspi/main.go \
     && upx -9 $APP_NAME
 
 FROM scratch
-ENV APP_NAME=pdc
+ENV APP_NAME=pdc-device-raspi
 COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
-COPY ./ui/build /app/ui/build
 
 WORKDIR /app
-CMD [ "pdc" ]
+CMD [ "pdc-device-raspi" ]
