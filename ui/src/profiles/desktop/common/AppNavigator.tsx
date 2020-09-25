@@ -22,6 +22,7 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/admin/device', '设备管理'],
     ['/admin/device/device-list', '设备列表'],
     ['/admin/device/device-model-list', '设备模板列表'],
+    ['/admin/device/device-dashboard-list', '设备仪表盘'],
     ['/admin/user', '用户管理'],
     ['/admin/user/user-list', '用户列表'],
 ])

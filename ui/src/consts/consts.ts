@@ -41,6 +41,26 @@ export interface IDevice {
     updatedAt: number
 }
 
+export interface IDeviceDashboard {
+    id: number
+    name: string
+    isVisible: boolean
+    telemetries: IDeviceDashboardTelemetry[]
+    createdAt: number
+    updatedAt: number
+}
+
+export interface IDeviceDashboardTelemetry {
+    id: number
+    deviceID: number
+    deviceName: string
+    name: string
+    value?: number
+    factor: number
+    unit: string
+    scale: number
+}
+
 const RubbishCategoryMap = new Map<number, TagStyle>([
     [0, {
         color: 'black',

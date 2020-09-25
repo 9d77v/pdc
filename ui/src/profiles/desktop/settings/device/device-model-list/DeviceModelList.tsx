@@ -5,7 +5,7 @@ import { ADD_DEVICE_MODEL, LIST_DEVICE_MODEL, UPDATE_DEVICE_MODEL } from '../../
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { DeviceTypeMap, IDeviceModel } from '../../../../../consts/consts';
 import "../../../../../style/card.less"
-import { DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import { IUpdateDeviceModel, DeviceModelUpdateForm } from './DeviceModelUpdateForm';
 
 interface IDeviceModelListProps {
@@ -125,7 +125,7 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
                                     })
                                     setDeviceModelUpdateFormVisible(true)
                                 }
-                            }><DeleteOutlined />编辑</div>
+                            }><EditOutlined />编辑</div>
                         ]}
                         className={props.currentSelectID === item.id ? "pdc-card-selected" : "pdc-card-default"}
                     >

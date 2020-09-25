@@ -34,7 +34,7 @@ const HistoryPage = React.lazy(() => import("./media/history/HistoryPage"))
 
 const DeviceModelIndex = React.lazy(() => import('./settings/device/device-model-list/index'))
 const DeviceIndex = React.lazy(() => import('./settings/device/device-list/index'))
-
+const DeviceDashboardList = React.lazy(() => import("./settings/device/device-dashboard-list/index"))
 export default function DesktopIndex() {
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo
@@ -88,6 +88,9 @@ export default function DesktopIndex() {
                             </Route>
                             <Route exact path="/admin/device/device-model-list">
                                 <DeviceModelIndex />
+                            </Route>
+                            <Route exact path="/admin/device/device-dashboard-list">
+                                <DeviceDashboardList />
                             </Route>
                             <Route exact path="/admin/device/device-list">
                                 <DeviceIndex />

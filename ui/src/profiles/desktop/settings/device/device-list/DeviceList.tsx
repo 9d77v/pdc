@@ -5,7 +5,7 @@ import { ADD_DEVICE, LIST_DEVICE, UPDATE_DEVICE } from '../../../../../consts/de
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { IDevice } from '../../../../../consts/consts';
 import "../../../../../style/card.less"
-import { DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import { IUpdateDevice, DeviceUpdateForm } from './DeviceUpdateForm';
 import { pb } from '../../../../../pb/compiled';
 import useWebSocket from 'react-use-websocket';
@@ -228,7 +228,7 @@ export const DeviceList = (props: IDeviceListProps) => {
                                         })
                                         setDeviceUpdateFormVisible(true)
                                     }
-                                }><DeleteOutlined />编辑</div>
+                                }><EditOutlined />编辑</div>
                             ]}
                             className={props.currentSelectID === item.id ? "pdc-card-selected" : "pdc-card-default"}
                         >
