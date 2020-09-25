@@ -13,12 +13,12 @@ import (
 )
 
 //BH1750 get light data
-func BH1750(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor) {
-	bh1750 := i2c.NewBH1750Driver(r)
+func BH1750(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
+	bh1750 := i2c.NewBH1750Driver(r, i2c.WithBus(getBus(bus...)))
 	work := func() {
 		bh1750.Start()
-		attributeMap := make(map[uint32]string, 0)
 		samplingFrequency := 1
+		attributeMap := make(map[uint32]string, 0)
 		bh1750Hz := device.AttributeConfig["bh1750_hz"]
 		if bh1750Hz != 0 {
 			attributeMap[bh1750Hz] = fmt.Sprintf("%.2fHz", 1.0/float64(samplingFrequency))

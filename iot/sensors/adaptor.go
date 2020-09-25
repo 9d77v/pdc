@@ -15,3 +15,11 @@ type Adaptor interface {
 	GetConnection(address int, bus int) (device i2c.Connection, err error)
 	GetDefaultBus() int
 }
+
+func getBus(bus ...int) int {
+	defaultBus := 1
+	if len(bus) == 1 {
+		defaultBus = bus[0]
+	}
+	return defaultBus
+}

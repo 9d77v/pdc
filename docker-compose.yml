@@ -86,17 +86,15 @@ services:
   #   depends:
   #     - pdc
   #   container_name: pdc-device-esp8266-sht3x
-  # pdc-device-raspi-bh1750:
-  #   image: 9d77v/pdc-device-raspi-bh1750:2020-09-17_aa9fdfd
-  #   user: pi
+  # pdc-device-raspi:
+  #   image: 9d77v/pdc-device-raspi:2020-09-17_509ba08
   #   restart: always
   #   env_file:
   #     - pdc.env
-  #   depends:cd 
-  #     - pdc
-  #   volumes:
-  #     - /dev/i2c-1
-  #   container_name: pdc-device-raspi-bh1750
+  #   devices:
+  #     - /dev/i2c-0
+  #     - /dev/i2c-1  
+  #   container_name: pdc-device-raspi
   # pdc-ping:
   #   image: 9d77v/pdc-ping:2020-09-17_aa9fdfd
   #   restart: always

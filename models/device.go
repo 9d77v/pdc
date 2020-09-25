@@ -50,10 +50,8 @@ type Device struct {
 type Attribute struct {
 	gorm.Model
 	DeviceID         uint `gorm:"unique_index:attribute_uix"` //设备模型id
-	AttributeModelID uint
+	AttributeModelID uint `gorm:"unique_index:attribute_uix"`
 	AttributeModel   AttributeModel
-	Key              string `gorm:"unique_index:attribute_uix;size:50"` //属性key
-	Name             string `gorm:"-"`
 	Value            string `gorm:"size:50;NOT NULL;"`
 }
 
@@ -61,8 +59,23 @@ type Attribute struct {
 type Telemetry struct {
 	gorm.Model
 	DeviceID         uint `gorm:"unique_index:telemetry_uix"` //设备id
-	TelemetryModelID uint
+	Device           Device
+	TelemetryModelID uint `gorm:"unique_index:telemetry_uix"`
 	TelemetryModel   TelemetryModel
-	Key              string `gorm:"unique_index:telemetry_uix;size:50"` //遥测key
-	Name             string `gorm:"-"`
+}
+
+//DeviceDashboard 设备仪表盘
+type DeviceDashboard struct {
+	gorm.Model
+	Name        string `gorm:"size:50"`
+	IsVisible   bool
+	Telemetries []*DeviceDashboardTelemetry
+}
+
+//DeviceDashboardTelemetry 仪表盘遥测
+type DeviceDashboardTelemetry struct {
+	gorm.Model
+	DeviceDashboardID uint `gorm:"unique_index:dashboard_telemetry_uix"`
+	TelemetryID       uint `gorm:"unique_index:dashboard_telemetry_uix"`
+	Telemetry         Telemetry
 }

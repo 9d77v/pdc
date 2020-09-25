@@ -135,3 +135,50 @@ input NewUpdateDevice {
   ip: String
   port: Int
 }
+
+type DeviceDashboard {
+  id: ID!
+  name: String!
+  isVisible: Boolean!
+  telemetries: [DeviceDashboardTelemetry!]
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type DeviceDashboardTelemetry {
+  id: ID!
+  deviceDashboardID: ID!
+  deviceID: ID!
+  deviceName: String!
+  telemetryID: ID!
+  key: String!
+  name: String!
+  value: Float
+  factor: Float!
+  scale: Int!
+  unit: String!
+  unitName: String!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
+type DeviceDashboardConnection {
+  totalCount: Int!
+  edges:[DeviceDashboard!]!
+}
+
+input NewDeviceDashboard {
+  name: String!
+  isVisible:Boolean!
+}
+
+input NewUpdateDeviceDashboard {
+  id: Int!
+  name: String! 
+  isVisible:Boolean!
+}
+
+input NewDeviceDashboardTelemetry {
+  deviceDashboardID: ID!
+  telemetryIDs: [ID!]!
+}

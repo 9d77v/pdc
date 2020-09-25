@@ -137,6 +137,26 @@ func (r *mutationResolver) UpdateDevice(ctx context.Context, input model.NewUpda
 	return deviceService.UpdateDevice(ctx, input)
 }
 
+func (r *mutationResolver) CreateDeviceDashboard(ctx context.Context, input model.NewDeviceDashboard) (*model.DeviceDashboard, error) {
+	return deviceService.CreateDeviceDashboard(ctx, input)
+}
+
+func (r *mutationResolver) UpdateDeviceDashboard(ctx context.Context, input model.NewUpdateDeviceDashboard) (*model.DeviceDashboard, error) {
+	return deviceService.UpdateDeviceDashboard(ctx, input)
+}
+
+func (r *mutationResolver) DeleteDeviceDashboard(ctx context.Context, id int64) (*model.DeviceDashboard, error) {
+	return deviceService.DeleteDeviceDashboard(ctx, id)
+}
+
+func (r *mutationResolver) AddDeviceDashboardTelemetry(ctx context.Context, input model.NewDeviceDashboardTelemetry) (*model.DeviceDashboard, error) {
+	return deviceService.AddDeviceDashboardTelemetry(ctx, input)
+}
+
+func (r *mutationResolver) RemoveDeviceDashboardTelemetry(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
+	return deviceService.RemoveDeviceDashboardTelemetry(ctx, ids)
+}
+
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
 	return commonService.PresignedURL(ctx, scheme, bucketName, objectName)
@@ -234,6 +254,14 @@ func (r *queryResolver) DeviceModels(ctx context.Context, keyword *string, page 
 func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceConnection, error) {
 	con := new(model.DeviceConnection)
 	total, data, err := deviceService.ListDevice(ctx, keyword, page, pageSize, ids, sorts)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
+}
+
+func (r *queryResolver) DeviceDashboards(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceDashboardConnection, error) {
+	con := new(model.DeviceDashboardConnection)
+	total, data, err := deviceService.ListDeviceDashboards(ctx, keyword, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

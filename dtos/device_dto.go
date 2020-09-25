@@ -51,7 +51,7 @@ func ToDeviceDto(m *models.Device) *model.Device {
 	for _, v := range m.Attributes {
 		as = append(as, &model.Attribute{
 			ID:        int64(v.ID),
-			Key:       v.Key,
+			Key:       v.AttributeModel.Key,
 			Name:      v.AttributeModel.Name,
 			Value:     v.Value,
 			CreatedAt: v.CreatedAt.Unix(),
@@ -62,7 +62,7 @@ func ToDeviceDto(m *models.Device) *model.Device {
 	for _, v := range m.Telemetries {
 		ts = append(ts, &model.Telemetry{
 			ID:        int64(v.ID),
-			Key:       v.Key,
+			Key:       v.TelemetryModel.Key,
 			Name:      v.TelemetryModel.Name,
 			Unit:      v.TelemetryModel.Unit,
 			UnitName:  v.TelemetryModel.UnitName,
@@ -84,5 +84,35 @@ func ToDeviceDto(m *models.Device) *model.Device {
 		Telemetries:     ts,
 		CreatedAt:       m.CreatedAt.Unix(),
 		UpdatedAt:       m.UpdatedAt.Unix(),
+	}
+}
+
+//ToDeviceDashboardDto ...
+func ToDeviceDashboardDto(m *models.DeviceDashboard) *model.DeviceDashboard {
+	ts := make([]*model.DeviceDashboardTelemetry, 0, len(m.Telemetries))
+	for _, v := range m.Telemetries {
+		ts = append(ts, &model.DeviceDashboardTelemetry{
+			ID:                int64(v.ID),
+			DeviceDashboardID: int64(v.DeviceDashboardID),
+			DeviceID:          int64(v.Telemetry.DeviceID),
+			DeviceName:        v.Telemetry.Device.Name,
+			TelemetryID:       int64(v.TelemetryID),
+			Key:               v.Telemetry.TelemetryModel.Key,
+			Name:              v.Telemetry.TelemetryModel.Name,
+			Unit:              v.Telemetry.TelemetryModel.Unit,
+			UnitName:          v.Telemetry.TelemetryModel.UnitName,
+			Factor:            v.Telemetry.TelemetryModel.Factor,
+			Scale:             int64(v.Telemetry.TelemetryModel.Scale),
+			CreatedAt:         v.CreatedAt.Unix(),
+			UpdatedAt:         v.UpdatedAt.Unix(),
+		})
+	}
+	return &model.DeviceDashboard{
+		ID:          int64(m.ID),
+		Name:        m.Name,
+		IsVisible:   m.IsVisible,
+		Telemetries: ts,
+		CreatedAt:   m.CreatedAt.Unix(),
+		UpdatedAt:   m.UpdatedAt.Unix(),
 	}
 }

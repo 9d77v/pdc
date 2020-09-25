@@ -16,6 +16,7 @@ type Query {
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
   deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
   devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceConnection!
+  deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
 } 
 
 type Mutation {
@@ -52,4 +53,9 @@ type Mutation {
   deleteTelemetryModel(id:Int!):TelemetryModel!
   createDevice(input:NewDevice!):Device!
   updateDevice(input:NewUpdateDevice!):Device!
+  createDeviceDashboard(input:NewDeviceDashboard!):DeviceDashboard!
+  updateDeviceDashboard(input:NewUpdateDeviceDashboard!):DeviceDashboard!
+  deleteDeviceDashboard(id:Int!):DeviceDashboard!
+  addDeviceDashboardTelemetry(input:NewDeviceDashboardTelemetry!):DeviceDashboard!
+  removeDeviceDashboardTelemetry(ids:[Int!]!):DeviceDashboard!
 }
