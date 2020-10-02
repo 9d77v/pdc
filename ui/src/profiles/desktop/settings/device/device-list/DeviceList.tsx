@@ -9,7 +9,7 @@ import { EditOutlined } from '@ant-design/icons';
 import { IUpdateDevice, DeviceUpdateForm } from './DeviceUpdateForm';
 import { pb } from '../../../../../pb/compiled';
 import useWebSocket from 'react-use-websocket';
-import { deviceHealthPrefix, iotSocketURL } from '../../../../../utils/ws_client';
+import { deviceHealthPrefix, iotHealthSocketURL } from '../../../../../utils/ws_client';
 import { blobToArrayBuffer } from '../../../../../utils/file';
 
 interface IDeviceListProps {
@@ -98,10 +98,10 @@ export const DeviceList = (props: IDeviceListProps) => {
     const {
         sendMessage,
         lastMessage,
-    } = useWebSocket(iotSocketURL, {
+    } = useWebSocket(iotHealthSocketURL, {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
-        share: false,
+        share: true,
         reconnectAttempts: 720
     });
     useEffect(() => {

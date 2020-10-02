@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react'
 
 import dayjs from 'dayjs';
 import useWebSocket from 'react-use-websocket';
-import { deviceTelemetryPrefix, iotSocketURL } from '../../../../../utils/ws_client';
+import { deviceTelemetryPrefix, iotTelemetrySocketURL } from '../../../../../utils/ws_client';
 import { pb } from '../../../../../pb/compiled';
 import { blobToArrayBuffer } from '../../../../../utils/file';
 interface ITelemetryTableProps {
@@ -61,10 +61,10 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
     const {
         sendMessage,
         lastMessage,
-    } = useWebSocket(iotSocketURL, {
+    } = useWebSocket(iotTelemetrySocketURL, {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
-        share: false,
+        share: true,
         reconnectAttempts: 720
     });
     useEffect(() => {

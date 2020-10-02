@@ -5,6 +5,7 @@ import { Uploader } from '../../../../components/Uploader';
 
 
 export interface NewUser {
+    id: number
     name: string
     password: string
     avatar: string
