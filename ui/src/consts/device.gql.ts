@@ -182,6 +182,8 @@ query devices($ids:[ID!]) {
       name
       ip
       port
+      accessKey
+      secretKey
       deviceModelID
       deviceModelName
       deviceModelDesc

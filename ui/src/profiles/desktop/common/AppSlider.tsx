@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlaySquareOutlined, ShoppingOutlined, UserOutlined } from '@ant-design/icons';
+import { PlaySquareOutlined, ShoppingOutlined, UserOutlined, LockOutlined, ProfileOutlined } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -140,11 +140,19 @@ const AppMenu = (props: AppHeaderProps) => {
                     </span>
                 }
             >
-                <Menu.Item key="user-profile"                    >
-                    <Link to="/app/user/profile">个人资料</Link>
+                <Menu.Item key="user-profile">
+                    <Link to="/app/user/profile"> <span>
+                        <ProfileOutlined />
+                        <span>个人资料</span>
+                    </span></Link>
                 </Menu.Item>
-                <Menu.Item key="user-account"                    >
-                    <Link to="/app/user/account">账户安全</Link>
+                <Menu.Item key="user-account">
+                    <Link to="/app/user/account">
+                        <span>
+                            <LockOutlined />
+                            <span>账户安全</span>
+                        </span>
+                    </Link>
                 </Menu.Item>
             </SubMenu>
         </Menu>

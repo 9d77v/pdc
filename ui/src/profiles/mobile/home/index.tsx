@@ -1,23 +1,17 @@
 import React, { useEffect, useState, useRef } from "react"
-import { Route, useLocation } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { GET_MOBILE_HOME_DEVICES } from "../../../consts/device.gql";
 import { useQuery } from "@apollo/react-hooks";
 import useWebSocket from "react-use-websocket";
-import { deviceTelemetryPrefix, iotSocketURL } from "../../../utils/ws_client";
+import { deviceTelemetryPrefix, iotTelemetrySocketURL } from "../../../utils/ws_client";
 import { pb } from "../../../pb/compiled";
 import "../../../style/card.less"
 import { blobToArrayBuffer } from "../../../utils/file";
 
 export default function HomeIndex() {
-    const location = useLocation();
     const [dataResource, setDataResource] = useState<any[]>([])
     const [telemetryMap, setTelemetryMap] = useState<Map<number, pb.Telemetry>>(new Map<number, pb.Telemetry>())
     const updateTelemetryCallback: any = useRef();
-
-    switch (location.pathname) {
-        case "/app/home":
-            break
-    }
 
     const { data } = useQuery(GET_MOBILE_HOME_DEVICES,
         {
@@ -56,10 +50,10 @@ export default function HomeIndex() {
     const {
         sendMessage,
         lastMessage,
-    } = useWebSocket(iotSocketURL, {
+    } = useWebSocket(iotTelemetrySocketURL, {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
-        share: false,
+        share: true,
     })
 
 

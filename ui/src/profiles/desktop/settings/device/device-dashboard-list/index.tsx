@@ -9,7 +9,7 @@ import { DeleteOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons
 import { IUpdateDeviceDashboard, DeviceDashboardUpdateForm } from './DeviceDashboardUpdateForm';
 import { pb } from '../../../../../pb/compiled';
 import useWebSocket from 'react-use-websocket';
-import { deviceTelemetryPrefix, iotSocketURL } from '../../../../../utils/ws_client';
+import { deviceTelemetryPrefix, iotTelemetrySocketURL } from '../../../../../utils/ws_client';
 import { blobToArrayBuffer } from '../../../../../utils/file';
 import { DeviceDashboardTelemetryAddForm, INewDeviceDashboardTelemetry } from './DeviceDashboardTelemetryAddForm';
 
@@ -129,10 +129,10 @@ export default function DeviceDashboardList() {
     const {
         sendMessage,
         lastMessage,
-    } = useWebSocket(iotSocketURL, {
+    } = useWebSocket(iotTelemetrySocketURL, {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
-        share: false,
+        share: true,
         reconnectAttempts: 720
     })
 

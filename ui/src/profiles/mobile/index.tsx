@@ -9,6 +9,10 @@ import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from '../desktop/settings/user/UserCreateForm';
 import { UpdateProfileForm } from './me/UpdateFrofileForm';
 import UpdatePasswordForm from './me/UpdatePasswordForm';
+import HomeNavBar from './home/HomeNavBar';
+import { Scanner } from './home/scanner/Scanner';
+import { ScannerResult } from './home/scanner/ScannerResult';
+import { QRCodePage } from './me/QRCodePage';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
@@ -57,6 +61,15 @@ export default function MobileIndex() {
             <Route exact path="/app/user/account"  >
                 <UpdatePasswordForm />
             </Route>
+            <Route exact path="/app/user/qrcode"  >
+                <QRCodePage text={user ? user.id.toString() : ""} />
+            </Route>
+            <Route exact path="/app/scanner"  >
+                <Scanner />
+            </Route>
+            <Route exact path="/app/scanner/result"  >
+                <ScannerResult url={"https://baidu.com"} />
+            </Route>
             <TabBar
                 unselectedTintColor="#949494"
                 tintColor="#33A3F4"
@@ -74,7 +87,7 @@ export default function MobileIndex() {
                         history.push('/app/home')
                     }}
                     data-seed="logId"
-                >
+                >  <HomeNavBar />
                     <HomeIndex />
                 </TabBar.Item>
                 <TabBar.Item
@@ -94,7 +107,6 @@ export default function MobileIndex() {
                         <VideoList />
                     </Route>
                 </TabBar.Item>
-
                 <TabBar.Item
                     icon={<UserOutlined />}
                     selectedIcon={<UserOutlined style={{ color: "#85dbf5" }} />}

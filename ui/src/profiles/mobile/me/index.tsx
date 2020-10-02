@@ -2,12 +2,14 @@ import React from "react"
 import { Avatar } from 'antd';
 import { useHistory } from "react-router-dom";
 import { apolloClient } from "../../../utils/apollo_client";
-import "../../../style/button.less"
+import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
+import { List } from "antd-mobile";
 
 interface AppHeaderProps {
     name: string;
     avatar: string;
 }
+const Item = List.Item
 
 export default function MeIndex(props: AppHeaderProps) {
     const history = useHistory();
@@ -39,19 +41,26 @@ export default function MeIndex(props: AppHeaderProps) {
                 <div style={{ flex: 1, fontSize: 36 }}>{props.name}</div>
 
             </div>
-            <div className="pdc-button" style={{
-                width: "100%",
-                marginTop: 20,
-                marginLeft: 0,
-                marginRight: 0,
-                borderRadius: 5
-            }} onClick={() => history.push("/app/user/account")} >修改密码</div>
-            <div className="pdc-button" style={{
-                width: "100%",
-                marginLeft: 0,
-                marginTop: 10,
-                marginRight: 0,
-                borderRadius: 5
-            }} onClick={() => logout()} >退出登录</div>
+            <List renderHeader={() => ''}>
+                <Item
+                    thumb={<QrcodeOutlined />}
+                    arrow="horizontal"
+                    onClick={() => history.push("/app/user/qrcode")}
+                >我的二维码</Item>
+                <Item
+                    thumb={<LockOutlined />}
+                    onClick={() => history.push("/app/user/account")}
+                    arrow="horizontal"
+                >
+                    修改密码
+                </Item>
+                <Item
+                    thumb={<LogoutOutlined />}
+                    onClick={() => logout()}
+                    arrow="horizontal"
+                >
+                    退出登录
+                </Item>
+            </List>
         </div>)
 }

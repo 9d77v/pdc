@@ -8,6 +8,8 @@ export const DeviceDetailDescriptions: React.FC<IDevice> = ({
     name,
     ip,
     port,
+    accessKey,
+    secretKey,
     deviceModelName,
     deviceModelDesc,
     createdAt,
@@ -25,6 +27,8 @@ export const DeviceDetailDescriptions: React.FC<IDevice> = ({
             <Descriptions.Item label="名称">{name}</Descriptions.Item>
             <Descriptions.Item label="IP">{ip}</Descriptions.Item>
             <Descriptions.Item label="端口">{port}</Descriptions.Item>
+            <Descriptions.Item label="AccessKey">{accessKey}</Descriptions.Item>
+            <Descriptions.Item label="SecretKey">{secretKey}</Descriptions.Item>
             <Descriptions.Item label="设备模板名称">{deviceModelName}</Descriptions.Item>
             <Descriptions.Item label="设备模板描述">{deviceModelDesc}</Descriptions.Item>
             <Descriptions.Item label="创建时间">{formatDetailTime(createdAt)}</Descriptions.Item>
