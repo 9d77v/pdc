@@ -37,6 +37,8 @@ type Device struct {
 	Name            string       `json:"name"`
 	IP              string       `json:"ip"`
 	Port            int64        `json:"port"`
+	AccessKey       string       `json:"accessKey"`
+	SecretKey       string       `json:"secretKey"`
 	DeviceModelName string       `json:"deviceModelName"`
 	DeviceModelDesc string       `json:"deviceModelDesc"`
 	Attributes      []*Attribute `json:"attributes"`

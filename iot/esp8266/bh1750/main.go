@@ -2,36 +2,22 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"os/signal"
-	"strconv"
-	"strings"
 
 	"github.com/9d77v/pdc/iot/sdk"
 	"github.com/9d77v/pdc/iot/sensors"
 	"gobot.io/x/gobot/platforms/firmata"
 )
 
-var iotSDK *sdk.IotSDK = sdk.NewIotSDK()
-
 func main() {
-	addr := sdk.GetEnvStr("DEVICE_ESP8266_BH1750", "")
-	if len(addr) == 0 {
-		return
-	}
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-	addresses := strings.Split(addr, ",")
-	for _, v := range addresses {
-		deviceID, _ := strconv.Atoi(v)
-		device, err := iotSDK.GetDeviceInfo(uint32(deviceID))
-		if err != nil {
-			log.Println("GetDeviceInfo Failed:", err)
-			continue
-		}
-		r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.IP, device.Port))
-		go sensors.BH1750(device, iotSDK, r)
-	}
-	log.Printf("exiting (%v)", <-c)
+	iotSDK := sdk.NewIotSDK()
+	iotSDK.Run([]func(){
+		func() {
+			device := iotSDK.DeviceInfo
+			if device == nil {
+				return
+			}
+			r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.IP, device.Port))
+			sensors.BH1750(iotSDK, r)
+		},
+	})
 }

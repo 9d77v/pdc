@@ -5,12 +5,17 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
+	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/models/nats"
 	"github.com/9d77v/pdc/services"
 	"github.com/9d77v/pdc/utils"
+	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/proto"
 )
 
 var userCtxKey = &contextKey{"user"}
@@ -25,7 +30,10 @@ type GraphReq struct {
 	OperationName string `json:"operationName"`
 }
 
-var userService = services.UserService{}
+var (
+	userService   = services.UserService{}
+	deviceService = services.DeviceService{}
+)
 
 var publicOperationArr = []string{"login", "refreshToken", "IntrospectionQuery"}
 var permissonMap = map[string][]int{
@@ -165,4 +173,63 @@ func parseBody(r *http.Request) (*GraphReq, error) {
 	}
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 	return req, err
+}
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+//HandleIotDevice ..
+func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		c, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			log.Print("upgrade:", err)
+			return
+		}
+		defer c.Close()
+		//check accessKey and secretKey
+		_, msg, err := c.ReadMessage()
+		loginMsg := new(pb.LoginMSG)
+		err = proto.Unmarshal(msg, loginMsg)
+		if err != nil {
+			log.Println("unmarshal data error")
+			return
+		}
+		id, err := deviceService.DeviceLogin(loginMsg.AccessKey, loginMsg.SecretKey)
+		if id == 0 || err != nil {
+			log.Println("login error:", err)
+			return
+		}
+		device, err := deviceService.GetDeviceInfo(uint32(id))
+		if err != nil {
+			log.Println("get device info error:", err)
+			return
+		}
+		deviceMsg, err := proto.Marshal(device)
+		if err != nil {
+			log.Println("proto marshal error:", err)
+			return
+		}
+		err = c.WriteMessage(websocket.BinaryMessage, deviceMsg)
+		if err != nil {
+			log.Println("websocket write error:", err)
+			return
+		}
+
+		for {
+			_, msg, err := c.ReadMessage()
+			if err != nil {
+				log.Println("read:", err)
+				break
+			}
+			//透传到mq
+			_, err = nats.Client.PublishAsync(nats.SubjectDeviceData, msg, utils.AckHandler)
+			if err != nil {
+				log.Println("send data error:", err)
+			}
+		}
+	}
 }

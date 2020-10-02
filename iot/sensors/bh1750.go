@@ -6,14 +6,17 @@ import (
 	"time"
 
 	"github.com/9d77v/pdc/iot/sdk"
-	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 )
 
 //BH1750 get light data
-func BH1750(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
+func BH1750(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
+	device := iotSDK.DeviceInfo
+	if device == nil {
+		return
+	}
 	bh1750 := i2c.NewBH1750Driver(r, i2c.WithBus(getBus(bus...)))
 	work := func() {
 		bh1750.Start()
@@ -24,7 +27,7 @@ func BH1750(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 			attributeMap[bh1750Hz] = fmt.Sprintf("%.2fHz", 1.0/float64(samplingFrequency))
 		}
 		if len(attributeMap) > 0 {
-			iotSDK.SetDeviceAttributes(device.ID, attributeMap)
+			iotSDK.SetDeviceAttributes(attributeMap)
 		}
 		gobot.Every(time.Duration(samplingFrequency)*time.Second, func() {
 			illu, err := bh1750.Lux()
@@ -38,7 +41,7 @@ func BH1750(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 				}
 				if len(telemetryMap) > 0 {
 					now := ptypes.TimestampNow()
-					iotSDK.SetDeviceTelemetries(device.ID, telemetryMap, now)
+					iotSDK.SetDeviceTelemetries(telemetryMap, now)
 				}
 			}
 		})

@@ -84,6 +84,8 @@ type Device {
   name: String!
   ip: String!
   port: Int!
+  accessKey: String!
+  secretKey: String!
   deviceModelName:String!
   deviceModelDesc:String!
   attributes: [Attribute!]

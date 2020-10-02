@@ -77,6 +77,8 @@ func ToDeviceDto(m *models.Device) *model.Device {
 		Name:            m.Name,
 		IP:              m.IP,
 		Port:            int64(m.Port),
+		AccessKey:       m.AccessKey,
+		SecretKey:       m.SecretKey,
 		DeviceModelID:   int64(m.DeviceModelID),
 		DeviceModelName: m.DeviceModel.Name,
 		DeviceModelDesc: m.DeviceModel.Desc,

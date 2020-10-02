@@ -14,11 +14,11 @@ import (
 	"github.com/9d77v/pdc/consumers"
 	"github.com/9d77v/pdc/graph"
 	"github.com/9d77v/pdc/graph/generated"
-	"github.com/9d77v/pdc/iot/sdk"
 	"github.com/9d77v/pdc/middleware"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/models/nats"
 	"github.com/9d77v/wspush/redishub"
+	"github.com/nats-io/stan.go"
 )
 
 const defaultPort = "8080"
@@ -34,7 +34,9 @@ func main() {
 		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
 	}
 	mux.Handle("/api", middleware.Auth()(apiHandler))
-	mux.HandleFunc("/ws/iot", redishub.Hub.HandlerDynamicChannel())
+	mux.HandleFunc("/ws/iot/device", middleware.HandleIotDevice())
+	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel())
+	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel())
 	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "ui/build/index.html")
 	})
@@ -65,29 +67,21 @@ func main() {
 		qsub1.Unsubscribe()
 		qsub1.Close()
 	}()
-	iotsdk := sdk.NewIotSDK()
-	qsub2, err := iotsdk.NatsSubscribe(consumers.ReplyDeviceMSG)
+	qsub2, err := nats.Client.QueueSubscribe(nats.SubjectDeviceData, nats.GroupSaveDeviceData, consumers.HandleDeviceMSG, stan.DurableName("dur"))
 	if err != nil {
-		log.Panicln("NatsSubscribe error:", err)
+		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	defer func() {
 		qsub2.Unsubscribe()
+		qsub2.Close()
 	}()
-	qsub3, err := iotsdk.SubscribeSaveDeviceData(consumers.HandleDeviceMSG)
+	qsub3, err := nats.Client.QueueSubscribe(nats.SubjectDeviceData, nats.GroupPublishDeviceData, consumers.PublishDeviceData, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	defer func() {
 		qsub3.Unsubscribe()
 		qsub3.Close()
-	}()
-	qsub4, err := iotsdk.SubscribePublishDeviceData(consumers.PublishDeviceData)
-	if err != nil {
-		log.Panicln("SubscribeDeviceAttribute error:", err)
-	}
-	defer func() {
-		qsub4.Unsubscribe()
-		qsub4.Close()
 	}()
 	go consumers.SaveDeviceTelemetry()
 	go consumers.SaveDeviceHealth()

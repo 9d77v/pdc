@@ -41,6 +41,8 @@ type Device struct {
 	DeviceModel   DeviceModel
 	Name          string       `gorm:"size:50;NOT NULL;"` //设备名称
 	IP            string       `gorm:"size:50;NOT NULL;"` //设备ip
+	AccessKey     string       `gorm:"size:12;NOT NULL;"` //设备key hashid(id,16)
+	SecretKey     string       `gorm:"size:32;NOT NULL;"` //设备访问密钥,randString()
 	Port          uint16       //设备端口
 	Attributes    []*Attribute //属性，由采集程序启动时注册
 	Telemetries   []*Telemetry //遥测，由采集程序按一定频率上传

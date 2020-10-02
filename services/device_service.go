@@ -3,11 +3,13 @@ package services
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/model"
+	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/utils"
 	"gorm.io/gorm"
@@ -222,6 +224,13 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 		tx.Rollback()
 		return &model.Device{}, err
 	}
+	m.AccessKey = utils.GenerateAccessKey(m.ID)
+	m.SecretKey = utils.GenerateSecretKey()
+	err = tx.Save(m).Error
+	if err != nil {
+		tx.Rollback()
+		return &model.Device{}, err
+	}
 	attributes := make([]*models.Attribute, 0, len(deviceModel.AttributeModels))
 	for _, v := range deviceModel.AttributeModels {
 		attributes = append(attributes, &models.Attribute{
@@ -325,6 +334,49 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 		result = append(result, r)
 	}
 	return total, result, nil
+}
+
+//GetDeviceInfo ..
+func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceMSG, error) {
+	replyDeviceMsg := &pb.DeviceMSG{
+		DeviceID: deviceID,
+	}
+	device := new(models.Device)
+	err := models.Gorm.Preload("Attributes").Preload("Attributes.AttributeModel").
+		Preload("Telemetries").Preload("Telemetries.TelemetryModel").
+		Where("id=?", replyDeviceMsg.DeviceID).First(device).Error
+	if err != nil {
+		log.Println("get device failed,err", err)
+		return replyDeviceMsg, err
+	}
+	attributeConfig := make(map[string]uint32, 0)
+	for _, v := range device.Attributes {
+		attributeConfig[v.AttributeModel.Key] = uint32(v.ID)
+	}
+	telemetryConfig := make(map[string]uint32)
+	for _, v := range device.Telemetries {
+		telemetryConfig[v.TelemetryModel.Key] = uint32(v.ID)
+	}
+	replyDeviceMsg.DeviceInfo = &pb.DeviceInfo{
+		ID:              deviceID,
+		IP:              device.IP,
+		Port:            uint32(device.Port),
+		AttributeConfig: attributeConfig,
+		TelemetryConfig: telemetryConfig,
+	}
+	return replyDeviceMsg, nil
+}
+
+//DeviceLogin ..
+func (s DeviceService) DeviceLogin(accessKey, secretKey string) (uint, error) {
+	device := new(models.Device)
+	err := models.Gorm.Select("id,access_key,secret_key").
+		Where("access_key=? and secret_key=?", accessKey, secretKey).First(device).Error
+	if err != nil {
+		log.Println("get device failed,err", err)
+		return 0, err
+	}
+	return device.ID, err
 }
 
 //CreateDeviceDashboard  ..
