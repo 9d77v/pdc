@@ -1,71 +1,119 @@
 package sdk
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
+	"os/signal"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/nats-io/nats.go"
-	"github.com/nats-io/stan.go"
+	"github.com/gorilla/websocket"
+	cron "github.com/robfig/cron/v3"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 //IotSDK IotSDK
 type IotSDK struct {
-	conn  stan.Conn
-	mutex *sync.Mutex
+	conn       *websocket.Conn
+	mutex      *sync.Mutex
+	DeviceInfo *pb.DeviceInfo
 }
 
 //NewIotSDK init iot sdk
 func NewIotSDK() *IotSDK {
 	return &IotSDK{
-		conn:  natsConn,
+		conn:  wsConn,
 		mutex: new(sync.Mutex),
 	}
 }
 
-//GetDeviceInfo get device info by device id
-func (sdk *IotSDK) GetDeviceInfo(deviceID uint32) (*pb.DeviceInfo, error) {
-	request := new(pb.DeviceMSG)
-	request.DeviceID = uint32(deviceID)
-	requestMsg, err := proto.Marshal(request)
+//Run 运行iot数据采集程序
+func (sdk *IotSDK) Run(works []func()) {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+	defer sdk.conn.Close()
+	done := make(chan struct{})
+	err := sdk.login()
 	if err != nil {
-		return nil, err
+		return
 	}
-	msg, err := sdk.conn.NatsConn().Request(subjectDevice, requestMsg, 5*time.Second)
-	if err != nil {
-		return nil, err
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+	for _, v := range works {
+		v := v
+		go v()
 	}
-	reply := new(pb.DeviceMSG)
-	err = proto.Unmarshal(msg.Data, reply)
-	if err != nil {
-		return nil, err
+	cr := cron.New()
+	cr.AddFunc("*/1 * * * *", func() {
+		sdk.pingCheck()
+	})
+	cr.Start()
+	defer cr.Stop()
+	for {
+		select {
+		case <-done:
+			return
+		case <-interrupt:
+			err := sdk.conn.WriteMessage(websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			if err != nil {
+				log.Println("write close:", err)
+				return
+			}
+			select {
+			case <-done:
+			case <-time.After(time.Second):
+			}
+			return
+		}
 	}
-	fmt.Println(reply)
-	return reply.DeviceInfo, nil
 }
 
-//ReplyDeviceInfo reply device msg
-func (sdk *IotSDK) ReplyDeviceInfo(replySubject string, deviceMsg *pb.DeviceMSG) {
-	reply, marshalError := proto.Marshal(deviceMsg)
-	if marshalError != nil {
-		log.Println("unmarshal deviceMSG error:", marshalError)
-	}
-	err := sdk.conn.NatsConn().Publish(replySubject, reply)
+//Login get device info by device id
+func (sdk *IotSDK) login() error {
+	request := new(pb.LoginMSG)
+	request.AccessKey = accessKey
+	request.SecretKey = secretKey
+	requestMsg, err := proto.Marshal(request)
 	if err != nil {
-		log.Println("publish error:", err)
+		return err
 	}
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
+	if err != nil {
+		log.Println("send login msg:", err)
+		return err
+	}
+	_, msg, err := sdk.conn.ReadMessage()
+	if err != nil {
+		log.Println("receive login reply:", err)
+		return err
+	}
+	reply := new(pb.DeviceMSG)
+	err = proto.Unmarshal(msg, reply)
+	if err != nil {
+		return err
+	}
+	fmt.Println(reply)
+	if reply.DeviceInfo == nil {
+		return errors.New("device info is nil")
+	}
+	sdk.DeviceInfo = reply.DeviceInfo
+	return nil
 }
 
 //SetDeviceAttributes set device attributes
-func (sdk *IotSDK) SetDeviceAttributes(deviceID uint32, attributeMap map[uint32]string) {
+func (sdk *IotSDK) SetDeviceAttributes(attributeMap map[uint32]string) {
 	request := new(pb.DeviceMSG)
 	request.Action = pb.DeviceAction_SetAttributes
-	request.DeviceID = deviceID
+	request.DeviceID = sdk.DeviceInfo.ID
 	request.AttributeMap = attributeMap
 	request.ActionTime = ptypes.TimestampNow()
 	requestMsg, err := proto.Marshal(request)
@@ -73,17 +121,17 @@ func (sdk *IotSDK) SetDeviceAttributes(deviceID uint32, attributeMap map[uint32]
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, AckHandler)
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
 	if err != nil {
-		log.Printf("publish error,id:%s,err:%v/n", msg, err)
+		log.Printf("SetDeviceAttributes error:%v/n", err)
 	}
 }
 
 //SetDeviceTelemetries upload device telemetries
-func (sdk *IotSDK) SetDeviceTelemetries(deviceID uint32, telemetryMap map[uint32]float64, now *timestamppb.Timestamp) {
+func (sdk *IotSDK) SetDeviceTelemetries(telemetryMap map[uint32]float64, now *timestamppb.Timestamp) {
 	request := new(pb.DeviceMSG)
 	request.Action = pb.DeviceAction_SetTelemetries
-	request.DeviceID = deviceID
+	request.DeviceID = sdk.DeviceInfo.ID
 	request.TelemetryMap = telemetryMap
 	request.ActionTime = now
 	requestMsg, err := proto.Marshal(request)
@@ -91,17 +139,16 @@ func (sdk *IotSDK) SetDeviceTelemetries(deviceID uint32, telemetryMap map[uint32
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, AckHandler)
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
 	if err != nil {
-		log.Printf("publish error,id:%s,err:%v/n", msg, err)
+		log.Printf("SetDeviceTelemetries error:%v/n", err)
 	}
 }
 
-//SetDeviceHealth upload device health
-func (sdk *IotSDK) SetDeviceHealth(deviceID uint32, health uint32, now *timestamppb.Timestamp) {
+func (sdk *IotSDK) setDeviceHealth(health uint32, now *timestamppb.Timestamp) {
 	request := new(pb.DeviceMSG)
 	request.Action = pb.DeviceAction_SetHealth
-	request.DeviceID = deviceID
+	request.DeviceID = sdk.DeviceInfo.ID
 	request.DeviceHealth = health
 	request.ActionTime = now
 	requestMsg, err := proto.Marshal(request)
@@ -109,23 +156,46 @@ func (sdk *IotSDK) SetDeviceHealth(deviceID uint32, health uint32, now *timestam
 		log.Println("proto marshal error:", err)
 		return
 	}
-	msg, err := sdk.conn.PublishAsync(subjectDeviceData, requestMsg, AckHandler)
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
 	if err != nil {
-		log.Printf("publish error,id:%s,err:%v/n", msg, err)
+		log.Printf("SetDeviceHealth error:%v/n", err)
 	}
 }
 
-//NatsSubscribe ..
-func (sdk *IotSDK) NatsSubscribe(handler func(m *nats.Msg)) (*nats.Subscription, error) {
-	return sdk.conn.NatsConn().QueueSubscribe(subjectDevice, groupDevice, handler)
+func (sdk *IotSDK) pingCheck() {
+	if sdk.DeviceInfo == nil {
+		return
+	}
+	now := ptypes.TimestampNow()
+	var flag uint32
+	if sdk.ping(sdk.DeviceInfo.IP) {
+		flag = 1
+	}
+	sdk.setDeviceHealth(flag, now)
 }
 
-//SubscribeSaveDeviceData ..
-func (sdk *IotSDK) SubscribeSaveDeviceData(handler func(m *stan.Msg)) (stan.Subscription, error) {
-	return sdk.conn.QueueSubscribe(subjectDeviceData, groupSaveDeviceData, handler, stan.DurableName("dur"))
-}
-
-//SubscribePublishDeviceData ..
-func (sdk *IotSDK) SubscribePublishDeviceData(handler func(m *stan.Msg)) (stan.Subscription, error) {
-	return sdk.conn.QueueSubscribe(subjectDeviceData, groupPublishDeviceData, handler, stan.DurableName("dur"))
+func (sdk *IotSDK) ping(ip string) bool {
+	var buf bytes.Buffer
+	var errorBuf bytes.Buffer
+	cmd := exec.Command("ping", "-i", "1", "-c", "3", ip)
+	cmd.Stdout = &buf
+	cmd.Stderr = &errorBuf
+	err := cmd.Run()
+	if err != nil {
+		log.Println("ping failed:", err)
+	}
+	if buf.String() != "" {
+		data := buf.String()
+		dataArr := strings.Split(data, "\n")
+		if len(dataArr) != 9 {
+			return false
+		}
+		statisticsStr := dataArr[6]
+		statisticsArr := strings.Split(statisticsStr, ",")
+		if len(statisticsArr) < 3 {
+			return false
+		}
+		return statisticsArr[2] == " 0% packet loss"
+	}
+	return false
 }

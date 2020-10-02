@@ -73,6 +73,7 @@ type ComplexityRoot struct {
 	}
 
 	Device struct {
+		AccessKey       func(childComplexity int) int
 		Attributes      func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		DeviceModelDesc func(childComplexity int) int
@@ -82,6 +83,7 @@ type ComplexityRoot struct {
 		IP              func(childComplexity int) int
 		Name            func(childComplexity int) int
 		Port            func(childComplexity int) int
+		SecretKey       func(childComplexity int) int
 		Telemetries     func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
 	}
@@ -565,6 +567,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Character.OriginalName(childComplexity), true
 
+	case "Device.accessKey":
+		if e.complexity.Device.AccessKey == nil {
+			break
+		}
+
+		return e.complexity.Device.AccessKey(childComplexity), true
+
 	case "Device.attributes":
 		if e.complexity.Device.Attributes == nil {
 			break
@@ -627,6 +636,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Device.Port(childComplexity), true
+
+	case "Device.secretKey":
+		if e.complexity.Device.SecretKey == nil {
+			break
+		}
+
+		return e.complexity.Device.SecretKey(childComplexity), true
 
 	case "Device.telemetries":
 		if e.complexity.Device.Telemetries == nil {
@@ -2481,6 +2497,8 @@ type Device {
   name: String!
   ip: String!
   port: Int!
+  accessKey: String!
+  secretKey: String!
   deviceModelName:String!
   deviceModelDesc:String!
   attributes: [Attribute!]
@@ -4795,6 +4813,74 @@ func (ec *executionContext) _Device_port(ctx context.Context, field graphql.Coll
 	res := resTmp.(int64)
 	fc.Result = res
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_accessKey(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AccessKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_secretKey(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SecretKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Device_deviceModelName(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
@@ -14778,6 +14864,16 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "port":
 			out.Values[i] = ec._Device_port(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "accessKey":
+			out.Values[i] = ec._Device_accessKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "secretKey":
+			out.Values[i] = ec._Device_secretKey(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

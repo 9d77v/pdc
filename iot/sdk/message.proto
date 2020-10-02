@@ -13,6 +13,11 @@ message DeviceMSG {
   uint32 DeviceHealth = 7;
 }
 
+message LoginMSG {
+  string AccessKey = 1;
+  string SecretKey = 2;
+}
+
 enum DeviceAction {
   SetAttributes = 0;
   SetTelemetries = 1;

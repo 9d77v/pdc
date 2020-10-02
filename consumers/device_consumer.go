@@ -8,53 +8,12 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/nats-io/nats.go"
 	"github.com/nats-io/stan.go"
 
-	"github.com/9d77v/pdc/iot/sdk"
 	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/models/clickhouse"
 )
-
-//ReplyDeviceMSG ...
-func ReplyDeviceMSG(m *nats.Msg) {
-	deviceMsg := new(pb.DeviceMSG)
-	err := proto.Unmarshal(m.Data, deviceMsg)
-	if err != nil {
-		log.Println("unmarshal data error")
-		return
-	}
-	iotsdk := sdk.NewIotSDK()
-	replyDeviceMsg := &pb.DeviceMSG{
-		DeviceID: deviceMsg.DeviceID,
-	}
-	device := new(models.Device)
-	err = models.Gorm.Preload("Attributes").Preload("Attributes.AttributeModel").
-		Preload("Telemetries").Preload("Telemetries.TelemetryModel").
-		Where("id=?", replyDeviceMsg.DeviceID).First(device).Error
-	if err != nil {
-		log.Println("get device failed,err", err)
-		iotsdk.ReplyDeviceInfo(m.Reply, replyDeviceMsg)
-		return
-	}
-	attributeConfig := make(map[string]uint32, 0)
-	for _, v := range device.Attributes {
-		attributeConfig[v.AttributeModel.Key] = uint32(v.ID)
-	}
-	telemetryConfig := make(map[string]uint32)
-	for _, v := range device.Telemetries {
-		telemetryConfig[v.TelemetryModel.Key] = uint32(v.ID)
-	}
-	replyDeviceMsg.DeviceInfo = &pb.DeviceInfo{
-		ID:              deviceMsg.DeviceID,
-		IP:              device.IP,
-		Port:            uint32(device.Port),
-		AttributeConfig: attributeConfig,
-		TelemetryConfig: telemetryConfig,
-	}
-	iotsdk.ReplyDeviceInfo(m.Reply, replyDeviceMsg)
-}
 
 var (
 	batchSize     = 1000

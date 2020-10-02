@@ -18,11 +18,20 @@ var (
 	Client stan.Conn
 )
 
-//mq constants
+//video subject
 const (
 	SubjectVideo         = "video"
 	SubjectGetDeviceInfo = "GetDeviceInfo"
 	GroupVideo           = "video-group"
+)
+
+//device subject
+const (
+	SubjectDevice          = "device.config"
+	SubjectDeviceData      = "device.data"
+	GroupDevice            = "group.device"
+	GroupSaveDeviceData    = "group.device.data.save"
+	GroupPublishDeviceData = "group.device.data.pub"
 )
 
 func init() {

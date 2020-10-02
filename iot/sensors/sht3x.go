@@ -6,14 +6,17 @@ import (
 	"time"
 
 	"github.com/9d77v/pdc/iot/sdk"
-	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
 	"gobot.io/x/gobot"
 	"gobot.io/x/gobot/drivers/i2c"
 )
 
 //SHT3x get temperature and humidity
-func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
+func SHT3x(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
+	device := iotSDK.DeviceInfo
+	if device == nil {
+		return
+	}
 	sht3x := i2c.NewSHT3xDriver(r, i2c.WithBus(getBus(bus...)))
 	work := func() {
 		sht3x.Units = "C"
@@ -35,7 +38,7 @@ func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 			attributeMap[sht30Hz] = fmt.Sprintf("%.2fHz", 1.0/float64(samplingFrequency))
 		}
 		if len(attributeMap) > 0 {
-			iotSDK.SetDeviceAttributes(device.ID, attributeMap)
+			iotSDK.SetDeviceAttributes(attributeMap)
 		}
 		gobot.Every(time.Duration(samplingFrequency)*time.Second, func() {
 			temp, rh, err := sht3x.Sample()
@@ -54,7 +57,7 @@ func SHT3x(device *pb.DeviceInfo, iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 				}
 				if len(telemetryMap) > 0 {
 					now := ptypes.TimestampNow()
-					iotSDK.SetDeviceTelemetries(device.ID, telemetryMap, now)
+					iotSDK.SetDeviceTelemetries(telemetryMap, now)
 				}
 			}
 		})
