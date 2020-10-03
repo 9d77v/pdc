@@ -1,6 +1,7 @@
 #!/bin/sh
 app='pdc'
-version="0.0.9"
+version="0.0.10"
+base_deploy_version="0.0.1"
 sudo=""
 if command -v sudo >/dev/null 2>&1; then
     sudo="sudo"
@@ -20,6 +21,10 @@ case $1 in
     base)
         $sudo docker build -t 9d77v/$app-base:$version -f Dockerfile.base .
         $sudo docker push 9d77v/$app-base:$version
+       ;;
+    base-deploy)
+        $sudo docker build -t 9d77v/$app-base-deploy:$base_deploy_version -f Dockerfile.base.deploy .
+        $sudo docker push 9d77v/$app-base-deploy:$base_deploy_version
        ;;
     deploy)
         # cd ui 
