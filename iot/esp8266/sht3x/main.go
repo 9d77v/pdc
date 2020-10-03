@@ -18,7 +18,7 @@ func main() {
 				return
 			}
 			r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.IP, device.Port))
-			sensors.SHT3x(iotSDK, r)
+			sensors.SHT3x(iotSDK, r, 0)
 		},
 	})
 }
