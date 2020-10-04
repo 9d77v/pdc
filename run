@@ -47,5 +47,8 @@ case $1 in
         $sudo docker build -t 9d77v/pdc-device-raspi:$IMAGE_TAG -f Dockerfile.raspi .
         $sudo docker push 9d77v/pdc-device-raspi:$IMAGE_TAG   
         ;;
+    gosec)
+       gosec -exclude=G204 -conf gosec.json ./...
+       ;;
 esac  
 

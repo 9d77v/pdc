@@ -486,8 +486,11 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 }
 
 func sendMsgToUpdateES(videoID int64) {
-	nats.Client.PublishAsync(nats.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
+	guid, err := nats.Client.PublishAsync(nats.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
 		utils.AckHandler)
+	if err != nil {
+		log.Println("nats publish failed,guid:", guid, " error:", err)
+	}
 }
 
 //ListVideoIndex ..
@@ -547,8 +550,14 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 	}
 	for _, v := range result.Hits.Hits {
 		vi := new(elasticsearch.VideoIndex)
-		data, _ := v.Source.MarshalJSON()
-		json.Unmarshal(data, &vi)
+		data, err := v.Source.MarshalJSON()
+		if err != nil {
+			log.Println("elastic search result json marshal error:", err)
+		}
+		err = json.Unmarshal(data, &vi)
+		if err != nil {
+			log.Println("elastic search result json unmarshal error:", err)
+		}
 		vi.Cover = dtos.GetOSSPrefix(scheme) + vi.Cover
 		vis = append(vis, &model.VideoIndex{
 			ID:       int64(vi.ID),

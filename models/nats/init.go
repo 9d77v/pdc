@@ -35,7 +35,8 @@ const (
 )
 
 func init() {
-	Client, _ = stan.Connect("test-cluster",
+	var err error
+	Client, err = stan.Connect("test-cluster",
 		fmt.Sprintf("client-%d", time.Now().Unix()),
 		stan.Pings(10, 5),
 		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
@@ -43,4 +44,7 @@ func init() {
 		}),
 		stan.NatsURL("nats://"+natsURL),
 	)
+	if err != nil {
+		log.Println("nats connect error:", err)
+	}
 }

@@ -52,9 +52,12 @@ func (sdk *IotSDK) Run(works []func()) {
 		go v()
 	}
 	cr := cron.New()
-	cr.AddFunc("*/1 * * * *", func() {
+	id, err := cr.AddFunc("*/1 * * * *", func() {
 		sdk.pingCheck()
 	})
+	if err != nil {
+		log.Println("cron add func error,entityID:", id, " error:", err)
+	}
 	cr.Start()
 	defer cr.Stop()
 	for {

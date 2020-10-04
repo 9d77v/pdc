@@ -96,7 +96,7 @@ func initDB() {
 	if err != nil {
 		log.Printf("Could not initialize gorm: %s", err.Error())
 	}
-	Gorm.AutoMigrate(
+	err = Gorm.AutoMigrate(
 		&User{},
 		&Thing{},
 		//media
@@ -116,6 +116,9 @@ func initDB() {
 		&DeviceDashboard{},
 		&DeviceDashboardTelemetry{},
 	)
+	if err != nil {
+		log.Println("auto migrate error:", err)
+	}
 }
 
 func initDBData() {

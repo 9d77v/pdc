@@ -86,7 +86,10 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 	}
 	err := models.Gorm.Model(user).Updates(updateMap).Error
 	key := fmt.Sprintf("%s:%d", models.PrefixUser, input.ID)
-	models.RedisClient.Del(ctx, key).Err()
+	redisErr := models.RedisClient.Del(ctx, key).Err()
+	if redisErr != nil {
+		log.Println("redis del failed:", redisErr)
+	}
 	return &model.User{ID: int64(user.ID)}, err
 }
 
@@ -219,7 +222,10 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 	}
 	err := models.Gorm.Model(user).Updates(updateMap).Error
 	key := fmt.Sprintf("%s:%d", models.PrefixUser, uid)
-	models.RedisClient.Del(ctx, key).Err()
+	redisErr := models.RedisClient.Del(ctx, key).Err()
+	if redisErr != nil {
+		log.Println("redis del failed:", redisErr)
+	}
 	return &model.User{ID: int64(uid)}, err
 }
 

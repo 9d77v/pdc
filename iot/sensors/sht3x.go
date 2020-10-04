@@ -20,7 +20,11 @@ func SHT3x(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 	sht3x := i2c.NewSHT3xDriver(r, i2c.WithBus(getBus(bus...)))
 	work := func() {
 		sht3x.Units = "C"
-		sht3x.Start()
+		err := sht3x.Start()
+		if err != nil {
+			log.Println("sht3x start error:", err)
+			return
+		}
 		samplingFrequency := 5
 		sn, err := sht3x.SerialNumber()
 		if err != nil {
@@ -70,5 +74,8 @@ func SHT3x(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 		work,
 	)
 
-	robot.Start()
+	err := robot.Start()
+	if err != nil {
+		log.Println("sht3xbot start error")
+	}
 }
