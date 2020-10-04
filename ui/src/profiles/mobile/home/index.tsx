@@ -7,6 +7,7 @@ import { deviceTelemetryPrefix, iotTelemetrySocketURL } from "../../../utils/ws_
 import { pb } from "../../../pb/compiled";
 import "../../../style/card.less"
 import { blobToArrayBuffer } from "../../../utils/file";
+import { Grid } from "antd-mobile";
 
 export default function HomeIndex() {
     const [dataResource, setDataResource] = useState<any[]>([])
@@ -105,49 +106,34 @@ export default function HomeIndex() {
             clearInterval(timer);
         }
     }, [])
-
-    const cards = dataResource?.map((v: any, index: number) => {
-        const cardItems = v.telemetries.map((t: any) => {
-            const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
-            return <div key={t.telemetryID}>{t.name}: {value}{t.unit}</div>
-        })
-        let width: string = "50%"
-        if (index === dataResource.length - 1 && dataResource.length % 2 === 1) {
-            width = "100%"
-        }
-        return <div key={v.id}
-            className="pdc-card-home"
-            style={{
-                width: width,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 10,
-                flexDirection: "column"
-            }}>
-            {v.name}
-            <div style={{
-                textAlign: "left",
-                paddingTop: 10
-            }}>
-                {cardItems}
-            </div>
-
-        </div>
-    })
     return (
         <Route exact path="/app/home">
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: "100%",
-                opacity: 0.7,
-                background: "#fff",
-                border: 1,
-                justifyContent: 'center',
-                backgroundColor: '#eee'
-            }}>
-                {cards}
-            </div>
+            <Grid data={dataResource}
+                columnNum={2}
+                renderItem={(dataItem: any) => {
+                    const cardItems = dataItem.telemetries.map((t: any) => {
+                        const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
+                        return <div key={t.telemetryID}>{t.name}: {value}{t.unit}</div>
+                    })
+                    return (<div key={dataItem.id}
+                        className="pdc-card-home"
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            padding: 10,
+                            opacity: 0.7,
+                            height: "100%",
+                            flexDirection: "column"
+                        }}>
+                        {dataItem.name}
+                        <div style={{
+                            textAlign: "left",
+                            paddingTop: 10
+                        }}>
+                            {cardItems}
+                        </div>
+                    </div>)
+                }}
+            />
         </Route>)
 }

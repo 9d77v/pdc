@@ -11,7 +11,6 @@ import { UpdateProfileForm } from './me/UpdateFrofileForm';
 import UpdatePasswordForm from './me/UpdatePasswordForm';
 import HomeNavBar from './home/HomeNavBar';
 import { Scanner } from './home/scanner/Scanner';
-import { ScannerResult } from './home/scanner/ScannerResult';
 import { QRCodePage } from './me/QRCodePage';
 
 const MeIndex = React.lazy(() => import('./me'))
@@ -67,9 +66,6 @@ export default function MobileIndex() {
             <Route exact path="/app/scanner"  >
                 <Scanner />
             </Route>
-            <Route exact path="/app/scanner/result"  >
-                <ScannerResult url={"https://baidu.com"} />
-            </Route>
             <TabBar
                 unselectedTintColor="#949494"
                 tintColor="#33A3F4"
@@ -119,7 +115,10 @@ export default function MobileIndex() {
                     }}
                 >
                     <Route exact path="/app/user"  >
-                        <MeIndex name={user ? user.name.toString() : ""} avatar={user ? user.avatar.toString() : ""} />
+                        <MeIndex
+                            uid={user ? user.id : 0}
+                            name={user ? user.name.toString() : ""}
+                            avatar={user ? user.avatar.toString() : ""} />
                     </Route>
                 </TabBar.Item>
             </TabBar>

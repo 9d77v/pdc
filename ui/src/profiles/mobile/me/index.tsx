@@ -6,6 +6,7 @@ import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons'
 import { List } from "antd-mobile";
 
 interface AppHeaderProps {
+    uid: number,
     name: string;
     avatar: string;
 }
@@ -38,7 +39,10 @@ export default function MeIndex(props: AppHeaderProps) {
                     marginRight: 20
                 }} size={80} gap={1} src={props.avatar} >{props.name}</Avatar>
 
-                <div style={{ flex: 1, fontSize: 36 }}>{props.name}</div>
+                <div style={{ flex: 1, flexDirection: "column" }}>
+                    <div style={{ fontSize: 36 }}> {props.name}</div>
+                    <div style={{ fontSize: 16 }}>UID: {props.uid}</div>
+                </div>
 
             </div>
             <List renderHeader={() => ''}>
