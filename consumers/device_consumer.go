@@ -146,12 +146,23 @@ func SaveDeviceTelemetry() {
 
 //batchSaveTelemetry ..
 func batchSaveTelemetry(telemetries []*pb.Telemetry) {
-	tx, _ := clickhouse.Client.Begin()
-	stmt, _ := tx.Prepare("INSERT INTO device_telemetry (device_id,telemetry_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
+	tx, err := clickhouse.Client.Begin()
+	if err != nil {
+		log.Println("clickhouse tx begin error:", err)
+		return
+	}
+	stmt, err := tx.Prepare("INSERT INTO device_telemetry (device_id,telemetry_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
+	if err != nil {
+		log.Println("clickhouse tx Prepare error:", err)
+		return
+	}
 	defer stmt.Close()
 	now := time.Now()
 	for _, v := range telemetries {
-		actionTime, _ := ptypes.Timestamp(v.ActionTime)
+		actionTime, err := ptypes.Timestamp(v.ActionTime)
+		if err != nil {
+			log.Println("conver actiontime to timestamp error:", err)
+		}
 		if _, err := stmt.Exec(
 			v.DeviceID,
 			v.ID,
@@ -162,7 +173,10 @@ func batchSaveTelemetry(telemetries []*pb.Telemetry) {
 			now.Nanosecond(),
 		); err != nil {
 			log.Println(err)
-			tx.Rollback()
+			err = tx.Rollback()
+			if err != nil {
+				log.Println("clickhouse tx rollback error:", err)
+			}
 			return
 		}
 	}
@@ -203,12 +217,23 @@ func SaveDeviceHealth() {
 
 //batchSaveHealth ..
 func batchSaveHealth(healths []*pb.Health) {
-	tx, _ := clickhouse.Client.Begin()
-	stmt, _ := tx.Prepare("INSERT INTO device_health (device_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
+	tx, err := clickhouse.Client.Begin()
+	if err != nil {
+		log.Println("clickhouse tx begin error:", err)
+		return
+	}
+	stmt, err := tx.Prepare("INSERT INTO device_health (device_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
+	if err != nil {
+		log.Println("clickhouse tx Prepare error:", err)
+		return
+	}
 	defer stmt.Close()
 	now := time.Now()
 	for _, v := range healths {
-		actionTime, _ := ptypes.Timestamp(v.ActionTime)
+		actionTime, err := ptypes.Timestamp(v.ActionTime)
+		if err != nil {
+			log.Println("conver actiontime to timestamp error:", err)
+		}
 		if _, err := stmt.Exec(
 			v.DeviceID,
 			actionTime,
@@ -218,7 +243,10 @@ func batchSaveHealth(healths []*pb.Health) {
 			now.Nanosecond(),
 		); err != nil {
 			log.Println(err)
-			tx.Rollback()
+			err = tx.Rollback()
+			if err != nil {
+				log.Println("clickhouse tx rollback error:", err)
+			}
 			return
 		}
 	}

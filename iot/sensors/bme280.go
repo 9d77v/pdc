@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/9d77v/pdc/iot/sdk"
@@ -82,5 +83,8 @@ func BME280(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 		work,
 	)
 
-	robot.Start()
+	err := robot.Start()
+	if err != nil {
+		log.Println("BME280bot start error")
+	}
 }

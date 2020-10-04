@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -22,7 +23,10 @@ func JWT(signingKey []byte, uid int64, tokenExpire time.Duration, issuer string)
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(signingKey)
+	tokenString, err := token.SignedString(signingKey)
+	if err != nil {
+		log.Println("generate token error:", err)
+	}
 	return tokenString
 }
 

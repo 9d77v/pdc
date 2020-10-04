@@ -1,8 +1,10 @@
 package utils
 
 import (
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"fmt"
+	"log"
+	"math/big"
 
 	hashids "github.com/speps/go-hashids"
 )
@@ -15,11 +17,13 @@ const (
 
 // RandString 生成随机字符串
 func RandString(len int) string {
-	r := rand.New(rand.NewSource(time.Now().Unix()))
 	bytes := make([]byte, len)
 	for i := 0; i < len; i++ {
-		b := r.Intn(26) + 65
-		bytes[i] = byte(b)
+		b, err := rand.Int(rand.Reader, big.NewInt(26))
+		if err != nil {
+			fmt.Println("rand.Int：", b, b.BitLen())
+		}
+		bytes[i] = byte(b.Int64() + 65)
 	}
 	return string(bytes)
 }
@@ -29,8 +33,16 @@ func GenerateAccessKey(id uint) string {
 	hd := hashids.NewData()
 	hd.Salt = salt
 	hd.MinLength = accessKeyLen
-	h, _ := hashids.NewWithData(hd)
-	e, _ := h.Encode([]int{int(id)})
+	h, err := hashids.NewWithData(hd)
+	if err != nil {
+		log.Println("NewWithData error:", err)
+		return ""
+	}
+	e, err := h.Encode([]int{int(id)})
+	if err != nil {
+		log.Println("hash encode error:", err)
+		return ""
+	}
 	return e
 }
 

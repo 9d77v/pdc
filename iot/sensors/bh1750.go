@@ -19,7 +19,11 @@ func BH1750(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 	}
 	bh1750 := i2c.NewBH1750Driver(r, i2c.WithBus(getBus(bus...)))
 	work := func() {
-		bh1750.Start()
+		err := bh1750.Start()
+		if err != nil {
+			log.Println("bh1750 start error:", err)
+			return
+		}
 		samplingFrequency := 1
 		attributeMap := make(map[uint32]string, 0)
 		bh1750Hz := device.AttributeConfig["bh1750_hz"]
@@ -54,5 +58,8 @@ func BH1750(iotSDK *sdk.IotSDK, r Adaptor, bus ...int) {
 		work,
 	)
 
-	robot.Start()
+	err := robot.Start()
+	if err != nil {
+		log.Println("BH1750bot start error")
+	}
 }

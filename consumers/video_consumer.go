@@ -29,9 +29,17 @@ func HandleVideoMSG(m *stan.Msg) {
 			return
 		}
 		vi.BulkSaveES(ctx, data, indexName, 1000, 3)
-		client.SetNewAlias(ctx, elasticsearch.AliasVideo, indexName)
+		err = client.SetNewAlias(ctx, elasticsearch.AliasVideo, indexName)
+		if err != nil {
+			log.Println("SetNewAlias  error:", err)
+			return
+		}
 		indexNames = client.FindIndexesByAlias(ctx, elasticsearch.AliasVideo, elasticsearch.ESLayout)
-		client.KeepIndex(ctx, indexNames, 3)
+		err = client.KeepIndex(ctx, indexNames, 3)
+		if err != nil {
+			log.Println("KeepIndex  error:", err)
+			return
+		}
 	} else {
 		err := vi.GetByID(id)
 		if err != nil {

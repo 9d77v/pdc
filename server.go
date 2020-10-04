@@ -64,24 +64,42 @@ func main() {
 		log.Panicln("QueueSubscribe error:", err)
 	}
 	defer func() {
-		qsub1.Unsubscribe()
-		qsub1.Close()
+		err = qsub1.Unsubscribe()
+		if err != nil {
+			log.Println("qsub1 Unsubscribe error:", err)
+		}
+		err = qsub1.Close()
+		if err != nil {
+			log.Println("qsub1 Close error:", err)
+		}
 	}()
 	qsub2, err := nats.Client.QueueSubscribe(nats.SubjectDeviceData, nats.GroupSaveDeviceData, consumers.HandleDeviceMSG, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	defer func() {
-		qsub2.Unsubscribe()
-		qsub2.Close()
+		err = qsub2.Unsubscribe()
+		if err != nil {
+			log.Println("qsub2 Unsubscribe error:", err)
+		}
+		err = qsub2.Close()
+		if err != nil {
+			log.Println("qsub2 Close error:", err)
+		}
 	}()
 	qsub3, err := nats.Client.QueueSubscribe(nats.SubjectDeviceData, nats.GroupPublishDeviceData, consumers.PublishDeviceData, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	defer func() {
-		qsub3.Unsubscribe()
-		qsub3.Close()
+		err = qsub3.Unsubscribe()
+		if err != nil {
+			log.Println("qsub3 Unsubscribe error:", err)
+		}
+		err = qsub3.Close()
+		if err != nil {
+			log.Println("qsub3 Close error:", err)
+		}
 	}()
 	go consumers.SaveDeviceTelemetry()
 	go consumers.SaveDeviceHealth()
@@ -93,6 +111,9 @@ func main() {
 	log.Printf("exiting (%v)", <-errc)
 	srvCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	srv.Shutdown(srvCtx)
+	err = srv.Shutdown(srvCtx)
+	if err != nil {
+		log.Println("server shut down error:", err)
+	}
 	log.Println("exited")
 }
