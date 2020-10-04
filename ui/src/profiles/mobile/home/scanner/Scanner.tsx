@@ -18,7 +18,11 @@ export const Scanner = () => {
 
     useEffect(() => {
         if (result !== "") {
-            if (result.indexOf("http://") !== -1 || result.indexOf("https://") !== -1) {
+            if (result.indexOf("pdc://") !== -1) {
+                const url = result.replace("pdc:", document.location.protocol)
+                const path = "/app/contact/addContact/" + btoa(url)
+                history.replace(path)
+            } else if (result.indexOf("http://") !== -1 || result.indexOf("https://") !== -1) {
                 setResultDiv(
                     <div style={{
                         display: "flex", flexDirection: "column",

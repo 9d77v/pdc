@@ -43,7 +43,6 @@ export default function MeIndex(props: AppHeaderProps) {
                     <div style={{ fontSize: 36 }}> {props.name}</div>
                     <div style={{ fontSize: 16 }}>UID: {props.uid}</div>
                 </div>
-
             </div>
             <List renderHeader={() => ''}>
                 <Item

@@ -12,6 +12,7 @@ import UpdatePasswordForm from './me/UpdatePasswordForm';
 import HomeNavBar from './home/HomeNavBar';
 import { Scanner } from './home/scanner/Scanner';
 import { QRCodePage } from './me/QRCodePage';
+import { AddFriendPage } from './contact/AddFriendPage';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
@@ -65,6 +66,9 @@ export default function MobileIndex() {
             </Route>
             <Route exact path="/app/scanner"  >
                 <Scanner />
+            </Route>
+            <Route exact path="/app/contact/addContact/:url"  >
+                <AddFriendPage />
             </Route>
             <TabBar
                 unselectedTintColor="#949494"

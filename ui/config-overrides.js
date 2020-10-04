@@ -15,6 +15,11 @@ const devServerConfig = () => config => {
                 changeOrigin: true,
                 secure: false
             },
+            '/card': {
+                target: target,
+                changeOrigin: true,
+                secure: false
+            },
             '/ws': {
                 target: target,
                 changeOrigin: true,
