@@ -1,8 +1,6 @@
 import { Modal, Form, Input, Switch, DatePicker, message, Radio, Select } from 'antd';
 import React, { useState } from 'react'
-import { Uploader } from '../../../../../components/Uploader';
-import { LIST_VIDEO } from '../../../../../consts/video.gql';
-import { useQuery } from '@apollo/react-hooks';
+import { Uploader } from '../../../../../../components/Uploader';
 
 const { TextArea } = Input;
 
@@ -26,24 +24,10 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
     const [url, setUrl] = useState("")
     const [videoURLs, setVideoURLs] = useState([])
     const [subtitles, setSubtitles] = useState([])
-    const { data, refetch } = useQuery(LIST_VIDEO,
-        {
-            variables: {
-                page: 1,
-                pageSize: 1,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
-            }
-        })
+    const [maxNum, setMaxNum] = useState(0)
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
-    }
-    let maxNum: number = 1
-    if (data && data.videos.edges.length > 0) {
-        maxNum = data.videos.edges[0].id + 1
     }
     const videoPathPrefix = "desktop/" + maxNum.toString() + "/"
     return (
@@ -78,7 +62,6 @@ export const VideoCreateForm: React.FC<VideoCreateFormProps> = ({
                     .then((values: any) => {
                         form.resetFields();
                         onCreate(values);
-                        refetch()
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info);

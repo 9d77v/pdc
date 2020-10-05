@@ -26,7 +26,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
             return <div
                 key={"pdc-button-" + value.videoID}
                 className={"pdc-button"}
-                onClick={() => { history.push('/app/media/videos/' + value.videoID) }}
+                onClick={() => { history.replace('/app/media/videos/' + value.videoID) }}
             >
                 {value.alias}
             </div>

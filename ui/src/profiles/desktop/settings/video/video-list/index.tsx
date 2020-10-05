@@ -6,7 +6,6 @@ import {
     UPDATE_SUBTITLE, UPDATE_MOBILE_VIDEO
 } from '../../../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
-import { VideoCreateForm } from './VideoCreateForm';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateForm';
 import dayjs from 'dayjs';
@@ -20,6 +19,7 @@ import { PlaySquareTwoTone } from '@ant-design/icons';
 import { SubtitleUpdateForm } from './SubtitleUpdateForm';
 import Search from 'antd/lib/input/Search';
 import { MobileVideoUpdateForm } from './MobileVideoUpdateForm';
+import { useHistory } from 'react-router-dom';
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -95,7 +95,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
 }
 
 export default function VideoTable() {
-    const [visible, setVisible] = useState(false);
+    const history = useHistory()
     const [currentVideoID, setCurrentVideoID] = useState(0);
     const [episodeVisible, setEpisodeVisible] = useState(false);
     const [updateVideoVisible, setUpdateVideoVisible] = useState(false)
@@ -184,7 +184,6 @@ export default function VideoTable() {
                 }
             }
         });
-        setVisible(false);
         await refetch()
     };
 
@@ -408,7 +407,7 @@ export default function VideoTable() {
             <Button
                 type="primary"
                 onClick={() => {
-                    setVisible(true)
+                    history.push("/admin/video/video-list/video-create")
                 }}
                 style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
@@ -418,13 +417,6 @@ export default function VideoTable() {
                 placeholder="搜索"
                 onSearch={value => setKeyword(value)}
                 style={{ width: 200, marginBottom: 12 }}
-            />
-            <VideoCreateForm
-                visible={visible}
-                onCreate={onVideoCreate}
-                onCancel={() => {
-                    setVisible(false);
-                }}
             />
             <VideoUpdateForm
                 visible={updateVideoVisible}

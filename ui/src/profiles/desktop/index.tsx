@@ -13,9 +13,9 @@ import { useQuery } from '@apollo/react-hooks';
 import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from './settings/user/UserCreateForm';
 import { UpdateProfileForm } from './user/UpdateFrofileForm';
-
-const VideoTable = React.lazy(() => import('./settings/video/video-list/VideoTable'))
-const VideoSeriesTable = React.lazy(() => import('./settings/video/video-series-list/VideoSeriesTable'))
+const VideoTable = React.lazy(() => import('./settings/video/video-list'))
+const VideoSeriesTable = React.lazy(() => import('./settings/video/video-series-list'))
+const VideoCreateIndex = React.lazy(() => import('./settings/video/video-list/video-create'))
 
 const UserTable = React.lazy(() => import('./settings/user/UserTable'))
 const UpdatePasswordForm = React.lazy(() => import("./user/UpdatePasswordForm"))
@@ -82,6 +82,9 @@ export default function DesktopIndex() {
                             </Route>
                             <Route exact path="/admin/video/video-list">
                                 <VideoTable />
+                            </Route>
+                            <Route exact path="/admin/video/video-list/video-create">
+                                <VideoCreateIndex />
                             </Route>
                             <Route exact path="/admin/video/video-series-list">
                                 <VideoSeriesTable />
