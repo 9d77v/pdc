@@ -34,6 +34,7 @@ func main() {
 		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
 	}
 	mux.Handle("/api", middleware.Auth()(apiHandler))
+	mux.HandleFunc("/card/", middleware.HandleCard())
 	mux.HandleFunc("/ws/iot/device", middleware.HandleIotDevice())
 	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel())
 	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel())
