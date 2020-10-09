@@ -1,14 +1,11 @@
 import { Button, message, Steps } from 'antd';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import "./index.less"
-import { VideoCreateStepOneForm } from './VideoCreateStepOneForm';
-import { VideoCreateStepThreeForm } from './VideoCreateStepThreeForm';
-import { VideoCreateStepTwoForm } from './VideoCreateStepTwoForm';
+import  VideoCreateStepOneForm from './VideoCreateStepOneForm';
+import  VideoCreateStepThreeForm  from './VideoCreateStepThreeForm';
+import  VideoCreateStepTwoForm from './VideoCreateStepTwoForm';
 const { Step } = Steps;
-
-
-
 
 export default function VideoCreateIndex() {
     const [current, setCurrent] = useState(0)
@@ -21,18 +18,22 @@ export default function VideoCreateIndex() {
         setCurrent(current - 1)
     }
 
+    const stepOneRef= useRef()
+    const stepTwoRef = useRef()
+    const stepThreRef = useRef()
+
     const steps = [
         {
             title: '基本信息',
-            content: <VideoCreateStepOneForm />,
+            content: <VideoCreateStepOneForm ref={stepOneRef}/>,
         },
         {
             title: '上传视频',
-            content: <VideoCreateStepTwoForm />,
+            content: <VideoCreateStepTwoForm ref={stepTwoRef}/>,
         },
         {
             title: '上传字幕',
-            content: <VideoCreateStepThreeForm />,
+            content: <VideoCreateStepThreeForm ref={stepThreRef}/>,
         },
     ];
     return (
@@ -53,7 +54,16 @@ export default function VideoCreateIndex() {
             <div className="steps-action">
                 {current < steps.length - 1 && (
                     <Button type="primary" style={{ float: "right" }}
-                        onClick={() => next()}>
+                        onClick={() => {
+                            if(current===0){
+                                console.log(current)
+                                const stepOne:any=stepOneRef.current       
+                                const ok=stepOne.onFinish()     
+                                if(ok){
+                                    next()
+                                }    
+                                        }
+                        }}>
                         下一步
                     </Button>
                 )}

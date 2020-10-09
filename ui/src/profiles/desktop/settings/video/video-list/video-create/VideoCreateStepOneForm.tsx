@@ -1,5 +1,5 @@
 import { Form, Input, Switch, DatePicker, Select } from 'antd';
-import React, { useState } from 'react'
+import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from '../../../../../../components/Uploader';
 
 const { TextArea } = Input;
@@ -13,10 +13,27 @@ interface VideoCreateStepOneFormProps {
     onCreate?: (values: Values) => void;
 }
 
-export const VideoCreateStepOneForm: React.FC<VideoCreateStepOneFormProps> = ({
-    onCreate,
-}) => {
+const VideoCreateStepOneForm  =  (props:VideoCreateStepOneFormProps,ref:  any)=>{
     const [form] = Form.useForm();
+    const onFinish = () => {
+        form.setFieldsValue({
+            "cover": url,
+        })
+        form
+            .validateFields()
+            .then((values: any) => {
+                console.log(values)
+                // onCreate(values);
+            })
+            .catch(info => {
+                console.log('Validate Failed:', info);
+            })
+        return form;
+      }
+
+      useImperativeHandle(ref, () => ({
+        onFinish,
+      }));
     const [url, setUrl] = useState("")
     const layout = {
         labelCol: { span: 4 },
@@ -30,6 +47,7 @@ export const VideoCreateStepOneForm: React.FC<VideoCreateStepOneFormProps> = ({
         form
             .validateFields()
             .then((values: any) => {
+                console.log(values)
                 // onCreate(values);
             })
             .catch(info => {
@@ -79,3 +97,5 @@ export const VideoCreateStepOneForm: React.FC<VideoCreateStepOneFormProps> = ({
         </Form>
     )
 }
+
+export default forwardRef(VideoCreateStepOneForm);

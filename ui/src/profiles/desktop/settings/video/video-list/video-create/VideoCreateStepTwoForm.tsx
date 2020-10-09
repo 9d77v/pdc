@@ -1,5 +1,5 @@
 import { Form, message } from 'antd';
-import React, { useState } from 'react'
+import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from '../../../../../../components/Uploader';
 
 interface Values {
@@ -11,10 +11,15 @@ interface VideoCreateStepTwoFormProps {
     onCreate?: (values: Values) => void;
 }
 
-export const VideoCreateStepTwoForm: React.FC<VideoCreateStepTwoFormProps> = ({
-    onCreate,
-}) => {
+const VideoCreateStepTwoForm  =  (props:VideoCreateStepTwoFormProps,ref:  any)=>{
     const [form] = Form.useForm();
+    const onFinish = () => {
+        return form;
+      }
+
+      useImperativeHandle(ref, () => ({
+        onFinish,
+      }));
     const [url, setUrl] = useState("")
     const [videoURLs, setVideoURLs] = useState([])
     const [subtitles, setSubtitles] = useState([])
@@ -72,3 +77,5 @@ export const VideoCreateStepTwoForm: React.FC<VideoCreateStepTwoFormProps> = ({
         </Form>
     )
 }
+
+export default forwardRef(VideoCreateStepTwoForm);
