@@ -57,9 +57,18 @@ input NewVideo {
   cover: String
   tags: [String!]
   isShow: Boolean!
+}
+
+input NewVideoResource{
+  id:ID!
   videoURLs:[String!]!
+}
+
+input NewSaveSubtitles {
+  id:ID!
   subtitles:NewSubtitles
 }
+
 
 input NewSubtitle{
   name:String!
@@ -94,11 +103,6 @@ input NewUpdateEpisode{
   cover: String
   url: String!
   subtitles:  [NewSubtitle!]  
-}
-
-input NewUpdateSubtitles {
-  id:ID!
-  subtitles:NewSubtitles
 }
 
 input NewUpdateMobileVideos{

@@ -28,10 +28,11 @@ type Mutation {
   refreshToken(refreshToken:String!):LoginResponse!
 
   createVideo(input: NewVideo!): Video!
+  addVideoResource(input:NewVideoResource!):Video!
+  saveSubtitles(input:NewSaveSubtitles!):Video!
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
-  updateSubtitle(input:NewUpdateSubtitles!):Video!
   updateMobileVideo(input:NewUpdateMobileVideos):Video!
   createVideoSeries(input: NewVideoSeries!): VideoSeries!
   updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!

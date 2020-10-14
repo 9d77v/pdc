@@ -181,6 +181,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddDeviceDashboardTelemetry    func(childComplexity int, input model.NewDeviceDashboardTelemetry) int
+		AddVideoResource               func(childComplexity int, input model.NewVideoResource) int
 		CreateAttributeModel           func(childComplexity int, input model.NewAttributeModel) int
 		CreateDevice                   func(childComplexity int, input model.NewDevice) int
 		CreateDeviceDashboard          func(childComplexity int, input model.NewDeviceDashboard) int
@@ -199,6 +200,7 @@ type ComplexityRoot struct {
 		RecordHistory                  func(childComplexity int, input model.NewHistoryInput) int
 		RefreshToken                   func(childComplexity int, refreshToken string) int
 		RemoveDeviceDashboardTelemetry func(childComplexity int, ids []int64) int
+		SaveSubtitles                  func(childComplexity int, input model.NewSaveSubtitles) int
 		UpdateAttributeModel           func(childComplexity int, input model.NewUpdateAttributeModel) int
 		UpdateDevice                   func(childComplexity int, input model.NewUpdateDevice) int
 		UpdateDeviceDashboard          func(childComplexity int, input model.NewUpdateDeviceDashboard) int
@@ -207,7 +209,6 @@ type ComplexityRoot struct {
 		UpdateMobileVideo              func(childComplexity int, input *model.NewUpdateMobileVideos) int
 		UpdatePassword                 func(childComplexity int, oldPassword string, newPassword string) int
 		UpdateProfile                  func(childComplexity int, input model.NewUpdateProfile) int
-		UpdateSubtitle                 func(childComplexity int, input model.NewUpdateSubtitles) int
 		UpdateTelemetryModel           func(childComplexity int, input model.NewUpdateTelemetryModel) int
 		UpdateThing                    func(childComplexity int, input model.NewUpdateThing) int
 		UpdateUser                     func(childComplexity int, input model.NewUpdateUser) int
@@ -388,10 +389,11 @@ type MutationResolver interface {
 	Login(ctx context.Context, username string, password string) (*model.LoginResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*model.LoginResponse, error)
 	CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error)
+	AddVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error)
+	SaveSubtitles(ctx context.Context, input model.NewSaveSubtitles) (*model.Video, error)
 	UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error)
 	CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error)
 	UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error)
-	UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error)
 	UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error)
 	CreateVideoSeries(ctx context.Context, input model.NewVideoSeries) (*model.VideoSeries, error)
 	UpdateVideoSeries(ctx context.Context, input model.NewUpdateVideoSeries) (*model.VideoSeries, error)
@@ -1097,6 +1099,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddDeviceDashboardTelemetry(childComplexity, args["input"].(model.NewDeviceDashboardTelemetry)), true
 
+	case "Mutation.addVideoResource":
+		if e.complexity.Mutation.AddVideoResource == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addVideoResource_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddVideoResource(childComplexity, args["input"].(model.NewVideoResource)), true
+
 	case "Mutation.createAttributeModel":
 		if e.complexity.Mutation.CreateAttributeModel == nil {
 			break
@@ -1313,6 +1327,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RemoveDeviceDashboardTelemetry(childComplexity, args["ids"].([]int64)), true
 
+	case "Mutation.saveSubtitles":
+		if e.complexity.Mutation.SaveSubtitles == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_saveSubtitles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.SaveSubtitles(childComplexity, args["input"].(model.NewSaveSubtitles)), true
+
 	case "Mutation.updateAttributeModel":
 		if e.complexity.Mutation.UpdateAttributeModel == nil {
 			break
@@ -1408,18 +1434,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateProfile(childComplexity, args["input"].(model.NewUpdateProfile)), true
-
-	case "Mutation.updateSubtitle":
-		if e.complexity.Mutation.UpdateSubtitle == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateSubtitle_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateSubtitle(childComplexity, args["input"].(model.NewUpdateSubtitles)), true
 
 	case "Mutation.updateTelemetryModel":
 		if e.complexity.Mutation.UpdateTelemetryModel == nil {
@@ -2657,10 +2671,11 @@ type Mutation {
   refreshToken(refreshToken:String!):LoginResponse!
 
   createVideo(input: NewVideo!): Video!
+  addVideoResource(input:NewVideoResource!):Video!
+  saveSubtitles(input:NewSaveSubtitles!):Video!
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
-  updateSubtitle(input:NewUpdateSubtitles!):Video!
   updateMobileVideo(input:NewUpdateMobileVideos):Video!
   createVideoSeries(input: NewVideoSeries!): VideoSeries!
   updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!
@@ -2865,9 +2880,18 @@ input NewVideo {
   cover: String
   tags: [String!]
   isShow: Boolean!
+}
+
+input NewVideoResource{
+  id:ID!
   videoURLs:[String!]!
+}
+
+input NewSaveSubtitles {
+  id:ID!
   subtitles:NewSubtitles
 }
+
 
 input NewSubtitle{
   name:String!
@@ -2902,11 +2926,6 @@ input NewUpdateEpisode{
   cover: String
   url: String!
   subtitles:  [NewSubtitle!]  
-}
-
-input NewUpdateSubtitles {
-  id:ID!
-  subtitles:NewSubtitles
 }
 
 input NewUpdateMobileVideos{
@@ -2983,6 +3002,20 @@ func (ec *executionContext) field_Mutation_addDeviceDashboardTelemetry_args(ctx 
 	var arg0 model.NewDeviceDashboardTelemetry
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewDeviceDashboardTelemetry2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceDashboardTelemetry(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addVideoResource_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewVideoResource
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewVideoResource2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewVideoResource(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3251,6 +3284,20 @@ func (ec *executionContext) field_Mutation_removeDeviceDashboardTelemetry_args(c
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_saveSubtitles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewSaveSubtitles
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewSaveSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSaveSubtitles(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateAttributeModel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3363,20 +3410,6 @@ func (ec *executionContext) field_Mutation_updateProfile_args(ctx context.Contex
 	var arg0 model.NewUpdateProfile
 	if tmp, ok := rawArgs["input"]; ok {
 		arg0, err = ec.unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateProfile(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_updateSubtitle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewUpdateSubtitles
-	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7430,6 +7463,88 @@ func (ec *executionContext) _Mutation_createVideo(ctx context.Context, field gra
 	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addVideoResource(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addVideoResource_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddVideoResource(rctx, args["input"].(model.NewVideoResource))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_saveSubtitles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_saveSubtitles_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SaveSubtitles(rctx, args["input"].(model.NewSaveSubtitles))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_updateVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -7551,47 +7666,6 @@ func (ec *executionContext) _Mutation_updateEpisode(ctx context.Context, field g
 	res := resTmp.(*model.Episode)
 	fc.Result = res
 	return ec.marshalNEpisode2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_updateSubtitle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateSubtitle_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateSubtitle(rctx, args["input"].(model.NewUpdateSubtitles))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Video)
-	fc.Result = res
-	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_updateMobileVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -13672,6 +13746,30 @@ func (ec *executionContext) unmarshalInputNewHistoryInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewSaveSubtitles(ctx context.Context, obj interface{}) (model.NewSaveSubtitles, error) {
+	var it model.NewSaveSubtitles
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "subtitles":
+			var err error
+			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewSubtitle(ctx context.Context, obj interface{}) (model.NewSubtitle, error) {
 	var it model.NewSubtitle
 	var asMap = obj.(map[string]interface{})
@@ -14116,30 +14214,6 @@ func (ec *executionContext) unmarshalInputNewUpdateProfile(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewUpdateSubtitles(ctx context.Context, obj interface{}) (model.NewUpdateSubtitles, error) {
-	var it model.NewUpdateSubtitles
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "id":
-			var err error
-			it.ID, err = ec.unmarshalNID2int64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "subtitles":
-			var err error
-			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewUpdateTelemetryModel(ctx context.Context, obj interface{}) (model.NewUpdateTelemetryModel, error) {
 	var it model.NewUpdateTelemetryModel
 	var asMap = obj.(map[string]interface{})
@@ -14560,15 +14634,27 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
-		case "videoURLs":
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewVideoResource(ctx context.Context, obj interface{}) (model.NewVideoResource, error) {
+	var it model.NewVideoResource
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
 			var err error
-			it.VideoURLs, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			it.ID, err = ec.unmarshalNID2int64(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "subtitles":
+		case "videoURLs":
 			var err error
-			it.Subtitles, err = ec.unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
+			it.VideoURLs, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15475,6 +15561,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addVideoResource":
+			out.Values[i] = ec._Mutation_addVideoResource(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "saveSubtitles":
+			out.Values[i] = ec._Mutation_saveSubtitles(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateVideo":
 			out.Values[i] = ec._Mutation_updateVideo(ctx, field)
 			if out.Values[i] == graphql.Null {
@@ -15487,11 +15583,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateEpisode":
 			out.Values[i] = ec._Mutation_updateEpisode(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "updateSubtitle":
-			out.Values[i] = ec._Mutation_updateSubtitle(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17454,6 +17545,10 @@ func (ec *executionContext) unmarshalNNewHistoryInput2githubᚗcomᚋ9d77vᚋpdc
 	return ec.unmarshalInputNewHistoryInput(ctx, v)
 }
 
+func (ec *executionContext) unmarshalNNewSaveSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSaveSubtitles(ctx context.Context, v interface{}) (model.NewSaveSubtitles, error) {
+	return ec.unmarshalInputNewSaveSubtitles(ctx, v)
+}
+
 func (ec *executionContext) unmarshalNNewSubtitle2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitle(ctx context.Context, v interface{}) (model.NewSubtitle, error) {
 	return ec.unmarshalInputNewSubtitle(ctx, v)
 }
@@ -17498,10 +17593,6 @@ func (ec *executionContext) unmarshalNNewUpdateProfile2githubᚗcomᚋ9d77vᚋpd
 	return ec.unmarshalInputNewUpdateProfile(ctx, v)
 }
 
-func (ec *executionContext) unmarshalNNewUpdateSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateSubtitles(ctx context.Context, v interface{}) (model.NewUpdateSubtitles, error) {
-	return ec.unmarshalInputNewUpdateSubtitles(ctx, v)
-}
-
 func (ec *executionContext) unmarshalNNewUpdateTelemetryModel2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateTelemetryModel(ctx context.Context, v interface{}) (model.NewUpdateTelemetryModel, error) {
 	return ec.unmarshalInputNewUpdateTelemetryModel(ctx, v)
 }
@@ -17532,6 +17623,10 @@ func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋ9d77vᚋpdcᚋgraph
 
 func (ec *executionContext) unmarshalNNewVideo2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewVideo(ctx context.Context, v interface{}) (model.NewVideo, error) {
 	return ec.unmarshalInputNewVideo(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewVideoResource2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewVideoResource(ctx context.Context, v interface{}) (model.NewVideoResource, error) {
+	return ec.unmarshalInputNewVideoResource(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewVideoSeries2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewVideoSeries(ctx context.Context, v interface{}) (model.NewVideoSeries, error) {
