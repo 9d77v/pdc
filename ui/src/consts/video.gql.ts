@@ -7,6 +7,23 @@ mutation createVideo($input:NewVideo!){
    }
 }
 `
+
+const ADD_VIDEO_RESOURCE = gql`
+mutation addVideoResource($input:NewVideoResource!){
+   addVideoResource(input:$input){
+     id
+   }
+}
+`
+
+const SAVE_SUBTITLES = gql`
+mutation saveSubtitles($input:NewSaveSubtitles!){
+  saveSubtitles(input:$input){
+     id
+   }
+}
+`
+
 const UPDATE_VIDEO = gql`
 mutation updateVideo($input:NewUpdateVideo!){
    updateVideo(input:$input){
@@ -26,14 +43,6 @@ mutation createEpisode($input:NewEpisode!){
 const UPDATE_EPISODE = gql`
 mutation updateEpisode($input:NewUpdateEpisode!){
    updateEpisode(input:$input){
-     id
-   }
-}
-`
-
-const UPDATE_SUBTITLE = gql`
-mutation updateSubtitle($input:NewUpdateSubtitles!){
-  updateSubtitle(input:$input){
      id
    }
 }
@@ -209,8 +218,9 @@ mutation updateVideoSeriesItem($input:NewUpdateVideoSeriesItem!){
 `
 
 export {
-  LIST_VIDEO, VIDEO_COMBO, ADD_VIDEO, UPDATE_VIDEO, ADD_EPISODE,
-  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, UPDATE_SUBTITLE,
+  ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES,
+  LIST_VIDEO, VIDEO_COMBO, UPDATE_VIDEO, ADD_EPISODE,
+  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO,
   UPDATE_MOBILE_VIDEO,
   LIST_VIDEO_SERIES, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
   ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM

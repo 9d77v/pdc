@@ -14,8 +14,7 @@ export const QRCodePage = (props: IQRCodeProps) => {
             onLeftClick={() => history.goBack()}
         >我的二维码</NavBar>
         <div style={{ marginTop: 200, display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <QRCode value={document.location.origin + "/card/" + props.text} size={256} />
+            <QRCode value={"pdc://" + document.location.host + "/card/" + props.text} size={256} />
         </div>
-
     </div>
 }

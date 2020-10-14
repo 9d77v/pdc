@@ -1,12 +1,12 @@
-import { Icon, NavBar, SegmentedControl } from 'antd-mobile'
+import { Icon, NavBar } from 'antd-mobile'
 import React, { useEffect, useState } from 'react'
 import QrReader from 'react-qr-reader'
 import { useHistory } from 'react-router-dom'
-
+import "../../../../style/button.less"
 export const Scanner = () => {
     const history = useHistory()
     const [result, setResult] = useState("")
-    const [selectIndex, setSelectIndex] = useState(0)
+    const [resultDiv, setResultDiv] = useState(<div />)
     const handleScan = (data: any) => {
         if (data) {
             setResult(data)
@@ -15,16 +15,33 @@ export const Scanner = () => {
     const handleError = (err: any) => {
         console.error(err)
     }
-    const onChange = (e: any) => {
-        setSelectIndex(e.nativeEvent.selectedSegmentIndex)
-    }
-
 
     useEffect(() => {
-        if (selectIndex === 0 && result !== "") {
-            history.push("/app/scanner/result?url=" + result)
+        if (result !== "") {
+            if (result.indexOf("pdc://") !== -1) {
+                const url = result.replace("pdc:", document.location.protocol)
+                const path = "/app/contact/addContact/" + btoa(url)
+                history.replace(path)
+            } else if (result.indexOf("http://") !== -1 || result.indexOf("https://") !== -1) {
+                setResultDiv(
+                    <div style={{
+                        display: "flex", flexDirection: "column",
+                        justifyContent: "center", alignItems: "center"
+                    }}>
+                        <div>{result}</div>
+                        <div className={"pdc-button"} onClick={() => {
+                            window.open(result, "_blank")
+                            history.goBack()
+                        }}>点击跳转</div>
+                    </div>
+                )
+            } else {
+                setResultDiv(
+                    <div>{result}</div>
+                )
+            }
         }
-    }, [selectIndex, result, history])
+    }, [result, history])
     return (
         <div style={{ height: "100%", textAlign: "center" }}>
             <NavBar
@@ -39,8 +56,7 @@ export const Scanner = () => {
                 style={{ width: '100%' }}
             />
             <div>将二维码放入框内</div>
-            <SegmentedControl values={['默认', '显示文本']} onChange={onChange} />
-            {selectIndex === 1 ? <p>{result}</p> : ""}
+            {resultDiv}
         </div>
     )
 }
