@@ -20,6 +20,20 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
         wrapperCol: { span: 16 },
     }
 
+    const onOK = () => {
+        form.setFieldsValue({
+            "subtitles": subtitles
+        })
+        form
+            .validateFields()
+            .then((values: any) => {
+                form.resetFields();
+                onUpdate(values);
+            })
+            .catch(info => {
+                console.log('Validate Failed:', info);
+            })
+    }
     return (
         <Modal
             visible={visible}
@@ -35,18 +49,14 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
             }
             getContainer={false}
             onOk={() => {
-                form.setFieldsValue({
-                    "subtitles": subtitles
-                })
-                form
-                    .validateFields()
-                    .then((values: any) => {
-                        form.resetFields();
-                        onUpdate(values);
+                if (subtitles.length === 0) {
+                    Modal.confirm({
+                        title: "当前字幕为空，确认要清空字幕吗",
+                        onOk: onOK
                     })
-                    .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                } else {
+                    onOK()
+                }
             }}
             maskClosable={false}
         >

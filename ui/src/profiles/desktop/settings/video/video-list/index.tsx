@@ -1,9 +1,9 @@
 import { Table, Button, message, Tag, Modal } from 'antd';
 import React, { useState, useEffect } from 'react'
 import {
-    LIST_VIDEO, ADD_VIDEO, UPDATE_VIDEO,
+    LIST_VIDEO, UPDATE_VIDEO,
     ADD_EPISODE, UPDATE_EPISODE,
-    UPDATE_SUBTITLE, UPDATE_MOBILE_VIDEO
+    SAVE_SUBTITLES, UPDATE_MOBILE_VIDEO
 } from '../../../../../consts/video.gql';
 import { useQuery } from '@apollo/react-hooks';
 import { useMutation } from '@apollo/react-hooks';
@@ -136,11 +136,10 @@ export default function VideoTable() {
         visible: false
     })
     const [keyword, setKeyword] = useState("")
-    const [addVideo] = useMutation(ADD_VIDEO);
     const [updateVideo] = useMutation(UPDATE_VIDEO)
     const [addEpisode] = useMutation(ADD_EPISODE)
     const [updateEpisode] = useMutation(UPDATE_EPISODE)
-    const [updateSubtitle] = useMutation(UPDATE_SUBTITLE)
+    const [saveSubtitles] = useMutation(SAVE_SUBTITLES)
     const [updateMobileVideo] = useMutation(UPDATE_MOBILE_VIDEO)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
@@ -161,31 +160,6 @@ export default function VideoTable() {
             message.error("接口请求失败！")
         }
     }, [error])
-
-    const onVideoCreate = async (values: any) => {
-        let subtitles = undefined
-        if (values.subtitles && values.subtitles.length > 0) {
-            subtitles = {
-                "name": values.subtitle_lang,
-                "urls": values.subtitles
-            }
-        }
-        await addVideo({
-            variables: {
-                "input": {
-                    "title": values.title,
-                    "desc": values.desc,
-                    "cover": values.cover,
-                    "pubDate": values.pubDate ? values.pubDate.unix() : 0,
-                    "tags": values.tags || [],
-                    "isShow": values.isShow,
-                    "videoURLs": values.videoURLs,
-                    "subtitles": subtitles
-                }
-            }
-        });
-        await refetch()
-    };
 
     const onVideoUpdate = async (values: any) => {
         await updateVideo({
@@ -241,7 +215,7 @@ export default function VideoTable() {
     };
 
     const onSubtitleUpdate = async (values: any) => {
-        await updateSubtitle({
+        await saveSubtitles({
             variables: {
                 "input": {
                     "id": currentVideoID,

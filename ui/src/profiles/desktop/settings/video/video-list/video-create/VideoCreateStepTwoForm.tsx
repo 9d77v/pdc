@@ -1,4 +1,4 @@
-import { Form, message } from 'antd';
+import { Form } from 'antd';
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from '../../../../../../components/Uploader';
 
@@ -8,51 +8,34 @@ interface Values {
 }
 
 interface VideoCreateStepTwoFormProps {
+    id: number
     onCreate?: (values: Values) => void;
 }
 
-const VideoCreateStepTwoForm  =  (props:VideoCreateStepTwoFormProps,ref:  any)=>{
+const VideoCreateStepTwoForm = (props: VideoCreateStepTwoFormProps, ref: Ref<any>) => {
     const [form] = Form.useForm();
-    const onFinish = () => {
-        return form;
-      }
+    const getForm = () => {
+        return form
+    }
+    const getVideoURLs = () => {
+        return videoURLs
+    }
+    const resetVideoURLS = () => {
+        setVideoURLs([])
+    }
+    useImperativeHandle(ref, () => ({
+        getForm,
+        getVideoURLs,
+        resetVideoURLS
+    }))
 
-      useImperativeHandle(ref, () => ({
-        onFinish,
-      }));
-    const [url, setUrl] = useState("")
     const [videoURLs, setVideoURLs] = useState([])
-    const [subtitles, setSubtitles] = useState([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
-    const maxNum = 1
-    const videoPathPrefix = "desktop/" + maxNum.toString() + "/"
 
-    const create = () => {
-        form.setFieldsValue({
-            "cover": url,
-            "videoURLs": videoURLs,
-            "subtitles": subtitles
-        })
-        if (subtitles.length > 0 && videoURLs.length !== subtitles.length) {
-            message.error(`视频数量与字幕数量不一致,视频数量：${videoURLs.length},字幕数量：${subtitles.length}`);
-            return
-        }
-        form
-            .validateFields()
-            .then((values: any) => {
-                form.resetFields();
-                // onCreate(values);
-            })
-            .catch(info => {
-                console.log('Validate Failed:', info);
-            });
-        setUrl('')
-        setVideoURLs([])
-        setSubtitles([])
-    }
+    const videoPathPrefix = "desktop/" + props.id.toString() + "/"
     return (
         <Form
             {...layout}

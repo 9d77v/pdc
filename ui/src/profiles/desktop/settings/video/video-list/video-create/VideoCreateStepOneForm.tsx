@@ -13,47 +13,25 @@ interface VideoCreateStepOneFormProps {
     onCreate?: (values: Values) => void;
 }
 
-const VideoCreateStepOneForm  =  (props:VideoCreateStepOneFormProps,ref:  any)=>{
+const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any>) => {
     const [form] = Form.useForm();
-    const onFinish = () => {
-        form.setFieldsValue({
-            "cover": url,
-        })
-        form
-            .validateFields()
-            .then((values: any) => {
-                console.log(values)
-                // onCreate(values);
-            })
-            .catch(info => {
-                console.log('Validate Failed:', info);
-            })
-        return form;
-      }
+    const getForm = () => {
+        return form
+    }
+    const getURL = () => {
+        return url
+    }
+    useImperativeHandle(ref, () => ({
+        getForm,
+        getURL
+    }))
 
-      useImperativeHandle(ref, () => ({
-        onFinish,
-      }));
     const [url, setUrl] = useState("")
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
 
-    const create = () => {
-        form.setFieldsValue({
-            "cover": url,
-        })
-        form
-            .validateFields()
-            .then((values: any) => {
-                console.log(values)
-                // onCreate(values);
-            })
-            .catch(info => {
-                console.log('Validate Failed:', info);
-            })
-    }
     return (
         <Form
             {...layout}
