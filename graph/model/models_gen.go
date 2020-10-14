@@ -186,6 +186,11 @@ type NewHistoryInput struct {
 	RemainingTime float64 `json:"remainingTime"`
 }
 
+type NewSaveSubtitles struct {
+	ID        int64         `json:"id"`
+	Subtitles *NewSubtitles `json:"subtitles"`
+}
+
 type NewSubtitle struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
@@ -271,11 +276,6 @@ type NewUpdateProfile struct {
 	IP        *string `json:"ip"`
 }
 
-type NewUpdateSubtitles struct {
-	ID        int64         `json:"id"`
-	Subtitles *NewSubtitles `json:"subtitles"`
-}
-
 type NewUpdateTelemetryModel struct {
 	ID       int64   `json:"id"`
 	Name     string  `json:"name"`
@@ -347,14 +347,17 @@ type NewUser struct {
 }
 
 type NewVideo struct {
-	Title     string        `json:"title"`
-	Desc      *string       `json:"desc"`
-	PubDate   *int64        `json:"pubDate"`
-	Cover     *string       `json:"cover"`
-	Tags      []string      `json:"tags"`
-	IsShow    bool          `json:"isShow"`
-	VideoURLs []string      `json:"videoURLs"`
-	Subtitles *NewSubtitles `json:"subtitles"`
+	Title   string   `json:"title"`
+	Desc    *string  `json:"desc"`
+	PubDate *int64   `json:"pubDate"`
+	Cover   *string  `json:"cover"`
+	Tags    []string `json:"tags"`
+	IsShow  bool     `json:"isShow"`
+}
+
+type NewVideoResource struct {
+	ID        int64    `json:"id"`
+	VideoURLs []string `json:"videoURLs"`
 }
 
 type NewVideoSeries struct {

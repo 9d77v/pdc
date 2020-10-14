@@ -37,43 +37,77 @@ func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*m
 		Tags:    input.Tags,
 		IsShow:  input.IsShow,
 	}
-	tx := models.Gorm.Begin()
-	err := tx.Create(m).Error
+	err := models.Gorm.Create(m).Error
 	if err != nil {
-		tx.Rollback()
 		return &model.Video{}, err
+	}
+	return &model.Video{ID: int64(m.ID)}, err
+}
+
+//AddVideoResource ..
+func (s VideoService) AddVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error) {
+	video := new(models.Video)
+	if err := models.Gorm.Select("id").
+		First(video, "id=?", input.ID).Error; err != nil {
+		return nil, err
 	}
 	episodes := make([]*models.Episode, 0, len(input.VideoURLs))
 	for i, url := range input.VideoURLs {
 		episodes = append(episodes, &models.Episode{
 			Num:     float64(i + 1),
-			VideoID: int64(m.ID),
+			VideoID: int64(input.ID),
 			URL:     url,
 		})
 	}
-	err = tx.Create(&episodes).Error
+	err := models.Gorm.Create(&episodes).Error
 	if err != nil {
-		tx.Rollback()
 		return &model.Video{}, err
 	}
-	if input.Subtitles != nil && len(input.Subtitles.Urls) > 0 {
-		subtitles := make([]*models.Subtitle, 0, len(input.Subtitles.Urls))
-		for i, v := range episodes {
-			subtitles = append(subtitles, &models.Subtitle{
-				EpisodeID: v.ID,
-				Name:      input.Subtitles.Name,
-				URL:       input.Subtitles.Urls[i],
-			})
+	sendMsgToUpdateES(input.ID)
+	return &model.Video{ID: int64(input.ID)}, nil
+}
+
+//SaveSubtitles ..
+func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubtitles) (*model.Video, error) {
+	data := make([]*models.Episode, 0)
+	if err := models.Gorm.Select("id").Preload("Subtitles", "name=?", input.Subtitles.Name).
+		Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
+		return nil, err
+	}
+	if len(input.Subtitles.Urls) == 0 {
+		ids := make([]uint, 0, len(data))
+		for _, v := range data {
+			ids = append(ids, v.ID)
 		}
-		err = tx.Create(&subtitles).Error
+		err := models.Gorm.Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).Delete(&models.Subtitle{}).Error
 		if err != nil {
-			tx.Rollback()
-			return &model.Video{}, err
+			return nil, err
+		}
+	} else {
+		if len(input.Subtitles.Urls) != len(data) {
+			return nil, errors.New("视频与字幕数量不一致")
+		}
+		subtitles := make([]*models.Subtitle, 0, 0)
+		for i, d := range data {
+			if len(d.Subtitles) == 0 {
+				subtitles = append(subtitles, &models.Subtitle{
+					EpisodeID: d.ID,
+					Name:      input.Subtitles.Name,
+					URL:       input.Subtitles.Urls[i],
+				})
+			} else {
+				if d.Subtitles[0].URL != input.Subtitles.Urls[i] {
+					d.Subtitles[0].URL = input.Subtitles.Urls[i]
+					subtitles = append(subtitles, d.Subtitles[0])
+				}
+			}
+		}
+		err := models.Gorm.Save(&subtitles).Error
+		if err != nil {
+			return nil, err
 		}
 	}
-	tx.Commit()
-	sendMsgToUpdateES(int64(m.ID))
-	return &model.Video{ID: int64(m.ID)}, err
+	return &model.Video{ID: int64(input.ID)}, nil
 }
 
 //UpdateVideo ..
@@ -140,7 +174,7 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 //UpdateEpisode ..
 func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
-	if err := models.Gorm.Select("id").First(episode, "id=?", input.ID).Error; err != nil {
+	if err := models.Gorm.Select("id,video_id").First(episode, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -184,56 +218,12 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 	return &model.Episode{ID: int64(episode.ID)}, err
 }
 
-//UpdateSubtitle ..
-func (s VideoService) UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error) {
-	data := make([]*models.Episode, 0)
-	if err := models.Gorm.Select("id").Preload("Subtitles", "name=?", input.Subtitles.Name).
-		Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
-		return nil, err
-	}
-	if len(input.Subtitles.Urls) == 0 {
-		ids := make([]uint, 0, len(data))
-		for _, v := range data {
-			ids = append(ids, v.ID)
-		}
-		err := models.Gorm.Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).Delete(&models.Subtitle{}).Error
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		if len(input.Subtitles.Urls) != len(data) {
-			return nil, errors.New("视频与字幕数量不一致")
-		}
-		subtitles := make([]*models.Subtitle, 0, 0)
-		for i, d := range data {
-			if len(d.Subtitles) == 0 {
-				subtitles = append(subtitles, &models.Subtitle{
-					EpisodeID: d.ID,
-					Name:      input.Subtitles.Name,
-					URL:       input.Subtitles.Urls[i],
-				})
-			} else {
-				if d.Subtitles[0].URL != input.Subtitles.Urls[i] {
-					d.Subtitles[0].URL = input.Subtitles.Urls[i]
-					subtitles = append(subtitles, d.Subtitles[0])
-				}
-			}
-		}
-		err := models.Gorm.Save(&subtitles).Error
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &model.Video{ID: int64(input.ID)}, nil
-}
-
 //UpdateMobileVideo ..
 func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error) {
 	data := make([]*models.Episode, 0)
 	if err := models.Gorm.Select("id,subtitles").Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
 		return nil, err
 	}
-	tx := models.Gorm.Begin()
 	if len(input.VideoURLs) > 0 && len(input.VideoURLs) != len(data) {
 		return nil, errors.New("移动端视频与已有视频数量不一致")
 	}
@@ -243,7 +233,6 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 				"mobile_url": "",
 			}).Error
 			if err != nil {
-				tx.Rollback()
 				return nil, err
 			}
 		}
@@ -253,12 +242,10 @@ func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpd
 				"mobile_url": input.VideoURLs[i],
 			}).Error
 			if err != nil {
-				tx.Rollback()
 				return nil, err
 			}
 		}
 	}
-	tx.Commit()
 	return &model.Video{ID: int64(input.ID)}, nil
 }
 

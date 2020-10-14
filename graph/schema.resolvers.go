@@ -5,7 +5,6 @@ package graph
 
 import (
 	"context"
-	"errors"
 
 	"github.com/9d77v/pdc/dtos"
 	"github.com/9d77v/pdc/graph/generated"
@@ -40,10 +39,15 @@ func (r *mutationResolver) RefreshToken(ctx context.Context, refreshToken string
 }
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
-	if len(input.VideoURLs) > 0 && input.Subtitles != nil && len(input.Subtitles.Urls) > 0 && len(input.VideoURLs) != len(input.Subtitles.Urls) {
-		return nil, errors.New("视频与字幕数量不一致")
-	}
 	return videoService.CreateVideo(ctx, input)
+}
+
+func (r *mutationResolver) AddVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error) {
+	return videoService.AddVideoResource(ctx, input)
+}
+
+func (r *mutationResolver) SaveSubtitles(ctx context.Context, input model.NewSaveSubtitles) (*model.Video, error) {
+	return videoService.SaveSubtitles(ctx, input)
 }
 
 func (r *mutationResolver) UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error) {
@@ -56,10 +60,6 @@ func (r *mutationResolver) CreateEpisode(ctx context.Context, input model.NewEpi
 
 func (r *mutationResolver) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
 	return videoService.UpdateEpisode(ctx, input)
-}
-
-func (r *mutationResolver) UpdateSubtitle(ctx context.Context, input model.NewUpdateSubtitles) (*model.Video, error) {
-	return videoService.UpdateSubtitle(ctx, input)
 }
 
 func (r *mutationResolver) UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error) {
