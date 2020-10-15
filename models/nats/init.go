@@ -27,11 +27,12 @@ const (
 
 //device subject
 const (
-	SubjectDevice          = "device.config"
-	SubjectDeviceData      = "device.data"
-	GroupDevice            = "group.device"
-	GroupSaveDeviceData    = "group.device.data.save"
-	GroupPublishDeviceData = "group.device.data.pub"
+	SubjectDeviceData            = "device.data"
+	SubjectDeviceTelemetryPrefix = "device.telemetry."
+	SubjectDeviceHealthPrefix    = "device.health."
+	GroupDevice                  = "group.device"
+	GroupSaveDeviceData          = "group.device.data.save"
+	GroupPublishDeviceData       = "group.device.data.pub"
 )
 
 func init() {

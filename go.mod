@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/99designs/gqlgen v0.11.3
 	github.com/9d77v/go-lib v0.0.3
-	github.com/9d77v/wspush v0.0.1
+	github.com/9d77v/wspush v0.0.4
 	github.com/ClickHouse/clickhouse-go v1.4.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis/v8 v8.0.0-beta.10

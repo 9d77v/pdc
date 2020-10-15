@@ -4,8 +4,8 @@ github.com/99designs/gqlgen v0.11.3 h1:oFSxl1DFS9X///uHV3y6CEfpcXWrDUxVblR4Xib2b
 github.com/99designs/gqlgen v0.11.3/go.mod h1:RgX5GRRdDWNkh4pBrdzNpNPFVsdoUFY2+adM6nb1N+4=
 github.com/9d77v/go-lib v0.0.3 h1:q+m8PaKrQQliTAptm31YbRLE/CcrgUfdydQh2Ymh6+0=
 github.com/9d77v/go-lib v0.0.3/go.mod h1:Wub17MIhONdXEJ6LUsTKY96bvL6Xh1QgM+UPFRZtlA8=
-github.com/9d77v/wspush v0.0.1 h1:yCNCF10BTapazeHEvtw8RvkErwy1aKXn/0tXzyTTXWE=
-github.com/9d77v/wspush v0.0.1/go.mod h1:2cfIQzJjacwfp5/QCToNv69oe0DzLRfd34gF0CepuVw=
+github.com/9d77v/wspush v0.0.4 h1:ah4btdoIDexNhk7nkRwN32PPrfss4fqTLJCLXzg6YKU=
+github.com/9d77v/wspush v0.0.4/go.mod h1:2cfIQzJjacwfp5/QCToNv69oe0DzLRfd34gF0CepuVw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/ClickHouse/clickhouse-go v1.4.3 h1:iAFMa2UrQdR5bHJ2/yaSLffZkxpcOYQMCUuKeNXGdqc=

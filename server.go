@@ -36,8 +36,8 @@ func main() {
 	mux.Handle("/api", middleware.Auth()(apiHandler))
 	mux.HandleFunc("/card/", middleware.HandleCard())
 	mux.HandleFunc("/ws/iot/device", middleware.HandleIotDevice())
-	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel())
-	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel())
+	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel(nats.SubjectDeviceTelemetryPrefix, middleware.CheckToken))
+	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel(nats.SubjectDeviceHealthPrefix, middleware.CheckToken))
 	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "ui/build/index.html")
 	})
