@@ -144,7 +144,7 @@ func (sdk *IotSDK) SetDeviceTelemetries(telemetryMap map[uint32]float64, now *ti
 	}
 	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
 	if err != nil {
-		log.Printf("SetDeviceTelemetries error:%v/n", err)
+		log.Panicf("SetDeviceTelemetries error:%v/n", err)
 	}
 }
 
@@ -161,7 +161,7 @@ func (sdk *IotSDK) setDeviceHealth(health uint32, now *timestamppb.Timestamp) {
 	}
 	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
 	if err != nil {
-		log.Printf("SetDeviceHealth error:%v/n", err)
+		log.Panicf("SetDeviceHealth error:%v/n", err)
 	}
 }
 

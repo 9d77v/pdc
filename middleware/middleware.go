@@ -234,3 +234,24 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+//CheckToken ..
+func CheckToken(accessToken string) bool {
+	//token验证
+	if accessToken == "" {
+		return false
+	}
+	token, err := utils.ParseJWT([]byte(models.JWTtAccessSecret), accessToken)
+	if err != nil {
+		return false
+	}
+	data, _ := token.Claims.(*utils.MyCustomClaims)
+	if data.Issuer != models.JWTIssuer {
+		return false
+	}
+	_, err = userService.GetByID(context.Background(), data.UID)
+	if err != nil {
+		return false
+	}
+	return true
+}
