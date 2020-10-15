@@ -9,7 +9,7 @@ import { DeleteOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons
 import { IUpdateDeviceDashboard, DeviceDashboardUpdateForm } from './DeviceDashboardUpdateForm';
 import { pb } from '../../../../../pb/compiled';
 import useWebSocket from 'react-use-websocket';
-import { deviceTelemetryPrefix, iotTelemetrySocketURL } from '../../../../../utils/ws_client';
+import { iotTelemetrySocketURL } from '../../../../../utils/ws_client';
 import { blobToArrayBuffer } from '../../../../../utils/file';
 import { DeviceDashboardTelemetryAddForm, INewDeviceDashboardTelemetry } from './DeviceDashboardTelemetryAddForm';
 
@@ -133,6 +133,9 @@ export default function DeviceDashboardList() {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
         share: true,
+        queryParams: {
+            'token': localStorage.getItem('accessToken') || "",
+        },
         reconnectAttempts: 720
     })
 
@@ -140,7 +143,7 @@ export default function DeviceDashboardList() {
         let telemetries: string[] = []
         for (let element of data ? data.deviceDashboards.edges : []) {
             for (let t of element.telemetries) {
-                telemetries.push(deviceTelemetryPrefix + "." + t.deviceID + "." + t.telemetryID)
+                telemetries.push(t.deviceID + "." + t.telemetryID)
             }
         }
         if (telemetries.length > 0) {
