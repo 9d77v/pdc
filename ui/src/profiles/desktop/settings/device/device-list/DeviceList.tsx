@@ -9,7 +9,7 @@ import { EditOutlined } from '@ant-design/icons';
 import { IUpdateDevice, DeviceUpdateForm } from './DeviceUpdateForm';
 import { pb } from '../../../../../pb/compiled';
 import useWebSocket from 'react-use-websocket';
-import { deviceHealthPrefix, iotHealthSocketURL } from '../../../../../utils/ws_client';
+import { iotHealthSocketURL } from '../../../../../utils/ws_client';
 import { blobToArrayBuffer } from '../../../../../utils/file';
 
 interface IDeviceListProps {
@@ -102,6 +102,9 @@ export const DeviceList = (props: IDeviceListProps) => {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
         share: true,
+        queryParams: {
+            'token': localStorage.getItem('accessToken') || "",
+        },
         reconnectAttempts: 720
     });
     useEffect(() => {
@@ -109,7 +112,7 @@ export const DeviceList = (props: IDeviceListProps) => {
         if (tempData.length > 0) {
             let subscribeStr = ""
             for (const d of tempData) {
-                subscribeStr += deviceHealthPrefix + "." + d.id + ";"
+                subscribeStr += d.id + ";"
             }
             sendMessage(subscribeStr);
         }

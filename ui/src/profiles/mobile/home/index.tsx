@@ -3,7 +3,7 @@ import { Route } from "react-router-dom";
 import { GET_MOBILE_HOME_DEVICES } from "../../../consts/device.gql";
 import { useQuery } from "@apollo/react-hooks";
 import useWebSocket from "react-use-websocket";
-import { deviceTelemetryPrefix, iotTelemetrySocketURL } from "../../../utils/ws_client";
+import { iotTelemetrySocketURL } from "../../../utils/ws_client";
 import { pb } from "../../../pb/compiled";
 import "../../../style/card.less"
 import { blobToArrayBuffer } from "../../../utils/file";
@@ -54,7 +54,11 @@ export default function HomeIndex() {
     } = useWebSocket(iotTelemetrySocketURL, {
         onOpen: () => () => { console.log('opened') },
         shouldReconnect: (closeEvent) => true,
+        queryParams: {
+            'token': localStorage.getItem('accessToken') || "",
+        },
         share: true,
+        reconnectAttempts: 720
     })
 
 
@@ -62,7 +66,7 @@ export default function HomeIndex() {
         let telemetries: string[] = []
         for (let element of data ? data.deviceDashboards.edges : []) {
             for (let t of element.telemetries) {
-                telemetries.push(deviceTelemetryPrefix + "." + t.deviceID + "." + t.telemetryID)
+                telemetries.push(t.deviceID + "." + t.telemetryID)
             }
         }
         if (telemetries.length > 0) {
