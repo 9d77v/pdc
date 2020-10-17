@@ -10,7 +10,7 @@ import { NewUser } from '../desktop/settings/user/UserCreateForm';
 import { UpdateProfileForm } from './me/UpdateFrofileForm';
 import UpdatePasswordForm from './me/UpdatePasswordForm';
 import HomeNavBar from './home/HomeNavBar';
-import { Scanner } from './home/scanner/Scanner';
+import { Scanner } from './home/scanner';
 import { QRCodePage } from './me/QRCodePage';
 import { AddFriendPage } from './contact/AddFriendPage';
 
@@ -62,10 +62,10 @@ export default function MobileIndex() {
                 <UpdatePasswordForm />
             </Route>
             <Route exact path="/app/user/qrcode"  >
-                <QRCodePage text={user ? user.id.toString() : ""} />
+                <QRCodePage user={user} />
             </Route>
             <Route exact path="/app/scanner"  >
-                <Scanner />
+                <Scanner user={user} />
             </Route>
             <Route exact path="/app/contact/addContact/:url"  >
                 <AddFriendPage />
@@ -119,10 +119,7 @@ export default function MobileIndex() {
                     }}
                 >
                     <Route exact path="/app/user"  >
-                        <MeIndex
-                            uid={user ? user.id : 0}
-                            name={user ? user.name.toString() : ""}
-                            avatar={user ? user.avatar.toString() : ""} />
+                        <MeIndex user={user} />
                     </Route>
                 </TabBar.Item>
             </TabBar>

@@ -4,6 +4,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import "../../../style/list.less"
+import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 export const AddFriendPage = () => {
     const params: any = useParams()
     const history = useHistory()
@@ -11,7 +12,8 @@ export const AddFriendPage = () => {
         "uid": 0,
         "host": "",
         "name": "",
-        "avatar": ""
+        "avatar": "",
+        "gender": undefined
     })
     const url = atob(params.url)
     useEffect(() => {
@@ -28,6 +30,7 @@ export const AddFriendPage = () => {
                     "uid": uid,
                     "host": host,
                     "name": response.data.name,
+                    "gender": response.data.gender,
                     "avatar": response.data.avatar
                 })
             })
@@ -45,12 +48,20 @@ export const AddFriendPage = () => {
             <WhiteSpace size="lg" />
             <Card>
                 <Card.Header
-                    title={data.name}
-                    thumb={<Avatar style={{
-                        backgroundColor: "#00a2ae",
-                        marginLeft: 20,
-                        marginRight: 20
-                    }} size={80} gap={1} src={data.name} >{data.name}</Avatar>}
+                    thumb={
+                        <div style={{ display: "flex", flexDirection: "row" }}>
+                            <Avatar style={{
+                                backgroundColor: "#00a2ae",
+                                marginLeft: 20,
+                                marginRight: 20
+                            }} size={80} gap={1} src={data.name} >{data.name}</Avatar>
+                            <div style={{ display: "flex", padding: 20 }}>
+                                <div style={{ fontSize: 36 }}> {data.name}</div>
+                                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", paddingLeft: 10 }}>
+                                    {data.gender === 0 ? <ManOutlined style={{ color: "blue" }} /> : <WomanOutlined style={{ color: "pink" }} />}
+                                </div>
+                            </div>
+                        </div>}
                 />
                 <Card.Body>
                     <List >

@@ -15,7 +15,7 @@ const devServerConfig = () => config => {
                 changeOrigin: true,
                 secure: false
             },
-            '/card': {
+            '/pdc': {
                 target: target,
                 changeOrigin: true,
                 secure: false
