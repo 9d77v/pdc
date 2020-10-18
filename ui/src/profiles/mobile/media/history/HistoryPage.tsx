@@ -53,9 +53,10 @@ export default function HistoryPage() {
         <NavBar
             mode="light"
             icon={<Icon type="left" />}
+            style={{ position: "fixed", width: "100%", zIndex: 10 }}
             onLeftClick={() => history.goBack()}
         >最近播放</NavBar>
-        <div >
+        <div style={{ marginTop: 45 }}>
             {options}
         </div>
     </div >)

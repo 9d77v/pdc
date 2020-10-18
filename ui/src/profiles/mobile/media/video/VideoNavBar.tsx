@@ -25,6 +25,7 @@ export default function VideoNavBar() {
     return (
         <NavBar
             mode="light"
+            style={{ position: "fixed", width: "100%", zIndex: 10, top: 0 }}
             icon={<Icon type="left" />}
             onLeftClick={() => history.goBack()}
             rightContent={

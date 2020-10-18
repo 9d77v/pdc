@@ -76,7 +76,7 @@ export default function VideoList() {
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <div style={{ marginTop: 45, display: "flex", flexDirection: "column", width: "100%" }}>
             <SearchBar
                 placeholder="搜索"
                 onSubmit={(value: any) => setPagination({
@@ -108,7 +108,7 @@ export default function VideoList() {
                     </CheckableTag>
                 ))}
             </div>
-            <div>
+            <div style={{ flex: 1, width: "100%" }}>
                 {cards}
             </div>
         </div>

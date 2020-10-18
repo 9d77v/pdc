@@ -52,7 +52,7 @@ export default function MobileIndex() {
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
             <Route exact path="/app/media/videos">
-                <div style={{ height: "100%", textAlign: "center" }}>
+                <div style={{ height: "100%", overflowY: "auto" }}>
                     <VideoNavBar />
                     <VideoList />
                 </div>
