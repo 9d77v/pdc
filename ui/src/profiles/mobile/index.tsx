@@ -1,6 +1,6 @@
 import { TabBar } from 'antd-mobile';
 import React, { useState, useEffect } from 'react';
-import { UserOutlined, HomeOutlined, PlaySquareOutlined } from '@ant-design/icons';
+import { UserOutlined, HomeOutlined, MessageOutlined } from '@ant-design/icons';
 
 import "./index.less"
 import { useHistory, Route, useLocation } from 'react-router-dom';
@@ -10,16 +10,18 @@ import { NewUser } from '../desktop/settings/user/UserCreateForm';
 import { UpdateProfileForm } from './me/UpdateFrofileForm';
 import UpdatePasswordForm from './me/UpdatePasswordForm';
 import HomeNavBar from './home/HomeNavBar';
-import { Scanner } from './home/scanner/Scanner';
+import { Scanner } from './home/scanner';
 import { QRCodePage } from './me/QRCodePage';
 import { AddFriendPage } from './contact/AddFriendPage';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
+const MessageIndex = React.lazy(() => import('./message'))
 const VideoDetail = React.lazy(() => import('./media/video/VideoDetail'))
 const VideoList = React.lazy(() => import('./media/video/VideoList'))
 const VideoNavBar = React.lazy(() => import('./media/video/VideoNavBar'))
 const HistoryPage = React.lazy(() => import('./media/history/HistoryPage'))
+const DeviceIndex = React.lazy(() => import('./device'))
 
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
@@ -32,11 +34,11 @@ export default function MobileIndex() {
     useEffect(() => {
         let isHome = true
         switch (location.pathname) {
-            case "/app/media/videos":
-                setSelectedTab("mediaTab")
-                break
             case "/app/user":
                 setSelectedTab("meTab")
+                break
+            case "/app/msg":
+                setSelectedTab("msgTab")
                 break
             case "/app/home":
                 setSelectedTab("homeTab")
@@ -49,11 +51,20 @@ export default function MobileIndex() {
 
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
+            <Route exact path="/app/media/videos">
+                <div style={{ height: "100%", textAlign: "center" }}>
+                    <VideoNavBar />
+                    <VideoList />
+                </div>
+            </Route>
             <Route exact path="/app/media/videos/:id"  >
                 <VideoDetail />
             </Route>
             <Route exact path="/app/media/history"  >
                 <HistoryPage />
+            </Route>
+            <Route exact path="/app/device"  >
+                <DeviceIndex />
             </Route>
             <Route exact path="/app/user/profile"  >
                 <UpdateProfileForm user={user} />
@@ -62,10 +73,10 @@ export default function MobileIndex() {
                 <UpdatePasswordForm />
             </Route>
             <Route exact path="/app/user/qrcode"  >
-                <QRCodePage text={user ? user.id.toString() : ""} />
+                <QRCodePage user={user} />
             </Route>
             <Route exact path="/app/scanner"  >
-                <Scanner />
+                <Scanner user={user} />
             </Route>
             <Route exact path="/app/contact/addContact/:url"  >
                 <AddFriendPage />
@@ -88,25 +99,25 @@ export default function MobileIndex() {
                     }}
                     data-seed="logId"
                 >  <HomeNavBar />
-                    <HomeIndex />
-                </TabBar.Item>
-                <TabBar.Item
-                    title="多媒体"
-                    key="media"
-                    icon={<PlaySquareOutlined />}
-                    selectedIcon={<PlaySquareOutlined style={{ color: "#85dbf5" }} />}
-                    selected={selectedTab === 'mediaTab'}
-                    onPress={() => {
-                        setSelectedTab('mediaTab')
-                        history.push('/app/media/videos')
-                    }}
-                    data-seed="logId"
-                >
-                    <Route exact path="/app/media/videos">
-                        <VideoNavBar />
-                        <VideoList />
+                    <Route exact path="/app/home">
+                        <HomeIndex />
                     </Route>
                 </TabBar.Item>
+                {/* <TabBar.Item
+                    icon={<MessageOutlined />}
+                    selectedIcon={<MessageOutlined style={{ color: "#85dbf5" }} />}
+                    title="消息"
+                    key="msg"
+                    selected={selectedTab === 'msgTab'}
+                    onPress={() => {
+                        setSelectedTab('msgTab')
+                        history.push('/app/msg')
+                    }}
+                >
+                    <Route exact path="/app/msg"  >
+                        <MessageIndex />
+                    </Route>
+                </TabBar.Item> */}
                 <TabBar.Item
                     icon={<UserOutlined />}
                     selectedIcon={<UserOutlined style={{ color: "#85dbf5" }} />}
@@ -119,10 +130,7 @@ export default function MobileIndex() {
                     }}
                 >
                     <Route exact path="/app/user"  >
-                        <MeIndex
-                            uid={user ? user.id : 0}
-                            name={user ? user.name.toString() : ""}
-                            avatar={user ? user.avatar.toString() : ""} />
+                        <MeIndex user={user} />
                     </Route>
                 </TabBar.Item>
             </TabBar>

@@ -22,31 +22,34 @@ export default function VideoNavBar() {
                 break
         }
     };
-    return (<NavBar
-        mode="light"
-        rightContent={
-            <Popover mask
-                visible={visible}
-                overlay={[
-                    (<Item key="1" icon={<HistoryOutlined />} >最近播放</Item>),
-                ]}
-                align={{
-                    overflow: { adjustY: 0, adjustX: 0 },
-                }}
-                onVisibleChange={handleVisibleChange}
-                onSelect={onSelect}
-            >
-                <div style={{
-                    height: '100%',
-                    padding: '0 15px',
-                    marginRight: '-15px',
-                    display: 'flex',
-                    alignItems: 'center',
-                }}
+    return (
+        <NavBar
+            mode="light"
+            icon={<Icon type="left" />}
+            onLeftClick={() => history.goBack()}
+            rightContent={
+                <Popover mask
+                    visible={visible}
+                    overlay={[
+                        (<Item key="1" icon={<HistoryOutlined />} >最近播放</Item>),
+                    ]}
+                    align={{
+                        overflow: { adjustY: 0, adjustX: 0 },
+                    }}
+                    onVisibleChange={handleVisibleChange}
+                    onSelect={onSelect}
                 >
-                    <Icon type="ellipsis" />
-                </div>
-            </Popover>
-        }
-    >视频列表 </NavBar>)
+                    <div style={{
+                        height: '100%',
+                        padding: '0 15px',
+                        marginRight: '-15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}
+                    >
+                        <Icon type="ellipsis" />
+                    </div>
+                </Popover>
+            }
+        >视频 </NavBar>)
 }

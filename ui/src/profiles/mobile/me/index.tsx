@@ -1,18 +1,17 @@
 import React from "react"
-import { Avatar } from 'antd';
 import { useHistory } from "react-router-dom";
 import { apolloClient } from "../../../utils/apollo_client";
 import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
 import { List } from "antd-mobile";
+import { UserBrief } from "../common/UserBrief";
+import { NewUser } from "../../desktop/settings/user/UserCreateForm";
 
-interface AppHeaderProps {
-    uid: number,
-    name: string;
-    avatar: string;
+interface IMeIndexProps {
+    user: NewUser
 }
 const Item = List.Item
 
-export default function MeIndex(props: AppHeaderProps) {
+export default function MeIndex(props: IMeIndexProps) {
     const history = useHistory();
     const logout = () => {
         localStorage.clear()
@@ -26,24 +25,7 @@ export default function MeIndex(props: AppHeaderProps) {
             flexDirection: "column", paddingTop: 20,
             backgroundColor: "#eee"
         }}>
-            <div style={{
-                display: "flex",
-                flexDirection: "row",
-                height: 80
-            }}
-                onClick={() => history.push("/app/user/profile")}
-            >
-                <Avatar style={{
-                    backgroundColor: "#00a2ae",
-                    marginLeft: 20,
-                    marginRight: 20
-                }} size={80} gap={1} src={props.avatar} >{props.name}</Avatar>
-
-                <div style={{ flex: 1, flexDirection: "column" }}>
-                    <div style={{ fontSize: 36 }}> {props.name}</div>
-                    <div style={{ fontSize: 16 }}>UID: {props.uid}</div>
-                </div>
-            </div>
+            <UserBrief user={props?.user} />
             <List renderHeader={() => ''}>
                 <Item
                     thumb={<QrcodeOutlined />}
