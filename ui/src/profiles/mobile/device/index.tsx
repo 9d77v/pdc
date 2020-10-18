@@ -115,35 +115,37 @@ export default function DeviceIndex() {
         <div style={{ height: "100%", textAlign: "center" }}>
             <NavBar
                 mode="light"
+                style={{ position: "fixed", width: "100%", zIndex: 10, top: 0 }}
                 icon={<Icon type="left" />}
                 onLeftClick={() => history.goBack()}
             >设备</NavBar>
-            <Grid data={dataResource}
-                columnNum={2}
-                renderItem={(dataItem: any) => {
-                    const cardItems = dataItem.telemetries.map((t: any) => {
-                        const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
-                        return <div key={t.telemetryID}>{t.name}: {value}{t.unit}</div>
-                    })
-                    return (<div key={dataItem.id}
-                        className="pdc-card-home"
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            padding: 10,
-                            opacity: 0.7,
-                            height: "100%",
-                            flexDirection: "column"
-                        }}>
-                        {dataItem.name}
-                        <div style={{
-                            textAlign: "left",
-                            paddingTop: 10
-                        }}>
-                            {cardItems}
-                        </div>
-                    </div>)
-                }}
-            />
+            <div style={{ marginTop: 45 }}>
+                <Grid data={dataResource}
+                    columnNum={2}
+                    renderItem={(dataItem: any) => {
+                        const cardItems = dataItem.telemetries.map((t: any) => {
+                            const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
+                            return <div key={t.telemetryID}>{t.name}: {value}{t.unit}</div>
+                        })
+                        return (<div key={dataItem.id}
+                            className="pdc-card-home"
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                padding: 10,
+                                opacity: 0.7,
+                                height: "100%",
+                                flexDirection: "column"
+                            }}>
+                            {dataItem.name}
+                            <div style={{
+                                textAlign: "left",
+                                paddingTop: 10
+                            }}>
+                                {cardItems}
+                            </div>
+                        </div>)
+                    }}
+                /></div>
         </div>)
 }
