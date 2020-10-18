@@ -26,7 +26,6 @@ export default function MeIndex(props: IMeIndexProps) {
             backgroundColor: "#eee"
         }}>
             <UserBrief user={props?.user} />
-
             <List renderHeader={() => ''}>
                 <Item
                     thumb={<QrcodeOutlined />}
