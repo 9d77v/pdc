@@ -80,7 +80,7 @@ export const UserCreateForm: React.FC<UserCreateFormProps> = ({
                 form={form}
                 layout="horizontal"
                 name="userCreateForm"
-                style={{ maxHeight: 600, overflowY: 'scroll' }}
+                style={{ maxHeight: 600, overflowY: 'auto' }}
                 initialValues={{ roleID: 3, gender: 0 }}
             >
                 <Form.Item

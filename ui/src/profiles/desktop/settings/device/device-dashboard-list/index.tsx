@@ -290,10 +290,16 @@ export default function DeviceDashboardList() {
                                     <div ><DeleteOutlined />删除</div>
                                 </Popconfirm>
                             ]}
-                            className={"pdc-card-home"}
-                            style={{ minHeight: 400, minWidth: 400, margin: 20, float: "left" }}
+                            className={"pdc-card-default"}
+                            style={{ margin: 20, float: "left", borderRadius: 40 }}
                         >
-                            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }} >
+                            <div style={{
+                                height: 400,
+                                width: 400,
+                                display: "flex",
+                                flexDirection: "column",
+                                overflowY: "auto"
+                            }} >
                                 <div >{item.name}</div>
                                 {telemetryList}
                             </div>

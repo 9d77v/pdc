@@ -11,6 +11,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["home"],
         "defaultSelectedKeys": ['home']
     }],
+    ["/app/device", {
+        "defaultOpenKeys": ["device"],
+        "defaultSelectedKeys": ['device']
+    }],
     ["/app/user/profile", {
         "defaultOpenKeys": ["user"],
         "defaultSelectedKeys": ['user-profile']
@@ -94,6 +98,9 @@ const AppMenu = (props: AppHeaderProps) => {
             <Menu.Item key="home">
                 <Link to="/app/home">首页</Link>
             </Menu.Item>
+            <Menu.Item key="device">
+                <Link to="/app/device">设备</Link>
+            </Menu.Item>
             <SubMenu
                 key="media"
                 style={{ display: roleID > 0 ? "block" : "none" }}
@@ -111,7 +118,7 @@ const AppMenu = (props: AppHeaderProps) => {
                     <Link to="/app/media/history">最近播放</Link>
                 </Menu.Item>
             </SubMenu>
-            <SubMenu
+            {/* <SubMenu
                 key="thing"
                 style={{ display: roleID >= 1 && roleID <= 3 ? "block" : "none" }}
                 title={
@@ -130,7 +137,7 @@ const AppMenu = (props: AppHeaderProps) => {
                 <Menu.Item key="thing-analysis">
                     <Link to="/app/thing/analysis">物品分析</Link>
                 </Menu.Item>
-            </SubMenu>
+            </SubMenu> */}
             <SubMenu
                 key="user"
                 title={

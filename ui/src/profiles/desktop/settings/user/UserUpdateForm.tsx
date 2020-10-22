@@ -102,7 +102,7 @@ export const UserUpdateForm: React.FC<UserUpdateFormProps> = ({
                 form={form}
                 layout="horizontal"
                 name="userUpdateForm"
-                style={{ maxHeight: 600, overflowY: 'scroll' }}
+                style={{ maxHeight: 600, overflowY: 'auto' }}
             >
                 <Form.Item
                     name="id"
