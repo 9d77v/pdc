@@ -5,6 +5,7 @@ import { useLocation, Link, useRouteMatch } from "react-router-dom";
 
 const breadcrumbNameMap = new Map<string, string>([
     ['/app/home', '首页'],
+    ['/app/device', '设备'],
     ['/app/user', '个人设置'],
     ['/app/user/profile', '个人资料'],
     ['/app/user/account', '账户安全'],

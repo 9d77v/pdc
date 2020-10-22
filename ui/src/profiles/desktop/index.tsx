@@ -13,6 +13,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { GET_USER } from '../../consts/user.gpl';
 import { NewUser } from './settings/user/UserCreateForm';
 import { UpdateProfileForm } from './user/UpdateFrofileForm';
+import AppDeviceIndex from './device';
 const VideoTable = React.lazy(() => import('./settings/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./settings/video/video-series-list'))
 const VideoCreateIndex = React.lazy(() => import('./settings/video/video-list/video-create'))
@@ -54,7 +55,10 @@ export default function DesktopIndex() {
                         <AppNavigator />
                         <div className={"wall"}>
                             <Route exact path="/app/home">
-                                欢迎使用{document.title}
+                                欢迎使用个人数据中心
+                            </Route>
+                            <Route exact path="/app/device">
+                                <AppDeviceIndex />
                             </Route>
                             <Route exact path="/app/media/videos/:id"  >
                                 <VideoDetail />

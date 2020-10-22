@@ -76,7 +76,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 form={form}
                 layout="horizontal"
                 name="thingCreateForm"
-                style={{ maxHeight: 600, overflowY: 'scroll' }}
+                style={{ maxHeight: 600, overflowY: 'auto' }}
                 initialValues={{ num: 1, unitPrice: 0, consumerExpenditure: "01", category: 0, status: 1, purchaseDate: dayjs() }}
             >
                 <Form.Item

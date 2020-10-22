@@ -118,7 +118,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
                 form={form}
                 layout="horizontal"
                 name="thingUpdateForm"
-                style={{ maxHeight: 600, overflowY: 'scroll' }}
+                style={{ maxHeight: 600, overflowY: 'auto' }}
                 initialValues={{ num: 1, unitPrice: 0, category: "01", rubbishCategory: [0], status: 1 }}
             >
                 <Form.Item
