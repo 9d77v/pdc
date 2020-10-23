@@ -11,11 +11,12 @@ import (
 	"strings"
 
 	"github.com/9d77v/pdc/dtos"
+	"github.com/9d77v/pdc/models"
 )
 
 //User public user info
 type User struct {
-	UID    uint   `json:"uid"`
+	UID    string `json:"uid"`
 	Avatar string `json:"avatar"`
 	Name   string `json:"name"`
 	Gender int    `json:"gender"`
@@ -38,7 +39,7 @@ func HandleCard() func(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println("get user error:", err)
 		}
-		user.UID = u.ID
+		user.UID = models.GetEncodeUID(u.ID)
 		scheme := req.Header.Get("X-Forwarded-Proto")
 		user.Avatar = dtos.GetOSSPrefix(scheme) + u.Avatar
 		user.Name = u.Name

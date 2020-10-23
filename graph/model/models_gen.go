@@ -452,6 +452,7 @@ type ThingConnection struct {
 
 type User struct {
 	ID        int64   `json:"id"`
+	UID       string  `json:"uid"`
 	Name      string  `json:"name"`
 	Avatar    *string `json:"avatar"`
 	RoleID    int64   `json:"roleID"`

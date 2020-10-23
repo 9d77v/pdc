@@ -52,7 +52,7 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 	if err != nil {
 		return &model.User{}, err
 	}
-	return &model.User{ID: int64(m.ID)}, err
+	return &model.User{UID: models.GetEncodeUID(m.ID)}, err
 }
 
 //UpdateUser ..
@@ -90,7 +90,7 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
-	return &model.User{ID: int64(user.ID)}, err
+	return &model.User{UID: models.GetEncodeUID(user.ID)}, err
 }
 
 //ListUser ..
@@ -164,8 +164,9 @@ func (s UserService) Login(ctx context.Context, username string, password string
 	if err != nil {
 		return res, errors.New("用户名或密码错误")
 	}
-	res.AccessToken = utils.JWT([]byte(models.JWTtAccessSecret), int64(user.ID), accessExpire, models.JWTIssuer)
-	res.RefreshToken = utils.JWT([]byte(models.JWTRefreshSecret), int64(user.ID), refreshExpire, models.JWTIssuer)
+	uid := models.GetEncodeUID(user.ID)
+	res.AccessToken = utils.JWT([]byte(models.JWTtAccessSecret), uid, accessExpire, models.JWTIssuer)
+	res.RefreshToken = utils.JWT([]byte(models.JWTRefreshSecret), uid, refreshExpire, models.JWTIssuer)
 	return res, nil
 }
 
@@ -226,7 +227,7 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
-	return &model.User{ID: int64(uid)}, err
+	return &model.User{UID: models.GetEncodeUID(uid)}, err
 }
 
 //UpdatePassword ..
@@ -258,5 +259,5 @@ func (s UserService) UpdatePassword(ctx context.Context, oldPassword string, new
 		log.Println("update password failed")
 		return nil, err
 	}
-	return &model.User{ID: int64(uid)}, nil
+	return &model.User{UID: models.GetEncodeUID(uid)}, err
 }

@@ -9,12 +9,6 @@ import (
 	hashids "github.com/speps/go-hashids"
 )
 
-const (
-	accessKeyLen = 12
-	secretKeyLen = 32
-	salt         = "pdc"
-)
-
 // RandString 生成随机字符串
 func RandString(len int) string {
 	bytes := make([]byte, len)
@@ -28,11 +22,11 @@ func RandString(len int) string {
 	return string(bytes)
 }
 
-//GenerateAccessKey ..
-func GenerateAccessKey(id uint) string {
+//GenerateHashID ..
+func GenerateHashID(id uint, salt string, length int) string {
 	hd := hashids.NewData()
 	hd.Salt = salt
-	hd.MinLength = accessKeyLen
+	hd.MinLength = length
 	h, err := hashids.NewWithData(hd)
 	if err != nil {
 		log.Println("NewWithData error:", err)
@@ -46,7 +40,25 @@ func GenerateAccessKey(id uint) string {
 	return e
 }
 
+//GetRawID ..
+func GetRawID(id string, salt string, length int) uint {
+	hd := hashids.NewData()
+	hd.Salt = salt
+	hd.MinLength = length
+	h, err := hashids.NewWithData(hd)
+	if err != nil {
+		log.Println("NewWithData error:", err)
+		return 0
+	}
+	nums, err := h.DecodeWithError(id)
+	if err != nil {
+		log.Println("hash encode error:", err)
+		return 0
+	}
+	return uint(nums[0])
+}
+
 //GenerateSecretKey ..
-func GenerateSecretKey() string {
-	return RandString(secretKeyLen)
+func GenerateSecretKey(length int) string {
+	return RandString(length)
 }

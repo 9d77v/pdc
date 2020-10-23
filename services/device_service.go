@@ -224,8 +224,8 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 		tx.Rollback()
 		return &model.Device{}, err
 	}
-	m.AccessKey = utils.GenerateAccessKey(m.ID)
-	m.SecretKey = utils.GenerateSecretKey()
+	m.AccessKey = models.GetDeviceAccessKey(m.ID)
+	m.SecretKey = models.GetDeviceSecretKey()
 	err = tx.Save(m).Error
 	if err != nil {
 		tx.Rollback()
