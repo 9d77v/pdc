@@ -10,6 +10,7 @@ import (
 	"github.com/9d77v/pdc/graph/generated"
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/middleware"
+	"github.com/9d77v/pdc/models"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -174,7 +175,10 @@ func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64,
 
 func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return dtos.ToUserDto(middleware.ForContext(ctx), scheme), nil
+	user := dtos.ToUserDto(middleware.ForContext(ctx), scheme)
+	user.UID = models.GetEncodeUID(uint(user.ID))
+	user.ID = 0
+	return user, nil
 }
 
 func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error) {

@@ -1,5 +1,6 @@
 type User {
 	id: ID!
+	uid: String!
 	name:String!
 	avatar: String
 	roleID: Int!  

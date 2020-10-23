@@ -86,6 +86,36 @@ var permissonMap = map[string][]int{
 	"deviceDashboards":               {models.RoleAdmin, models.RoleManager},
 }
 
+//Error ...
+type Error struct {
+	Message string   `json:"message"`
+	Path    []string `json:"path"`
+}
+
+//ErrorResponse ..
+type ErrorResponse struct {
+	Errors []*Error `json:"errors"`
+}
+
+//NewErrorResponse ..
+func NewErrorResponse(message, path string) *ErrorResponse {
+	res := new(ErrorResponse)
+	err := &Error{
+		Message: message,
+		Path:    []string{path},
+	}
+	res.Errors = []*Error{err}
+	return res
+}
+
+func resString(errRes *ErrorResponse) string {
+	ret, err := json.Marshal(errRes)
+	if err != nil {
+		log.Println("json marshal faield:", err)
+	}
+	return string(ret)
+}
+
 //Auth ..
 func Auth() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -93,7 +123,8 @@ func Auth() func(http.Handler) http.Handler {
 			if r.URL.Path == "/api" {
 				req, err := parseBody(r)
 				if err != nil {
-					http.Error(w, "Invalid request", http.StatusBadRequest)
+					w.Header().Set("Content-type", "application/json")
+					http.Error(w, resString(NewErrorResponse("Invalid request", r.URL.Path)), http.StatusBadRequest)
 					return
 				}
 				//不需要验证的方法
@@ -106,24 +137,29 @@ func Auth() func(http.Handler) http.Handler {
 				//token验证
 				accessToken := r.Header.Get("Authorization")
 				if accessToken == "" {
-					http.Error(w, "Invalid token", http.StatusUnauthorized)
+					w.Header().Set("Content-type", "application/json")
+					http.Error(w, resString(NewErrorResponse("Invalid token", r.URL.Path)), http.StatusUnauthorized)
 					return
 				}
 				accessToken = strings.TrimPrefix(accessToken, "Bearer ")
 				token, err := utils.ParseJWT([]byte(models.JWTtAccessSecret), accessToken)
 				if err != nil {
-					http.Error(w, "Invalid token", http.StatusUnauthorized)
+					w.Header().Set("Content-type", "application/json")
+					http.Error(w, resString(NewErrorResponse("Invalid token", r.URL.Path)), http.StatusUnauthorized)
 					return
 				}
 				data, _ := token.Claims.(*utils.MyCustomClaims)
 				if data.Issuer != models.JWTIssuer {
-					http.Error(w, "Invalid token", http.StatusUnauthorized)
+					w.Header().Set("Content-type", "application/json")
+					http.Error(w, resString(NewErrorResponse("Invalid token", r.URL.Path)), http.StatusUnauthorized)
 					return
 				}
-
-				user, err := userService.GetByID(r.Context(), data.UID)
+				//获取hash前用户id
+				uid := models.GetDecodeUID(data.UID)
+				user, err := userService.GetByID(r.Context(), int64(uid))
 				if err != nil {
-					http.Error(w, "Invalid token", http.StatusUnauthorized)
+					w.Header().Set("Content-type", "application/json")
+					http.Error(w, resString(NewErrorResponse("Invalid token", r.URL.Path)), http.StatusUnauthorized)
 					return
 				}
 				//权限校验
@@ -136,7 +172,8 @@ func Auth() func(http.Handler) http.Handler {
 					}
 				}
 				if !valid {
-					http.Error(w, "Permission denied", http.StatusForbidden)
+					w.Header().Set("Content-type", "application/json")
+					http.Error(w, resString(NewErrorResponse("Permission denied", r.URL.Path)), http.StatusForbidden)
 					return
 				}
 				ctx := context.WithValue(r.Context(), userCtxKey, user)
@@ -249,7 +286,8 @@ func CheckToken(accessToken string) bool {
 	if data.Issuer != models.JWTIssuer {
 		return false
 	}
-	_, err = userService.GetByID(context.Background(), data.UID)
+	uid := models.GetDecodeUID(data.UID)
+	_, err = userService.GetByID(context.Background(), int64(uid))
 	if err != nil {
 		return false
 	}

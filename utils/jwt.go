@@ -9,12 +9,12 @@ import (
 
 //MyCustomClaims jwt自定义内容
 type MyCustomClaims struct {
-	UID int64 `json:"uid"` //用户id
+	UID string `json:"uid"` //用户id
 	jwt.StandardClaims
 }
 
 //JWT 生成jwt字符串
-func JWT(signingKey []byte, uid int64, tokenExpire time.Duration, issuer string) string {
+func JWT(signingKey []byte, uid string, tokenExpire time.Duration, issuer string) string {
 	claims := MyCustomClaims{
 		uid,
 		jwt.StandardClaims{

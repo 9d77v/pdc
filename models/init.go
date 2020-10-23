@@ -46,6 +46,9 @@ var (
 
 	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
+
+	hashSecretUID      = utils.GetEnvStr("PDC_HASH_SECRET_UID", "asdfgh")
+	hashSecretDeviceID = utils.GetEnvStr("PDC_HASH_SECRET_DEVICE_ID", "zxcvbn")
 )
 
 var (
@@ -242,4 +245,35 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(int(config.MaxIdleConns))
 	sqlDB.SetMaxOpenConns(int(config.MaxOpenConns))
 	return db, err
+}
+
+const (
+	uidLength = 18
+)
+
+//GetEncodeUID ..
+func GetEncodeUID(id uint) string {
+	return utils.GenerateHashID(id, hashSecretUID, uidLength)
+}
+
+//GetDecodeUID ..
+func GetDecodeUID(id string) uint {
+	return utils.GetRawID(id, hashSecretUID, uidLength)
+}
+
+//hashid key length
+const (
+	accessKeyLen = 12
+	secretKeyLen = 32
+)
+
+//GetDeviceAccessKey ..
+func GetDeviceAccessKey(id uint) string {
+	return utils.GenerateHashID(id, hashSecretDeviceID, accessKeyLen)
+
+}
+
+//GetDeviceSecretKey ..
+func GetDeviceSecretKey() string {
+	return utils.GenerateSecretKey(secretKeyLen)
 }
