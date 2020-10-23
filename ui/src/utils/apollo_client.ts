@@ -54,23 +54,25 @@ const authLink = setContext(
         })
     })
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-    if (graphQLErrors) {
+    if (networkError) {
+        const err: any = networkError
+        if (err.statusCode === 401) {
+            localStorage.clear()
+            apolloClient.resetStore()
+            message.error("token失效，将回到登录页面")
+            setTimeout(() => {
+                window.location.href = "/login"
+            }, 2000)
+        } else if (err.statusCode === 403) {
+            message.error("无操作权限")
+        }
+    } else if (graphQLErrors) {
         graphQLErrors.map(({ message, locations, path }) =>
             msg.error(
                 `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
             ),
         )
     }
-    if (networkError) {
-        const err: any = networkError
-        if (err.statusCode === 401) {
-            localStorage.clear()
-            apolloClient.resetStore()
-            message.error("token失效，请刷新页面")
-        } else if (err.statusCode === 403) {
-            message.error("无操作权限")
-        }
-    };
 })
 export const apolloClient = new ApolloClient({
     link: from([

@@ -25,13 +25,13 @@ export default function MeIndex(props: IMeIndexProps) {
             flexDirection: "column", paddingTop: 20,
             backgroundColor: "#eee"
         }}>
-            <UserBrief user={props?.user} />
+            <UserBrief user={props?.user} host={document.location.host} />
             <List renderHeader={() => ''}>
                 <Item
                     thumb={<QrcodeOutlined />}
                     arrow="horizontal"
                     onClick={() => history.push("/app/user/qrcode")}
-                >我的二维码</Item>
+                >我的二维码名片</Item>
                 <Item
                     thumb={<LockOutlined />}
                     onClick={() => history.push("/app/user/account")}

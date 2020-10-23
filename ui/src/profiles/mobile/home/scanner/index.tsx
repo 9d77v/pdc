@@ -28,7 +28,7 @@ export const Scanner = (props: IScannerProps) => {
             if (result.indexOf("/pdc/") !== -1) {
                 const arr = result.split("/")
                 const id = arr[arr.length - 1]
-                if (Number(id) !== props.user.id) {
+                if (id !== props.user.uid) {
                     setResultDiv(
                         <Button type="primary" onClick={() => {
                             const path = "/app/contact/addContact/" + btoa(result)

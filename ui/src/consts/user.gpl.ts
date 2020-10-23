@@ -3,14 +3,14 @@ import gql from 'graphql-tag';
 const ADD_USER = gql`
 mutation createUser($input:NewUser!){
    createUser(input:$input){
-     id
+     uid
    }
 }
 `
 const UPDATE_USER = gql`
 mutation updateUser($input:NewUpdateUser!){
    updateUser(input:$input){
-     id
+     uid
    }
 }
 `
@@ -37,7 +37,7 @@ const LIST_USER = gql`
 const GET_USER = gql`
  query userInfo($uid:ID) {
    userInfo(uid:$uid){
-      id
+      uid
       name
       avatar
       roleID
@@ -70,14 +70,14 @@ mutation refreshToken($refreshToken:String!){
 const UPDATE_PROFILE = gql`
 mutation updateProfile($input:NewUpdateProfile!){
    updateProfile(input:$input){
-      id
+      uid
    }
 }
 `
 const UPDATE_PASSWORD = gql`
 mutation updatePassword($oldPassword:String!,$newPassword:String!){
    updatePassword(oldPassword:$oldPassword,newPassword:$newPassword){
-      id
+      uid
    }
 }
 `
