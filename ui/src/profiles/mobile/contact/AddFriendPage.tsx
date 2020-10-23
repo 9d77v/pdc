@@ -9,7 +9,7 @@ export const AddFriendPage = () => {
     const params: any = useParams()
     const history = useHistory()
     const [data, setData] = useState({
-        "uid": 0,
+        "uid": "",
         "host": "",
         "name": "",
         "avatar": "",
@@ -17,11 +17,11 @@ export const AddFriendPage = () => {
     })
     const url = atob(params.url)
     useEffect(() => {
-        let uid: number = 0
+        let uid: string = ""
         let host: string = ""
         const arr = url.split("/", -1)
         if (arr.length === 5) {
-            uid = Number(arr[4])
+            uid = arr[4]
             host = arr[2]
         }
         axios.get(url)
