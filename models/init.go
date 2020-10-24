@@ -48,7 +48,10 @@ var (
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
 
 	hashSecretUID      = utils.GetEnvStr("PDC_HASH_SECRET_UID", "asdfgh")
+	hashUIDLength      = utils.GetEnvInt("PDC_HASH_UID_LENGTH", 12)
 	hashSecretDeviceID = utils.GetEnvStr("PDC_HASH_SECRET_DEVICE_ID", "zxcvbn")
+	accessKeyLen       = utils.GetEnvInt("PDC_DEVICE_ACCESS_KEY_LENGTH", 12)
+	secretKeyLen       = utils.GetEnvInt("PDC_DEVICE_SECRET_KEY_LENGTH", 32)
 )
 
 var (
@@ -76,10 +79,23 @@ const (
 )
 
 func init() {
+	checkEnv()
 	initDB()
 	initDBData()
 	initMinio()
 	initRedis()
+}
+
+func checkEnv() {
+	if hashUIDLength < 10 {
+		log.Panicln("PDC_HASH_UID_LENGTH should longer than or equal to 10")
+	}
+	if accessKeyLen < 10 {
+		log.Panicln("PDC_DEVICE_ACCESS_KEY_LENGTH should longer than or equal to 10")
+	}
+	if secretKeyLen < 20 {
+		log.Panicln("PDC_DEVICE_SECRET_KEY_LENGTH should longer than or equal to 20")
+	}
 }
 
 func initDB() {
@@ -247,25 +263,15 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 	return db, err
 }
 
-const (
-	uidLength = 18
-)
-
 //GetEncodeUID ..
 func GetEncodeUID(id uint) string {
-	return utils.GenerateHashID(id, hashSecretUID, uidLength)
+	return utils.GenerateHashID(id, hashSecretUID, hashUIDLength)
 }
 
 //GetDecodeUID ..
 func GetDecodeUID(id string) uint {
-	return utils.GetRawID(id, hashSecretUID, uidLength)
+	return utils.GetRawID(id, hashSecretUID, hashUIDLength)
 }
-
-//hashid key length
-const (
-	accessKeyLen = 12
-	secretKeyLen = 32
-)
 
 //GetDeviceAccessKey ..
 func GetDeviceAccessKey(id uint) string {
