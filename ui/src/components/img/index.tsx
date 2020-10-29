@@ -2,8 +2,8 @@ import React, { useState, useRef } from "react"
 
 import "./index.less"
 import { Modal, Progress } from "antd"
-import useIntersectionObserver from "../../hooks/use-intersection-observer"
-import { formatTimeLength } from "../../utils/util"
+import useIntersectionObserver from "src/hooks/use-intersection-observer"
+import { formatTimeLength } from "src/utils/util"
 interface ImageProps {
     src: string
     width?: number | string

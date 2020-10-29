@@ -8,7 +8,7 @@ import { setContext } from '@apollo/client/link/context';
 import { onError } from "@apollo/client/link/error";
 import jwt_decode from 'jwt-decode';
 import dayjs from 'dayjs';
-import { getRefreshToken } from '../consts/http';
+import { getRefreshToken } from 'src/consts/http';
 import { message as msg, message } from 'antd'
 const httpLink = new HttpLink({ uri: '/api' });
 

@@ -1,13 +1,13 @@
 import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, Select, DatePicker, message } from 'antd';
 import React, { useState, useEffect } from 'react';
-import { GenderMap } from "../../../consts/consts";
-import { Uploader } from "../../../components/Uploader";
+import { GenderMap } from "src/consts/consts";
+import { Uploader } from "src/components/Uploader";
 import dayjs from 'dayjs';
-import { UPDATE_PROFILE } from '../../../consts/user.gpl';
+import { UPDATE_PROFILE } from 'src/consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
-import { NewUser } from '../../desktop/settings/user/UserCreateForm';
 import { NavBar, Icon } from 'antd-mobile';
+import { NewUser } from 'src/models/user';
 
 interface UpdateProfileFormProps {
     user: NewUser

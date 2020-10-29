@@ -1,6 +1,6 @@
 import React from "react"
 import { useHistory } from "react-router-dom";
-import "../../../style/card.less"
+import "src/styles/card.less"
 import { Grid } from "antd-mobile";
 import {
     PlayCircleOutlined, DashboardOutlined,

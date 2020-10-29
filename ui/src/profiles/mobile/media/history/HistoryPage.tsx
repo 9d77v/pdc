@@ -1,11 +1,11 @@
 import React, { useEffect } from "react"
 import { message } from "antd"
 import { useQuery } from "@apollo/react-hooks";
-import { LIST_HISTORY } from "../../../../consts/history.gpl";
+import { LIST_HISTORY } from "src/consts/history.gpl";
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { useHistory } from "react-router-dom";
-import Img from "../../../../components/img";
-import { formatDetailTime } from "../../../../utils/util";
+import Img from "src/components/img";
+import { formatDetailTime } from "src/utils/util";
 import { NavBar, Icon } from "antd-mobile";
 
 export default function HistoryPage() {

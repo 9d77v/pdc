@@ -1,5 +1,5 @@
 import React from "react"
-import { SerieData } from "../consts/chart"
+import { SerieData } from "src/consts/chart"
 import ReactEchartsCore from 'echarts-for-react/lib/core';
 import echarts from 'echarts/lib/echarts';
 import 'echarts/lib/chart/pie';

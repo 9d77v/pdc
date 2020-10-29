@@ -2,7 +2,7 @@ import "./index.less"
 import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
 import React, { useEffect } from 'react';
-import { LOGIN } from '../../consts/user.gpl';
+import { LOGIN } from 'src/consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
 
 const layout = {

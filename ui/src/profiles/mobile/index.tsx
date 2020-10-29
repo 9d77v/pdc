@@ -5,14 +5,14 @@ import { UserOutlined, HomeOutlined, MessageOutlined } from '@ant-design/icons';
 import "./index.less"
 import { useHistory, Route, useLocation } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
-import { GET_USER } from '../../consts/user.gpl';
-import { NewUser } from '../desktop/settings/user/UserCreateForm';
+import { GET_USER } from 'src/consts/user.gpl';
 import { UpdateProfileForm } from './me/UpdateFrofileForm';
 import UpdatePasswordForm from './me/UpdatePasswordForm';
 import HomeNavBar from './home/HomeNavBar';
 import { Scanner } from './home/scanner';
 import { QRCodePage } from './me/QRCodePage';
 import { AddFriendPage } from './contact/AddFriendPage';
+import { NewUser } from 'src/models/user';
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
