@@ -126,7 +126,7 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 		"title":    ptrs.String(input.Title),
 		"pub_date": time.Unix(ptrs.Int64(input.PubDate), 0),
 		"desc":     ptrs.String(input.Desc),
-		"tags":     input.Tags,
+		"tags":     &input.Tags,
 		"is_show":  ptrs.Bool(input.IsShow),
 	}
 	if input.Cover != nil {

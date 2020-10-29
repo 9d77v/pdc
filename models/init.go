@@ -48,7 +48,7 @@ var (
 	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
 
 	hashSecretUID      = utils.GetEnvStr("PDC_HASH_SECRET_UID", "asdfgh")
-	hashUIDLength      = utils.GetEnvInt("PDC_HASH_UID_LENGTH", 12)
+	hashUIDLength      = utils.GetEnvInt("PDC_HASH_UID_LENGTH", 10)
 	hashSecretDeviceID = utils.GetEnvStr("PDC_HASH_SECRET_DEVICE_ID", "zxcvbn")
 	accessKeyLen       = utils.GetEnvInt("PDC_DEVICE_ACCESS_KEY_LENGTH", 12)
 	secretKeyLen       = utils.GetEnvInt("PDC_DEVICE_SECRET_KEY_LENGTH", 32)
