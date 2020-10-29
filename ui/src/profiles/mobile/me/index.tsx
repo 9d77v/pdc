@@ -1,10 +1,10 @@
 import React from "react"
 import { useHistory } from "react-router-dom";
-import { apolloClient } from "../../../utils/apollo_client";
+import { apolloClient } from "src/utils/apollo_client";
 import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
 import { List } from "antd-mobile";
-import { UserBrief } from "../common/UserBrief";
-import { NewUser } from "../../desktop/settings/user/UserCreateForm";
+import { UserBrief } from "src/profiles/mobile/common/UserBrief";
+import { NewUser } from "src/models/user";
 
 interface IMeIndexProps {
     user: NewUser

@@ -3,7 +3,7 @@ import { Button, Card, Icon, List, NavBar, WhiteSpace, WingBlank } from 'antd-mo
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
-import "../../../style/list.less"
+import "src/styles/list.less"
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 export const AddFriendPage = () => {
     const params: any = useParams()

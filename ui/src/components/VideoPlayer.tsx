@@ -4,7 +4,7 @@ import "video.js/dist/video-js.css"
 import "./VideoPlayer.less"
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import { useLocation } from 'react-router-dom'
-import { recordHistory } from '../consts/http'
+import { recordHistory } from 'src/consts/http'
 
 const lang: any = video_zhCN
 lang["Picture-in-Picture"] = "画中画"

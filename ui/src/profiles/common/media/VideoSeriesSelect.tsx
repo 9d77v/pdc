@@ -1,5 +1,5 @@
 import React from "react"
-import "../../../style/button.less"
+import "src/styles/button.less"
 import { useHistory } from "react-router-dom"
 
 interface IVideoSeriesSelectProps {

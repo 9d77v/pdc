@@ -1,10 +1,10 @@
 import { useHistory } from 'react-router-dom';
 import { Form, Input, Button, Select } from 'antd';
 import React, { useState } from 'react';
-import { GenderMap } from "../../../consts/consts";
-import { UPDATE_PASSWORD } from '../../../consts/user.gpl';
+import { GenderMap } from "src/consts/consts";
+import { UPDATE_PASSWORD } from 'src/consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
-import { apolloClient } from '../../../utils/apollo_client';
+import { apolloClient } from 'src/utils/apollo_client';
 import { NavBar, Icon } from 'antd-mobile';
 
 export default function UpdatePasswordForm() {

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { PieLineSerieData } from "../consts/chart"
+import { PieLineSerieData } from "src/consts/chart"
 import ReactEchartsCore from 'echarts-for-react/lib/core';
 import dayjs from 'dayjs'
 import echarts from 'echarts/lib/echarts';

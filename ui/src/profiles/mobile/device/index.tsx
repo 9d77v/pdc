@@ -1,7 +1,7 @@
 import React from "react"
 import { useHistory } from "react-router-dom";
 import { Icon, NavBar } from "antd-mobile";
-import DeviceCards from "../../common/device/DeviceCard";
+import DeviceCards from "src/profiles/common/device/DeviceCard";
 
 export default function DeviceIndex() {
     const history = useHistory()

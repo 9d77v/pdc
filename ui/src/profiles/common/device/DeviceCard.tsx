@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef, useMemo } from "react"
-import { GET_MOBILE_HOME_DEVICES } from "../../../consts/device.gql";
+import { GET_MOBILE_HOME_DEVICES } from "src/consts/device.gql";
 import { useQuery } from "@apollo/react-hooks";
 import useWebSocket from "react-use-websocket";
-import { iotTelemetrySocketURL } from "../../../utils/ws_client";
-import { pb } from "../../../pb/compiled";
-import "../../../style/card.less"
-import { blobToArrayBuffer } from "../../../utils/file";
-import { Card } from "../../../components/Card";
+import { iotTelemetrySocketURL } from "src/utils/ws_client";
+import { pb } from "src/pb/compiled";
+import "src/styles/card.less"
+import { blobToArrayBuffer } from "src/utils/file";
+import { Card } from "src/components/Card";
 
 interface IDeviceCardsProps {
     width: string | number

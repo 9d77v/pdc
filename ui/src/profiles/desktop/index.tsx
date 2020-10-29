@@ -10,32 +10,32 @@ import { AppHeader } from './common/AppHeader';
 import { AppSlider } from './common/AppSlider';
 import { AppNavigator } from './common/AppNavigator';
 import { useQuery } from '@apollo/react-hooks';
-import { GET_USER } from '../../consts/user.gpl';
-import { NewUser } from './settings/user/UserCreateForm';
-import { UpdateProfileForm } from './user/UpdateFrofileForm';
-import AppDeviceIndex from './device';
-const VideoTable = React.lazy(() => import('./settings/video/video-list'))
-const VideoSeriesTable = React.lazy(() => import('./settings/video/video-series-list'))
-const VideoCreateIndex = React.lazy(() => import('./settings/video/video-list/video-create'))
+import { GET_USER } from 'src/consts/user.gpl';
+import { UpdateProfileForm } from './app/user/UpdateFrofileForm';
+import AppDeviceIndex from './app/device';
+import { NewUser } from 'src/models/user';
+const VideoTable = React.lazy(() => import('./admin/video/video-list'))
+const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
+const VideoCreateIndex = React.lazy(() => import('./admin/video/video-list/video-create'))
 
-const UserTable = React.lazy(() => import('./settings/user/UserTable'))
-const UpdatePasswordForm = React.lazy(() => import("./user/UpdatePasswordForm"))
-
-
-const ThingTable = React.lazy(() => import('./thing/ThingTable'))
-const ThingDashboard = React.lazy(() => import('./thing/ThingDashboard'))
-const ThingAnalysis = React.lazy(() => import('./thing/ThingAnalysis'))
-
-const VideoList = React.lazy(() => import('./media/video/VideoList'))
-const VideoDetail = React.lazy(() => import('./media/video/VideoDetail'))
+const UserTable = React.lazy(() => import('./admin/user/UserTable'))
+const UpdatePasswordForm = React.lazy(() => import("./app/user/UpdatePasswordForm"))
 
 
-const HistoryPage = React.lazy(() => import("./media/history/HistoryPage"))
+const ThingTable = React.lazy(() => import('./app/thing/ThingTable'))
+const ThingDashboard = React.lazy(() => import('./app/thing/ThingDashboard'))
+const ThingAnalysis = React.lazy(() => import('./app/thing/ThingAnalysis'))
+
+const VideoList = React.lazy(() => import('./app/media/video/VideoList'))
+const VideoDetail = React.lazy(() => import('./app/media/video/VideoDetail'))
 
 
-const DeviceModelIndex = React.lazy(() => import('./settings/device/device-model-list/index'))
-const DeviceIndex = React.lazy(() => import('./settings/device/device-list/index'))
-const DeviceDashboardList = React.lazy(() => import("./settings/device/device-dashboard-list/index"))
+const HistoryPage = React.lazy(() => import("./app/media/history/HistoryPage"))
+
+
+const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
+const DeviceIndex = React.lazy(() => import('./admin/device/device-list/index'))
+const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
 export default function DesktopIndex() {
     const { data } = useQuery(GET_USER);
     const user: NewUser = data?.userInfo

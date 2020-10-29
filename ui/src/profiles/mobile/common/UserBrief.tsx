@@ -1,7 +1,7 @@
 import { Avatar } from 'antd'
 import React from 'react'
-import { NewUser } from '../../desktop/settings/user/UserCreateForm'
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
+import { NewUser } from 'src/models/user';
 
 interface IUserBriefProps {
     user: NewUser

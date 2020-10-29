@@ -1,7 +1,7 @@
 import React from "react"
 import { Layout, Dropdown, Avatar, Button } from 'antd';
 import { Link, useHistory, useLocation } from "react-router-dom";
-import { apolloClient } from "../../../utils/apollo_client";
+import { apolloClient } from "src/utils/apollo_client";
 const { Header } = Layout;
 
 interface AppHeaderProps {

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { useHistory } from 'react-router-dom';
 import { message } from "antd"
-import "../../../../style/button.less"
+import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks";
-import { LIST_VIDEO_CARD } from '../../../../consts/video.gql';
-import Img from "../../../../components/img";
+import { LIST_VIDEO_CARD } from 'src/consts/video.gql';
+import Img from "src/components/img";
 import { SearchBar } from "antd-mobile";
 import CheckableTag from "antd/lib/tag/CheckableTag";
-import { IVideoPagination } from "../../../../consts/consts";
+import { IVideoPagination } from "src/consts/consts";
 
 
 export default function VideoList() {

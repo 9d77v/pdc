@@ -1,4 +1,4 @@
-import { isMobile } from "../utils/util";
+import { isMobile } from "src/utils/util";
 import jwt_decode from "jwt-decode";
 import dayjs from "dayjs";
 

@@ -1,8 +1,8 @@
+import { NewUser } from 'src/models/user';
 import { Button, Icon, List, NavBar } from 'antd-mobile'
 import React, { useEffect, useState } from 'react'
 import QrReader from 'react-qr-reader'
 import { useHistory } from 'react-router-dom'
-import { NewUser } from '../../../desktop/settings/user/UserCreateForm';
 
 const Item = List.Item;
 

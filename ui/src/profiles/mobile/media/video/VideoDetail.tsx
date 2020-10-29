@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { message } from "antd"
-import "../../../../style/button.less"
+import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks";
-import { GET_VIDEO } from '../../../../consts/video.gql';
-import { VideoPlayer } from "../../../../components/VideoPlayer";
+import { GET_VIDEO } from 'src/consts/video.gql';
+import { VideoPlayer } from "src/components/VideoPlayer";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { NavBar, Icon } from "antd-mobile";
-import VideoSelect from "../../../common/media/VideoSelect";
-import VideoSeriesSelect from "../../../common/media/VideoSeriesSelect";
+import VideoSelect from "src/profiles/common/media/VideoSelect";
+import VideoSeriesSelect from "src/profiles/common/media/VideoSeriesSelect";
 
 export default function VideoDetail() {
     const match = useRouteMatch('/app/media/videos/:id');

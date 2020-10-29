@@ -1,8 +1,8 @@
+import { NewUser } from 'src/models/user'
 import { Icon, NavBar } from 'antd-mobile'
 import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { NewUser } from '../../desktop/settings/user/UserCreateForm'
-import { UserBrief } from '../common/UserBrief'
+import { UserBrief } from 'src/profiles/mobile/common/UserBrief'
 var QRCode = require('qrcode.react')
 interface IQRCodeProps {
     user: NewUser
