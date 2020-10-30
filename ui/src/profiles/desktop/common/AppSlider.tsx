@@ -176,6 +176,9 @@ const AdminMenu = (props: AppHeaderProps) => {
             defaultOpenKeys={config["defaultOpenKeys"]}
             style={{ height: '100%', borderRight: 0 }}
         >
+            <Menu.Item key="home">
+                <Link to="/admin/home">首页</Link>
+            </Menu.Item>
             <SubMenu
                 key="settings-user"
                 style={{ display: (roleID === 1) ? "block" : "none" }}

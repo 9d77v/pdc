@@ -17,6 +17,7 @@ const breadcrumbNameMap = new Map<string, string>([
     ['/app/thing/dashboard', '物品概览'],
     ['/app/thing/things', '物品列表'],
     ['/app/thing/analysis', '物品分析'],
+    ['/admin/home', '首页'],
     ['/admin/video', '视频管理'],
     ['/admin/video/video-list', '视频列表'],
     ['/admin/video/video-list/video-create', '新增视频'],
