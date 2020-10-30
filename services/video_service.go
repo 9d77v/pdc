@@ -474,7 +474,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 
 func sendMsgToUpdateES(videoID int64) {
 	guid, err := nats.Client.PublishAsync(nats.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
-		utils.AckHandler)
+		AckHandler)
 	if err != nil {
 		log.Println("nats publish failed,guid:", guid, " error:", err)
 	}

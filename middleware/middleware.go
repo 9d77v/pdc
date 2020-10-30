@@ -264,7 +264,7 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			//透传到mq
-			_, err = nats.Client.PublishAsync(nats.SubjectDeviceData, msg, utils.AckHandler)
+			_, err = nats.Client.PublishAsync(nats.SubjectDeviceData, msg, services.AckHandler)
 			if err != nil {
 				log.Println("send data error:", err)
 			}

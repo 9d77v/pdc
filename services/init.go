@@ -1,6 +1,11 @@
 package services
 
-import "github.com/9d77v/go-lib/ptrs"
+import (
+	"log"
+
+	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/pdc/models"
+)
 
 //GetPageInfo 获取分页信息
 func GetPageInfo(page, pageSize *int64) (int, int) {
@@ -20,4 +25,13 @@ func GetPageInfo(page, pageSize *int64) (int, int) {
 	}
 	offset = (offset - 1) * limit
 	return int(offset), int(limit)
+}
+
+//AckHandler ..
+func AckHandler(ackedNuid string, err error) {
+	if err != nil {
+		log.Printf("Warning: error publishing msg id %s: %v\n", ackedNuid, err.Error())
+	} else if models.DEBUG {
+		log.Printf("Received ack for msg id %s\n", ackedNuid)
+	}
 }

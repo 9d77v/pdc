@@ -6,7 +6,7 @@ RUN cd /app \
     && go build -o $APP_NAME -ldflags "-s -w" \
     && upx -9 $APP_NAME
 
-FROM scratch
+FROM 9d77v/pdc-base-deploy:0.0.1
 ENV APP_NAME=pdc
 COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
 COPY ./ui/build /app/ui/build
