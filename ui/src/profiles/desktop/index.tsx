@@ -84,6 +84,9 @@ export default function DesktopIndex() {
                             <Route exact path="/app/thing/analysis">
                                 <ThingAnalysis />
                             </Route>
+                            <Route exact path="/admin/home">
+                                欢迎使用个人数据中心管理后台
+                            </Route>
                             <Route exact path="/admin/video/video-list">
                                 <VideoTable />
                             </Route>

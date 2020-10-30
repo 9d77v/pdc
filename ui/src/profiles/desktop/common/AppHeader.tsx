@@ -19,7 +19,7 @@ export const AppHeader = (props: AppHeaderProps) => {
     }
 
     const gotoAdmin = () => {
-        history.push("/admin/user/user-list")
+        history.push("/admin/home")
     }
 
     const gotoApp = () => {
