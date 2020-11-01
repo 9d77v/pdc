@@ -174,11 +174,11 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
+			sort := " DESC"
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
-			} else {
-				builder = builder.Order(v.Field + " DESC")
+				sort = " ASC"
 			}
+			builder = builder.Order(v.Field + sort)
 		}
 		if edgeFieldMap["attributeModels"] {
 			builder = builder.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
@@ -309,11 +309,11 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
+			sort := " DESC"
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
-			} else {
-				builder = builder.Order(v.Field + " DESC")
+				sort = " ASC"
 			}
+			builder = builder.Order(v.Field + sort)
 		}
 		if edgeFieldMap["attributes"] {
 			builder = builder.Preload("Attributes").Preload("Attributes.AttributeModel")
@@ -480,11 +480,11 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
+			sort := " DESC"
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
-			} else {
-				builder = builder.Order(v.Field + " DESC")
+				sort = " ASC"
 			}
+			builder = builder.Order(v.Field + sort)
 		}
 		if edgeFieldMap["telemetries"] {
 			builder = builder.Preload("Telemetries").

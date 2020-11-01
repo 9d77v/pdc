@@ -286,11 +286,11 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
+			sort := " DESC"
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
-			} else {
-				builder = builder.Order(v.Field + " DESC")
+				sort = " ASC"
 			}
+			builder = builder.Order(v.Field + sort)
 		}
 		if edgeFieldMap["episodes"] {
 			builder = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
@@ -420,11 +420,11 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
+			sort := " DESC"
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
-			} else {
-				builder = builder.Order(v.Field + " DESC")
+				sort = " ASC"
 			}
+			builder = builder.Order(v.Field + sort)
 		}
 		err = builder.Find(&data).Error
 		if err != nil {
