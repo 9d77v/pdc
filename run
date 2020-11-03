@@ -1,6 +1,6 @@
 #!/bin/sh
 app='pdc'
-version="0.0.11"
+version="0.0.12"
 base_deploy_version="0.0.1"
 sudo=""
 if command -v sudo >/dev/null 2>&1; then
