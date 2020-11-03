@@ -263,7 +263,7 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 		builder = builder.Where("title like ?", "%"+ptrs.String(keyword)+"%")
 	}
 	if ptrs.Bool(isCombo) {
-		builder = builder.Where("NOT EXISTS (select video_id from " + models.DBPrefix + "_video_series_item where video_id=id)")
+		builder = builder.Where("NOT EXISTS (select video_id from " + models.TablePrefix + "_video_series_item where video_id=id)")
 	}
 	var total int64
 	if fieldMap["totalCount"] {
@@ -438,8 +438,8 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 			}
 			items := make([]*models.VideoSeriesItem, 0)
 			itemBuilder := models.Gorm
-			videoTableName := models.DBPrefix + "_video"
-			videoSeriesItemTableName := models.DBPrefix + "_video_series_item"
+			videoTableName := models.TablePrefix + "_video"
+			videoSeriesItemTableName := models.TablePrefix + "_video_series_item"
 			if itemFIeldMap["title"] {
 				itemBuilder = itemBuilder.Select(append(utils.ToDBFields(itemFields, "title", "__typename"),
 					videoTableName+".\"title\"")).

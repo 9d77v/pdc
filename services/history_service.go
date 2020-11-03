@@ -66,7 +66,7 @@ func (s HistoryService) ListHistory(ctx context.Context, sourceType, page, pageS
 	if fieldMap["edges"] {
 		switch ptrs.Int64(sourceType) {
 		case 1:
-			builder = builder.Table(models.DBPrefix + "_history a").
+			builder = builder.Table(models.TablePrefix + "_history a").
 				Select("a.uid,a.source_type,a.source_id,a.sub_source_id,a.current_time,a.remaining_time,a.device_type,cast(EXTRACT(epoch FROM CAST( a.updated_at AS TIMESTAMP)) as bigint) updated_at,  b.title,b.cover,c.num,c.title sub_title").
 				Joins("JOIN pdc_video b ON a.source_id=b.id").
 				Joins("JOIN pdc_episode c on a.sub_source_id=c.id")

@@ -18,6 +18,10 @@ case $1 in
         cd ui
         yarn start
         ;;
+    b|backup)
+        datename=$(date +%Y%m%d)
+        PGPASSWORD="123456" pg_dump -h domain.local -p 5432 -U postgres  -d pdc -f ./pdc_db_backup.$datename.tar.gz -Ft 
+        ;;
     base)
         $sudo docker build -t 9d77v/$app-base:$version -f Dockerfile.base .
         $sudo docker push 9d77v/$app-base:$version
