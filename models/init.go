@@ -26,12 +26,12 @@ var (
 	ownerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
 	ownerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
 
-	dbHost     = utils.GetEnvStr("DB_HOST", "domain.local")
-	dbPort     = utils.GetEnvInt("DB_PORT", 5432)
-	dbUser     = utils.GetEnvStr("DB_USER", "postgres")
-	dbPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
-	dbName     = utils.GetEnvStr("DB_NAME", "pdc")
-	DBPrefix   = utils.GetEnvStr("DB_PREFIX", "pdc")
+	dbHost      = utils.GetEnvStr("DB_HOST", "domain.local")
+	dbPort      = utils.GetEnvInt("DB_PORT", 5432)
+	dbUser      = utils.GetEnvStr("DB_USER", "postgres")
+	dbPassword  = utils.GetEnvStr("DB_PASSWORD", "123456")
+	dbName      = utils.GetEnvStr("DB_NAME", "pdc_deploy")
+	TablePrefix = utils.GetEnvStr("DB_PREFIX", "pdc")
 
 	JWTtAccessSecret = utils.GetEnvStr("JWT_ACCESS_SECRET", "JWT_ACCESS_SECRET")
 	JWTRefreshSecret = utils.GetEnvStr("JWT_REFRESH_SECRET", "JWT_REFRESH_SECRET")
@@ -244,7 +244,7 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 	gormConfig := &gorm.Config{
 		SkipDefaultTransaction: true,
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   DBPrefix + "_", // table name prefix, table for `User` would be `t_users`
+			TablePrefix:   TablePrefix + "_", // table name prefix, table for `User` would be `t_users`
 			SingularTable: true,
 		},
 	}

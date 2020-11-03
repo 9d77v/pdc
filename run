@@ -1,6 +1,6 @@
 #!/bin/sh
 app='pdc'
-version="0.0.11"
+version="0.0.12"
 base_deploy_version="0.0.1"
 sudo=""
 if command -v sudo >/dev/null 2>&1; then
@@ -17,6 +17,10 @@ case $1 in
     ui)
         cd ui
         yarn start
+        ;;
+    b|backup)
+        datename=$(date +%Y%m%d)
+        PGPASSWORD="123456" pg_dump -h domain.local -p 5432 -U postgres  -d pdc -f ./pdc_db_backup.$datename.tar.gz -Ft 
         ;;
     base)
         $sudo docker build -t 9d77v/$app-base:$version -f Dockerfile.base .

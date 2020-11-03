@@ -23,8 +23,8 @@ type Episode struct {
 //Subtitle 字幕
 type Subtitle struct {
 	gorm.Model
-	EpisodeID uint   `gorm:"unique_index:subtitle_uix"`
-	Name      string `gorm:"unique_index:subtitle_uix;size:50;NOT NULL;"`
+	EpisodeID uint
+	Name      string `gorm:"size:50;NOT NULL;"`
 	URL       string `gorm:"size:500;NOT NULL;"`
 }
 

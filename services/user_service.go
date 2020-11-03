@@ -127,11 +127,11 @@ func (s UserService) ListUser(ctx context.Context, keyword *string,
 			builder = builder.Offset(offset).Limit(limit)
 		}
 		for _, v := range sorts {
+			sort := " DESC"
 			if v.IsAsc {
-				builder = builder.Order(v.Field + " ASC")
-			} else {
-				builder = builder.Order(v.Field + " DESC")
+				sort = " ASC"
 			}
+			builder = builder.Order(v.Field + sort)
 		}
 		err = builder.Find(&data).Error
 		if err != nil {
