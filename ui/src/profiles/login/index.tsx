@@ -4,6 +4,7 @@ import { Form, Input, Button, message } from 'antd';
 import React, { useEffect } from 'react';
 import { LOGIN } from 'src/consts/user.gpl';
 import { useMutation } from '@apollo/react-hooks';
+import { GesturePasswordKey } from "src/consts/consts";
 
 const layout = {
     labelCol: { span: 8 },
@@ -29,7 +30,11 @@ export default function Login() {
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         if (token) {
-            history.push('/app/home')
+            if (localStorage.getItem(GesturePasswordKey)) {
+                history.push('/gesture_login')
+            } else {
+                history.push('/app/home')
+            }
         }
     }, [history])
 

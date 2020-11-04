@@ -151,8 +151,9 @@ const DeviceTypeMap = new Map<number, string>([
     [0, "默认"]
 ])
 
+const GesturePasswordKey = "gesture-password"
 
 export {
     RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr,
-    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap
+    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap, GesturePasswordKey
 }

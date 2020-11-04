@@ -22,6 +22,7 @@ const VideoList = React.lazy(() => import('./media/video/VideoList'))
 const VideoNavBar = React.lazy(() => import('./media/video/VideoNavBar'))
 const HistoryPage = React.lazy(() => import('./media/history/HistoryPage'))
 const DeviceIndex = React.lazy(() => import('./device'))
+const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
 
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
@@ -31,6 +32,7 @@ export default function MobileIndex() {
     const user: NewUser = data?.userInfo
 
     const location = useLocation();
+
     useEffect(() => {
         let isHome = true
         switch (location.pathname) {
@@ -71,6 +73,9 @@ export default function MobileIndex() {
             </Route>
             <Route exact path="/app/user/account"  >
                 <UpdatePasswordForm />
+            </Route>
+            <Route exact path="/app/user/gesture_password"  >
+                <GesturePassword />
             </Route>
             <Route exact path="/app/user/qrcode"  >
                 <QRCodePage user={user} />
