@@ -203,7 +203,7 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 			return nil, err
 		}
 	}
-	if input.Cover != nil {
+	if input.Cover != nil && *input.Cover != "" {
 		updateMap["cover"] = ptrs.String(input.Cover)
 	}
 	if input.URL != "" {
