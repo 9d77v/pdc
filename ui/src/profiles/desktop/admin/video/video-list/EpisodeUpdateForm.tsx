@@ -12,7 +12,7 @@ interface EpisodeUpdateFormProps {
     visible: boolean
     onUpdate: (values: Episode) => void
     onCancel: () => void
-    data: Episode
+    data: Episode,
 }
 
 export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
@@ -68,6 +68,8 @@ export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
         }
         form.setFieldsValue({ subtitles: [...subtitles] })
     }
+
+    const videoPathPrefix = "desktop/" + data.videoID.toString() + "/"
     return (
         <Modal
             visible={visible}
@@ -158,6 +160,7 @@ export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
                             bucketName="video"
                             validFileTypes={["video/mp4"]}
                             setURL={setUrl}
+                            filePathPrefix={videoPathPrefix}
                         />
                     </Form.Item>
                     <Form.Item

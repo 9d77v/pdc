@@ -6,6 +6,7 @@ export interface Subtitle {
 
 export interface Episode {
     id: number
+    videoID: number
     title: string
     desc: string
     num: number

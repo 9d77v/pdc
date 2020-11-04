@@ -71,6 +71,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
                     onClick={() => {
                         setUpdateEpisodeData({
                             id: record.id,
+                            videoID: episodeRawData.id,
                             num: record.num,
                             title: record.title,
                             desc: record.desc,
@@ -110,6 +111,7 @@ export default function VideoTable() {
     const [updateEpisodeVisible, setUpdateEpisodeVisible] = useState(false)
     const [updateEpisodeData, setUpdateEpisodeData] = useState({
         id: 0,
+        videoID: 0,
         num: 0,
         title: "",
         desc: "",
@@ -401,6 +403,7 @@ export default function VideoTable() {
                 }}
             />
             <EpisodeCreateForm
+                currentVideoID={currentVideoID}
                 visible={episodeVisible}
                 onCreate={onEpisodeCreate}
                 onCancel={() => {
@@ -434,9 +437,8 @@ export default function VideoTable() {
             <Modal
                 visible={playerData.visible}
                 title={playerData.title}
-                okText="确定"
+                footer={null}
                 destroyOnClose={true}
-                cancelText="取消"
                 width={1008}
                 onCancel={
                     () => {

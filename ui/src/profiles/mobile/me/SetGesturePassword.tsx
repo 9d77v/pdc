@@ -24,6 +24,12 @@ const SetGesturePassword: FC = () => {
             mode="light"
             icon={<Icon type="left" />}
             onLeftClick={() => history.goBack()}
+            rightContent={[
+                <div key="0" style={{ marginRight: '16px' }} onClick={() => {
+                    localStorage.removeItem(GesturePasswordKey)
+                    history.goBack()
+                }} >清除密码</div>,
+            ]}
         >设置手势密码</NavBar>
         <div style={{
             height: "100%",

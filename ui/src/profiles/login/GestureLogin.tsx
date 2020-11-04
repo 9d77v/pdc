@@ -16,7 +16,7 @@ const GestureLogin: FC = () => {
             if (bcrypt.compareSync(password, hashPassword)) {
                 history.push("/app/home")
             } else {
-                message.error("密码错误")
+                message.error("手势错误")
             }
         }
     }

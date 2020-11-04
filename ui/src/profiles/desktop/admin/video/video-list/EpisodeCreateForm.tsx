@@ -10,7 +10,8 @@ import {
 interface EpisodeCreateFormProps {
     visible: boolean
     onCreate: (values: any) => void
-    onCancel: () => void
+    onCancel: () => void,
+    currentVideoID: number,
     num: number,
 }
 
@@ -18,6 +19,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
+    currentVideoID,
     num
 }) => {
     const [form] = Form.useForm()
@@ -59,6 +61,8 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
         }
         form.setFieldsValue({ subtitles: [...subtitles] })
     }
+
+    const videoPathPrefix = "desktop/" + currentVideoID.toString() + "/"
     return (
         <Modal
             visible={visible}
@@ -145,6 +149,7 @@ export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
                             bucketName="video"
                             validFileTypes={["video/mp4"]}
                             setURL={setUrl}
+                            filePathPrefix={videoPathPrefix}
                         />
                     </Form.Item>
                     <Form.Item
