@@ -40,6 +40,13 @@ export default function MeIndex(props: IMeIndexProps) {
                     修改密码
                 </Item>
                 <Item
+                    thumb={<LockOutlined />}
+                    onClick={() => history.push("/app/user/gesture_password")}
+                    arrow="horizontal"
+                >
+                    手势密码
+                </Item>
+                <Item
                     thumb={<LogoutOutlined />}
                     onClick={() => logout()}
                     arrow="horizontal"

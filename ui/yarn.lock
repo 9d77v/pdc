@@ -2,6 +2,18 @@
 # yarn lockfile v1
 
 
+"@alitajs/gesture-password-react@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.npm.taobao.org/@alitajs/gesture-password-react/download/@alitajs/gesture-password-react-1.0.6.tgz#4609b0a385dea4120b141985ec6b3a0a7cb54bc9"
+  integrity sha1-Rgmwo4XepBILFBmF7Gs6Cny1S8k=
+  dependencies:
+    "@alitajs/gesture-password" "^1.0.6"
+
+"@alitajs/gesture-password@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.npm.taobao.org/@alitajs/gesture-password/download/@alitajs/gesture-password-1.0.6.tgz#c1c1cb2d1237bde40ac2f369fa09e9439821b4ee"
+  integrity sha1-wcHLLRI3veQKwvNp+gnpQ5ghtO4=
+
 "@ant-design/colors@^3.1.0":
   version "3.2.2"
   resolved "https://registry.npm.taobao.org/@ant-design/colors/download/@ant-design/colors-3.2.2.tgz#5ad43d619e911f3488ebac303d606e66a8423903"
@@ -1703,6 +1715,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/bcryptjs@^2.4.2":
+  version "2.4.2"
+  resolved "https://registry.npm.taobao.org/@types/bcryptjs/download/@types/bcryptjs-2.4.2.tgz#e3530eac9dd136bfdfb0e43df2c4c5ce1f77dfae"
+  integrity sha1-41MOrJ3RNr/fsOQ98sTFzh93364=
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.npm.taobao.org/@types/color-name/download/@types/color-name-1.1.1.tgz?cache=0&sync_timestamp=1596837707987&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fcolor-name%2Fdownload%2F%40types%2Fcolor-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
@@ -2953,6 +2970,11 @@ bcrypt-pbkdf@^1.0.0:
   integrity sha1-pDAdOJtqQ/m2f/PKEaP2Y342Dp4=
   dependencies:
     tweetnacl "^0.14.3"
+
+bcryptjs@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.npm.taobao.org/bcryptjs/download/bcryptjs-2.4.3.tgz#9ab5627b93e60621ff7cdac5da9733027df1d0cb"
+  integrity sha1-mrVie5PmBiH/fNrF2pczAn3x0Ms=
 
 big.js@^5.2.2:
   version "5.2.2"
