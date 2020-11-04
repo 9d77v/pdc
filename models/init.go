@@ -30,7 +30,7 @@ var (
 	dbPort      = utils.GetEnvInt("DB_PORT", 5432)
 	dbUser      = utils.GetEnvStr("DB_USER", "postgres")
 	dbPassword  = utils.GetEnvStr("DB_PASSWORD", "123456")
-	dbName      = utils.GetEnvStr("DB_NAME", "pdc_deploy")
+	dbName      = utils.GetEnvStr("DB_NAME", "pdc")
 	TablePrefix = utils.GetEnvStr("DB_PREFIX", "pdc")
 
 	JWTtAccessSecret = utils.GetEnvStr("JWT_ACCESS_SECRET", "JWT_ACCESS_SECRET")
