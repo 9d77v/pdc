@@ -18,7 +18,7 @@ type VideoIndex struct {
 	PubDate     int64          `json:"pub_date"`
 	Cover       string         `json:"cover"`
 	TotalNum    int32          `json:"total_num"`
-	Tags        pq.StringArray `json:"tags"`
+	Tags        pq.StringArray `gorm:"type:varchar(10)[]" json:"tags"`
 	IsShow      bool           `json:"is_show"`
 	SeriesID    uint           `json:"series_id"`
 	SeriesName  string         `json:"series_name"`
