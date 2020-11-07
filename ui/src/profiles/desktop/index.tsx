@@ -14,6 +14,7 @@ import { GET_USER } from 'src/consts/user.gpl';
 import { UpdateProfileForm } from './app/user/UpdateFrofileForm';
 import AppDeviceIndex from './app/device';
 import { NewUser } from 'src/models/user';
+import Calculator from 'src/components/calculator';
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
 const VideoCreateIndex = React.lazy(() => import('./admin/video/video-list/video-create'))
@@ -83,6 +84,9 @@ export default function DesktopIndex() {
                             </Route>
                             <Route exact path="/app/thing/analysis">
                                 <ThingAnalysis />
+                            </Route>
+                            <Route exact path="/app/util/calculator">
+                                <Calculator />
                             </Route>
                             <Route exact path="/admin/home">
                                 欢迎使用个人数据中心管理后台

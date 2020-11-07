@@ -14,6 +14,7 @@ import { QRCodePage } from './me/QRCodePage';
 import { AddFriendPage } from './contact/AddFriendPage';
 import { NewUser } from 'src/models/user';
 
+const CalculatorMobile = React.lazy(() => import('./home/calculator'))
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
@@ -67,6 +68,9 @@ export default function MobileIndex() {
             </Route>
             <Route exact path="/app/device"  >
                 <DeviceIndex />
+            </Route>
+            <Route exact path="/app/util/calculator"  >
+                <CalculatorMobile />
             </Route>
             <Route exact path="/app/user/profile"  >
                 <UpdateProfileForm user={user} />
