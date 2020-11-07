@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { PlaySquareOutlined, ShoppingOutlined, UserOutlined, LockOutlined, ProfileOutlined } from '@ant-design/icons';
+import {
+    PlaySquareOutlined, ShoppingOutlined, UserOutlined, LockOutlined,
+    ProfileOutlined, HomeOutlined, DashboardOutlined, ToolOutlined,
+    CalculatorOutlined
+} from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -14,6 +18,14 @@ const locationMap = new Map<string, any>([
     ["/app/device", {
         "defaultOpenKeys": ["device"],
         "defaultSelectedKeys": ['device']
+    }],
+    ["/app/util", {
+        "defaultOpenKeys": ["util"],
+        "defaultSelectedKeys": ['util']
+    }],
+    ["/app/util/calculator", {
+        "defaultOpenKeys": ["util"],
+        "defaultSelectedKeys": ['util-calculator']
     }],
     ["/app/user/profile", {
         "defaultOpenKeys": ["user"],
@@ -96,10 +108,10 @@ const AppMenu = (props: AppHeaderProps) => {
             style={{ height: '100%', borderRight: 0 }}
         >
             <Menu.Item key="home">
-                <Link to="/app/home">首页</Link>
-            </Menu.Item>
-            <Menu.Item key="device">
-                <Link to="/app/device">设备</Link>
+                <Link to="/app/home">  <span>
+                    <HomeOutlined />
+                    <span>首页</span>
+                </span></Link>
             </Menu.Item>
             <SubMenu
                 key="media"
@@ -118,6 +130,12 @@ const AppMenu = (props: AppHeaderProps) => {
                     <Link to="/app/media/history">最近播放</Link>
                 </Menu.Item>
             </SubMenu>
+            <Menu.Item key="device">
+                <Link to="/app/device">  <span>
+                    <DashboardOutlined />
+                    <span>设备</span>
+                </span></Link>
+            </Menu.Item>
             {/* <SubMenu
                 key="thing"
                 style={{ display: roleID >= 1 && roleID <= 3 ? "block" : "none" }}
@@ -138,6 +156,23 @@ const AppMenu = (props: AppHeaderProps) => {
                     <Link to="/app/thing/analysis">物品分析</Link>
                 </Menu.Item>
             </SubMenu> */}
+            <SubMenu
+                key="util"
+                style={{ display: roleID > 0 ? "block" : "none" }}
+                title={
+                    <span>
+                        <ToolOutlined />
+                        <span>工具</span>
+                    </span>
+                }
+            >
+                <Menu.Item key="util-calculator">
+                    <Link to="/app/util/calculator">   <span>
+                        <CalculatorOutlined />
+                        <span>计算器</span>
+                    </span></Link>
+                </Menu.Item>
+            </SubMenu>
             <SubMenu
                 key="user"
                 title={

@@ -20,30 +20,31 @@ const publicData = [
 ]
 
 const privateData = [
+    // {
+    //     "text": "通讯录",
+    //     "icon": <ContactsOutlined style={{ fontSize: 26, color: "brown" }} />,
+    //     "url": "/app/contacts"
+    // }, {
+    //     "text": "密码箱",
+    //     "icon": <LockOutlined style={{ fontSize: 26, color: "red" }} />,
+    //     "url": "/app/password"
+    // }, {
+    //     "text": "记事本",
+    //     "icon": <BookOutlined style={{ fontSize: 26, color: "green" }} />,
+    //     "url": "/app/note"
+    // },
     {
-        "text": "通讯录",
-        "icon": <ContactsOutlined style={{ fontSize: 26, color: "brown" }} />,
-        "url": "/app/contacts"
-    }, {
-        "text": "密码箱",
-        "icon": <LockOutlined style={{ fontSize: 26, color: "red" }} />,
-        "url": "/app/password"
-    }, {
-        "text": "记事本",
-        "icon": <BookOutlined style={{ fontSize: 26, color: "green" }} />,
-        "url": "/app/note"
-    }, {
         "text": "计算器",
         "icon": <CalculatorOutlined style={{ fontSize: 26, color: "blue" }} />,
-        "url": "/app/calculator"
+        "url": "/app/util/calculator"
     }
 ]
 export default function HomeIndex() {
     const history = useHistory()
     return (
         <>
-            <Grid data={publicData} columnNum={2} onClick={(item: any) => history.push(item.url)} />
+            <Grid data={publicData} columnNum={4} onClick={(item: any) => history.push(item.url)} />
             <br />
-            {/* <Grid data={privateData} columnNum={4} onClick={(item: any) => history.push(item.url)} /> */}
+            <Grid data={privateData} columnNum={4} onClick={(item: any) => history.push(item.url)} />
         </>)
 }
