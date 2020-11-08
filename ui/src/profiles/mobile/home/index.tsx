@@ -7,36 +7,44 @@ import {
     ContactsOutlined, LockOutlined, BookOutlined, CalculatorOutlined
 } from '@ant-design/icons';
 
-const publicData = [
+interface IApp {
+    text: string
+    icon: JSX.Element
+    url: string
+}
+
+const publicData: IApp[] = [
     {
-        "text": "视频",
-        "icon": <PlayCircleOutlined style={{ fontSize: 26 }} />,
-        "url": "/app/media/videos"
+        text: "视频",
+        icon: <PlayCircleOutlined style={{ fontSize: 26 }} />,
+        url: "/app/media/videos"
     }, {
-        "text": "设备",
-        "icon": <DashboardOutlined style={{ fontSize: 26 }} />,
-        "url": "/app/device"
+        text: "设备",
+        icon: <DashboardOutlined style={{ fontSize: 26 }} />,
+        url: "/app/device"
     }
 ]
 
-const privateData = [
+const privateData: IApp[] = [
     // {
     //     "text": "通讯录",
     //     "icon": <ContactsOutlined style={{ fontSize: 26, color: "brown" }} />,
     //     "url": "/app/contacts"
-    // }, {
-    //     "text": "密码箱",
-    //     "icon": <LockOutlined style={{ fontSize: 26, color: "red" }} />,
-    //     "url": "/app/password"
-    // }, {
+    // }, 
+    // {
+    //     text: "密码箱",
+    //     icon: <LockOutlined style={{ fontSize: 26, color: "red" }} />,
+    //     url: "/app/util/password"
+    // },
+    // {
     //     "text": "记事本",
     //     "icon": <BookOutlined style={{ fontSize: 26, color: "green" }} />,
     //     "url": "/app/note"
     // },
     {
-        "text": "计算器",
-        "icon": <CalculatorOutlined style={{ fontSize: 26, color: "blue" }} />,
-        "url": "/app/util/calculator"
+        text: "计算器",
+        icon: <CalculatorOutlined style={{ fontSize: 26, color: "blue" }} />,
+        url: "/app/util/calculator"
     }
 ]
 export default function HomeIndex() {

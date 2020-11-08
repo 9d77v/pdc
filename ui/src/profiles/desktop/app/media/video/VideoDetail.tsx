@@ -4,7 +4,7 @@ import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks";
 import { GET_VIDEO } from 'src/consts/video.gql';
 import Img from "src/components/img";
-import { VideoPlayer } from "src/components/VideoPlayer";
+import { VideoPlayer } from "src/components/videoplayer";
 import { useRouteMatch } from "react-router-dom";
 import TextArea from "antd/lib/input/TextArea";
 import VideoSelect from "src/profiles/common/media/VideoSelect";
@@ -32,7 +32,6 @@ export default function VideoDetail() {
             fetchPolicy: "cache-and-network"
         })
     const [num, setNum] = useState(0)
-
     useEffect(() => {
         if (error) {
             message.error("接口请求失败！")
@@ -44,7 +43,8 @@ export default function VideoDetail() {
         cover: "",
         title: "",
         desc: "",
-        episodes: []
+        episodes: [],
+        theme: ""
     }
     let video: any = null
     if (data) {
@@ -57,7 +57,8 @@ export default function VideoDetail() {
                     cover: video.cover,
                     title: video.title,
                     desc: video.desc,
-                    episodes: video.episodes
+                    episodes: video.episodes,
+                    theme: video.theme
                 })
             }
         }
@@ -88,6 +89,7 @@ export default function VideoDetail() {
             })
         }
     }, [video, num])
+
     return (
         <div style={{
             display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
@@ -97,6 +99,7 @@ export default function VideoDetail() {
                 width: 1080, height: 891,
             }}>
                 <VideoPlayer
+                    theme={videoItem.theme}
                     videoID={videoItem.id}
                     episodeID={episodeItem.id}
                     url={episodeItem.url}
