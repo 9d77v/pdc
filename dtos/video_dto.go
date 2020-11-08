@@ -54,6 +54,7 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 		Cover:     cover,
 		Tags:      m.Tags,
 		IsShow:    m.IsShow,
+		Theme:     m.Theme,
 		CreatedAt: m.CreatedAt.Unix(),
 		UpdatedAt: m.UpdatedAt.Unix(),
 	}
