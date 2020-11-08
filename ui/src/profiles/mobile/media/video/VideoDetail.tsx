@@ -3,7 +3,7 @@ import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks";
 import { GET_VIDEO } from 'src/consts/video.gql';
-import { VideoPlayer } from "src/components/VideoPlayer";
+import { VideoPlayer } from "src/components/videoplayer";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { NavBar, Icon } from "antd-mobile";
 import VideoSelect from "src/profiles/common/media/VideoSelect";
@@ -45,7 +45,8 @@ export default function VideoDetail() {
         cover: "",
         title: "",
         desc: "",
-        episodes: []
+        episodes: [],
+        theme: ""
     }
     let video: any = null
     if (data) {
@@ -58,7 +59,8 @@ export default function VideoDetail() {
                     cover: video.cover,
                     title: video.title,
                     desc: video.desc,
-                    episodes: video.episodes
+                    episodes: video.episodes,
+                    theme: video.theme
                 })
             }
         }
@@ -98,6 +100,7 @@ export default function VideoDetail() {
                 onLeftClick={() => history.goBack()}
             >{videoItem.title + " 第" + (num + 1) + "话"} </NavBar>
             <VideoPlayer
+                theme={videoItem.theme}
                 videoID={videoItem.id}
                 episodeID={episodeItem.id}
                 url={(episodeItem.mobileURL !== "") ? episodeItem.mobileURL : episodeItem.url}

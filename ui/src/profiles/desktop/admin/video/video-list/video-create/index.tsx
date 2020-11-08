@@ -54,6 +54,7 @@ export default function VideoCreateIndex() {
                             "pubDate": values.pubDate ? values.pubDate.unix() : 0,
                             "tags": values.tags || [],
                             "isShow": values.isShow,
+                            "theme": values.theme
                         }
                     }
                 })

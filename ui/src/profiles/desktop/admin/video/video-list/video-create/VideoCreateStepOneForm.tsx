@@ -38,7 +38,7 @@ const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any
             form={form}
             layout="horizontal"
             name="videoCreateForm"
-            initialValues={{ isShow: true, subtitle_lang: "简体中文" }}
+            initialValues={{ isShow: true, subtitle_lang: "简体中文", theme: "" }}
         >
             <Form.Item
                 name="title"
@@ -71,6 +71,12 @@ const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any
             </Form.Item>
             <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                 <Switch />
+            </Form.Item>
+            <Form.Item name="theme" label="主题">
+                <Select onChange={() => { }}>
+                    <Select.Option value="">默认</Select.Option>
+                    <Select.Option value="vjs-theme-lemon">柠檬</Select.Option>
+                </Select>
             </Form.Item>
         </Form>
     )

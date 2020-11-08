@@ -80,6 +80,7 @@ const LIST_VIDEO = gql`
             updatedAt
             }
             isShow
+            theme
             tags
             createdAt
             updatedAt
@@ -141,6 +142,7 @@ const GET_VIDEO = gql`
               }
             }
             tags
+            theme
        }
    }
    videoSerieses(videoID:$videoID){

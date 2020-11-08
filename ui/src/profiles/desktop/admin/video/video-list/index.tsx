@@ -9,7 +9,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { useMutation } from '@apollo/react-hooks';
 import { EpisodeCreateForm } from './EpisodeCreateForm';
 import dayjs from 'dayjs';
-import { VideoPlayer } from 'src/components/VideoPlayer';
+import { VideoPlayer } from 'src/components/videoplayer';
 import { VideoUpdateForm } from './VideoUpdateForm';
 import { EpisodeUpdateForm } from './EpisodeUpdateForm';
 import Img from 'src/components/img';
@@ -46,7 +46,8 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
                             title: episodeRawData.title + " 第" + record.num + "话",
                             url: value,
                             subtitles: record.subtitles,
-                            visible: true
+                            visible: true,
+                            theme: episodeRawData.theme
                         })}
                         icon={<PlaySquareTwoTone />}
                     />
@@ -107,6 +108,7 @@ export default function VideoTable() {
         pubDate: 0,
         tags: [],
         isShow: false,
+        theme: ""
     })
     const [updateEpisodeVisible, setUpdateEpisodeVisible] = useState(false)
     const [updateEpisodeData, setUpdateEpisodeData] = useState({
@@ -135,7 +137,8 @@ export default function VideoTable() {
         title: "",
         url: "",
         subtitles: null,
-        visible: false
+        visible: false,
+        theme: ""
     })
     const [keyword, setKeyword] = useState("")
     const [updateVideo] = useMutation(UPDATE_VIDEO)
@@ -174,6 +177,7 @@ export default function VideoTable() {
                     "pubDate": values.pubDate ? values.pubDate.unix() : 0,
                     "tags": values.tags || [],
                     "isShow": values.isShow,
+                    "theme": values.theme
                 }
             }
         });
@@ -337,6 +341,12 @@ export default function VideoTable() {
             )
         },
         {
+            title: '主题', dataIndex: 'theme', key: 'theme', width: 80,
+            render: (value: string, record: any) => (
+                value === "vjs-theme-lemon" ? "柠檬" : "默认"
+            )
+        },
+        {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
@@ -356,6 +366,7 @@ export default function VideoTable() {
                             pubDate: record.pubDate,
                             tags: record.tags || [],
                             isShow: record.isShow,
+                            theme: record.theme
                         })
                         setUpdateVideoVisible(true)
                     }}>编辑视频</Button>
@@ -440,6 +451,7 @@ export default function VideoTable() {
                 footer={null}
                 destroyOnClose={true}
                 width={1008}
+                getContainer={false}
                 onCancel={
                     () => {
                         setPlayerData({
@@ -448,22 +460,13 @@ export default function VideoTable() {
                             title: "",
                             url: "",
                             subtitles: null,
-                            visible: false
+                            visible: false,
+                            theme: ""
                         })
                     }
                 }
-                getContainer={false}
-                onOk={() => {
-                    setPlayerData({
-                        videoID: 0,
-                        episodeID: 0,
-                        title: "",
-                        url: "",
-                        subtitles: null,
-                        visible: false
-                    })
-                }}
             >  <VideoPlayer
+                    theme={playerData.theme}
                     videoID={playerData.videoID}
                     episodeID={playerData.episodeID}
                     url={playerData.url}
@@ -490,6 +493,5 @@ export default function VideoTable() {
                 dataSource={data ? data.videos.edges : []}
             />
         </div>
-
     );
 }

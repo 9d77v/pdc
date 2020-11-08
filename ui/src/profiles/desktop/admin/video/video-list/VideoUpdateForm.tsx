@@ -17,6 +17,7 @@ interface UpdateVideoProps {
     pubDate: number,
     tags: string[],
     isShow: boolean,
+    theme: string
 }
 interface VideoUpdateFormProps {
     visible: boolean;
@@ -43,7 +44,8 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
             "desc": data.desc,
             "tags": data.tags,
             "pubDate": dayjs(data.pubDate * 1000),
-            "isShow": data.isShow
+            "isShow": data.isShow,
+            "theme": data.theme
         })
     }, [form, data]);
 
@@ -115,6 +117,12 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
                 </Form.Item>
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />
+                </Form.Item>
+                <Form.Item name="theme" label="主题">
+                    <Select onChange={() => { }}>
+                        <Select.Option value="">默认</Select.Option>
+                        <Select.Option value="vjs-theme-lemon">柠檬</Select.Option>
+                    </Select>
                 </Form.Item>
             </Form>
         </Modal>

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
-import "video.js/dist/video-js.css"
-import "./VideoPlayer.less"
+import "video.js/dist/video-js.min.css"
+import "./index.less"
+import "./vjs-theme-lemon.less"
+
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import { useLocation } from 'react-router-dom'
 import { recordHistory } from 'src/consts/http'
@@ -15,6 +17,7 @@ export interface SubtitleProps {
 }
 
 export interface VideoPlayerProps {
+    theme?: string
     videoID: number
     episodeID: number
     url: string
@@ -29,6 +32,7 @@ export interface VideoPlayerProps {
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
+    theme = "",
     videoID,
     episodeID,
     url,
@@ -127,7 +131,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <video id={videoKey}
                 playsInline
                 ref={(node: any) => setVideoNode(node)}
-                className="video-js vjs-big-play-centered"
+                className={"video-js vjs-big-play-centered " + theme}
                 crossOrigin="anonymous"
             />
         </div>
