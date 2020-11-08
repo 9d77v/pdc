@@ -337,6 +337,7 @@ type ComplexityRoot struct {
 		IsShow    func(childComplexity int) int
 		PubDate   func(childComplexity int) int
 		Tags      func(childComplexity int) int
+		Theme     func(childComplexity int) int
 		Title     func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
@@ -1711,14 +1712,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SerieData.Value(childComplexity), true
 
-	case "Staff.Job":
+	case "Staff.job":
 		if e.complexity.Staff.Job == nil {
 			break
 		}
 
 		return e.complexity.Staff.Job(childComplexity), true
 
-	case "Staff.Persons":
+	case "Staff.persons":
 		if e.complexity.Staff.Persons == nil {
 			break
 		}
@@ -2179,6 +2180,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Video.Tags(childComplexity), true
+
+	case "Video.theme":
+		if e.complexity.Video.Theme == nil {
+			break
+		}
+
+		return e.complexity.Video.Theme(childComplexity), true
 
 	case "Video.title":
 		if e.complexity.Video.Title == nil {
@@ -2839,6 +2847,7 @@ type LoginResponse{
   episodes: [Episode!]!
   tags: [String!]
   isShow: Boolean!
+  theme: String!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -2849,8 +2858,8 @@ type Character{
 }
 
 type Staff{
-  Job: String!
-  Persons: [String!]!
+  job: String!
+  persons: [String!]!
 }
 
 type Subtitle{
@@ -2889,6 +2898,7 @@ input NewVideo {
   cover: String
   tags: [String!]
   isShow: Boolean!
+  theme: String!
 }
 
 input NewVideoResource{
@@ -2925,6 +2935,7 @@ input NewUpdateVideo{
   cover: String
   tags: [String!]
   isShow: Boolean 
+  theme: String!
 }
 
 input NewUpdateEpisode{
@@ -9430,7 +9441,7 @@ func (ec *executionContext) _SerieData_value(ctx context.Context, field graphql.
 	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Staff_Job(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_job(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -9464,7 +9475,7 @@ func (ec *executionContext) _Staff_Job(ctx context.Context, field graphql.Collec
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Staff_Persons(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
+func (ec *executionContext) _Staff_persons(ctx context.Context, field graphql.CollectedField, obj *model.Staff) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -11673,6 +11684,40 @@ func (ec *executionContext) _Video_isShow(ctx context.Context, field graphql.Col
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Video_theme(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Video",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Theme, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Video_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
@@ -14521,6 +14566,12 @@ func (ec *executionContext) unmarshalInputNewUpdateVideo(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "theme":
+			var err error
+			it.Theme, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -14674,6 +14725,12 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 		case "isShow":
 			var err error
 			it.IsShow, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "theme":
+			var err error
+			it.Theme, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16058,13 +16115,13 @@ func (ec *executionContext) _Staff(ctx context.Context, sel ast.SelectionSet, ob
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Staff")
-		case "Job":
-			out.Values[i] = ec._Staff_Job(ctx, field, obj)
+		case "job":
+			out.Values[i] = ec._Staff_job(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Persons":
-			out.Values[i] = ec._Staff_Persons(ctx, field, obj)
+		case "persons":
+			out.Values[i] = ec._Staff_persons(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -16533,6 +16590,11 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Video_tags(ctx, field, obj)
 		case "isShow":
 			out.Values[i] = ec._Video_isShow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "theme":
+			out.Values[i] = ec._Video_theme(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

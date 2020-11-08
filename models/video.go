@@ -38,6 +38,7 @@ type Video struct {
 	Episodes []*Episode
 	Tags     pq.StringArray `gorm:"type:varchar(10)[]"`
 	IsShow   bool
+	Theme    string `gorm:"size:50;"`
 }
 
 //VideoSeriesItem 视频系列视频列表

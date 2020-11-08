@@ -323,6 +323,7 @@ type NewUpdateVideo struct {
 	Cover   *string  `json:"cover"`
 	Tags    []string `json:"tags"`
 	IsShow  *bool    `json:"isShow"`
+	Theme   string   `json:"theme"`
 }
 
 type NewUpdateVideoSeries struct {
@@ -353,6 +354,7 @@ type NewVideo struct {
 	Cover   *string  `json:"cover"`
 	Tags    []string `json:"tags"`
 	IsShow  bool     `json:"isShow"`
+	Theme   string   `json:"theme"`
 }
 
 type NewVideoResource struct {
@@ -387,8 +389,8 @@ type Sort struct {
 }
 
 type Staff struct {
-	Job     string   `json:"Job"`
-	Persons []string `json:"Persons"`
+	Job     string   `json:"job"`
+	Persons []string `json:"persons"`
 }
 
 type Subtitle struct {
@@ -478,6 +480,7 @@ type Video struct {
 	Episodes  []*Episode `json:"episodes"`
 	Tags      []string   `json:"tags"`
 	IsShow    bool       `json:"isShow"`
+	Theme     string     `json:"theme"`
 	CreatedAt int64      `json:"createdAt"`
 	UpdatedAt int64      `json:"updatedAt"`
 }

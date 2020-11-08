@@ -36,6 +36,7 @@ func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*m
 		Cover:   ptrs.String(input.Cover),
 		Tags:    input.Tags,
 		IsShow:  input.IsShow,
+		Theme:   input.Theme,
 	}
 	err := models.Gorm.Create(m).Error
 	if err != nil {
@@ -127,6 +128,7 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 		"pub_date": time.Unix(ptrs.Int64(input.PubDate), 0),
 		"desc":     ptrs.String(input.Desc),
 		"tags":     &input.Tags,
+		"theme":    input.Theme,
 		"is_show":  ptrs.Bool(input.IsShow),
 	}
 	if input.Cover != nil {
