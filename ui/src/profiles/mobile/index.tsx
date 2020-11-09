@@ -14,8 +14,9 @@ import { QRCodePage } from './me/QRCodePage'
 import { AddFriendPage } from './contact/AddFriendPage'
 import { NewUser } from 'src/models/user'
 import { AppPath } from 'src/consts/path'
+import CalculatorMobile from './home/calculator'
 
-const CalculatorMobile = React.lazy(() => import('./home/calculator'))
+
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
@@ -26,15 +27,13 @@ const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
 const DeviceIndex = React.lazy(() => import('./device'))
 const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
 
-export default function MobileIndex() {
+const MobileIndex = () => {
     const [selectedTab, setSelectedTab] = useState("homeTab")
     const [visible, setVisible] = useState(false)
     const history = useHistory()
     const { data } = useQuery(GET_USER)
     const user: NewUser = data?.userInfo
-
     const location = useLocation()
-
     useEffect(() => {
         let isHome = true
         switch (location.pathname) {
@@ -147,3 +146,5 @@ export default function MobileIndex() {
         </div>
     )
 }
+
+export default MobileIndex
