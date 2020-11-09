@@ -37,6 +37,7 @@ const Calculator: React.FC<ICalculatorProps> = ({
         <div className={"calculator"}>
             <DisplayToolbar
                 marginTop={marginTop}
+                setFormula={setFormula}
                 formula={formula}
                 input={input}
                 setIsShowHistory={() => setIsShowHistory(!isShowHistory)}

@@ -4,6 +4,7 @@ import './DisplayToolbar.less';
 interface IDisplayToolbarProps {
     marginTop: number
     formula: string
+    setFormula: any
     input: string
     setIsShowHistory: any,
     isShowHistory: boolean
@@ -11,6 +12,7 @@ interface IDisplayToolbarProps {
 const DisplayToolbar: React.FC<IDisplayToolbarProps> = ({
     marginTop = 0,
     formula,
+    setFormula,
     input,
     setIsShowHistory,
     isShowHistory
@@ -28,6 +30,7 @@ const DisplayToolbar: React.FC<IDisplayToolbarProps> = ({
                     readOnly
                     className="display-input"
                     rows={1}
+                    onClick={() => setFormula(input)}
                     value={input}></textarea>
             </form>
             {/* <div className="toolbar">
