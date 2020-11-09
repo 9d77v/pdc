@@ -1,11 +1,11 @@
 export async function getTextFromFile(file: File) {
     return new Promise<string>(resolve => {
-        const reader = new FileReader();
+        const reader = new FileReader()
         reader.onload = () => {
             resolve(reader.result?.toString())
-        };
-        reader.readAsText(file);
-    });
+        }
+        reader.readAsText(file)
+    })
 }
 
 export function replaceURL(url: string): string {
@@ -22,11 +22,11 @@ export function replaceURL(url: string): string {
 
 export async function blobToArrayBuffer(blob: Blob) {
     return new Promise(function (resolve): any {
-        var reader = new FileReader();
+        var reader = new FileReader()
 
         reader.onloadend = function () {
-            resolve(reader.result);
-        };
-        reader.readAsArrayBuffer(blob);
+            resolve(reader.result)
+        }
+        reader.readAsArrayBuffer(blob)
     })
 }

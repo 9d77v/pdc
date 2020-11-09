@@ -1,13 +1,13 @@
-import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd';
+import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd'
 import React, { useState, useEffect } from 'react'
-import { Uploader } from 'src/components/Uploader';
-import dayjs from 'dayjs';
-import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from 'src/consts/consts';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Uploader } from 'src/components/Uploader'
+import dayjs from 'dayjs'
+import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from 'src/consts/consts'
+import { QuestionCircleOutlined } from '@ant-design/icons'
 
 interface Values {
-    title: string;
-    description: string;
+    title: string
+    description: string
 }
 
 interface UpdateThingProps {
@@ -29,10 +29,10 @@ interface UpdateThingProps {
     rubbishCategory: number[]
 }
 interface ThingUpdateFormProps {
-    visible: boolean;
+    visible: boolean
     data: UpdateThingProps,
-    onUpdate: (values: Values) => void;
-    onCancel: () => void;
+    onUpdate: (values: Values) => void
+    onCancel: () => void
 }
 
 export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
@@ -41,7 +41,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const emptURLS: string[] = []
     const [thingURLs, setThingURLs] = useState(emptURLS)
     const layout = {
@@ -68,7 +68,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
             "rubbishCategory": data.rubbishCategory
         })
         setThingURLs(data.pics)
-    }, [form, data]);
+    }, [form, data])
 
     let categoryOptions: any[] = []
     ConsumerExpenditureMap.forEach((value: string, key: string) => {
@@ -103,12 +103,12 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onUpdate(values);
+                        form.resetFields()
+                        onUpdate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setThingURLs([])
             }}
             maskClosable={false}
@@ -151,7 +151,7 @@ export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
                 <Form.Item
                     name="consumerExpenditure"
                     label={<span>
-                        消费支出&nbsp;
+                        消费支出&nbsp
                         <Tooltip title={<a href="http://www.stats.gov.cn/tjsj/tjbz/201310/P020131021349384303616.pdf" target="_blank" rel="noopener noreferrer">居民消费支出分类（2013）</a>}>
                             <QuestionCircleOutlined />
                         </Tooltip>

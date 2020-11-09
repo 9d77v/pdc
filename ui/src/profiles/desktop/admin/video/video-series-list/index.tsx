@@ -1,18 +1,18 @@
-import { Table, Button, message } from 'antd';
+import { Table, Button, message } from 'antd'
 import React, { useState, useEffect } from 'react'
 import {
     LIST_VIDEO_SERIES, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
     ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
-} from 'src/consts/video.gql';
-import { useQuery } from '@apollo/react-hooks';
-import { VideoSeriesCreateForm } from './VideoSeriesCreateForm';
-import { useMutation } from '@apollo/react-hooks';
-import { VideoSeriesItemCreateForm } from './VideoSeriesItemCreateForm';
-import dayjs from 'dayjs';
-import { VideoSeriesUpdateForm } from './VideoSeriesUpdateForm';
-import { VideoSeriesItemUpdateForm } from './VideoSeriesItemUpdateForm';
-import { TablePaginationConfig } from 'antd/lib/table';
-import Search from 'antd/lib/input/Search';
+} from 'src/consts/video.gql'
+import { useQuery } from '@apollo/react-hooks'
+import { VideoSeriesCreateForm } from './VideoSeriesCreateForm'
+import { useMutation } from '@apollo/react-hooks'
+import { VideoSeriesItemCreateForm } from './VideoSeriesItemCreateForm'
+import dayjs from 'dayjs'
+import { VideoSeriesUpdateForm } from './VideoSeriesUpdateForm'
+import { VideoSeriesItemUpdateForm } from './VideoSeriesItemUpdateForm'
+import { TablePaginationConfig } from 'antd/lib/table'
+import Search from 'antd/lib/input/Search'
 
 
 function VideoSeriesItemTable(itemRawData: any, setUpdateItemData: any, setUpdateItemVisible: any) {
@@ -38,7 +38,7 @@ function VideoSeriesItemTable(itemRawData: any, setUpdateItemData: any, setUpdat
                     }}>编辑视频</Button>
             </span>
         },
-    ];
+    ]
 
     return <div>
         <Table
@@ -51,10 +51,10 @@ function VideoSeriesItemTable(itemRawData: any, setUpdateItemData: any, setUpdat
 }
 
 export default function VideoSeriesTable() {
-    const [currentVideoSeriesID, setCurrentVideoSeriesID] = useState(0);
+    const [currentVideoSeriesID, setCurrentVideoSeriesID] = useState(0)
 
-    const [videoSeriesVisible, setVideoSeriesVisible] = useState(false);
-    const [videoSeriesItemVisible, setVideoSeriesItemVisible] = useState(false);
+    const [videoSeriesVisible, setVideoSeriesVisible] = useState(false)
+    const [videoSeriesItemVisible, setVideoSeriesItemVisible] = useState(false)
     const [updateVideoSeriesVisible, setUpdateVideoSeriesVisible] = useState(false)
     const [updateVideoSeriesData, setUpdateVideoSeriesData] = useState({
         id: 0,
@@ -76,7 +76,7 @@ export default function VideoSeriesTable() {
     })
 
     const [keyword, setKeyword] = useState("")
-    const [addVideoSeries] = useMutation(ADD_VIDEO_SERIES);
+    const [addVideoSeries] = useMutation(ADD_VIDEO_SERIES)
     const [updateVideoSeries] = useMutation(UPDATE_VIDEO_SERIES)
     const [addVideoSeriesItem] = useMutation(ADD_VIDEO_SERIES_ITEM)
     const [updateVideoSeriesItem] = useMutation(UPDATE_VIDEO_SERIES_ITEM)
@@ -106,10 +106,10 @@ export default function VideoSeriesTable() {
                     "name": values.name,
                 }
             }
-        });
-        setVideoSeriesVisible(false);
+        })
+        setVideoSeriesVisible(false)
         await refetch()
-    };
+    }
 
     const onVideoSeriesUpdate = async (values: any) => {
         await updateVideoSeries({
@@ -119,10 +119,10 @@ export default function VideoSeriesTable() {
                     "name": values.name
                 }
             }
-        });
-        setUpdateVideoSeriesVisible(false);
+        })
+        setUpdateVideoSeriesVisible(false)
         await refetch()
-    };
+    }
 
     const onVideoSeriesItemCreate = async (values: any) => {
         await addVideoSeriesItem({
@@ -133,8 +133,8 @@ export default function VideoSeriesTable() {
                     "alias": values.alias
                 }
             }
-        });
-        setVideoSeriesItemVisible(false);
+        })
+        setVideoSeriesItemVisible(false)
         await refetch()
     }
 
@@ -147,10 +147,10 @@ export default function VideoSeriesTable() {
                     "alias": values.alias,
                 }
             }
-        });
-        setUpdateVideoSeriesItemVisible(false);
+        })
+        setUpdateVideoSeriesItemVisible(false)
         await refetch()
-    };
+    }
 
     const onChange = (pageConfig: TablePaginationConfig) => {
         fetchMore({
@@ -159,8 +159,8 @@ export default function VideoSeriesTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.videoSerieses.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.videoSerieses.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.videoSerieses.edges : []
+                const totalCount = fetchMoreResult ? fetchMoreResult.videoSerieses.totalCount : 0
                 const t = {
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -209,7 +209,7 @@ export default function VideoSeriesTable() {
                         }}>新增视频</Button>
                 </span>
         }
-    ];
+    ]
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
@@ -230,7 +230,7 @@ export default function VideoSeriesTable() {
                 visible={videoSeriesVisible}
                 onCreate={onVideoSeriesCreate}
                 onCancel={() => {
-                    setVideoSeriesVisible(false);
+                    setVideoSeriesVisible(false)
                 }}
             />
             <VideoSeriesUpdateForm
@@ -238,14 +238,14 @@ export default function VideoSeriesTable() {
                 data={updateVideoSeriesData}
                 onUpdate={onVideoSeriesUpdate}
                 onCancel={() => {
-                    setUpdateVideoSeriesVisible(false);
+                    setUpdateVideoSeriesVisible(false)
                 }}
             />
             <VideoSeriesItemCreateForm
                 visible={videoSeriesItemVisible}
                 onCreate={onVideoSeriesItemCreate}
                 onCancel={() => {
-                    setVideoSeriesItemVisible(false);
+                    setVideoSeriesItemVisible(false)
                 }}
                 video_series_id={currentVideoSeriesID}
             />
@@ -254,7 +254,7 @@ export default function VideoSeriesTable() {
                 data={updateVideoSeriesItemData}
                 onUpdate={onVideoSeriesItemUpdate}
                 onCancel={() => {
-                    setUpdateVideoSeriesItemVisible(false);
+                    setUpdateVideoSeriesItemVisible(false)
                 }}
             />
             <Table
@@ -277,5 +277,5 @@ export default function VideoSeriesTable() {
             />
         </div>
 
-    );
+    )
 }

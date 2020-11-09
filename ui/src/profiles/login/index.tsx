@@ -1,39 +1,40 @@
 import "./index.less"
-import { useHistory } from 'react-router-dom';
-import { Form, Input, Button, message } from 'antd';
-import React, { useEffect } from 'react';
-import { LOGIN } from 'src/consts/user.gpl';
-import { useMutation } from '@apollo/react-hooks';
-import { GesturePasswordKey } from "src/consts/consts";
+import { useHistory } from 'react-router-dom'
+import { Form, Input, Button, message } from 'antd'
+import React, { useEffect } from 'react'
+import { LOGIN } from 'src/consts/user.gpl'
+import { useMutation } from '@apollo/react-hooks'
+import { GesturePasswordKey } from "src/consts/consts"
+import { AppPath } from "src/consts/path"
 
 const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
-};
+}
 const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
-};
+}
 
 export default function Login() {
 
-    const history = useHistory();
-    const [login, { data }] = useMutation(LOGIN);
+    const history = useHistory()
+    const [login, { data }] = useMutation(LOGIN)
 
     useEffect(() => {
         if (data) {
             localStorage.setItem("accessToken", data.login.accessToken)
             localStorage.setItem("refreshToken", data.login.refreshToken)
-            history.push('/app/home')
+            history.push(AppPath.HOME)
         }
     }, [data, history])
 
     useEffect(() => {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken')
         if (token) {
             if (localStorage.getItem(GesturePasswordKey)) {
-                history.push('/gesture_login')
+                history.push(AppPath.GESTURE_LOGIN)
             } else {
-                history.push('/app/home')
+                history.push(AppPath.HOME)
             }
         }
     }, [history])
@@ -44,13 +45,13 @@ export default function Login() {
                 "username": values.username,
                 "password": values.password
             }
-        });
-    };
+        })
+    }
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
-        message.error(errorInfo);
-    };
+        console.log('Failed:', errorInfo)
+        message.error(errorInfo)
+    }
     return (
         <div className="login-background">
             <div className="login-form">
@@ -85,5 +86,5 @@ export default function Login() {
                 </Form>
             </div>
         </div>
-    );
-};
+    )
+}

@@ -1,12 +1,12 @@
-import { Modal, Form } from 'antd';
+import { Modal, Form } from 'antd'
 import React, { useState } from 'react'
-import { Uploader } from 'src/components/Uploader';
+import { Uploader } from 'src/components/Uploader'
 
 interface MobileVideoUpdateProps {
-    visible: boolean;
+    visible: boolean
     videoID: number
-    onUpdate: (values: any) => void;
-    onCancel: () => void;
+    onUpdate: (values: any) => void
+    onCancel: () => void
 }
 
 export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
@@ -15,7 +15,7 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [videoURLs, setVideoURLs] = useState([])
     const layout = {
         labelCol: { span: 4 },
@@ -43,12 +43,12 @@ export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onUpdate(values);
+                        form.resetFields()
+                        onUpdate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setVideoURLs([])
             }}
             maskClosable={false}

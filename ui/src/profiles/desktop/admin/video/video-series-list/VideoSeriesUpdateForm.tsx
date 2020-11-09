@@ -1,4 +1,4 @@
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input } from 'antd'
 import React, { useEffect } from 'react'
 
 interface UpdateVideoProps {
@@ -6,10 +6,10 @@ interface UpdateVideoProps {
     name: string,
 }
 interface VideoUpdateSeriesFormProps {
-    visible: boolean;
+    visible: boolean
     data: UpdateVideoProps,
-    onUpdate: (values: UpdateVideoProps) => void;
-    onCancel: () => void;
+    onUpdate: (values: UpdateVideoProps) => void
+    onCancel: () => void
 }
 
 export const VideoSeriesUpdateForm: React.FC<VideoUpdateSeriesFormProps> = ({
@@ -18,7 +18,7 @@ export const VideoSeriesUpdateForm: React.FC<VideoUpdateSeriesFormProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
@@ -28,7 +28,7 @@ export const VideoSeriesUpdateForm: React.FC<VideoUpdateSeriesFormProps> = ({
             "id": data.id,
             "name": data.name,
         })
-    }, [form, data]);
+    }, [form, data])
 
     return (
         <Modal
@@ -47,12 +47,12 @@ export const VideoSeriesUpdateForm: React.FC<VideoUpdateSeriesFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onUpdate(values);
+                        form.resetFields()
+                        onUpdate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
             }}
             maskClosable={false}
         >

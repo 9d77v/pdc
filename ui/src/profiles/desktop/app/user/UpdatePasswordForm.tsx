@@ -1,18 +1,19 @@
-import { useHistory } from 'react-router-dom';
-import { Form, Input, Button, Select } from 'antd';
-import React, { useState } from 'react';
-import { GenderMap } from "src/consts/consts";
-import { UPDATE_PASSWORD } from 'src/consts/user.gpl';
-import { useMutation } from '@apollo/react-hooks';
-import { apolloClient } from 'src/utils/apollo_client';
+import { useHistory } from 'react-router-dom'
+import { Form, Input, Button, Select } from 'antd'
+import React, { useState } from 'react'
+import { GenderMap } from "src/consts/consts"
+import { UPDATE_PASSWORD } from 'src/consts/user.gpl'
+import { useMutation } from '@apollo/react-hooks'
+import { apolloClient } from 'src/utils/apollo_client'
+import { AppPath } from 'src/consts/path'
 
 export default function UpdatePasswordForm() {
-    const history = useHistory();
+    const history = useHistory()
 
     const [loading, setLoading] = useState(false)
     const [updatePassword] = useMutation(UPDATE_PASSWORD)
 
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },
@@ -28,34 +29,34 @@ export default function UpdatePasswordForm() {
     })
 
     const onUpdate = async (values: any) => {
-        setLoading(true);
+        setLoading(true)
         const data = await updatePassword({
             variables: {
                 "oldPassword": values.oldPassword,
                 "newPassword": values.newPassword
             }
-        });
-        setLoading(false);
+        })
+        setLoading(false)
         if (!data.errors) {
             apolloClient.resetStore()
             localStorage.clear()
-            history.push('/login')
+            history.push(AppPath.LOGIN)
         }
-    };
+    }
 
     const onFinish = (values: any) => {
         form
             .validateFields()
             .then((values: any) => {
-                onUpdate(values);
+                onUpdate(values)
             })
             .catch(info => {
-                console.log('Validate Failed:', info);
-            });
+                console.log('Validate Failed:', info)
+            })
     }
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+        console.log('Failed:', errorInfo)
     }
 
     return (
@@ -94,9 +95,9 @@ export default function UpdatePasswordForm() {
                         ({ getFieldValue }) => ({
                             validator(rule, value) {
                                 if (!value || getFieldValue('oldPassword') !== value) {
-                                    return Promise.resolve();
+                                    return Promise.resolve()
                                 }
-                                return Promise.reject('新旧密码不能相同!');
+                                return Promise.reject('新旧密码不能相同!')
                             },
                         }),
                     ]}
@@ -121,9 +122,9 @@ export default function UpdatePasswordForm() {
                         ({ getFieldValue }) => ({
                             validator(rule, value) {
                                 if (!value || getFieldValue('newPassword') === value) {
-                                    return Promise.resolve();
+                                    return Promise.resolve()
                                 }
-                                return Promise.reject('两次密码不一致!');
+                                return Promise.reject('两次密码不一致!')
                             },
                         }),
                     ]}
@@ -138,5 +139,5 @@ export default function UpdatePasswordForm() {
                 </Form.Item>
             </Form>
         </div >
-    );
-};
+    )
+}

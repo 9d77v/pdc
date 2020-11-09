@@ -1,9 +1,10 @@
 import React, { FC } from 'react'
 import { useHistory } from 'react-router-dom'
-import GesturePassword from '@alitajs/gesture-password-react';
-import { message } from 'antd';
-import { GesturePasswordKey } from 'src/consts/consts';
+import GesturePassword from '@alitajs/gesture-password-react'
+import { message } from 'antd'
+import { GesturePasswordKey } from 'src/consts/consts'
 import bcrypt from 'bcryptjs'
+import { AppPath } from 'src/consts/path'
 
 const GestureLogin: FC = () => {
     const history = useHistory()
@@ -14,7 +15,7 @@ const GestureLogin: FC = () => {
             const password = data.join("")
             const hashPassword = localStorage.getItem(GesturePasswordKey) || ""
             if (bcrypt.compareSync(password, hashPassword)) {
-                history.push("/app/home")
+                history.push(AppPath.HOME)
             } else {
                 message.error("手势错误")
             }

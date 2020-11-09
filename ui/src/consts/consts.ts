@@ -153,6 +153,7 @@ const DeviceTypeMap = new Map<number, string>([
 
 const GesturePasswordKey = "gesture-password"
 
+
 export {
     RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr,
     GenderMap, RoleMap, FullRoleMap, DeviceTypeMap, GesturePasswordKey

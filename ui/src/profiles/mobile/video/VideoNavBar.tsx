@@ -2,9 +2,10 @@ import { NavBar, Popover, Icon } from "antd-mobile"
 import React, { useState } from "react"
 import {
     HistoryOutlined
-} from '@ant-design/icons';
-import Item from "antd-mobile/lib/popover/Item";
-import { useHistory } from "react-router-dom";
+} from '@ant-design/icons'
+import Item from "antd-mobile/lib/popover/Item"
+import { useHistory } from "react-router-dom"
+import { AppPath } from "src/consts/path"
 
 export default function VideoNavBar() {
 
@@ -18,10 +19,10 @@ export default function VideoNavBar() {
         setVisible(false)
         switch (opt.props.children) {
             case "最近播放":
-                history.push("/app/media/history")
+                history.push(AppPath.HISTORY)
                 break
         }
-    };
+    }
     return (
         <NavBar
             mode="light"

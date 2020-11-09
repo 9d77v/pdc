@@ -1,11 +1,11 @@
-import { Modal, Form, Input, Radio } from 'antd';
+import { Modal, Form, Input, Radio } from 'antd'
 import React, { useState } from 'react'
-import { Uploader } from 'src/components/Uploader';
+import { Uploader } from 'src/components/Uploader'
 
 interface SubtitleUpdateFormProps {
-    visible: boolean;
-    onUpdate: (values: any) => void;
-    onCancel: () => void;
+    visible: boolean
+    onUpdate: (values: any) => void
+    onCancel: () => void
 }
 
 export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
@@ -13,7 +13,7 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [subtitles, setSubtitles] = useState([])
     const layout = {
         labelCol: { span: 4 },
@@ -27,11 +27,11 @@ export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
         form
             .validateFields()
             .then((values: any) => {
-                form.resetFields();
-                onUpdate(values);
+                form.resetFields()
+                onUpdate(values)
             })
             .catch(info => {
-                console.log('Validate Failed:', info);
+                console.log('Validate Failed:', info)
             })
     }
     return (

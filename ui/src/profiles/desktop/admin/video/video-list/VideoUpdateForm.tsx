@@ -1,13 +1,13 @@
-import { Modal, Form, Input, Switch, DatePicker, Select } from 'antd';
+import { Modal, Form, Input, Switch, DatePicker, Select } from 'antd'
 import React, { useState, useEffect } from 'react'
-import { Uploader } from 'src/components/Uploader';
-import dayjs from 'dayjs';
+import { Uploader } from 'src/components/Uploader'
+import dayjs from 'dayjs'
 
-const { TextArea } = Input;
+const { TextArea } = Input
 
 interface Values {
-    title: string;
-    description: string;
+    title: string
+    description: string
 }
 
 interface UpdateVideoProps {
@@ -20,10 +20,10 @@ interface UpdateVideoProps {
     theme: string
 }
 interface VideoUpdateFormProps {
-    visible: boolean;
+    visible: boolean
     data: UpdateVideoProps,
-    onUpdate: (values: Values) => void;
-    onCancel: () => void;
+    onUpdate: (values: Values) => void
+    onCancel: () => void
 }
 
 export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
@@ -32,7 +32,7 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [url, setUrl] = useState("")
     const layout = {
         labelCol: { span: 4 },
@@ -47,7 +47,7 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
             "isShow": data.isShow,
             "theme": data.theme
         })
-    }, [form, data]);
+    }, [form, data])
 
     return (
         <Modal
@@ -70,12 +70,12 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onUpdate(values);
+                        form.resetFields()
+                        onUpdate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setUrl('')
             }}
             maskClosable={false}

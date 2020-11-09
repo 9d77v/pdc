@@ -1,49 +1,50 @@
-import { TabBar } from 'antd-mobile';
-import React, { useState, useEffect } from 'react';
-import { UserOutlined, HomeOutlined, MessageOutlined } from '@ant-design/icons';
+import { TabBar } from 'antd-mobile'
+import React, { useState, useEffect } from 'react'
+import { UserOutlined, HomeOutlined, MessageOutlined } from '@ant-design/icons'
 
 import "./index.less"
-import { useHistory, Route, useLocation } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
-import { GET_USER } from 'src/consts/user.gpl';
-import { UpdateProfileForm } from './me/UpdateFrofileForm';
-import UpdatePasswordForm from './me/UpdatePasswordForm';
-import HomeNavBar from './home/HomeNavBar';
-import { Scanner } from './home/scanner';
-import { QRCodePage } from './me/QRCodePage';
-import { AddFriendPage } from './contact/AddFriendPage';
-import { NewUser } from 'src/models/user';
+import { useHistory, Route, useLocation } from 'react-router-dom'
+import { useQuery } from '@apollo/react-hooks'
+import { GET_USER } from 'src/consts/user.gpl'
+import { UpdateProfileForm } from './me/UpdateFrofileForm'
+import UpdatePasswordForm from './me/UpdatePasswordForm'
+import HomeNavBar from './home/HomeNavBar'
+import { Scanner } from './home/scanner'
+import { QRCodePage } from './me/QRCodePage'
+import { AddFriendPage } from './contact/AddFriendPage'
+import { NewUser } from 'src/models/user'
+import { AppPath } from 'src/consts/path'
 
 const CalculatorMobile = React.lazy(() => import('./home/calculator'))
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
-const VideoDetail = React.lazy(() => import('./media/video/VideoDetail'))
-const VideoList = React.lazy(() => import('./media/video/VideoList'))
-const VideoNavBar = React.lazy(() => import('./media/video/VideoNavBar'))
-const HistoryPage = React.lazy(() => import('./media/history/HistoryPage'))
+const VideoDetail = React.lazy(() => import('./video/VideoDetail'))
+const VideoList = React.lazy(() => import('./video/VideoList'))
+const VideoNavBar = React.lazy(() => import('./video/VideoNavBar'))
+const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
 const DeviceIndex = React.lazy(() => import('./device'))
 const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
 
 export default function MobileIndex() {
     const [selectedTab, setSelectedTab] = useState("homeTab")
     const [visible, setVisible] = useState(false)
-    const history = useHistory();
-    const { data } = useQuery(GET_USER);
+    const history = useHistory()
+    const { data } = useQuery(GET_USER)
     const user: NewUser = data?.userInfo
 
-    const location = useLocation();
+    const location = useLocation()
 
     useEffect(() => {
         let isHome = true
         switch (location.pathname) {
-            case "/app/user":
+            case AppPath.USER:
                 setSelectedTab("meTab")
                 break
-            case "/app/msg":
+            case AppPath.MSG:
                 setSelectedTab("msgTab")
                 break
-            case "/app/home":
+            case AppPath.HOME:
                 setSelectedTab("homeTab")
                 break
             default:
@@ -54,40 +55,40 @@ export default function MobileIndex() {
 
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
-            <Route exact path="/app/media/videos">
+            <Route exact path={AppPath.VIDEO_SEARCH}>
                 <div style={{ height: "100%", overflowY: "auto" }}>
                     <VideoNavBar />
                     <VideoList />
                 </div>
             </Route>
-            <Route exact path="/app/media/videos/:id"  >
+            <Route exact path={AppPath.VIDEO_DETAIL}  >
                 <VideoDetail />
             </Route>
-            <Route exact path="/app/media/history"  >
+            <Route exact path={AppPath.HISTORY} >
                 <HistoryPage />
             </Route>
-            <Route exact path="/app/device"  >
+            <Route exact path={AppPath.DEVICE}  >
                 <DeviceIndex />
             </Route>
-            <Route exact path="/app/util/calculator"  >
+            <Route exact path={AppPath.UTIL_CALCULATOR}  >
                 <CalculatorMobile />
             </Route>
-            <Route exact path="/app/user/profile"  >
+            <Route exact path={AppPath.USER_PROFILE}  >
                 <UpdateProfileForm user={user} />
             </Route>
-            <Route exact path="/app/user/account"  >
+            <Route exact path={AppPath.USER_ACCOUNT}  >
                 <UpdatePasswordForm />
             </Route>
-            <Route exact path="/app/user/gesture_password"  >
+            <Route exact path={AppPath.USER_GESTURE_PASSWORD}  >
                 <GesturePassword />
             </Route>
-            <Route exact path="/app/user/qrcode"  >
+            <Route exact path={AppPath.UESR_QECODE}  >
                 <QRCodePage user={user} />
             </Route>
-            <Route exact path="/app/scanner"  >
+            <Route exact path={AppPath.SCANNER}  >
                 <Scanner user={user} />
             </Route>
-            <Route exact path="/app/contact/addContact/:url"  >
+            <Route exact path={AppPath.CONTACT_ADD}  >
                 <AddFriendPage />
             </Route>
             <TabBar
@@ -104,11 +105,11 @@ export default function MobileIndex() {
                     selected={selectedTab === 'homeTab'}
                     onPress={() => {
                         setSelectedTab('homeTab')
-                        history.push('/app/home')
+                        history.push(AppPath.HOME)
                     }}
                     data-seed="logId"
                 >  <HomeNavBar />
-                    <Route exact path="/app/home">
+                    <Route exact path={AppPath.HOME}>
                         <HomeIndex />
                     </Route>
                 </TabBar.Item>
@@ -120,10 +121,10 @@ export default function MobileIndex() {
                     selected={selectedTab === 'msgTab'}
                     onPress={() => {
                         setSelectedTab('msgTab')
-                        history.push('/app/msg')
+                        history.push(AppPath.MSG)
                     }}
                 >
-                    <Route exact path="/app/msg"  >
+                    <Route exact path={AppPath.MSG}  >
                         <MessageIndex />
                     </Route>
                 </TabBar.Item> */}
@@ -135,14 +136,14 @@ export default function MobileIndex() {
                     selected={selectedTab === 'meTab'}
                     onPress={() => {
                         setSelectedTab('meTab')
-                        history.push('/app/user')
+                        history.push(AppPath.USER)
                     }}
                 >
-                    <Route exact path="/app/user"  >
+                    <Route exact path={AppPath.USER}  >
                         <MeIndex user={user} />
                     </Route>
                 </TabBar.Item>
             </TabBar>
         </div>
-    );
+    )
 }

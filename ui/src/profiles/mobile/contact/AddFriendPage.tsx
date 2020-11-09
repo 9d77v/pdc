@@ -2,11 +2,10 @@ import { Avatar } from 'antd'
 import { Button, Card, Icon, List, NavBar, WhiteSpace, WingBlank } from 'antd-mobile'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import "src/styles/list.less"
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
 export const AddFriendPage = () => {
-    const params: any = useParams()
     const history = useHistory()
     const [data, setData] = useState({
         "uid": "",
@@ -15,7 +14,9 @@ export const AddFriendPage = () => {
         "avatar": "",
         "gender": undefined
     })
-    const url = atob(params.url)
+    const location = useLocation()
+    const query = new URLSearchParams(location.search)
+    const url = atob(query.get("url") || "")
     useEffect(() => {
         let uid: string = ""
         let host: string = ""

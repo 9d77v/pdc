@@ -5,6 +5,7 @@ import GesturePassword from '@alitajs/gesture-password-react';
 import { message } from 'antd';
 import { GesturePasswordKey } from 'src/consts/consts';
 import bcrypt from 'bcryptjs'
+import { AppPath } from 'src/consts/path';
 
 const SetGesturePassword: FC = () => {
     const history = useHistory()
@@ -15,7 +16,7 @@ const SetGesturePassword: FC = () => {
             const password = data.join("")
             const hashPassword = bcrypt.hashSync(password, 10);
             localStorage.setItem(GesturePasswordKey, hashPassword)
-            history.push("/gesture_login")
+            history.push(AppPath.GESTURE_LOGIN)
         }
     }
 

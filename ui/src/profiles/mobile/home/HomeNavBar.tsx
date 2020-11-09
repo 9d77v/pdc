@@ -2,9 +2,10 @@ import { NavBar, Popover, Icon } from "antd-mobile"
 import React, { useState } from "react"
 import {
     ScanOutlined
-} from '@ant-design/icons';
-import Item from "antd-mobile/lib/popover/Item";
-import { useHistory } from "react-router-dom";
+} from '@ant-design/icons'
+import Item from "antd-mobile/lib/popover/Item"
+import { useHistory } from "react-router-dom"
+import { AppPath } from "src/consts/path"
 
 export default function HomeNavBar() {
 
@@ -18,10 +19,10 @@ export default function HomeNavBar() {
         setVisible(false)
         switch (opt.props.children) {
             case "扫一扫":
-                history.push("/app/scanner")
+                history.push(AppPath.SCANNER)
                 break
         }
-    };
+    }
     return (<NavBar
         mode="light"
         rightContent={
