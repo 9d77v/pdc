@@ -5,7 +5,7 @@ import { Episode } from 'src/models/video'
 import { SubtitleForm } from './SubtitleForm'
 import {
     DeleteOutlined
-} from '@ant-design/icons';
+} from '@ant-design/icons'
 
 
 interface EpisodeUpdateFormProps {

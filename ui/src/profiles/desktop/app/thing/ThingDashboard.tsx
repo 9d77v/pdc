@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
 
 import { message, Select } from "antd"
-import { useQuery } from "@apollo/react-hooks";
-import { Pie } from "src/components/Pie";
-import { THING_SERIES } from "src/consts/thing.gql";
-import { ConsumerExpenditureMap, ThingStatusMap } from "src/consts/consts";
-import { SerieData } from "src/consts/chart";
+import { useQuery } from "@apollo/react-hooks"
+import { Pie } from "src/components/Pie"
+import { THING_SERIES } from "src/consts/thing.gql"
+import { ConsumerExpenditureMap, ThingStatusMap } from "src/consts/consts"
+import { SerieData } from "src/consts/chart"
 
 const mapFunc = (value: SerieData) => {
     return {
@@ -24,7 +24,7 @@ export default function ThingDashboard() {
                 "index2": "num",
                 "status": [1, 2, 3, 4, 5]
             }
-        });
+        })
 
     useEffect(() => {
         if (error) {

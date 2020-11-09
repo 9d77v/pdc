@@ -1,11 +1,12 @@
 import React from "react"
-import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom"
 import "src/styles/card.less"
-import { Grid } from "antd-mobile";
+import { Grid } from "antd-mobile"
 import {
     PlayCircleOutlined, DashboardOutlined,
     ContactsOutlined, LockOutlined, BookOutlined, CalculatorOutlined
-} from '@ant-design/icons';
+} from '@ant-design/icons'
+import { AppPath } from "src/consts/path"
 
 interface IApp {
     text: string
@@ -17,11 +18,11 @@ const publicData: IApp[] = [
     {
         text: "视频",
         icon: <PlayCircleOutlined style={{ fontSize: 26 }} />,
-        url: "/app/media/videos"
+        url: AppPath.VIDEO_SEARCH
     }, {
         text: "设备",
         icon: <DashboardOutlined style={{ fontSize: 26 }} />,
-        url: "/app/device"
+        url: AppPath.DEVICE
     }
 ]
 

@@ -4,7 +4,7 @@ import { Uploader } from 'src/components/Uploader'
 import { SubtitleForm } from './SubtitleForm'
 import {
     DeleteOutlined
-} from '@ant-design/icons';
+} from '@ant-design/icons'
 
 
 interface EpisodeCreateFormProps {

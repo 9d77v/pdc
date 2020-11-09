@@ -1,15 +1,15 @@
-import { Modal, Form, Input } from 'antd';
+import { Modal, Form, Input } from 'antd'
 import React from 'react'
 
 interface Values {
-    title: string;
-    description: string;
+    title: string
+    description: string
 }
 
 interface VideoSeriesCreateFormProps {
-    visible: boolean;
-    onCreate: (values: Values) => void;
-    onCancel: () => void;
+    visible: boolean
+    onCreate: (values: Values) => void
+    onCancel: () => void
 }
 
 export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
@@ -17,7 +17,7 @@ export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
     onCreate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
 
     const layout = {
         labelCol: { span: 4 },
@@ -41,12 +41,12 @@ export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onCreate(values);
+                        form.resetFields()
+                        onCreate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
             }}
             maskClosable={false}
         >

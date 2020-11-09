@@ -1,20 +1,20 @@
-import { Table, Button, message, Tag } from 'antd';
+import { Table, Button, message, Tag } from 'antd'
 import React, { useState, useEffect } from 'react'
 
-import { LIST_THING, ADD_THING, UPDATE_THING } from 'src/consts/thing.gql';
-import { useQuery } from '@apollo/react-hooks';
-import { ThingCreateForm } from './ThingCreateForm';
-import { useMutation } from '@apollo/react-hooks';
-import dayjs from 'dayjs';
-import { ThingUpdateForm } from './ThingUpdateForm';
-import Img from 'src/components/img';
-import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from 'src/consts/consts';
-import { TablePaginationConfig } from 'antd/lib/table';
-import Search from 'antd/lib/input/Search';
+import { LIST_THING, ADD_THING, UPDATE_THING } from 'src/consts/thing.gql'
+import { useQuery } from '@apollo/react-hooks'
+import { ThingCreateForm } from './ThingCreateForm'
+import { useMutation } from '@apollo/react-hooks'
+import dayjs from 'dayjs'
+import { ThingUpdateForm } from './ThingUpdateForm'
+import Img from 'src/components/img'
+import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from 'src/consts/consts'
+import { TablePaginationConfig } from 'antd/lib/table'
+import Search from 'antd/lib/input/Search'
 
 
 export default function ThingTable() {
-    const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = useState(false)
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 10,
@@ -42,7 +42,7 @@ export default function ThingTable() {
         rubbishCategory: []
     })
     const [keyword, setKeyword] = useState("")
-    const [addThing] = useMutation(ADD_THING);
+    const [addThing] = useMutation(ADD_THING)
     const [updateThing] = useMutation(UPDATE_THING)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_THING,
         {
@@ -56,7 +56,7 @@ export default function ThingTable() {
                 }]
             },
             fetchPolicy: "cache-and-network"
-        });
+        })
 
     useEffect(() => {
         if (error) {
@@ -85,10 +85,10 @@ export default function ThingTable() {
                     "rubbishCategory": values.rubbishCategory
                 }
             }
-        });
-        setVisible(false);
+        })
+        setVisible(false)
         await refetch()
-    };
+    }
 
     const onThingUpdate = async (values: any) => {
         await updateThing({
@@ -112,10 +112,10 @@ export default function ThingTable() {
                     "rubbishCategory": values.rubbishCategory
                 }
             }
-        });
-        setUpdateThingVisible(false);
+        })
+        setUpdateThingVisible(false)
         await refetch()
-    };
+    }
 
     const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
@@ -124,8 +124,8 @@ export default function ThingTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.things.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.things.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.things.edges : []
+                const totalCount = fetchMoreResult ? fetchMoreResult.things.totalCount : 0
                 setPagination({
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -139,7 +139,7 @@ export default function ThingTable() {
                             totalCount
                         }
                     }
-                    : previousResult;
+                    : previousResult
             }
         })
     }
@@ -209,7 +209,7 @@ export default function ThingTable() {
                             <Tag color={RubbishCategoryMap.get(value)?.color || 'default'} key={"rubbish_category_tag" + value}>
                                 {RubbishCategoryMap.get(value)?.text}
                             </Tag>
-                        );
+                        )
                     })
                     return <div>{tagNodes}</div>
                 }
@@ -250,13 +250,13 @@ export default function ThingTable() {
                     }}>编辑物品</Button>
                 </span>
         },
-    ];
+    ]
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
                 type="primary"
                 onClick={() => {
-                    setVisible(true);
+                    setVisible(true)
                 }}
                 style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
@@ -271,7 +271,7 @@ export default function ThingTable() {
                 visible={visible}
                 onCreate={onThingCreate}
                 onCancel={() => {
-                    setVisible(false);
+                    setVisible(false)
                 }}
             />
             <ThingUpdateForm
@@ -279,7 +279,7 @@ export default function ThingTable() {
                 data={updateThingData}
                 onUpdate={onThingUpdate}
                 onCancel={() => {
-                    setUpdateThingVisible(false);
+                    setUpdateThingVisible(false)
                 }}
             />
             <Table

@@ -1,15 +1,15 @@
 
 export function checkIsFile(source: any) {
-    return source instanceof File;
+    return source instanceof File
 }
 
 export function getExt(url: string): string {
     if (url.includes('?')) {
-        return getExt(url.split('?')[0]);
+        return getExt(url.split('?')[0])
     }
 
     if (url.includes('#')) {
-        return getExt(url.split('#')[0]);
+        return getExt(url.split('#')[0])
     }
 
     return url
@@ -21,7 +21,7 @@ export function getExt(url: string): string {
 
 
 export function getType(source: any) {
-    return checkIsFile(source) ? getExt(source.name) : getExt(source);
+    return checkIsFile(source) ? getExt(source.name) : getExt(source)
 }
 
 export function subToVtt(sub: any) {
@@ -29,33 +29,33 @@ export function subToVtt(sub: any) {
         'WEBVTT\n\n' +
         sub
             .map((item: any, index: any) => {
-                return index + 1 + '\n' + item.start + ' --> ' + item.end + '\n' + item.text;
+                return index + 1 + '\n' + item.start + ' --> ' + item.end + '\n' + item.text
             })
             .join('\n\n')
-    );
+    )
 }
 
 export async function getVttFromFile(file: File) {
     return new Promise<string>(resolve => {
-        const reader = new FileReader();
+        const reader = new FileReader()
         reader.onload = () => {
             switch (getType(file)) {
                 case 'vtt':
-                    resolve(reader.result?.toString().replace(/{[\s\S]*?}/g, ''));
-                    break;
+                    resolve(reader.result?.toString().replace(/{[\s\S]*?}/g, ''))
+                    break
                 case 'ass':
-                    resolve(assToVtt(reader.result));
-                    break;
+                    resolve(assToVtt(reader.result))
+                    break
                 case 'srt':
-                    resolve(srtToVtt(reader.result));
-                    break;
+                    resolve(srtToVtt(reader.result))
+                    break
                 default:
-                    resolve();
-                    break;
+                    resolve()
+                    break
             }
-        };
-        reader.readAsText(file);
-    });
+        }
+        reader.readAsText(file)
+    })
 }
 
 export function assToVtt(ass: any) {
@@ -68,7 +68,7 @@ export function assToVtt(ass: any) {
         '(?:[^,]*,){4}' +
         '([\\s\\S]*)$',
         'i',
-    );
+    )
 
     function fixTime(time = '') {
         return time
@@ -76,19 +76,19 @@ export function assToVtt(ass: any) {
             .map((item, index, arr) => {
                 if (index === arr.length - 1) {
                     if (item.length === 1) {
-                        return '.' + item + '00';
+                        return '.' + item + '00'
                     } else if (item.length === 2) {
-                        return '.' + item + '0';
+                        return '.' + item + '0'
                     }
                 } else {
                     if (item.length === 1) {
-                        return (index === 0 ? '0' : ':0') + item;
+                        return (index === 0 ? '0' : ':0') + item
                     }
                 }
 
-                return index === 0 ? item : index === arr.length - 1 ? '.' + item : ':' + item;
+                return index === 0 ? item : index === arr.length - 1 ? '.' + item : ':' + item
             })
-            .join('');
+            .join('')
     }
 
     return (
@@ -96,8 +96,8 @@ export function assToVtt(ass: any) {
         ass
             .split(/\r?\n/)
             .map((line: any) => {
-                const m = line.match(re_ass);
-                if (!m) return null;
+                const m = line.match(re_ass)
+                if (!m) return null
                 return {
                     start: fixTime(m[1].trim()),
                     end: fixTime(m[2].trim()),
@@ -108,19 +108,19 @@ export function assToVtt(ass: any) {
                         .split(/\r?\n/)
                         .map((item: any) => item.trim())
                         .join('\n'),
-                };
+                }
             })
             .filter((line: any) => line)
             .map((line: any, index: any) => {
                 if (line) {
-                    return index + 1 + '\n' + line.start + ' --> ' + line.end + '\n' + line.text;
+                    return index + 1 + '\n' + line.start + ' --> ' + line.end + '\n' + line.text
                 } else {
-                    return '';
+                    return ''
                 }
             })
             .filter((line: any) => line.trim())
             .join('\n\n')
-    );
+    )
 }
 
 export function srtToVtt(srt: any) {
@@ -133,5 +133,5 @@ export function srtToVtt(srt: any) {
             .replace(/(\d\d:\d\d:\d\d),(\d\d\d)/g, '$1.$2')
             .replace(/{[\s\S]*?}/g, '')
             .concat('\r\n\r\n'),
-    );
+    )
 }

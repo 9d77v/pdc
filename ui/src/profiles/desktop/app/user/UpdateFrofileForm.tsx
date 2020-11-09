@@ -1,23 +1,23 @@
-import { Form, Input, Button, Select, DatePicker, message } from 'antd';
-import React, { useState, useEffect } from 'react';
-import { GenderMap } from "src/consts/consts";
-import { Uploader } from "src/components/Uploader";
-import dayjs from 'dayjs';
-import { UPDATE_PROFILE } from 'src/consts/user.gpl';
-import { useMutation } from '@apollo/react-hooks';
-import { NewUser } from 'src/models/user';
+import { Form, Input, Button, Select, DatePicker, message } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { GenderMap } from "src/consts/consts"
+import { Uploader } from "src/components/Uploader"
+import dayjs from 'dayjs'
+import { UPDATE_PROFILE } from 'src/consts/user.gpl'
+import { useMutation } from '@apollo/react-hooks'
+import { NewUser } from 'src/models/user'
 
 interface UpdateProfileFormProps {
     user: NewUser
 }
-export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
+const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     user
 }) => {
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)
 
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },
@@ -34,7 +34,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
 
 
     const onUpdate = async (values: any) => {
-        setLoading(true);
+        setLoading(true)
         const data = await updateProfile({
             variables: {
                 "input": {
@@ -44,12 +44,12 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                     "ip": values.ip,
                 }
             }
-        });
+        })
         if (!data.errors) {
             message.success("更新个人资料成功")
         }
-        setLoading(false);
-    };
+        setLoading(false)
+    }
 
     const onFinish = (values: any) => {
         form.setFieldsValue({
@@ -58,15 +58,15 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         form
             .validateFields()
             .then((values: any) => {
-                onUpdate(values);
+                onUpdate(values)
             })
             .catch(info => {
-                console.log('Validate Failed:', info);
-            });
+                console.log('Validate Failed:', info)
+            })
     }
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+        console.log('Failed:', errorInfo)
     }
     useEffect(() => {
         form.setFieldsValue({
@@ -75,7 +75,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
             birthDate: dayjs(user?.birthDate * 1000),
             ip: user?.ip
         })
-    }, [form, user]);
+    }, [form, user])
     return (
         <div style={{ display: "flex", justifyContent: "center", padding: 20, height: "100%" }}>
             <Form
@@ -131,5 +131,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                 </Form.Item>
             </Form>
         </div >
-    );
-};
+    )
+}
+
+export default UpdateProfileForm

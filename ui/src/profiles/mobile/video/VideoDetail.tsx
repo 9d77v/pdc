@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react"
 import { message } from "antd"
 import "src/styles/button.less"
-import { useQuery } from "@apollo/react-hooks";
-import { GET_VIDEO } from 'src/consts/video.gql';
-import { VideoPlayer } from "src/components/videoplayer";
-import { useRouteMatch, useHistory } from "react-router-dom";
-import { NavBar, Icon } from "antd-mobile";
-import VideoSelect from "src/profiles/common/media/VideoSelect";
-import VideoSeriesSelect from "src/profiles/common/media/VideoSeriesSelect";
+import { useQuery } from "@apollo/react-hooks"
+import { GET_VIDEO } from 'src/consts/video.gql'
+import { VideoPlayer } from "src/components/videoplayer"
+import { useHistory, useLocation } from "react-router-dom"
+import { NavBar, Icon } from "antd-mobile"
+import VideoSelect from "src/profiles/common/video/VideoSelect"
+import VideoSeriesSelect from "src/profiles/common/video/VideoSeriesSelect"
 
 export default function VideoDetail() {
-    const match = useRouteMatch('/app/media/videos/:id');
     const history = useHistory()
     const [episodeItem, setEpisodeItem] = useState({
         id: 0,
@@ -18,17 +17,13 @@ export default function VideoDetail() {
         mobileURL: "",
         subtitles: null
     })
-    let ids: number[] = []
-    let params: any
-    if (match) {
-        params = match.params
-        ids = [params.id]
-    }
+    const location = useLocation()
+    const query = new URLSearchParams(location.search)
+    const videoID = query.get("video_id")
     const { error, data } = useQuery(GET_VIDEO,
         {
             variables: {
-                ids: ids,
-                videoID: params.id
+                videoID: videoID
             },
             fetchPolicy: "cache-and-network"
         })
@@ -123,7 +118,7 @@ export default function VideoDetail() {
                     <br />
                     <VideoSeriesSelect
                         data={data?.videoSerieses.edges}
-                        videoID={Number(params.id)} />
+                        videoID={Number(videoID)} />
                 </div>
             </div>
         </div>)

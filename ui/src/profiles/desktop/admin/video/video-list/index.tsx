@@ -1,25 +1,26 @@
-import { Table, Button, message, Tag, Modal } from 'antd';
+import { Table, Button, message, Tag, Modal } from 'antd'
 import React, { useState, useEffect } from 'react'
 import {
     LIST_VIDEO, UPDATE_VIDEO,
     ADD_EPISODE, UPDATE_EPISODE,
     SAVE_SUBTITLES, UPDATE_MOBILE_VIDEO
-} from 'src/consts/video.gql';
-import { useQuery } from '@apollo/react-hooks';
-import { useMutation } from '@apollo/react-hooks';
-import { EpisodeCreateForm } from './EpisodeCreateForm';
-import dayjs from 'dayjs';
-import { VideoPlayer } from 'src/components/videoplayer';
-import { VideoUpdateForm } from './VideoUpdateForm';
-import { EpisodeUpdateForm } from './EpisodeUpdateForm';
-import Img from 'src/components/img';
-import TextArea from 'antd/lib/input/TextArea';
-import { TablePaginationConfig } from 'antd/lib/table';
-import { PlaySquareTwoTone } from '@ant-design/icons';
-import { SubtitleUpdateForm } from './SubtitleUpdateForm';
-import Search from 'antd/lib/input/Search';
-import { MobileVideoUpdateForm } from './MobileVideoUpdateForm';
-import { useHistory } from 'react-router-dom';
+} from 'src/consts/video.gql'
+import { useQuery } from '@apollo/react-hooks'
+import { useMutation } from '@apollo/react-hooks'
+import { EpisodeCreateForm } from './EpisodeCreateForm'
+import dayjs from 'dayjs'
+import { VideoPlayer } from 'src/components/videoplayer'
+import { VideoUpdateForm } from './VideoUpdateForm'
+import { EpisodeUpdateForm } from './EpisodeUpdateForm'
+import Img from 'src/components/img'
+import TextArea from 'antd/lib/input/TextArea'
+import { TablePaginationConfig } from 'antd/lib/table'
+import { PlaySquareTwoTone } from '@ant-design/icons'
+import { SubtitleUpdateForm } from './SubtitleUpdateForm'
+import Search from 'antd/lib/input/Search'
+import { MobileVideoUpdateForm } from './MobileVideoUpdateForm'
+import { useHistory } from 'react-router-dom'
+import { AdminPath } from 'src/consts/path'
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -84,7 +85,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
                     }}>编辑分集</Button>
             </span>
         },
-    ];
+    ]
 
     return <div>
         <Table
@@ -98,8 +99,8 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
 
 export default function VideoTable() {
     const history = useHistory()
-    const [currentVideoID, setCurrentVideoID] = useState(0);
-    const [episodeVisible, setEpisodeVisible] = useState(false);
+    const [currentVideoID, setCurrentVideoID] = useState(0)
+    const [episodeVisible, setEpisodeVisible] = useState(false)
     const [updateVideoVisible, setUpdateVideoVisible] = useState(false)
     const [updateVideoData, setUpdateVideoData] = useState({
         title: "",
@@ -159,7 +160,7 @@ export default function VideoTable() {
             },
             fetchPolicy: "cache-and-network"
         })
-    const [num, setNum] = useState(1);
+    const [num, setNum] = useState(1)
     useEffect(() => {
         if (error) {
             message.error("接口请求失败！")
@@ -180,10 +181,10 @@ export default function VideoTable() {
                     "theme": values.theme
                 }
             }
-        });
-        setUpdateVideoVisible(false);
+        })
+        setUpdateVideoVisible(false)
         await refetch()
-    };
+    }
 
     const onEpisodeCreate = async (values: any) => {
         await addEpisode({
@@ -197,8 +198,8 @@ export default function VideoTable() {
                     "subtitles": values.subtitles
                 }
             }
-        });
-        setEpisodeVisible(false);
+        })
+        setEpisodeVisible(false)
         await refetch()
     }
 
@@ -215,10 +216,10 @@ export default function VideoTable() {
                     "subtitles": values.subtitles
                 }
             }
-        });
-        setUpdateEpisodeVisible(false);
+        })
+        setUpdateEpisodeVisible(false)
         await refetch()
-    };
+    }
 
     const onSubtitleUpdate = async (values: any) => {
         await saveSubtitles({
@@ -231,10 +232,10 @@ export default function VideoTable() {
                     }
                 }
             }
-        });
-        setUpdateSubtitleVisible(false);
+        })
+        setUpdateSubtitleVisible(false)
         await refetch()
-    };
+    }
 
     const onMobileVideoUpdate = async (values: any) => {
         await updateMobileVideo({
@@ -244,8 +245,8 @@ export default function VideoTable() {
                     "videoURLs": values.videoURLs,
                 }
             }
-        });
-        setUpdateMobileVideoVisible(false);
+        })
+        setUpdateMobileVideoVisible(false)
     }
 
     const onChange = (pageConfig: TablePaginationConfig) => {
@@ -255,8 +256,8 @@ export default function VideoTable() {
                 pageSize: pageConfig.pageSize || 10
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
-                const newEdges = fetchMoreResult ? fetchMoreResult.videos.edges : [];
-                const totalCount = fetchMoreResult ? fetchMoreResult.videos.totalCount : 0;
+                const newEdges = fetchMoreResult ? fetchMoreResult.videos.edges : []
+                const totalCount = fetchMoreResult ? fetchMoreResult.videos.totalCount : 0
                 const t = {
                     ...pagination,
                     current: pageConfig.current || 1,
@@ -328,7 +329,7 @@ export default function VideoTable() {
                             <Tag color={'cyan'} key={"tag_" + record.id + "_" + index}>
                                 {value}
                             </Tag>
-                        );
+                        )
                     })
                     return <div>{tagNodes}</div>
                 }
@@ -388,13 +389,13 @@ export default function VideoTable() {
                         }}>更换视频</Button>
                 </span>
         }
-    ];
+    ]
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
                 type="primary"
                 onClick={() => {
-                    history.push("/admin/video/video-list/video-create")
+                    history.push(AdminPath.VIDEO_CREATE)
                 }}
                 style={{ float: 'left', marginBottom: 6, marginTop: 5, zIndex: 1, width: 100 }}
             >
@@ -410,7 +411,7 @@ export default function VideoTable() {
                 data={updateVideoData}
                 onUpdate={onVideoUpdate}
                 onCancel={() => {
-                    setUpdateVideoVisible(false);
+                    setUpdateVideoVisible(false)
                 }}
             />
             <EpisodeCreateForm
@@ -418,7 +419,7 @@ export default function VideoTable() {
                 visible={episodeVisible}
                 onCreate={onEpisodeCreate}
                 onCancel={() => {
-                    setEpisodeVisible(false);
+                    setEpisodeVisible(false)
                 }}
                 num={num}
             />
@@ -427,14 +428,14 @@ export default function VideoTable() {
                 data={updateEpisodeData}
                 onUpdate={onEpisodeUpdate}
                 onCancel={() => {
-                    setUpdateEpisodeVisible(false);
+                    setUpdateEpisodeVisible(false)
                 }}
             />
             <SubtitleUpdateForm
                 visible={updateSubtitleVisible}
                 onUpdate={onSubtitleUpdate}
                 onCancel={() => {
-                    setUpdateSubtitleVisible(false);
+                    setUpdateSubtitleVisible(false)
                 }}
             />
             <MobileVideoUpdateForm
@@ -442,7 +443,7 @@ export default function VideoTable() {
                 videoID={currentVideoID}
                 onUpdate={onMobileVideoUpdate}
                 onCancel={() => {
-                    setUpdateMobileVideoVisible(false);
+                    setUpdateMobileVideoVisible(false)
                 }}
             />
             <Modal
@@ -493,5 +494,5 @@ export default function VideoTable() {
                 dataSource={data ? data.videos.edges : []}
             />
         </div>
-    );
+    )
 }

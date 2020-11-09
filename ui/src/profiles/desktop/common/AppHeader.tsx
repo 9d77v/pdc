@@ -1,32 +1,33 @@
 import React from "react"
-import { Layout, Dropdown, Avatar, Button } from 'antd';
-import { Link, useHistory, useLocation } from "react-router-dom";
-import { apolloClient } from "src/utils/apollo_client";
-const { Header } = Layout;
+import { Layout, Dropdown, Avatar, Button } from 'antd'
+import { Link, useHistory, useLocation } from "react-router-dom"
+import { apolloClient } from "src/utils/apollo_client"
+import { AdminPath, AppPath } from "src/consts/path"
+const { Header } = Layout
 
 interface AppHeaderProps {
-    name: string;
-    avatar: string;
-    roleID: number;
+    name: string
+    avatar: string
+    roleID: number
 }
 
 export const AppHeader = (props: AppHeaderProps) => {
-    const history = useHistory();
+    const history = useHistory()
     const logout = () => {
         localStorage.clear()
         apolloClient.resetStore()
-        history.push("/login")
+        history.push(AppPath.LOGIN)
     }
 
     const gotoAdmin = () => {
-        history.push("/admin/home")
+        history.push(AdminPath.HOME)
     }
 
     const gotoApp = () => {
-        history.push("/app/home")
+        history.push(AppPath.HOME)
     }
 
-    const location = useLocation();
+    const location = useLocation()
     const roleID = props.roleID
     const isApp = location.pathname.indexOf("/app") >= 0
     if (isApp) {
@@ -36,7 +37,7 @@ export const AppHeader = (props: AppHeaderProps) => {
     }
     return (
         <Header className="header">
-            <Link to="/app/home" style={{ fontSize: 26, color: "white", textAlign: "left", float: 'left' }}>{document.title}</Link>
+            <Link to={AppPath.HOME} style={{ fontSize: 26, color: "white", textAlign: "left", float: 'left' }}>{document.title}</Link>
             <div ></div>
             <div style={{ float: 'right', height: 56, alignItems: 'center', display: 'flex' }}>
                 <Dropdown

@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react"
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom'
 import { message, Pagination } from "antd"
 import "src/styles/video.less"
 import "src/styles/button.less"
-import { useQuery } from "@apollo/react-hooks";
-import { LIST_VIDEO_CARD } from 'src/consts/video.gql';
-import Img from "src/components/img";
-import Search from "antd/lib/input/Search";
-import CheckableTag from "antd/lib/tag/CheckableTag";
-import { IVideoPagination } from "src/consts/consts";
+import { useQuery } from "@apollo/react-hooks"
+import { LIST_VIDEO_CARD } from 'src/consts/video.gql'
+import Img from "src/components/img"
+import Search from "antd/lib/input/Search"
+import CheckableTag from "antd/lib/tag/CheckableTag"
+import { IVideoPagination } from "src/consts/consts"
+import { AppPath } from "src/consts/path"
 
 
-export default function VideoList() {
+const VideoSearch = () => {
 
     const [cards, setCards] = useState(<div />)
     const [pagination, setPagination] = useState<IVideoPagination>({
@@ -30,7 +31,7 @@ export default function VideoList() {
             },
             fetchPolicy: "cache-and-network"
         }
-    );
+    )
 
     useEffect(() => {
         if (error) {
@@ -44,7 +45,7 @@ export default function VideoList() {
             const videos = data.searchVideo.edges
             setCards(videos.map((item: any) =>
                 <div key={item.id}
-                    onClick={() => history.push('/app/media/videos/' + item.id)}
+                    onClick={() => history.push(AppPath.VIDEO_DETAIL + "?video_id=" + item.id)}
                     className={"card"}
                 >
                     <div style={{ clear: "both" }} />
@@ -66,7 +67,7 @@ export default function VideoList() {
     }
 
     const onTagChange = (tag: any, checked: any) => {
-        const nextSelectedTags = checked ? [...pagination.selectedTags, tag] : pagination.selectedTags.filter(t => t !== tag);
+        const nextSelectedTags = checked ? [...pagination.selectedTags, tag] : pagination.selectedTags.filter(t => t !== tag)
         setPagination({
             keyword: pagination.keyword,
             page: pagination.page,
@@ -76,7 +77,7 @@ export default function VideoList() {
     }
 
     const showTotal = (total: number) => {
-        return `共 ${parseInt(((total / pagination.pageSize) + 1).toString())} 页/ ${total} 个`;
+        return `共 ${parseInt(((total / pagination.pageSize) + 1).toString())} 页/ ${total} 个`
     }
 
     return (
@@ -142,3 +143,5 @@ export default function VideoList() {
         </div>
     )
 }
+
+export default VideoSearch

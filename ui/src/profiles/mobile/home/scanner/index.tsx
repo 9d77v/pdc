@@ -3,6 +3,7 @@ import { Button, Icon, List, NavBar } from 'antd-mobile'
 import React, { useEffect, useState } from 'react'
 import QrReader from 'react-qr-reader'
 import { useHistory } from 'react-router-dom'
+import { AppPath } from 'src/consts/path';
 
 const Item = List.Item;
 
@@ -31,15 +32,14 @@ export const Scanner = (props: IScannerProps) => {
                 if (id !== props.user.uid) {
                     setResultDiv(
                         <Button type="primary" onClick={() => {
-                            const path = "/app/contact/addContact/" + btoa(result)
+                            const path = AppPath.CONTACT_ADD + "?url=" + btoa(result)
                             history.replace(path)
                         }}>加好友</Button>
                     )
                 } else {
                     setResultDiv(
                         <Button type="primary" onClick={() => {
-                            const path = "/app/user"
-                            history.replace(path)
+                            history.replace(AppPath.USER)
                         }}>我的</Button>
                     )
                 }

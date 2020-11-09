@@ -1,13 +1,13 @@
-import { useHistory } from 'react-router-dom';
-import { Form, Input, Button, Select, DatePicker, message } from 'antd';
-import React, { useState, useEffect } from 'react';
-import { GenderMap } from "src/consts/consts";
-import { Uploader } from "src/components/Uploader";
-import dayjs from 'dayjs';
-import { UPDATE_PROFILE } from 'src/consts/user.gpl';
-import { useMutation } from '@apollo/react-hooks';
-import { NavBar, Icon } from 'antd-mobile';
-import { NewUser } from 'src/models/user';
+import { useHistory } from 'react-router-dom'
+import { Form, Input, Button, Select, DatePicker, message } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { GenderMap } from "src/consts/consts"
+import { Uploader } from "src/components/Uploader"
+import dayjs from 'dayjs'
+import { UPDATE_PROFILE } from 'src/consts/user.gpl'
+import { useMutation } from '@apollo/react-hooks'
+import { NavBar, Icon } from 'antd-mobile'
+import { NewUser } from 'src/models/user'
 
 interface UpdateProfileFormProps {
     user: NewUser
@@ -15,13 +15,13 @@ interface UpdateProfileFormProps {
 export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
     user
 }) => {
-    const history = useHistory();
+    const history = useHistory()
 
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)
 
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },
@@ -37,7 +37,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
             key={'user_gender_options_' + key}>{value}</Select.Option>)
     })
     const onUpdate = async (values: any) => {
-        setLoading(true);
+        setLoading(true)
         const data = await updateProfile({
             variables: {
                 "input": {
@@ -47,13 +47,13 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                     "ip": values.ip,
                 }
             }
-        });
-        setLoading(false);
+        })
+        setLoading(false)
         if (!data.errors) {
             message.success("更新个人资料成功")
             history.goBack()
         }
-    };
+    }
 
     const onFinish = (values: any) => {
         form.setFieldsValue({
@@ -62,15 +62,15 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
         form
             .validateFields()
             .then((values: any) => {
-                onUpdate(values);
+                onUpdate(values)
             })
             .catch(info => {
-                console.log('Validate Failed:', info);
-            });
+                console.log('Validate Failed:', info)
+            })
     }
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+        console.log('Failed:', errorInfo)
     }
     useEffect(() => {
         form.setFieldsValue({
@@ -79,7 +79,7 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
             birthDate: dayjs(user?.birthDate * 1000),
             ip: user?.ip
         })
-    }, [form, user]);
+    }, [form, user])
     return (
         <div style={{ height: "100%" }}>
             <NavBar
@@ -141,5 +141,5 @@ export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
                 </Form.Item>
             </Form>
         </div >
-    );
-};
+    )
+}

@@ -1,9 +1,9 @@
-import { Form, Radio } from 'antd';
+import { Form, Radio } from 'antd'
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
-import { Uploader } from 'src/components/Uploader';
+import { Uploader } from 'src/components/Uploader'
 
 const VideoCreateStepThreeForm = (props: any, ref: Ref<any>) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const getForm = () => {
         return form
     }
@@ -51,4 +51,4 @@ const VideoCreateStepThreeForm = (props: any, ref: Ref<any>) => {
     )
 }
 
-export default forwardRef(VideoCreateStepThreeForm);
+export default forwardRef(VideoCreateStepThreeForm)

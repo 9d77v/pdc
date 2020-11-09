@@ -3,18 +3,19 @@ import {
     ApolloClient,
     InMemoryCache,
     HttpLink
-} from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { onError } from "@apollo/client/link/error";
-import jwt_decode from 'jwt-decode';
-import dayjs from 'dayjs';
-import { getRefreshToken } from 'src/consts/http';
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import { onError } from "@apollo/client/link/error"
+import jwt_decode from 'jwt-decode'
+import dayjs from 'dayjs'
+import { getRefreshToken } from 'src/consts/http'
 import { message as msg, message } from 'antd'
-const httpLink = new HttpLink({ uri: '/api' });
+import { AppPath } from 'src/consts/path'
+const httpLink = new HttpLink({ uri: '/api' })
 
 const authLink = setContext(
     () => {
-        let token = localStorage.getItem('accessToken') || "";
+        let token = localStorage.getItem('accessToken') || ""
         if (token === "") {
             return {
                 headers: {
@@ -30,7 +31,7 @@ const authLink = setContext(
                 }
             }
         }
-        const refreshToken = localStorage.getItem('refreshToken') || "";
+        const refreshToken = localStorage.getItem('refreshToken') || ""
         return new Promise(async (success, fail) => {
             //refresh token
             const data = await getRefreshToken(refreshToken)
@@ -61,7 +62,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
             apolloClient.resetStore()
             message.error("token失效，将回到登录页面")
             setTimeout(() => {
-                window.location.href = "/login"
+                window.location.href = AppPath.LOGIN
             }, 2000)
         } else if (err.statusCode === 403) {
             message.error("无操作权限")
@@ -81,4 +82,4 @@ export const apolloClient = new ApolloClient({
         httpLink,
     ]),
     cache: new InMemoryCache()
-});
+})

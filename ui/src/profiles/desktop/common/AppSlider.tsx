@@ -1,99 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
     PlaySquareOutlined, ShoppingOutlined, UserOutlined, LockOutlined,
     ProfileOutlined, HomeOutlined, DashboardOutlined, ToolOutlined,
     CalculatorOutlined
-} from '@ant-design/icons';
-import { Layout, Menu } from 'antd';
-import { Link, useLocation } from 'react-router-dom';
+} from '@ant-design/icons'
+import { Layout, Menu } from 'antd'
+import { Link, useLocation } from 'react-router-dom'
+import { AdminPath, AppPath, PathDict } from 'src/consts/path'
 
-const { Sider } = Layout;
-const { SubMenu } = Menu;
+const { Sider } = Layout
+const { SubMenu } = Menu
 
 const locationMap = new Map<string, any>([
-    ["/app/home", {
+    [AppPath.HOME, {
         "defaultOpenKeys": ["home"],
         "defaultSelectedKeys": ['home']
     }],
-    ["/app/device", {
+    [AppPath.DEVICE, {
         "defaultOpenKeys": ["device"],
         "defaultSelectedKeys": ['device']
     }],
-    ["/app/util", {
+    [AppPath.UTIL, {
         "defaultOpenKeys": ["util"],
         "defaultSelectedKeys": ['util']
     }],
-    ["/app/util/calculator", {
+    [AppPath.UTIL_CALCULATOR, {
         "defaultOpenKeys": ["util"],
         "defaultSelectedKeys": ['util-calculator']
     }],
-    ["/app/user/profile", {
+    [AppPath.USER_PROFILE, {
         "defaultOpenKeys": ["user"],
         "defaultSelectedKeys": ['user-profile']
     }],
-    ["/app/user/account", {
+    [AppPath.USER_ACCOUNT, {
         "defaultOpenKeys": ["user"],
         "defaultSelectedKeys": ['user-account']
     }],
-    ["/app/media/videos", {
+    [AppPath.VIDEO_SEARCH, {
         "defaultOpenKeys": ["media"],
-        "defaultSelectedKeys": ['media-videos']
+        "defaultSelectedKeys": ['media-search']
     }],
-    ["/app/media/history", {
+    [AppPath.HISTORY, {
         "defaultOpenKeys": ["media"],
         "defaultSelectedKeys": ['media-history']
     }],
-    ["/app/thing/dashboard", {
+    [AppPath.THING_DASHBOARD, {
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-dashboard']
     }],
-    ["/app/thing/things", {
+    [AppPath.THING_LIST, {
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-things']
     }],
-    ["/app/thing/analysis", {
+    [AppPath.THING_ANALYSIS, {
         "defaultOpenKeys": ["thing"],
         "defaultSelectedKeys": ['thing-analysis']
     }],
-    ["/admin/video", {
+    [AdminPath.VIDEO, {
         "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-list']
     }],
-    ["/admin/video/video-list", {
+    [AdminPath.VIDEO_LIST, {
         "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-list']
     }],
-    ["/admin/video/video-series-list", {
+    [AdminPath.VIDEO_SEREIS_LIST, {
         "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-series-list']
     }],
-    ["/admin/device", {
+    [AdminPath.DEVICE, {
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-list']
     }],
-    ["/admin/device/device-list", {
+    [AdminPath.DEVICE_LIST, {
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-list']
     }],
-    ["/admin/device/device-model-list", {
+    [AdminPath.DEVICE_MODEL_LIST, {
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-model-list']
     }],
-    ["/admin/device/device-dashboard-list", {
+    [AdminPath.DEVICE_DASHBOARD_LIST, {
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-dashboard-list']
     }],
-    ["/admin/user", {
+    [AdminPath.USER, {
         "defaultOpenKeys": ["settings-user"],
         "defaultSelectedKeys": ['user-list']
-    }], ["/admin/user/user-list", {
+    }],
+    [AdminPath.USER_LIST, {
         "defaultOpenKeys": ["settings-user"],
         "defaultSelectedKeys": ['user-list']
     }]
 ])
 
 interface AppHeaderProps {
-    roleID: number;
+    roleID: number
     config?: any
 }
 
@@ -108,9 +110,9 @@ const AppMenu = (props: AppHeaderProps) => {
             style={{ height: '100%', borderRight: 0 }}
         >
             <Menu.Item key="home">
-                <Link to="/app/home">  <span>
+                <Link to={AppPath.HOME}>  <span>
                     <HomeOutlined />
-                    <span>首页</span>
+                    <span>{PathDict.get(AppPath.HOME)}</span>
                 </span></Link>
             </Menu.Item>
             <SubMenu
@@ -119,21 +121,21 @@ const AppMenu = (props: AppHeaderProps) => {
                 title={
                     <span>
                         <PlaySquareOutlined />
-                        <span>媒体库</span>
+                        <span>{PathDict.get(AppPath.VIDEO)}</span>
                     </span>
                 }
             >
-                <Menu.Item key="media-videos">
-                    <Link to="/app/media/videos">视频</Link>
+                <Menu.Item key="media-search">
+                    <Link to={AppPath.VIDEO_SEARCH}>{PathDict.get(AppPath.VIDEO_SEARCH)}</Link>
                 </Menu.Item>
                 <Menu.Item key="media-history">
-                    <Link to="/app/media/history">最近播放</Link>
+                    <Link to={AppPath.HISTORY}>{PathDict.get(AppPath.HISTORY)}</Link>
                 </Menu.Item>
             </SubMenu>
             <Menu.Item key="device">
-                <Link to="/app/device">  <span>
+                <Link to={AppPath.DEVICE}>  <span>
                     <DashboardOutlined />
-                    <span>设备</span>
+                    <span>{PathDict.get(AppPath.DEVICE)}</span>
                 </span></Link>
             </Menu.Item>
             {/* <SubMenu
@@ -142,18 +144,18 @@ const AppMenu = (props: AppHeaderProps) => {
                 title={
                     <span>
                         <ShoppingOutlined />
-                        <span>物品</span>
+                        <span>{PathDict.get(AppPath.THING)}</span>
                     </span>
                 }
             >
                 <Menu.Item key="thing-dashboard">
-                    <Link to="/app/thing/dashboard">物品概览</Link>
+                    <Link to={AppPath.THING_DASHBOARD}>{PathDict.get(AppPath.THING_DASHBOARD)}</Link>
                 </Menu.Item>
                 <Menu.Item key="thing-things">
-                    <Link to="/app/thing/things">物品列表</Link>
+                    <Link to={AppPath.THING_LIST}>{PathDict.get(AppPath.THING_LIST)}</Link>
                 </Menu.Item>
                 <Menu.Item key="thing-analysis">
-                    <Link to="/app/thing/analysis">物品分析</Link>
+                    <Link to={AppPath.THING_ANALYSIS}>{PathDict.get(AppPath.THING_ANALYSIS)}</Link>
                 </Menu.Item>
             </SubMenu> */}
             <SubMenu
@@ -162,14 +164,14 @@ const AppMenu = (props: AppHeaderProps) => {
                 title={
                     <span>
                         <ToolOutlined />
-                        <span>工具</span>
+                        <span>{PathDict.get(AppPath.UTIL)}</span>
                     </span>
                 }
             >
                 <Menu.Item key="util-calculator">
-                    <Link to="/app/util/calculator">   <span>
+                    <Link to={AppPath.UTIL_CALCULATOR}>   <span>
                         <CalculatorOutlined />
-                        <span>计算器</span>
+                        <span>{PathDict.get(AppPath.UTIL_CALCULATOR)}</span>
                     </span></Link>
                 </Menu.Item>
             </SubMenu>
@@ -178,21 +180,21 @@ const AppMenu = (props: AppHeaderProps) => {
                 title={
                     <span>
                         <UserOutlined />
-                        <span>个人设置</span>
+                        <span>{PathDict.get(AppPath.USER)}</span>
                     </span>
                 }
             >
                 <Menu.Item key="user-profile">
-                    <Link to="/app/user/profile"> <span>
+                    <Link to={AppPath.USER_PROFILE}> <span>
                         <ProfileOutlined />
-                        <span>个人资料</span>
+                        <span>{PathDict.get(AppPath.USER_PROFILE)}</span>
                     </span></Link>
                 </Menu.Item>
                 <Menu.Item key="user-account">
-                    <Link to="/app/user/account">
+                    <Link to={AppPath.USER_ACCOUNT}>
                         <span>
                             <LockOutlined />
-                            <span>账户安全</span>
+                            <span>{PathDict.get(AppPath.USER_ACCOUNT)}</span>
                         </span>
                     </Link>
                 </Menu.Item>
@@ -212,7 +214,7 @@ const AdminMenu = (props: AppHeaderProps) => {
             style={{ height: '100%', borderRight: 0 }}
         >
             <Menu.Item key="home">
-                <Link to="/admin/home">首页</Link>
+                <Link to={AdminPath.HOME}>{PathDict.get(AdminPath.HOME)}</Link>
             </Menu.Item>
             <SubMenu
                 key="settings-user"
@@ -220,12 +222,12 @@ const AdminMenu = (props: AppHeaderProps) => {
                 title={
                     <span>
                         <UserOutlined />
-                        <span>用户管理</span>
+                        <span>{PathDict.get(AdminPath.USER)}</span>
                     </span>
                 }
             >
                 <Menu.Item key="user-list" >
-                    <Link to="/admin/user/user-list">用户列表</Link>
+                    <Link to={AdminPath.USER_LIST}>{PathDict.get(AdminPath.USER_LIST)}</Link>
                 </Menu.Item>
             </SubMenu>
             <SubMenu
@@ -234,15 +236,15 @@ const AdminMenu = (props: AppHeaderProps) => {
                 title={
                     <span>
                         <PlaySquareOutlined />
-                        <span>视频管理</span>
+                        <span>{PathDict.get(AdminPath.VIDEO)}</span>
                     </span>
                 }
             >
                 <Menu.Item key="video-list" >
-                    <Link to="/admin/video/video-list">视频列表</Link>
+                    <Link to={AdminPath.VIDEO_LIST}>{PathDict.get(AdminPath.VIDEO_LIST)}</Link>
                 </Menu.Item>
                 <Menu.Item key="video-series-list" >
-                    <Link to="/admin/video/video-series-list">视频系列列表</Link>
+                    <Link to={AdminPath.VIDEO_SEREIS_LIST}>{PathDict.get(AdminPath.VIDEO_SEREIS_LIST)}</Link>
                 </Menu.Item>
             </SubMenu>
             <SubMenu
@@ -250,18 +252,18 @@ const AdminMenu = (props: AppHeaderProps) => {
                 style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
                 title={
                     <span>
-                        <span>设备管理</span>
+                        <span>{PathDict.get(AdminPath.DEVICE)}</span>
                     </span>
                 }
             >
                 <Menu.Item key="device-list" >
-                    <Link to="/admin/device/device-list">设备列表</Link>
+                    <Link to={AdminPath.DEVICE_LIST}>{PathDict.get(AdminPath.DEVICE_LIST)}</Link>
                 </Menu.Item>
                 <Menu.Item key="device-model-list" >
-                    <Link to="/admin/device/device-model-list">设备模板列表</Link>
+                    <Link to={AdminPath.DEVICE_MODEL_LIST}>{PathDict.get(AdminPath.DEVICE_MODEL_LIST)}</Link>
                 </Menu.Item>
                 <Menu.Item key="device-dashboard-list" >
-                    <Link to="/admin/device/device-dashboard-list">设备仪表盘</Link>
+                    <Link to={AdminPath.DEVICE_DASHBOARD_LIST}>{PathDict.get(AdminPath.DEVICE_DASHBOARD_LIST)}</Link>
                 </Menu.Item>
             </SubMenu>
         </Menu>
@@ -269,8 +271,8 @@ const AdminMenu = (props: AppHeaderProps) => {
 }
 
 export const AppSlider = (props: AppHeaderProps) => {
-    const [collapsed, setCollapsed] = useState(false);
-    const location = useLocation();
+    const [collapsed, setCollapsed] = useState(false)
+    const location = useLocation()
     let config = locationMap.get(location.pathname) || []
     const roleID = props.roleID
     const isApp = location.pathname.indexOf("/app") >= 0

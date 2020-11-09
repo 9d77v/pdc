@@ -1,6 +1,6 @@
 import React from "react"
 import "src/styles/card.less"
-import { NavBar } from "antd-mobile";
+import { NavBar } from "antd-mobile"
 
 export default function MessageIndex() {
     return (

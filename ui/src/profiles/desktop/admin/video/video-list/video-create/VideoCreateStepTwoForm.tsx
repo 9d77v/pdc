@@ -1,19 +1,19 @@
-import { Form } from 'antd';
+import { Form } from 'antd'
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
-import { Uploader } from 'src/components/Uploader';
+import { Uploader } from 'src/components/Uploader'
 
 interface Values {
-    title: string;
-    description: string;
+    title: string
+    description: string
 }
 
 interface VideoCreateStepTwoFormProps {
     id: number
-    onCreate?: (values: Values) => void;
+    onCreate?: (values: Values) => void
 }
 
 const VideoCreateStepTwoForm = (props: VideoCreateStepTwoFormProps, ref: Ref<any>) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const getForm = () => {
         return form
     }
@@ -61,4 +61,4 @@ const VideoCreateStepTwoForm = (props: VideoCreateStepTwoFormProps, ref: Ref<any
     )
 }
 
-export default forwardRef(VideoCreateStepTwoForm);
+export default forwardRef(VideoCreateStepTwoForm)

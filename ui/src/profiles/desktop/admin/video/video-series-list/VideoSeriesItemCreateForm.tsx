@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Select } from 'antd'
 import React, { useState, useEffect } from 'react'
-import { useQuery } from '@apollo/react-hooks';
-import { VIDEO_COMBO } from 'src/consts/video.gql';
+import { useQuery } from '@apollo/react-hooks'
+import { VIDEO_COMBO } from 'src/consts/video.gql'
 
 interface VideoSeriesItemCreateFormProps {
     visible: boolean
@@ -9,7 +9,7 @@ interface VideoSeriesItemCreateFormProps {
     onCancel: () => void
     video_series_id: number,
 }
-const { Option } = Select;
+const { Option } = Select
 export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps> = ({
     visible,
     onCreate,
@@ -52,13 +52,13 @@ export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps>
         timer = setTimeout(() => {
             setKeyword(value)
         }, 1000)
-    };
+    }
 
     const handleChange = (value: number) => {
         setValue(value)
     }
     const options = data === undefined ? null : data.videos.edges.map((d: any) =>
-        <Option key={d.value} value={d.value}>{d.text}</Option>);
+        <Option key={d.value} value={d.value}>{d.text}</Option>)
     return (
         <Modal
             visible={visible}

@@ -1,20 +1,20 @@
-import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd';
+import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd'
 import React, { useState } from 'react'
-import { Uploader } from 'src/components/Uploader';
-import { ConsumerExpenditureMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from 'src/consts/consts';
-import dayjs from 'dayjs';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Uploader } from 'src/components/Uploader'
+import { ConsumerExpenditureMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from 'src/consts/consts'
+import dayjs from 'dayjs'
+import { QuestionCircleOutlined } from '@ant-design/icons'
 
 
 interface Values {
-    title: string;
-    description: string;
+    title: string
+    description: string
 }
 
 interface ThingCreateFormProps {
-    visible: boolean;
-    onCreate: (values: Values) => void;
-    onCancel: () => void;
+    visible: boolean
+    onCreate: (values: Values) => void
+    onCancel: () => void
 }
 
 export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
@@ -22,7 +22,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
     onCreate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [thingURLs, setThingURLs] = useState([])
     const layout = {
         labelCol: { span: 5 },
@@ -61,12 +61,12 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onCreate(values);
+                        form.resetFields()
+                        onCreate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setThingURLs([])
             }}
             maskClosable={false}
@@ -103,7 +103,7 @@ export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
                 <Form.Item
                     name="consumerExpenditure"
                     label={<span>
-                        消费支出&nbsp;
+                        消费支出&nbsp
                         <Tooltip title={<a href="http://www.stats.gov.cn/tjsj/tjbz/201310/P020131021349384303616.pdf" target="_blank" rel="noopener noreferrer">居民消费支出分类（2013）</a>}>
                             <QuestionCircleOutlined />
                         </Tooltip>

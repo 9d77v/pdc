@@ -1,44 +1,43 @@
-import React from 'react';
+import React from 'react'
 import {
     Route,
-} from "react-router-dom";
-import { Layout } from 'antd';
+} from "react-router-dom"
+import { Layout } from 'antd'
 import "./index.less"
-import { ConfigProvider } from 'antd';
-import zhCN from 'antd/es/locale/zh_CN';
-import { AppHeader } from './common/AppHeader';
-import { AppSlider } from './common/AppSlider';
-import { AppNavigator } from './common/AppNavigator';
-import { useQuery } from '@apollo/react-hooks';
-import { GET_USER } from 'src/consts/user.gpl';
-import { UpdateProfileForm } from './app/user/UpdateFrofileForm';
-import AppDeviceIndex from './app/device';
-import { NewUser } from 'src/models/user';
-import Calculator from 'src/components/calculator';
+import { ConfigProvider } from 'antd'
+import zhCN from 'antd/es/locale/zh_CN'
+import { AppHeader } from './common/AppHeader'
+import { AppSlider } from './common/AppSlider'
+import { AppNavigator } from './common/AppNavigator'
+import { useQuery } from '@apollo/react-hooks'
+import { GET_USER } from 'src/consts/user.gpl'
+import { NewUser } from 'src/models/user'
+import { AdminPath, AppPath } from 'src/consts/path'
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
 const VideoCreateIndex = React.lazy(() => import('./admin/video/video-list/video-create'))
 
 const UserTable = React.lazy(() => import('./admin/user/UserTable'))
 const UpdatePasswordForm = React.lazy(() => import("./app/user/UpdatePasswordForm"))
-
+const UpdateProfileForm = React.lazy(() => import('./app/user/UpdateFrofileForm'))
 
 const ThingTable = React.lazy(() => import('./app/thing/ThingTable'))
 const ThingDashboard = React.lazy(() => import('./app/thing/ThingDashboard'))
 const ThingAnalysis = React.lazy(() => import('./app/thing/ThingAnalysis'))
 
-const VideoList = React.lazy(() => import('./app/media/video/VideoList'))
-const VideoDetail = React.lazy(() => import('./app/media/video/VideoDetail'))
+const VideoIndex = React.lazy(() => import("./app/video"))
+const VideoSearch = React.lazy(() => import('./app/video/VideoSearch'))
+const VideoDetail = React.lazy(() => import('./app/video/VideoDetail'))
+const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
 
-
-const HistoryPage = React.lazy(() => import("./app/media/history/HistoryPage"))
-
-
+const AppDeviceIndex = React.lazy(() => import('./app/device'))
 const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
 const DeviceIndex = React.lazy(() => import('./admin/device/device-list/index'))
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
+
+const Calculator = React.lazy(() => import('src/components/calculator'))
 export default function DesktopIndex() {
-    const { data } = useQuery(GET_USER);
+    const { data } = useQuery(GET_USER)
     const user: NewUser = data?.userInfo
     return (
         <ConfigProvider locale={zhCN}>
@@ -55,61 +54,64 @@ export default function DesktopIndex() {
                     <Layout style={{ padding: '10px' }}>
                         <AppNavigator />
                         <div className={"wall"}>
-                            <Route exact path="/app/home">
+                            <Route exact path={AppPath.HOME}>
                                 欢迎使用个人数据中心
                             </Route>
-                            <Route exact path="/app/device">
+                            <Route exact path={AppPath.DEVICE}>
                                 <AppDeviceIndex />
                             </Route>
-                            <Route exact path="/app/media/videos/:id"  >
+                            <Route exact path={AppPath.VIDEO_DETAIL}  >
                                 <VideoDetail />
                             </Route>
-                            <Route exact path="/app/media/videos">
-                                <VideoList />
+                            <Route exact path={AppPath.VIDEO_SUGGEST}>
+                                <VideoIndex />
                             </Route>
-                            <Route exact path="/app/media/history">
+                            <Route exact path={AppPath.VIDEO_SEARCH}>
+                                <VideoSearch />
+                            </Route>
+                            <Route exact path={AppPath.HISTORY}>
                                 <HistoryPage />
                             </Route>
-                            <Route exact path="/app/thing/dashboard">
+                            <Route exact path={AppPath.THING_DASHBOARD}>
                                 <ThingDashboard />
                             </Route>
-                            <Route exact path="/app/thing/things">
-                                <ThingTable />
-                            </Route>
-                            <Route exact path="/app/user/profile">
-                                <UpdateProfileForm user={user} />
-                            </Route>
-                            <Route exact path="/app/user/account">
-                                <UpdatePasswordForm />
-                            </Route>
-                            <Route exact path="/app/thing/analysis">
+                            <Route exact path={AppPath.THING_ANALYSIS}>
                                 <ThingAnalysis />
                             </Route>
-                            <Route exact path="/app/util/calculator">
+                            <Route exact path={AppPath.THING_LIST}>
+                                <ThingTable />
+                            </Route>
+                            <Route exact path={AppPath.USER_PROFILE}>
+                                <UpdateProfileForm user={user} />
+                            </Route>
+                            <Route exact path={AppPath.USER_ACCOUNT}>
+                                <UpdatePasswordForm />
+                            </Route>
+                            <Route exact path={AppPath.UTIL_CALCULATOR}>
                                 <Calculator />
                             </Route>
-                            <Route exact path="/admin/home">
+                            <Route exact path={AdminPath.HOME}>
                                 欢迎使用个人数据中心管理后台
                             </Route>
-                            <Route exact path="/admin/video/video-list">
+                            <Route exact path={AdminPath.VIDEO_LIST}>
                                 <VideoTable />
                             </Route>
-                            <Route exact path="/admin/video/video-list/video-create">
+                            <Route exact path={AdminPath.VIDEO_CREATE}>
                                 <VideoCreateIndex />
                             </Route>
-                            <Route exact path="/admin/video/video-series-list">
+                            <Route exact path={AdminPath.VIDEO_SEREIS_LIST}>
                                 <VideoSeriesTable />
                             </Route>
-                            <Route exact path="/admin/device/device-model-list">
+                            <Route exact path={AdminPath.DEVICE_MODEL_LIST}>
                                 <DeviceModelIndex />
                             </Route>
-                            <Route exact path="/admin/device/device-dashboard-list">
+                            <Route exact path={AdminPath.DEVICE_DASHBOARD_LIST}>
                                 <DeviceDashboardList />
                             </Route>
-                            <Route exact path="/admin/device/device-list">
+                            <Route exact path={AdminPath.DEVICE_LIST}>
                                 <DeviceIndex />
                             </Route>
-                            <Route exact path="/admin/user/user-list">
+                            <Route exact path={AdminPath.USER_LIST}>
                                 <UserTable />
                             </Route>
                         </div>

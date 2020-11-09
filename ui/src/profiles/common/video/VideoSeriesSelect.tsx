@@ -1,6 +1,7 @@
 import React from "react"
 import "src/styles/button.less"
 import { useHistory } from "react-router-dom"
+import { AppPath } from "src/consts/path"
 
 interface IVideoSeriesSelectProps {
     data?: any[]
@@ -26,7 +27,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
             return <div
                 key={"pdc-button-" + value.videoID}
                 className={"pdc-button"}
-                onClick={() => { history.replace('/app/media/videos/' + value.videoID) }}
+                onClick={() => { history.replace(AppPath.VIDEO_DETAIL + "?video_id=" + value.videoID) }}
             >
                 {value.alias}
             </div>

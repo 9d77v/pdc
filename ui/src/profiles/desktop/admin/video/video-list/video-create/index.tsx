@@ -1,13 +1,13 @@
-import { useMutation } from '@apollo/react-hooks';
-import { Button, message, Steps } from 'antd';
-import React, { useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES } from 'src/consts/video.gql';
+import { useMutation } from '@apollo/react-hooks'
+import { Button, message, Steps } from 'antd'
+import React, { useRef, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES } from 'src/consts/video.gql'
 import "./index.less"
-import VideoCreateStepOneForm from './VideoCreateStepOneForm';
-import VideoCreateStepThreeForm from './VideoCreateStepThreeForm';
-import VideoCreateStepTwoForm from './VideoCreateStepTwoForm';
-const { Step } = Steps;
+import VideoCreateStepOneForm from './VideoCreateStepOneForm'
+import VideoCreateStepThreeForm from './VideoCreateStepThreeForm'
+import VideoCreateStepTwoForm from './VideoCreateStepTwoForm'
+const { Step } = Steps
 
 export default function VideoCreateIndex() {
     const [addVideo] = useMutation(ADD_VIDEO)
@@ -67,7 +67,7 @@ export default function VideoCreateIndex() {
                 }
             })
             .catch((info: any) => {
-                console.log('Validate Failed:', info);
+                console.log('Validate Failed:', info)
             })
     }
 
@@ -96,8 +96,8 @@ export default function VideoCreateIndex() {
                 }
             })
             .catch((info: any) => {
-                console.log('Validate Failed:', info);
-            });
+                console.log('Validate Failed:', info)
+            })
         stepTwo.resetVideoURLS()
     }
 
@@ -109,7 +109,7 @@ export default function VideoCreateIndex() {
             "subtitles": subtitles
         })
         if (subtitles.length > 0 && videoURLs.length !== subtitles.length) {
-            message.error(`字幕数量与视频数量不一致,视频数量：${videoURLs.length},字幕数量：${subtitles.length}`);
+            message.error(`字幕数量与视频数量不一致,视频数量：${videoURLs.length},字幕数量：${subtitles.length}`)
             return
         }
         form
@@ -142,7 +142,7 @@ export default function VideoCreateIndex() {
 
             })
             .catch((info: any) => {
-                console.log('Validate Failed:', info);
+                console.log('Validate Failed:', info)
             })
         stepThree.resetSubtitles()
     }

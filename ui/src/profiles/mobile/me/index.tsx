@@ -1,10 +1,11 @@
 import React from "react"
-import { useHistory } from "react-router-dom";
-import { apolloClient } from "src/utils/apollo_client";
-import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons';
-import { List } from "antd-mobile";
-import { UserBrief } from "src/profiles/mobile/common/UserBrief";
-import { NewUser } from "src/models/user";
+import { useHistory } from "react-router-dom"
+import { apolloClient } from "src/utils/apollo_client"
+import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons'
+import { List } from "antd-mobile"
+import { UserBrief } from "src/profiles/mobile/common/UserBrief"
+import { NewUser } from "src/models/user"
+import { AppPath } from "src/consts/path"
 
 interface IMeIndexProps {
     user: NewUser
@@ -12,11 +13,11 @@ interface IMeIndexProps {
 const Item = List.Item
 
 export default function MeIndex(props: IMeIndexProps) {
-    const history = useHistory();
+    const history = useHistory()
     const logout = () => {
         localStorage.clear()
         apolloClient.resetStore()
-        history.push("/login")
+        history.push(AppPath.LOGIN)
     }
     return (
         <div style={{
@@ -30,18 +31,18 @@ export default function MeIndex(props: IMeIndexProps) {
                 <Item
                     thumb={<QrcodeOutlined />}
                     arrow="horizontal"
-                    onClick={() => history.push("/app/user/qrcode")}
+                    onClick={() => history.push(AppPath.UESR_QECODE)}
                 >我的二维码名片</Item>
                 <Item
                     thumb={<LockOutlined />}
-                    onClick={() => history.push("/app/user/account")}
+                    onClick={() => history.push(AppPath.USER_ACCOUNT)}
                     arrow="horizontal"
                 >
                     修改密码
                 </Item>
                 <Item
                     thumb={<LockOutlined />}
-                    onClick={() => history.push("/app/user/gesture_password")}
+                    onClick={() => history.push(AppPath.USER_GESTURE_PASSWORD)}
                     arrow="horizontal"
                 >
                     手势密码
