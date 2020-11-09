@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/9d77v/pdc/dtos"
@@ -31,11 +30,8 @@ func HandleCard() func(w http.ResponseWriter, r *http.Request) {
 			io.WriteString(w, "request error")
 			return
 		}
-		id, err := strconv.ParseInt(arr[2], 10, 64)
-		if err != nil {
-			log.Println("conver id to int error:", err)
-		}
-		u, err := userService.GetByID(context.Background(), id)
+		id := models.GetDecodeUID(arr[2])
+		u, err := userService.GetByID(context.Background(), int64(id))
 		if err != nil {
 			log.Println("get user error:", err)
 		}
