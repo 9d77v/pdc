@@ -3,7 +3,7 @@ export const calcOptions = {
     historyRow: 8,
     floatFixed: 3,
     maxHistoryLength: 50,
-    maxOperationLength: 50
+    maxOperationLength: 500
 }
 
 export enum CalculatorKey {

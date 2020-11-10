@@ -16,6 +16,7 @@ import { AdminPath, AppPath } from 'src/consts/path'
 import UpdateProfileForm from './app/user/UpdateFrofileForm'
 import UpdatePasswordForm from './app/user/UpdatePasswordForm'
 import Calculator from 'src/components/calculator'
+import VideoIndex from './app/video'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -27,7 +28,6 @@ const ThingTable = React.lazy(() => import('./app/thing/ThingTable'))
 const ThingDashboard = React.lazy(() => import('./app/thing/ThingDashboard'))
 const ThingAnalysis = React.lazy(() => import('./app/thing/ThingAnalysis'))
 
-const VideoIndex = React.lazy(() => import("./app/video"))
 const VideoSearch = React.lazy(() => import('./app/video/VideoSearch'))
 const VideoDetail = React.lazy(() => import('./app/video/VideoDetail'))
 const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))

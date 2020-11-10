@@ -23,9 +23,7 @@ const VideoIndex = () => {
                 return <VideoTagSuggest
                     key={index}
                     tag={tag.key}
-                    pageSize={5}
-                    color="pink"
-                    fontSize={16}
+                    pageSize={3}
                 />
             })
         }

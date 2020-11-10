@@ -21,6 +21,7 @@ const DisplayToolbar: React.FC<IDisplayToolbarProps> = ({
         <div className="display-toolbar">
             <form className="display">
                 <textarea
+                    id="display-formula"
                     readOnly
                     className="display-formula"
                     value={formula}

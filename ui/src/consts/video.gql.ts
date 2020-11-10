@@ -108,6 +108,31 @@ const LIST_VIDEO_CARD = gql`
   }
 `;
 
+const GET_VIDEO_TAGS = gql`
+ query searchVideo($page:Int=1) {
+   searchVideo(page: $page){
+    aggResults{
+         key
+         value
+       }
+   }
+  }
+`;
+
+const VIDEO_RANDOM_TAG_SUGGEST = gql`
+ query searchVideo($tag:String!) {
+   searchVideo(tags:[$tag],page: 1, pageSize: 3,isRandom:true){
+       edges{
+            id
+            title
+            desc
+            cover
+            totalNum
+       }
+   }
+  }
+`;
+
 const VIDEO_COMBO = gql`
  query videos($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!],$isFilterVideoSeries:Boolean=true) {
    videos(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts,isFilterVideoSeries:$isFilterVideoSeries){
@@ -120,8 +145,8 @@ const VIDEO_COMBO = gql`
 `;
 
 const GET_VIDEO = gql`
- query videos( $ids: [ID!],$videoID:ID!,$sourceType:Int!=1) {
-   videos(ids:$ids){
+ query videos($videoID:ID!,$sourceType:Int!=1) {
+   videos(ids:[$videoID]){
        edges{
             id
             title
@@ -222,8 +247,8 @@ mutation updateVideoSeriesItem($input:NewUpdateVideoSeriesItem!){
 export {
   ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES,
   LIST_VIDEO, VIDEO_COMBO, UPDATE_VIDEO, ADD_EPISODE,
-  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO,
-  UPDATE_MOBILE_VIDEO,
+  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, GET_VIDEO_TAGS,
+  UPDATE_MOBILE_VIDEO, VIDEO_RANDOM_TAG_SUGGEST,
   LIST_VIDEO_SERIES, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
   ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
 }

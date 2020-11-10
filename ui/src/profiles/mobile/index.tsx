@@ -15,6 +15,7 @@ import { AddFriendPage } from './contact/AddFriendPage'
 import { NewUser } from 'src/models/user'
 import { AppPath } from 'src/consts/path'
 import CalculatorMobile from './home/calculator'
+import VideoIndex from './video'
 
 
 const MeIndex = React.lazy(() => import('./me'))
@@ -54,11 +55,14 @@ const MobileIndex = () => {
 
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
-            <Route exact path={AppPath.VIDEO_SEARCH}>
+            <Route exact path={AppPath.VIDEO_SUGGEST}>
                 <div style={{ height: "100%", overflowY: "auto" }}>
                     <VideoNavBar />
-                    <VideoList />
+                    <VideoIndex />
                 </div>
+            </Route>
+            <Route exact path={AppPath.VIDEO_SEARCH}  >
+                <VideoList />
             </Route>
             <Route exact path={AppPath.VIDEO_DETAIL}  >
                 <VideoDetail />

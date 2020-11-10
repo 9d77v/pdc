@@ -18,7 +18,7 @@ const publicData: IApp[] = [
     {
         text: "视频",
         icon: <PlayCircleOutlined style={{ fontSize: 26 }} />,
-        url: AppPath.VIDEO_SEARCH
+        url: AppPath.VIDEO_SUGGEST
     }, {
         text: "设备",
         icon: <DashboardOutlined style={{ fontSize: 26 }} />,
@@ -45,7 +45,7 @@ const privateData: IApp[] = [
     {
         text: "计算器",
         icon: <CalculatorOutlined style={{ fontSize: 26, color: "blue" }} />,
-        url: "/app/util/calculator"
+        url: AppPath.UTIL_CALCULATOR
     }
 ]
 export default function HomeIndex() {
