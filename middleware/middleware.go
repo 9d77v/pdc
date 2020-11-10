@@ -43,6 +43,7 @@ var permissonMap = map[string][]int{
 	"videos":                         {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"videoSerieses":                  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"searchVideo":                    {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
+	"similarVideos":                  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
 	"things":                         {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"thingSeries":                    {models.RoleAdmin, models.RoleManager, models.RoleUser},
 	"thingAnalyze":                   {models.RoleAdmin, models.RoleManager, models.RoleUser},
