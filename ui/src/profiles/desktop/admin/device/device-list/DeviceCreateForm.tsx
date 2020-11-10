@@ -50,7 +50,7 @@ export const DeviceCreateForm: React.FC<DeviceCreateFormProps> = ({
         timer = setTimeout(() => {
             setKeyword(value)
         }, 1000)
-    };
+    }
 
     const handleChange = (value: number) => {
         setValue(value)

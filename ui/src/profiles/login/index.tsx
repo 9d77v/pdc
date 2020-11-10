@@ -15,8 +15,7 @@ const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
 }
 
-export default function Login() {
-
+const Login = () => {
     const history = useHistory()
     const [login, { data }] = useMutation(LOGIN)
 
@@ -88,3 +87,5 @@ export default function Login() {
         </div>
     )
 }
+
+export default Login

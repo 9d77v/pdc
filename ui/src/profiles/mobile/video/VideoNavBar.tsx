@@ -1,7 +1,7 @@
 import { NavBar, Popover, Icon } from "antd-mobile"
 import React, { useState } from "react"
 import {
-    HistoryOutlined
+    HistoryOutlined, SearchOutlined
 } from '@ant-design/icons'
 import Item from "antd-mobile/lib/popover/Item"
 import { useHistory } from "react-router-dom"
@@ -21,6 +21,9 @@ export default function VideoNavBar() {
             case "最近播放":
                 history.push(AppPath.HISTORY)
                 break
+            case "视频索引":
+                history.push(AppPath.VIDEO_SEARCH)
+                break
         }
     }
     return (
@@ -34,6 +37,7 @@ export default function VideoNavBar() {
                     visible={visible}
                     overlay={[
                         (<Item key="1" icon={<HistoryOutlined />} >最近播放</Item>),
+                        (<Item key="2" icon={<SearchOutlined />} >视频索引</Item>),
                     ]}
                     align={{
                         overflow: { adjustY: 0, adjustX: 0 },

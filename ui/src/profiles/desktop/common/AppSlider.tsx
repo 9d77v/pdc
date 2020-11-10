@@ -58,7 +58,11 @@ const locationMap = new Map<string, any>([
     }],
     [AdminPath.VIDEO, {
         "defaultOpenKeys": ["settings-video"],
-        "defaultSelectedKeys": ['video-list']
+        "defaultSelectedKeys": ['video-suggest']
+    }],
+    [AdminPath.VIDEO_SEREIS_LIST, {
+        "defaultOpenKeys": ["settings-video"],
+        "defaultSelectedKeys": ['video-suggest']
     }],
     [AdminPath.VIDEO_LIST, {
         "defaultOpenKeys": ["settings-video"],
@@ -125,6 +129,9 @@ const AppMenu = (props: AppHeaderProps) => {
                     </span>
                 }
             >
+                <Menu.Item key="media-suggest">
+                    <Link to={AppPath.VIDEO_SUGGEST}>{PathDict.get(AppPath.VIDEO_SUGGEST)}</Link>
+                </Menu.Item>
                 <Menu.Item key="media-search">
                     <Link to={AppPath.VIDEO_SEARCH}>{PathDict.get(AppPath.VIDEO_SEARCH)}</Link>
                 </Menu.Item>

@@ -33,10 +33,17 @@ const Calculator: React.FC<ICalculatorProps> = ({
         }
     }, [historyOperations])
 
+    useEffect(() => {
+        const obj = document.getElementById("display-formula")
+        if (obj) {
+            obj.scrollTop = obj.scrollHeight
+        }
+    }, [formula])
     return (
         <div className={"calculator"}>
             <DisplayToolbar
                 marginTop={marginTop}
+                setFormula={setFormula}
                 formula={formula}
                 input={input}
                 setIsShowHistory={() => setIsShowHistory(!isShowHistory)}

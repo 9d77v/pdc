@@ -13,19 +13,21 @@ import { useQuery } from '@apollo/react-hooks'
 import { GET_USER } from 'src/consts/user.gpl'
 import { NewUser } from 'src/models/user'
 import { AdminPath, AppPath } from 'src/consts/path'
+import UpdateProfileForm from './app/user/UpdateFrofileForm'
+import UpdatePasswordForm from './app/user/UpdatePasswordForm'
+import Calculator from 'src/components/calculator'
+import VideoIndex from './app/video'
+
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
 const VideoCreateIndex = React.lazy(() => import('./admin/video/video-list/video-create'))
 
 const UserTable = React.lazy(() => import('./admin/user/UserTable'))
-const UpdatePasswordForm = React.lazy(() => import("./app/user/UpdatePasswordForm"))
-const UpdateProfileForm = React.lazy(() => import('./app/user/UpdateFrofileForm'))
 
 const ThingTable = React.lazy(() => import('./app/thing/ThingTable'))
 const ThingDashboard = React.lazy(() => import('./app/thing/ThingDashboard'))
 const ThingAnalysis = React.lazy(() => import('./app/thing/ThingAnalysis'))
 
-const VideoIndex = React.lazy(() => import("./app/video"))
 const VideoSearch = React.lazy(() => import('./app/video/VideoSearch'))
 const VideoDetail = React.lazy(() => import('./app/video/VideoDetail'))
 const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
@@ -35,8 +37,7 @@ const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-li
 const DeviceIndex = React.lazy(() => import('./admin/device/device-list/index'))
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
 
-const Calculator = React.lazy(() => import('src/components/calculator'))
-export default function DesktopIndex() {
+const DesktopIndex = () => {
     const { data } = useQuery(GET_USER)
     const user: NewUser = data?.userInfo
     return (
@@ -121,3 +122,5 @@ export default function DesktopIndex() {
         </ConfigProvider>
     )
 }
+
+export default DesktopIndex

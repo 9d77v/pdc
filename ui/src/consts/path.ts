@@ -3,7 +3,7 @@ const AppPath = {
     DEVICE: "/app/device",
     VIDEO: "/app/video",
     VIDEO_DETAIL: "/app/video/detail",
-    VIDEO_SUGGEST: "app/video/suggest",
+    VIDEO_SUGGEST: "/app/video/suggest",
     VIDEO_SEARCH: "/app/video/search",
     HISTORY: "/app/history",
     THING: "/app/thing",

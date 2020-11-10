@@ -8,6 +8,5 @@ export default function DeviceIndex() {
                 设备
             </div>
             <DeviceCards width={200} />
-
         </>)
 }

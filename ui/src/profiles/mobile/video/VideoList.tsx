@@ -5,7 +5,7 @@ import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import { LIST_VIDEO_CARD } from 'src/consts/video.gql'
 import Img from "src/components/img"
-import { SearchBar } from "antd-mobile"
+import { Icon, NavBar, SearchBar } from "antd-mobile"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
 import { AppPath } from "src/consts/path"
@@ -77,40 +77,48 @@ export default function VideoList() {
     }
 
     return (
-        <div style={{ marginTop: 45, display: "flex", flexDirection: "column", width: "100%" }}>
-            <SearchBar
-                placeholder="搜索"
-                onSubmit={(value: any) => setPagination({
-                    keyword: value,
-                    page: 1,
-                    pageSize: pagination.pageSize,
-                    selectedTags: pagination.selectedTags
-                })}
-                maxLength={8} />
-            <div >
-                <div className={"pdc-button-selected"}
-                    style={{ cursor: "pointer", width: 66 }}
-                    onClick={() => {
-                        setPagination({
-                            keyword: pagination.keyword,
-                            page: pagination.page,
-                            pageSize: pagination.pageSize,
-                            selectedTags: []
-                        })
-                    }}>全部</div>
-                {data?.searchVideo.aggResults.map((tag: any) => (
-                    <CheckableTag
-                        className={pagination.selectedTags.indexOf(tag.key) > -1 ? "pdc-button-selected" : "pdc-button"}
-                        key={tag.key}
-                        checked={pagination.selectedTags.indexOf(tag.key) > -1}
-                        onChange={checked => onTagChange(tag.key, checked)}
-                    >
-                        {tag.key + "(" + tag.value + ")"}
-                    </CheckableTag>
-                ))}
-            </div>
-            <div style={{ flex: 1, width: "100%" }}>
-                {cards}
+        <div style={{ height: "100%" }}>
+            <NavBar
+                mode="light"
+                icon={<Icon type="left" />}
+                style={{ position: "fixed", width: "100%", zIndex: 10, top: 0 }}
+                onLeftClick={() => history.goBack()}
+            >视频索引</NavBar>
+            <div style={{ marginTop: 45, display: "flex", flexDirection: "column", width: "100%" }}>
+                <SearchBar
+                    placeholder="搜索"
+                    onSubmit={(value: any) => setPagination({
+                        keyword: value,
+                        page: 1,
+                        pageSize: pagination.pageSize,
+                        selectedTags: pagination.selectedTags
+                    })}
+                    maxLength={8} />
+                <div >
+                    <div className={"pdc-button-selected"}
+                        style={{ cursor: "pointer", width: 66 }}
+                        onClick={() => {
+                            setPagination({
+                                keyword: pagination.keyword,
+                                page: pagination.page,
+                                pageSize: pagination.pageSize,
+                                selectedTags: []
+                            })
+                        }}>全部</div>
+                    {data?.searchVideo.aggResults.map((tag: any) => (
+                        <CheckableTag
+                            className={pagination.selectedTags.indexOf(tag.key) > -1 ? "pdc-button-selected" : "pdc-button"}
+                            key={tag.key}
+                            checked={pagination.selectedTags.indexOf(tag.key) > -1}
+                            onChange={checked => onTagChange(tag.key, checked)}
+                        >
+                            {tag.key + "(" + tag.value + ")"}
+                        </CheckableTag>
+                    ))}
+                </div>
+                <div style={{ flex: 1, width: "100%" }}>
+                    {cards}
+                </div>
             </div>
         </div>
     )
