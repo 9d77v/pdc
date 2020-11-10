@@ -200,11 +200,11 @@ func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, vide
 	return con, err
 }
 
-func (r *queryResolver) SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64) (*model.VideoIndexConnection, error) {
+func (r *queryResolver) SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) (*model.VideoIndexConnection, error) {
 	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
 	total, data, aggResults, err := videoService.ListVideoIndex(ctx, keyword, tags,
-		page, pageSize, scheme)
+		page, pageSize, scheme, isRandom)
 	con.TotalCount = total
 	con.Edges = data
 	con.AggResults = aggResults
