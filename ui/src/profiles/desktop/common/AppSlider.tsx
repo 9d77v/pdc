@@ -36,13 +36,21 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["user"],
         "defaultSelectedKeys": ['user-account']
     }],
+    [AppPath.VIDEO, {
+        "defaultOpenKeys": ["video"],
+        "defaultSelectedKeys": ['video-suggest']
+    }],
+    [AppPath.VIDEO_SUGGEST, {
+        "defaultOpenKeys": ["video"],
+        "defaultSelectedKeys": ['video-suggest']
+    }],
     [AppPath.VIDEO_SEARCH, {
-        "defaultOpenKeys": ["media"],
-        "defaultSelectedKeys": ['media-search']
+        "defaultOpenKeys": ["video"],
+        "defaultSelectedKeys": ['video-search']
     }],
     [AppPath.HISTORY, {
-        "defaultOpenKeys": ["media"],
-        "defaultSelectedKeys": ['media-history']
+        "defaultOpenKeys": ["video"],
+        "defaultSelectedKeys": ['video-history']
     }],
     [AppPath.THING_DASHBOARD, {
         "defaultOpenKeys": ["thing"],
@@ -120,7 +128,7 @@ const AppMenu = (props: AppHeaderProps) => {
                 </span></Link>
             </Menu.Item>
             <SubMenu
-                key="media"
+                key="video"
                 style={{ display: roleID > 0 ? "block" : "none" }}
                 title={
                     <span>
@@ -129,13 +137,13 @@ const AppMenu = (props: AppHeaderProps) => {
                     </span>
                 }
             >
-                <Menu.Item key="media-suggest">
+                <Menu.Item key="video-suggest">
                     <Link to={AppPath.VIDEO_SUGGEST}>{PathDict.get(AppPath.VIDEO_SUGGEST)}</Link>
                 </Menu.Item>
-                <Menu.Item key="media-search">
+                <Menu.Item key="video-search">
                     <Link to={AppPath.VIDEO_SEARCH}>{PathDict.get(AppPath.VIDEO_SEARCH)}</Link>
                 </Menu.Item>
-                <Menu.Item key="media-history">
+                <Menu.Item key="video-history">
                     <Link to={AppPath.HISTORY}>{PathDict.get(AppPath.HISTORY)}</Link>
                 </Menu.Item>
             </SubMenu>

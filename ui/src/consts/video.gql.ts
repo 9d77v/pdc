@@ -120,8 +120,22 @@ const GET_VIDEO_TAGS = gql`
 `;
 
 const VIDEO_RANDOM_TAG_SUGGEST = gql`
- query searchVideo($tag:String!) {
-   searchVideo(tags:[$tag],page: 1, pageSize: 3,isRandom:true){
+ query searchVideo($tag:String!,$pageSize:Int!) {
+   searchVideo(tags:[$tag],page: 1, pageSize:$pageSize,isRandom:true){
+       edges{
+            id
+            title
+            desc
+            cover
+            totalNum
+       }
+   }
+  }
+`;
+
+const SIMILAR_VIDEOS = gql`
+ query similarVideos($videoID:ID!,$pageSize:Int!) {
+   similarVideos(videoID:$videoID, pageSize:$pageSize,){
        edges{
             id
             title
@@ -248,7 +262,7 @@ export {
   ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES,
   LIST_VIDEO, VIDEO_COMBO, UPDATE_VIDEO, ADD_EPISODE,
   UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, GET_VIDEO_TAGS,
-  UPDATE_MOBILE_VIDEO, VIDEO_RANDOM_TAG_SUGGEST,
+  UPDATE_MOBILE_VIDEO, VIDEO_RANDOM_TAG_SUGGEST, SIMILAR_VIDEOS,
   LIST_VIDEO_SERIES, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
   ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
 }

@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom"
 import TextArea from "antd/lib/input/TextArea"
 import VideoSelect from "src/profiles/common/video/VideoSelect"
 import VideoSeriesSelect from "src/profiles/common/video/VideoSeriesSelect"
+import SimilarVideoList from "src/profiles/common/video/SimilarVideoList"
 
 export default function VideoDetail() {
     const [episodeItem, setEpisodeItem] = useState({
@@ -130,6 +131,7 @@ export default function VideoDetail() {
                 <VideoSeriesSelect
                     data={data?.videoSerieses.edges}
                     videoID={Number(videoID)} />
+                <SimilarVideoList videoID={Number(videoID)} pageSize={10} />
             </div>
         </div>)
 }

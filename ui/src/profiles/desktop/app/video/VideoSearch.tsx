@@ -5,11 +5,10 @@ import "src/styles/video.less"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import { LIST_VIDEO_CARD } from 'src/consts/video.gql'
-import Img from "src/components/img"
 import Search from "antd/lib/input/Search"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
-import { AppPath } from "src/consts/path"
+import { VideoCard } from "src/profiles/common/video/VideoCard"
 
 
 const VideoSearch = () => {
@@ -43,16 +42,14 @@ const VideoSearch = () => {
     useEffect(() => {
         if (data && data.searchVideo.edges) {
             const videos = data.searchVideo.edges
-            setCards(videos.map((item: any) =>
-                <div key={item.id}
-                    onClick={() => history.push(AppPath.VIDEO_DETAIL + "?video_id=" + item.id)}
-                    className={"card"}
-                >
-                    <div style={{ clear: "both" }} />
-                    <Img src={item.cover} />
-                    <div style={{ marginTop: 5, fontSize: 14 }}>{item.title}</div>
-                    <div style={{ fontSize: 12 }}>全{item.totalNum}话</div>
-                </div >
+            setCards(videos.map((item: any, index: number) =>
+                <VideoCard
+                    key={index}
+                    videoID={item.id}
+                    cover={item.cover}
+                    title={item.title}
+                    totalNum={item.totalNum}
+                />
             ))
         }
     }, [data, history])

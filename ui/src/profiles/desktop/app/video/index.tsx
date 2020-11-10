@@ -25,6 +25,7 @@ const VideoIndex = () => {
                     tag={tag.key}
                     pageSize={5}
                     color="pink"
+                    width={1162}
                     fontSize={16}
                 />
             })
@@ -34,7 +35,7 @@ const VideoIndex = () => {
         <div style={{
             display: "flex",
             flexDirection: "column",
-            marginTop: 45
+            marginTop: 10
         }}>
             {cards}
         </div>

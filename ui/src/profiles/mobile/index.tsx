@@ -16,13 +16,13 @@ import { NewUser } from 'src/models/user'
 import { AppPath } from 'src/consts/path'
 import CalculatorMobile from './home/calculator'
 import VideoIndex from './video'
+import VideoList from './video/VideoList'
+import VideoDetail from './video/VideoDetail'
 
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
-const VideoDetail = React.lazy(() => import('./video/VideoDetail'))
-const VideoList = React.lazy(() => import('./video/VideoList'))
 const VideoNavBar = React.lazy(() => import('./video/VideoNavBar'))
 const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
 const DeviceIndex = React.lazy(() => import('./device'))
