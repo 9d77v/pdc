@@ -231,6 +231,7 @@ type ComplexityRoot struct {
 		HistoryInfo      func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL     func(childComplexity int, bucketName string, objectName string) int
 		SearchVideo      func(childComplexity int, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) int
+		SimilarVideos    func(childComplexity int, videoID int64, pageSize int64) int
 		ThingAnalyze     func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries      func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
 		Things           func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
@@ -427,6 +428,7 @@ type QueryResolver interface {
 	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error)
 	VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
 	SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) (*model.VideoIndexConnection, error)
+	SimilarVideos(ctx context.Context, videoID int64, pageSize int64) (*model.VideoIndexConnection, error)
 	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
@@ -1614,6 +1616,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.SearchVideo(childComplexity, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64), args["isRandom"].(*bool)), true
 
+	case "Query.similarVideos":
+		if e.complexity.Query.SimilarVideos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_similarVideos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.SimilarVideos(childComplexity, args["videoID"].(int64), args["pageSize"].(int64)), true
+
 	case "Query.thingAnalyze":
 		if e.complexity.Query.ThingAnalyze == nil {
 			break
@@ -2668,6 +2682,7 @@ type Query {
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
   videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
   searchVideo(keyword:String,tags:[String!],page: Int, pageSize: Int,isRandom:Boolean):VideoIndexConnection!
+  similarVideos(videoID:ID!,pageSize:Int!):VideoIndexConnection!
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
@@ -3791,6 +3806,28 @@ func (ec *executionContext) field_Query_searchVideo_args(ctx context.Context, ra
 		}
 	}
 	args["isRandom"] = arg4
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_similarVideos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["videoID"]; ok {
+		arg0, err = ec.unmarshalNID2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["videoID"] = arg0
+	var arg1 int64
+	if tmp, ok := rawArgs["pageSize"]; ok {
+		arg1, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pageSize"] = arg1
 	return args, nil
 }
 
@@ -8971,6 +9008,47 @@ func (ec *executionContext) _Query_searchVideo(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().SearchVideo(rctx, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64), args["isRandom"].(*bool))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.VideoIndexConnection)
+	fc.Result = res
+	return ec.marshalNVideoIndexConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoIndexConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_similarVideos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_similarVideos_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SimilarVideos(rctx, args["videoID"].(int64), args["pageSize"].(int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15951,6 +16029,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_searchVideo(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "similarVideos":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_similarVideos(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

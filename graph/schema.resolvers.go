@@ -211,6 +211,14 @@ func (r *queryResolver) SearchVideo(ctx context.Context, keyword *string, tags [
 	return con, err
 }
 
+func (r *queryResolver) SimilarVideos(ctx context.Context, videoID int64, pageSize int64) (*model.VideoIndexConnection, error) {
+	con := new(model.VideoIndexConnection)
+	scheme := middleware.ForSchemeContext(ctx)
+	_, data, err := videoService.SimilarVideoIndex(ctx, videoID, pageSize, scheme)
+	con.Edges = data
+	return con, err
+}
+
 func (r *queryResolver) Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)

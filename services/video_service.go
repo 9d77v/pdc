@@ -542,7 +542,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
 				Sort("title.keyword", true)
 		}
 	} else {
-		searchService.Source(nil)
+		searchService.FetchSource(false)
 	}
 	result, err := searchService.Do(ctx)
 	vis := make([]*model.VideoIndex, 0)
@@ -586,4 +586,63 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
 		}
 	}
 	return result.TotalHits(), vis, aggResults, nil
+}
+
+//SimilarVideoIndex ..
+func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, pageSize int64, scheme string) (int64, []*model.VideoIndex, error) {
+	id := strconv.FormatInt(videoID, 10)
+	boolQuery := elastic.NewBoolQuery()
+	fsQuery := elastic.NewFunctionScoreQuery()
+	mltQuery := elastic.NewMoreLikeThisQuery()
+	moreLikeThisItem := elastic.NewMoreLikeThisQueryItem()
+	moreLikeThisItem = moreLikeThisItem.Index(elasticsearch.AliasVideo).Id(id)
+	mltQuery = mltQuery.Field(
+		"title",
+		"desc^0.01",
+		"title.ikmax",
+		"title.sy_ikmax",
+		"title.synonym^",
+		"tags").
+		LikeItems(moreLikeThisItem).
+		MinTermFreq(1).
+		MinDocFreq(5).
+		MaxQueryTerms(12).
+		Analyzer("ik_smart_synonym")
+	filterQueries := make([]elastic.Query, 0)
+	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
+	filterQuery := elastic.NewBoolQuery().
+		Must(filterQueries...)
+	boolQuery.Must(fsQuery.Query(mltQuery)).Filter(filterQuery)
+	searchService := elasticsearch.ESClient.Search().
+		Index(elasticsearch.AliasVideo).
+		Query(boolQuery).
+		Size(int(pageSize)).
+		Sort("_score", false).
+		Sort("title.keyword", true)
+	result, err := searchService.Do(ctx)
+	vis := make([]*model.VideoIndex, 0)
+	if err != nil {
+		log.Println("err:", err)
+		return 0, vis, nil
+	}
+	for _, v := range result.Hits.Hits {
+		vi := new(elasticsearch.VideoIndex)
+		data, err := v.Source.MarshalJSON()
+		if err != nil {
+			log.Println("elastic search result json marshal error:", err)
+		}
+		err = json.Unmarshal(data, &vi)
+		if err != nil {
+			log.Println("elastic search result json unmarshal error:", err)
+		}
+		vi.Cover = dtos.GetOSSPrefix(scheme) + vi.Cover
+		vis = append(vis, &model.VideoIndex{
+			ID:       int64(vi.ID),
+			Title:    vi.Title,
+			Desc:     vi.Desc,
+			Cover:    vi.Cover,
+			TotalNum: int64(vi.TotalNum),
+		})
+	}
+	return result.TotalHits(), vis, nil
 }
