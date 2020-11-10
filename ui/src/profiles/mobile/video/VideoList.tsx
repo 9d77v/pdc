@@ -4,11 +4,10 @@ import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import { LIST_VIDEO_CARD } from 'src/consts/video.gql'
-import Img from "src/components/img"
 import { Icon, NavBar, SearchBar } from "antd-mobile"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
-import { AppPath } from "src/consts/path"
+import { MobileVideoCard } from "src/profiles/common/video/VideoCard"
 
 
 export default function VideoList() {
@@ -41,27 +40,14 @@ export default function VideoList() {
     useEffect(() => {
         if (data && data.searchVideo.edges) {
             const videos = data.searchVideo.edges
-            setCards(videos.map((item: any) =>
-                <div key={item.id}
-                    onClick={() => history.push(AppPath.VIDEO_DETAIL + "?video_id=" + item.id)}
-                    style={{
-                        width: "30%",
-                        margin: "2.5% 0 0 2.5%",
-                        height: 210,
-                        display: "flex",
-                        float: "left",
-                        flexDirection: "column"
-                    }}
-                >
-                    <Img src={item.cover} width={"100%"} height={"70%"} />
-                    <div style={{
-                        fontSize: 12,
-                        height: 36,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis"
-                    }}>{item.title}</div>
-                    <div style={{ fontSize: 10 }}>全{item.totalNum}话</div>
-                </div >
+            setCards(videos.map((item: any, index: number) =>
+                <MobileVideoCard
+                    key={index}
+                    videoID={item.id}
+                    cover={item.cover}
+                    title={item.title}
+                    totalNum={item.totalNum}
+                />
             ))
         }
     }, [data, history])

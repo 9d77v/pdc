@@ -8,6 +8,7 @@ import { useHistory, useLocation } from "react-router-dom"
 import { NavBar, Icon } from "antd-mobile"
 import VideoSelect from "src/profiles/common/video/VideoSelect"
 import VideoSeriesSelect from "src/profiles/common/video/VideoSeriesSelect"
+import SimilarVideoList from "src/profiles/common/video/SimilarVideoList"
 
 export default function VideoDetail() {
     const history = useHistory()
@@ -119,6 +120,7 @@ export default function VideoDetail() {
                     <VideoSeriesSelect
                         data={data?.videoSerieses.edges}
                         videoID={Number(videoID)} />
+                    <SimilarVideoList videoID={Number(videoID)} pageSize={10} />
                 </div>
             </div>
         </div>)

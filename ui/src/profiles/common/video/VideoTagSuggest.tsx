@@ -5,7 +5,7 @@ import { VIDEO_RANDOM_TAG_SUGGEST } from 'src/consts/video.gql'
 import {
     SyncOutlined,
 } from '@ant-design/icons';
-import "src/styles/video.less"
+
 import { isMobile } from 'src/utils/util'
 import { MobileVideoCard, VideoCard } from './VideoCard'
 
@@ -14,9 +14,11 @@ interface IVideoTagSuggestProps {
     pageSize: number
     color?: string
     fontSize?: number
+    width?: number | string
 }
 
 const VideoTagSuggest: React.FC<IVideoTagSuggestProps> = ({
+    width = "100%",
     tag,
     pageSize,
     color = "#85dbf5",
@@ -74,7 +76,7 @@ const VideoTagSuggest: React.FC<IVideoTagSuggestProps> = ({
 
 
     return (
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: width }}>
             <div style={{ fontSize: fontSize + 6, paddingLeft: 20, fontWeight: 800, textAlign: "left" }}>{tag}</div>
             <div>{cards}</div>
             <div style={{
