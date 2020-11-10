@@ -230,7 +230,7 @@ type ComplexityRoot struct {
 		Histories        func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
 		HistoryInfo      func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL     func(childComplexity int, bucketName string, objectName string) int
-		SearchVideo      func(childComplexity int, keyword *string, tags []string, page *int64, pageSize *int64) int
+		SearchVideo      func(childComplexity int, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) int
 		ThingAnalyze     func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries      func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
 		Things           func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
@@ -426,7 +426,7 @@ type QueryResolver interface {
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
 	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error)
 	VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
-	SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64) (*model.VideoIndexConnection, error)
+	SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) (*model.VideoIndexConnection, error)
 	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
@@ -1612,7 +1612,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.SearchVideo(childComplexity, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64)), true
+		return e.complexity.Query.SearchVideo(childComplexity, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64), args["isRandom"].(*bool)), true
 
 	case "Query.thingAnalyze":
 		if e.complexity.Query.ThingAnalyze == nil {
@@ -2667,7 +2667,7 @@ type Query {
   userInfo(uid:ID):User!
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
   videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
-  searchVideo(keyword:String,tags:[String!],page: Int, pageSize: Int):VideoIndexConnection!
+  searchVideo(keyword:String,tags:[String!],page: Int, pageSize: Int,isRandom:Boolean):VideoIndexConnection!
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
@@ -3783,6 +3783,14 @@ func (ec *executionContext) field_Query_searchVideo_args(ctx context.Context, ra
 		}
 	}
 	args["pageSize"] = arg3
+	var arg4 *bool
+	if tmp, ok := rawArgs["isRandom"]; ok {
+		arg4, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["isRandom"] = arg4
 	return args, nil
 }
 
@@ -8962,7 +8970,7 @@ func (ec *executionContext) _Query_searchVideo(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SearchVideo(rctx, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64))
+		return ec.resolvers.Query().SearchVideo(rctx, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64), args["isRandom"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

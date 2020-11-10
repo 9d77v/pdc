@@ -483,7 +483,10 @@ func sendMsgToUpdateES(videoID int64) {
 }
 
 //ListVideoIndex ..
-func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
+func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
+	tags []string, page *int64, pageSize *int64, scheme string,
+	isRandom *bool) (int64, []*model.VideoIndex, []*model.AggResult, error) {
+	fieldMap, _ := utils.GetFieldData(ctx, "")
 	boolQuery := elastic.NewBoolQuery()
 	keywordStr := strings.ReplaceAll(ptrs.String(keyword), " ", "")
 	if keywordStr != "" {
@@ -508,10 +511,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 
 		boolQuery.Must(subBoolQuery)
 	}
-	offset, limit := GetPageInfo(page, pageSize)
-	aggsParams := []*es.AggsParam{
-		{Field: "tags", Size: 50},
-	}
+	offset, limit := GetElasticPageInfo(page, pageSize)
 	filterQueries := make([]elastic.Query, 0)
 	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
 	if len(tags) > 0 {
@@ -526,10 +526,24 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
 		From(int(offset)).
-		Size(int(limit)).
-		Sort("_score", false).
-		Sort("title.keyword", true)
-	searchService = es.Aggs(searchService, aggsParams...)
+		Size(int(limit))
+
+	aggsParams := []*es.AggsParam{
+		{Field: "tags", Size: 50},
+	}
+	if fieldMap["aggResults"] {
+		searchService = es.Aggs(searchService, aggsParams...)
+	}
+	if fieldMap["edges"] {
+		if ptrs.Bool(isRandom) {
+			searchService.SortBy(elastic.NewScriptSort(elastic.NewScript("Math.random()"), "number").Order(true))
+		} else {
+			searchService.Sort("_score", false).
+				Sort("title.keyword", true)
+		}
+	} else {
+		searchService.Source(nil)
+	}
 	result, err := searchService.Do(ctx)
 	vis := make([]*model.VideoIndex, 0)
 	aggResults := make([]*model.AggResult, 0)
@@ -537,33 +551,37 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string, tags 
 		log.Println("err:", err)
 		return 0, vis, aggResults, nil
 	}
-	for _, v := range result.Hits.Hits {
-		vi := new(elasticsearch.VideoIndex)
-		data, err := v.Source.MarshalJSON()
-		if err != nil {
-			log.Println("elastic search result json marshal error:", err)
+	if fieldMap["edges"] {
+		for _, v := range result.Hits.Hits {
+			vi := new(elasticsearch.VideoIndex)
+			data, err := v.Source.MarshalJSON()
+			if err != nil {
+				log.Println("elastic search result json marshal error:", err)
+			}
+			err = json.Unmarshal(data, &vi)
+			if err != nil {
+				log.Println("elastic search result json unmarshal error:", err)
+			}
+			vi.Cover = dtos.GetOSSPrefix(scheme) + vi.Cover
+			vis = append(vis, &model.VideoIndex{
+				ID:       int64(vi.ID),
+				Title:    vi.Title,
+				Desc:     vi.Desc,
+				Cover:    vi.Cover,
+				TotalNum: int64(vi.TotalNum),
+			})
 		}
-		err = json.Unmarshal(data, &vi)
-		if err != nil {
-			log.Println("elastic search result json unmarshal error:", err)
-		}
-		vi.Cover = dtos.GetOSSPrefix(scheme) + vi.Cover
-		vis = append(vis, &model.VideoIndex{
-			ID:       int64(vi.ID),
-			Title:    vi.Title,
-			Desc:     vi.Desc,
-			Cover:    vi.Cover,
-			TotalNum: int64(vi.TotalNum),
-		})
 	}
-	for _, v := range aggsParams {
-		aggResult, found := result.Aggregations.Terms("group_by_" + v.Field)
-		if found {
-			for _, v := range aggResult.Buckets {
-				aggResults = append(aggResults, &model.AggResult{
-					Key:   v.Key.(string),
-					Value: v.DocCount,
-				})
+	if fieldMap["aggResults"] {
+		for _, v := range aggsParams {
+			aggResult, found := result.Aggregations.Terms("group_by_" + v.Field)
+			if found {
+				for _, v := range aggResult.Buckets {
+					aggResults = append(aggResults, &model.AggResult{
+						Key:   v.Key.(string),
+						Value: v.DocCount,
+					})
+				}
 			}
 		}
 	}
