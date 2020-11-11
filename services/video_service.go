@@ -591,6 +591,8 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
 //SimilarVideoIndex ..
 func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, pageSize int64, scheme string) (int64, []*model.VideoIndex, error) {
 	id := strconv.FormatInt(videoID, 10)
+	vis := make([]*model.VideoIndex, 0)
+
 	boolQuery := elastic.NewBoolQuery()
 	fsQuery := elastic.NewFunctionScoreQuery()
 	mltQuery := elastic.NewMoreLikeThisQuery()
@@ -601,17 +603,26 @@ func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, page
 		"desc^0.01",
 		"title.ikmax",
 		"title.sy_ikmax",
-		"title.synonym^",
-		"tags").
+		"title.synonym",
+		"tags^5").
 		LikeItems(moreLikeThisItem).
 		MinTermFreq(1).
 		MinDocFreq(5).
 		MaxQueryTerms(12).
 		Analyzer("ik_smart_synonym")
+	videoDoc, err := new(elasticsearch.VideoIndex).GetByIDFromElastic(ctx, id)
+	if err != nil {
+		return 0, vis, nil
+	}
 	filterQueries := make([]elastic.Query, 0)
 	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
+
+	ignoreQueries := make([]elastic.Query, 0)
+	seriesID := strconv.FormatUint(uint64(videoDoc.SeriesID), 10)
+	ignoreQueries = append(ignoreQueries, elastic.NewTermQuery("series_id", seriesID))
 	filterQuery := elastic.NewBoolQuery().
-		Must(filterQueries...)
+		Must(filterQueries...).
+		MustNot(ignoreQueries...)
 	boolQuery.Must(fsQuery.Query(mltQuery)).Filter(filterQuery)
 	searchService := elasticsearch.ESClient.Search().
 		Index(elasticsearch.AliasVideo).
@@ -620,7 +631,6 @@ func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, page
 		Sort("_score", false).
 		Sort("title.keyword", true)
 	result, err := searchService.Do(ctx)
-	vis := make([]*model.VideoIndex, 0)
 	if err != nil {
 		log.Println("err:", err)
 		return 0, vis, nil
