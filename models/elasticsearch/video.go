@@ -2,7 +2,9 @@ package elasticsearch
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 
 	elastic "github.com/9d77v/go-lib/clients/elastic/v7"
@@ -65,6 +67,26 @@ func (v *VideoIndex) BulkSaveES(ctx context.Context, vis []*VideoIndex, indexNam
 	for _, v := range errs {
 		fmt.Println(v)
 	}
+}
+
+//GetByIDFromElastic ...
+func (v *VideoIndex) GetByIDFromElastic(ctx context.Context, videoID string) (*VideoIndex, error) {
+	result, err := ESClient.Get().Index(AliasVideo).Id(videoID).Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	vi := new(VideoIndex)
+	data, err := result.Source.MarshalJSON()
+	if err != nil {
+		log.Println("elastic search result json marshal error:", err)
+		return nil, err
+	}
+	err = json.Unmarshal(data, &vi)
+	if err != nil {
+		log.Println("elastic search result json unmarshal error:", err)
+		return nil, err
+	}
+	return vi, nil
 }
 
 //VideoMapping ..
