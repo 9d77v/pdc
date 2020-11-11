@@ -15,3 +15,10 @@ export interface Episode {
     subtitles: Subtitle[]
 }
 
+export interface VideoCardModel {
+    id: number
+    title: string
+    desc: string
+    cover: string
+    totalNum: number
+}

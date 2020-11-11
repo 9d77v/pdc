@@ -111,7 +111,7 @@ export default function VideoDetail() {
                 display: 'flex', flexDirection: 'column', padding: 10,
                 width: "100%", height: "100%"
             }}>
-                <div style={{ margin: 20, display: "flex", flexDirection: 'column' }}>
+                <div style={{ display: "flex", flexDirection: 'column' }}>
                     <VideoSelect
                         data={video?.episodes}
                         num={num}

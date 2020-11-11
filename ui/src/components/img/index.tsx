@@ -9,7 +9,8 @@ interface ImageProps {
     width?: number | string
     height?: number | string
     currentTime?: number,
-    remainingTime?: number
+    remainingTime?: number,
+    hideModal?: boolean
 }
 
 const Img: React.FC<ImageProps> = ({
@@ -17,7 +18,8 @@ const Img: React.FC<ImageProps> = ({
     width,
     height,
     currentTime,
-    remainingTime
+    remainingTime,
+    hideModal = false
 }) => {
     const [visible, setVisible] = useState(false)
     const ref: any = useRef();
@@ -36,11 +38,12 @@ const Img: React.FC<ImageProps> = ({
         ref={ref}
         className={"img-box"}
         style={{
-            height: height ? height : 214,
+            maxHeight: height ? height : 214,
             width: width ? width : 160,
-            position: "relative"
+            position: "relative",
+            overflowY: "hidden"
         }}>
-        <Modal
+        {hideModal ? null : <Modal
             title="查看图片"
             visible={visible}
             destroyOnClose={true}
@@ -49,7 +52,7 @@ const Img: React.FC<ImageProps> = ({
             footer={null}
         >
             {src ? <img src={src} alt="图片不存在" /> : "暂无图片"}
-        </Modal>
+        </Modal>}
         {src ? isVisible && (<div style={{ width: "100%", height: "100%" }}>
             <img src={src}
                 alt="图片不存在"
