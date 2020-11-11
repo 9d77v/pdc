@@ -93,25 +93,28 @@ export default function VideoDetail() {
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
+                style={{ position: "fixed", width: "100%", zIndex: 10, top: 0 }}
                 onLeftClick={() => history.goBack()}
             >{videoItem.title + " 第" + (num + 1) + "话"} </NavBar>
-            <VideoPlayer
-                theme={videoItem.theme}
-                videoID={videoItem.id}
-                episodeID={episodeItem.id}
-                url={(episodeItem.mobileURL !== "") ? episodeItem.mobileURL : episodeItem.url}
-                subtitles={episodeItem.subtitles}
-                height={231}
-                width={"100%"}
-                autoplay={false}
-                autoDestroy={false}
-                currentTime={(Number(data?.historyInfo?.subSourceID) !== 0 && Number(data?.historyInfo?.subSourceID) === Number(episodeItem.id)) ? data?.historyInfo?.currentTime : 0}
-            />
+            <div style={{ marginTop: 45 }}>
+                <VideoPlayer
+                    theme={videoItem.theme}
+                    videoID={videoItem.id}
+                    episodeID={episodeItem.id}
+                    url={(episodeItem.mobileURL !== "") ? episodeItem.mobileURL : episodeItem.url}
+                    subtitles={episodeItem.subtitles}
+                    height={231}
+                    width={"100%"}
+                    autoplay={false}
+                    autoDestroy={false}
+                    currentTime={(Number(data?.historyInfo?.subSourceID) !== 0 && Number(data?.historyInfo?.subSourceID) === Number(episodeItem.id)) ? data?.historyInfo?.currentTime : 0}
+                />
+            </div>
             <div style={{
                 display: 'flex', flexDirection: 'column', padding: 10,
-                width: "100%", height: "100%"
+                height: "calc(100% - 276px)", overflowY: "scroll"
             }}>
-                <div style={{ display: "flex", flexDirection: 'column', overflowY: "scroll" }}>
+                <div style={{ display: "flex", flexDirection: 'column' }}>
                     <VideoSelect
                         data={video?.episodes}
                         num={num}
