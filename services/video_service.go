@@ -598,16 +598,19 @@ func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, page
 	mltQuery := elastic.NewMoreLikeThisQuery()
 	moreLikeThisItem := elastic.NewMoreLikeThisQueryItem()
 	moreLikeThisItem = moreLikeThisItem.Index(elasticsearch.AliasVideo).Id(id)
+	stopWords := []string{"的", "第一季", "第二季", "第三季"}
 	mltQuery = mltQuery.Field(
 		"title",
 		"desc^0.01",
 		"title.ikmax",
 		"title.sy_ikmax",
 		"title.synonym",
-		"tags^5").
+		"tags^10").
 		LikeItems(moreLikeThisItem).
 		MinTermFreq(1).
-		MinDocFreq(5).
+		MinDocFreq(5).StopWord(
+		stopWords...,
+	).
 		MaxQueryTerms(12).
 		Analyzer("ik_smart_synonym")
 	videoDoc, err := new(elasticsearch.VideoIndex).GetByIDFromElastic(ctx, id)
@@ -616,7 +619,6 @@ func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, page
 	}
 	filterQueries := make([]elastic.Query, 0)
 	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
-
 	ignoreQueries := make([]elastic.Query, 0)
 	seriesID := strconv.FormatUint(uint64(videoDoc.SeriesID), 10)
 	ignoreQueries = append(ignoreQueries, elastic.NewTermQuery("series_id", seriesID))
