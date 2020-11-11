@@ -601,11 +601,8 @@ func (s VideoService) SimilarVideoIndex(ctx context.Context, videoID int64, page
 	stopWords := []string{"的", "第一季", "第二季", "第三季"}
 	mltQuery = mltQuery.Field(
 		"title",
-		"desc^0.01",
-		"title.ikmax",
-		"title.sy_ikmax",
-		"title.synonym",
-		"tags^10").
+		"desc",
+		"tags").
 		LikeItems(moreLikeThisItem).
 		MinTermFreq(1).
 		MinDocFreq(5).StopWord(
