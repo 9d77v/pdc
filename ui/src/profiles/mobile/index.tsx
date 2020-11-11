@@ -18,6 +18,7 @@ import CalculatorMobile from './home/calculator'
 import VideoIndex from './video'
 import VideoList from './video/VideoList'
 import VideoDetail from './video/VideoDetail'
+import DeviceIndex from './device'
 
 
 const MeIndex = React.lazy(() => import('./me'))
@@ -25,7 +26,6 @@ const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
 const VideoNavBar = React.lazy(() => import('./video/VideoNavBar'))
 const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
-const DeviceIndex = React.lazy(() => import('./device'))
 const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
 
 const MobileIndex = () => {

@@ -19,6 +19,7 @@ import Calculator from 'src/components/calculator'
 import VideoIndex from './app/video'
 import VideoDetail from './app/video/VideoDetail'
 import VideoSearch from './app/video/VideoSearch'
+import DeviceIndex from './app/device'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -34,7 +35,6 @@ const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
 
 const AppDeviceIndex = React.lazy(() => import('./app/device'))
 const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
-const DeviceIndex = React.lazy(() => import('./admin/device/device-list/index'))
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
 
 const DesktopIndex = () => {
