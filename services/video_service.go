@@ -516,7 +516,9 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
 	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
 	if len(tags) > 0 {
 		for _, v := range tags {
-			filterQueries = append(filterQueries, elastic.NewTermQuery("tags", v))
+			if v != "" {
+				filterQueries = append(filterQueries, elastic.NewTermQuery("tags", v))
+			}
 		}
 	}
 	filterQuery := elastic.NewBoolQuery().
