@@ -19,13 +19,22 @@ const VideoIndex = () => {
     const cards = useMemo(() => {
         if (data && data.searchVideo.aggResults) {
             const tags = data.searchVideo.aggResults
-            return tags.slice(0, 12).map((tag: any, index: number) => {
+            const suggests: JSX.Element[] = [
+                <VideoTagSuggest
+                    key={-1}
+                    title={"视频动态"}
+                    tag={""}
+                    pageSize={6}
+                />
+            ]
+            suggests.push(tags.slice(0, 12).map((tag: any, index: number) => {
                 return <VideoTagSuggest
                     key={index}
                     tag={tag.key}
                     pageSize={3}
                 />
-            })
+            }))
+            return suggests
         }
     }, [data])
     return (

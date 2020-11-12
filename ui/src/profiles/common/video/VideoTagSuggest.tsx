@@ -10,6 +10,7 @@ import { isMobile } from 'src/utils/util'
 import { MobileVideoCard, VideoCard } from './VideoCard'
 
 interface IVideoTagSuggestProps {
+    title?: string
     tag: string
     pageSize: number
     color?: string
@@ -18,6 +19,7 @@ interface IVideoTagSuggestProps {
 }
 
 const VideoTagSuggest: React.FC<IVideoTagSuggestProps> = ({
+    title,
     width = "100%",
     tag,
     pageSize,
@@ -74,10 +76,11 @@ const VideoTagSuggest: React.FC<IVideoTagSuggestProps> = ({
         }, 1000)
     }
 
-
     return (
         <div style={{ display: "flex", flexDirection: "column", width: width }}>
-            <div style={{ fontSize: fontSize + 6, paddingLeft: 20, fontWeight: 800, textAlign: "left" }}>{tag}</div>
+            <div style={{ fontSize: fontSize + 6, paddingLeft: 20, fontWeight: 800, textAlign: "left" }}>
+                {tag ? tag : title}
+            </div>
             <div>{cards}</div>
             <div style={{
                 fontSize: fontSize,
