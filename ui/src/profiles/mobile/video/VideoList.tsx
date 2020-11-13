@@ -63,7 +63,10 @@ export default function VideoList() {
     }
 
     return (
-        <div style={{ height: "100%" }}>
+        <div style={{
+            height: "100%",
+            overflowY: "scroll"
+        }}>
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
