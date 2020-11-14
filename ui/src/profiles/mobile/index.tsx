@@ -24,7 +24,6 @@ import DeviceIndex from './device'
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
-const VideoNavBar = React.lazy(() => import('./video/VideoNavBar'))
 const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
 const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
 
@@ -56,10 +55,7 @@ const MobileIndex = () => {
     return (
         <div style={{ position: 'fixed', height: '100%', width: '100%', top: 0 }}>
             <Route exact path={AppPath.VIDEO_SUGGEST}>
-                <div style={{ height: "100%", overflowY: "auto" }}>
-                    <VideoNavBar />
-                    <VideoIndex />
-                </div>
+                <VideoIndex />
             </Route>
             <Route exact path={AppPath.VIDEO_SEARCH}  >
                 <VideoList />
