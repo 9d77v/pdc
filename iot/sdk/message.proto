@@ -30,6 +30,9 @@ message DeviceInfo {
   uint32 Port = 3;
   map<string, uint32> AttributeConfig = 4;
   map<string, uint32> TelemetryConfig = 5;
+  uint32 CameraType=6;
+  string Username=7;
+  string Password=8;
 }
 
 message Telemetry {
