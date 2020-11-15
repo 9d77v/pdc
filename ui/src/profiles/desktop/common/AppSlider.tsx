@@ -229,7 +229,10 @@ const AdminMenu = (props: AppHeaderProps) => {
             style={{ height: '100%', borderRight: 0 }}
         >
             <Menu.Item key="home">
-                <Link to={AdminPath.HOME}>{PathDict.get(AdminPath.HOME)}</Link>
+                <Link to={AdminPath.HOME}>  <span>
+                    <HomeOutlined />
+                    <span>{PathDict.get(AdminPath.HOME)}</span>
+                </span></Link>
             </Menu.Item>
             <SubMenu
                 key="settings-user"
@@ -267,6 +270,7 @@ const AdminMenu = (props: AppHeaderProps) => {
                 style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
                 title={
                     <span>
+                        <DashboardOutlined />
                         <span>{PathDict.get(AdminPath.DEVICE)}</span>
                     </span>
                 }

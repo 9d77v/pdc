@@ -72,7 +72,7 @@ const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any
             <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                 <Switch />
             </Form.Item>
-            <Form.Item name="theme" label="主题">
+            <Form.Item name="theme" label="主题" hidden>
                 <Select onChange={() => { }}>
                     <Select.Option value="">默认</Select.Option>
                     <Select.Option value="vjs-theme-lemon">柠檬</Select.Option>

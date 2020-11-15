@@ -341,12 +341,12 @@ export default function VideoTable() {
                 value ? "是" : "否"
             )
         },
-        {
-            title: '主题', dataIndex: 'theme', key: 'theme', width: 80,
-            render: (value: string, record: any) => (
-                value === "vjs-theme-lemon" ? "柠檬" : "默认"
-            )
-        },
+        // {
+        //     title: '主题', dataIndex: 'theme', key: 'theme', width: 80,
+        //     render: (value: string, record: any) => (
+        //         value === "vjs-theme-lemon" ? "柠檬" : "默认"
+        //     )
+        // },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt',
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")

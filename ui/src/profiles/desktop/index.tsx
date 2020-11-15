@@ -19,7 +19,7 @@ import Calculator from 'src/components/calculator'
 import VideoIndex from './app/video'
 import VideoDetail from './app/video/VideoDetail'
 import VideoSearch from './app/video/VideoSearch'
-import DeviceIndex from './app/device'
+import DeviceIndex from './admin/device/device-list'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
