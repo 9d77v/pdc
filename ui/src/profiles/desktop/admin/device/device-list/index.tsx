@@ -13,6 +13,7 @@ export default function DeviceModelIndex() {
         createdAt: 0,
         updatedAt: 0,
     })
+
     return (
         <div style={{ display: "flex" }}>
             <div style={{ width: 350, padding: 10 }}>

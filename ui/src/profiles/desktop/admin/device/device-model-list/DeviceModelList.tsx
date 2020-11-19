@@ -1,12 +1,13 @@
 import { List, Button, Tag } from 'antd';
 import React, { useState } from 'react';
-import { DeviceModelCreateForm, INewDeviceModel } from './DeviceModelCreateForm';
+import { DeviceModelCreateForm } from './DeviceModelCreateForm';
 import { ADD_DEVICE_MODEL, LIST_DEVICE_MODEL, UPDATE_DEVICE_MODEL } from 'src/consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { DeviceTypeMap, IDeviceModel } from 'src/consts/consts';
+import { DeviceTypeMap } from 'src/consts/consts';
 import "src/styles/card.less"
 import { EditOutlined } from '@ant-design/icons';
-import { IUpdateDeviceModel, DeviceModelUpdateForm } from './DeviceModelUpdateForm';
+import { DeviceModelUpdateForm } from './DeviceModelUpdateForm';
+import { IDeviceModel, INewDeviceModel, IUpdateDeviceModel } from 'src/models/device';
 
 interface IDeviceModelListProps {
     currentSelectID: number
@@ -46,6 +47,7 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
                     "name": values.name,
                     "deviceType": values.deviceType || 0,
                     "desc": values.desc,
+                    "cameraCompany": values.cameraCompany
                 }
             }
         });

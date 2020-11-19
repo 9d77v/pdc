@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 
 import { useMutation } from '@apollo/react-hooks';
 import dayjs from 'dayjs';
-import { AttributeModelCreateForm, INewAttributeModel } from './AttributeModelCreateForm';
+import { AttributeModelCreateForm } from './AttributeModelCreateForm';
 import { ADD_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL } from 'src/consts/device.gql';
-import { IUpdateAttributeModel, AttributeModelUpdateForm } from './AttributeModelUpdateForm';
+import { AttributeModelUpdateForm } from './AttributeModelUpdateForm';
+import { INewAttributeModel, IUpdateAttributeModel } from 'src/models/device';
 
 
 interface IAttributeModelTableProps {
@@ -136,7 +137,7 @@ export default function AttributeModelTable(props: IAttributeModelTableProps) {
                 columns={columns}
                 bordered
                 pagination={{
-                    pageSize: 5,
+                    pageSize: 10,
                     hideOnSinglePage: true,
                     total: data.length
                 }}

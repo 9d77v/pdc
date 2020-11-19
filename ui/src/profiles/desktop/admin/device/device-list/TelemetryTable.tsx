@@ -123,7 +123,7 @@ export default function TelemetryTable(props: ITelemetryTableProps) {
                 columns={columns}
                 bordered
                 pagination={{
-                    pageSize: 5,
+                    pageSize: 10,
                     total: dataResource.length
                 }}
                 dataSource={dataResource}

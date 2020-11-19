@@ -1,14 +1,14 @@
 import { Modal, Form, Input } from 'antd'
-import React, { useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
 
-interface VideoSeriesItemUpdateFormProps {
+interface IVideoSeriesItemUpdateFormProps {
     visible: boolean
     onUpdate: (values: any) => void
     onCancel: () => void
     data: any
 }
 
-export const VideoSeriesItemUpdateForm: React.FC<VideoSeriesItemUpdateFormProps> = ({
+export const VideoSeriesItemUpdateForm: FC<IVideoSeriesItemUpdateFormProps> = ({
     visible,
     onUpdate,
     onCancel,

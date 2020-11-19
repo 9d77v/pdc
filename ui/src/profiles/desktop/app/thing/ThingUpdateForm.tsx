@@ -1,5 +1,5 @@
 import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import { Uploader } from 'src/components/Uploader'
 import dayjs from 'dayjs'
 import { ConsumerExpenditureMap, RubbishCategoryMap, ThingStatusMap, TagStyle } from 'src/consts/consts'
@@ -10,7 +10,7 @@ interface Values {
     description: string
 }
 
-interface UpdateThingProps {
+interface IUpdateThingProps {
     id: number
     name: string
     num: number
@@ -28,14 +28,14 @@ interface UpdateThingProps {
     refOrderID: string
     rubbishCategory: number[]
 }
-interface ThingUpdateFormProps {
+interface IThingUpdateFormProps {
     visible: boolean
-    data: UpdateThingProps,
+    data: IUpdateThingProps,
     onUpdate: (values: Values) => void
     onCancel: () => void
 }
 
-export const ThingUpdateForm: React.FC<ThingUpdateFormProps> = ({
+export const ThingUpdateForm: FC<IThingUpdateFormProps> = ({
     visible,
     data,
     onUpdate,

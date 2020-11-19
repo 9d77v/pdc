@@ -7,6 +7,7 @@ import { UserBrief } from "src/profiles/mobile/common/UserBrief"
 import { NewUser } from "src/models/user"
 import { AppPath } from "src/consts/path"
 
+
 interface IMeIndexProps {
     user: NewUser
 }

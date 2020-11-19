@@ -2,6 +2,7 @@ import { Form, Input, Switch, DatePicker, Select } from 'antd'
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
 
+
 const { TextArea } = Input
 
 interface Values {
@@ -9,11 +10,11 @@ interface Values {
     description: string
 }
 
-interface VideoCreateStepOneFormProps {
+interface IVideoCreateStepOneFormProps {
     onCreate?: (values: Values) => void
 }
 
-const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any>) => {
+const VideoCreateStepOneForm = (props: IVideoCreateStepOneFormProps, ref: Ref<any>) => {
     const [form] = Form.useForm()
     const getForm = () => {
         return form

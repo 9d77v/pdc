@@ -1,5 +1,5 @@
 import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import { Uploader } from 'src/components/Uploader'
 import { Episode } from 'src/models/video'
 import { SubtitleForm } from './SubtitleForm'
@@ -8,14 +8,14 @@ import {
 } from '@ant-design/icons'
 
 
-interface EpisodeUpdateFormProps {
+interface IEpisodeUpdateFormProps {
     visible: boolean
     onUpdate: (values: Episode) => void
     onCancel: () => void
     data: Episode,
 }
 
-export const EpisodeUpdateForm: React.FC<EpisodeUpdateFormProps> = ({
+export const EpisodeUpdateForm: FC<IEpisodeUpdateFormProps> = ({
     visible,
     onUpdate,
     onCancel,

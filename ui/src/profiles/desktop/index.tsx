@@ -20,6 +20,8 @@ import VideoIndex from './app/video'
 import VideoDetail from './app/video/VideoDetail'
 import VideoSearch from './app/video/VideoSearch'
 import DeviceIndex from './admin/device/device-list'
+import DeviceTelemetry from './app/device/DeviceTelemetry'
+import DeviceCamera from './app/device/DeviceCamera'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -33,7 +35,6 @@ const ThingAnalysis = React.lazy(() => import('./app/thing/ThingAnalysis'))
 
 const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
 
-const AppDeviceIndex = React.lazy(() => import('./app/device'))
 const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
 
@@ -58,8 +59,11 @@ const DesktopIndex = () => {
                             <Route exact path={AppPath.HOME}>
                                 欢迎使用个人数据中心
                             </Route>
-                            <Route exact path={AppPath.DEVICE}>
-                                <AppDeviceIndex />
+                            <Route exact path={AppPath.DEVICE_TELEMETRY}>
+                                <DeviceTelemetry />
+                            </Route>
+                            <Route exact path={AppPath.DEVICE_CAMERA}>
+                                <DeviceCamera />
                             </Route>
                             <Route exact path={AppPath.VIDEO_DETAIL}  >
                                 <VideoDetail />

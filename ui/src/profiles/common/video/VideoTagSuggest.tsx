@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/react-hooks'
 import { message } from 'antd'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { VIDEO_RANDOM_TAG_SUGGEST } from 'src/consts/video.gql'
 import {
     SyncOutlined,
@@ -18,7 +18,7 @@ interface IVideoTagSuggestProps {
     width?: number | string
 }
 
-const VideoTagSuggest: React.FC<IVideoTagSuggestProps> = ({
+const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
     title,
     width = "100%",
     tag,

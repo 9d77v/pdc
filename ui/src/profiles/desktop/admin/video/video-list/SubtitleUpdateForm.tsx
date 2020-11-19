@@ -1,14 +1,14 @@
 import { Modal, Form, Input, Radio } from 'antd'
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
 
-interface SubtitleUpdateFormProps {
+interface ISubtitleUpdateFormProps {
     visible: boolean
     onUpdate: (values: any) => void
     onCancel: () => void
 }
 
-export const SubtitleUpdateForm: React.FC<SubtitleUpdateFormProps> = ({
+export const SubtitleUpdateForm: FC<ISubtitleUpdateFormProps> = ({
     visible,
     onUpdate,
     onCancel,

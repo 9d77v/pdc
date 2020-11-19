@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, FC } from 'react'
 import { Modal, Form, Radio } from 'antd'
 import { Uploader } from 'src/components/Uploader'
 
-interface ModalFormProps {
+interface IModalFormProps {
     visible: boolean
     onCancel: () => void
 }
@@ -22,7 +22,7 @@ const useResetFormOnCloseModal = ({ form, visible }: any) => {
     }, [form, prevVisible, visible])
 }
 
-export const SubtitleForm: React.FC<ModalFormProps> = ({ visible, onCancel }) => {
+export const SubtitleForm: FC<IModalFormProps> = ({ visible, onCancel }) => {
     const [form] = Form.useForm()
 
     const [url, setUrl] = useState("")

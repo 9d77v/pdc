@@ -3,15 +3,17 @@ import { Layout, Dropdown, Avatar, Button } from 'antd'
 import { Link, useHistory, useLocation } from "react-router-dom"
 import { apolloClient } from "src/utils/apollo_client"
 import { AdminPath, AppPath } from "src/consts/path"
+
+
 const { Header } = Layout
 
-interface AppHeaderProps {
+interface IAppHeaderProps {
     name: string
     avatar: string
     roleID: number
 }
 
-export const AppHeader = (props: AppHeaderProps) => {
+export const AppHeader = (props: IAppHeaderProps) => {
     const history = useHistory()
     const logout = () => {
         localStorage.clear()

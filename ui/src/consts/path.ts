@@ -1,6 +1,8 @@
 const AppPath = {
     HOME: "/app/home",
     DEVICE: "/app/device",
+    DEVICE_TELEMETRY: "/app/device/telemetry",
+    DEVICE_CAMERA: "/app/device/camera",
     VIDEO: "/app/video",
     VIDEO_DETAIL: "/app/video/detail",
     VIDEO_SUGGEST: "/app/video/suggest",
@@ -41,6 +43,8 @@ const AdminPath = {
 const PathDict = new Map<string, string>([
     [AppPath.HOME, '首页'],
     [AppPath.DEVICE, '设备'],
+    [AppPath.DEVICE_TELEMETRY, '遥测'],
+    [AppPath.DEVICE_CAMERA, '摄像头'],
     [AppPath.USER, '个人主页'],
     [AppPath.USER_PROFILE, '个人资料'],
     [AppPath.USER_ACCOUNT, '账户安全'],

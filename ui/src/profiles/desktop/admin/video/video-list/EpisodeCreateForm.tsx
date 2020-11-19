@@ -1,5 +1,5 @@
 import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import { Uploader } from 'src/components/Uploader'
 import { SubtitleForm } from './SubtitleForm'
 import {
@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons'
 
 
-interface EpisodeCreateFormProps {
+interface IEpisodeCreateFormProps {
     visible: boolean
     onCreate: (values: any) => void
     onCancel: () => void,
@@ -15,7 +15,7 @@ interface EpisodeCreateFormProps {
     num: number,
 }
 
-export const EpisodeCreateForm: React.FC<EpisodeCreateFormProps> = ({
+export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,

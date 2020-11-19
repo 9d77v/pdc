@@ -3,9 +3,10 @@ import React, { useState } from 'react'
 
 import { useMutation } from '@apollo/react-hooks';
 import dayjs from 'dayjs';
-import { TelemetryModelCreateForm, INewTelemetryModel } from './TelemetryModelCreateForm';
+import { TelemetryModelCreateForm } from './TelemetryModelCreateForm';
 import { UPDATE_TELEMETRY_MODEL, ADD_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL } from 'src/consts/device.gql';
-import { IUpdateTelemetryModel, TelemetryModelUpdateForm } from './TelemetryModelUpdateForm';
+import { TelemetryModelUpdateForm } from './TelemetryModelUpdateForm';
+import { INewTelemetryModel, IUpdateTelemetryModel } from 'src/models/device';
 
 
 interface ITelemetryModelTableProps {
@@ -156,7 +157,7 @@ export default function TelemetryModelTable(props: ITelemetryModelTableProps) {
                 columns={columns}
                 bordered
                 pagination={{
-                    pageSize: 5,
+                    pageSize: 10,
                     total: data.length
                 }}
                 dataSource={data}

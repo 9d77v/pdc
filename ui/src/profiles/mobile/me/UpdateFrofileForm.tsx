@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom'
 import { Form, Input, Button, Select, DatePicker, message } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import { GenderMap } from "src/consts/consts"
 import { Uploader } from "src/components/Uploader"
 import dayjs from 'dayjs'
@@ -9,10 +9,12 @@ import { useMutation } from '@apollo/react-hooks'
 import { NavBar, Icon } from 'antd-mobile'
 import { NewUser } from 'src/models/user'
 
-interface UpdateProfileFormProps {
+
+interface IUpdateProfileFormProps {
     user: NewUser
 }
-export const UpdateProfileForm: React.FC<UpdateProfileFormProps> = ({
+
+export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
     user
 }) => {
     const history = useHistory()

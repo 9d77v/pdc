@@ -1,20 +1,16 @@
 import { Modal, Form, Input } from 'antd';
-import React, { useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
+import { IUpdateAttributeModel } from 'src/models/device';
 
-export interface IUpdateAttributeModel {
-    id: number
-    key: string
-    name: string
-}
 
-interface AttributeModelCreateFormProps {
+interface IAttributeModelCreateFormProps {
     data: IUpdateAttributeModel
     visible: boolean;
     onUpdate: (values: IUpdateAttributeModel) => void;
     onCancel: () => void;
 }
 
-export const AttributeModelUpdateForm: React.FC<AttributeModelCreateFormProps> = ({
+export const AttributeModelUpdateForm: FC<IAttributeModelCreateFormProps> = ({
     data,
     visible,
     onUpdate,

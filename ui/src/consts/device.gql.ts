@@ -99,6 +99,7 @@ query deviceModels($ids:[ID!]) {
       name
       desc
       deviceType
+      cameraCompany
       attributeModels{
         id
         key
@@ -153,14 +154,16 @@ query devices($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
       deviceModelName
       ip
       port
+      username
+      password
     }
   }
 }
 `
 
 const LIST_DEVICE_SELECTOR = gql`
-query devices( $sorts: [Sort!]) {
-  devices(sorts: $sorts) {
+query devices($deviceType:Int!, $sorts: [Sort!]) {
+  devices(deviceType:$deviceType,sorts: $sorts) {
     edges {
       id
       name
@@ -184,9 +187,13 @@ query devices($ids:[ID!]) {
       port
       accessKey
       secretKey
+      username
+      password
       deviceModelID
       deviceModelName
       deviceModelDesc
+      deviceModelDeviceType
+      deviceModelCameraCompany
       attributes{
         id
         key
@@ -215,19 +222,29 @@ query devices($ids:[ID!]) {
 `
 
 const GET_MOBILE_HOME_DEVICES = gql`
-query deviceDashboards($keyword: String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-  deviceDashboards(keyword: $keyword, page: $page, pageSize: $pageSize, sorts: $sorts) {
+query appDeviceDashboards($deviceType: Int) {
+  appDeviceDashboards(deviceType: $deviceType) {
+    totalCount
     edges {
       id
       name
+      isVisible
+      deviceType
       telemetries{
-        telemetryID
+        id
         deviceID
+        deviceName
+        telemetryID
         name
         value
         factor
         scale
         unit
+      }
+      cameras{
+        id
+        deviceID
+        deviceName
       }
     }
   }
@@ -265,6 +282,7 @@ query deviceDashboards($keyword: String, $page: Int, $pageSize: Int, $sorts: [So
       id
       name
       isVisible
+      deviceType
       telemetries{
         id
         deviceID
@@ -275,6 +293,11 @@ query deviceDashboards($keyword: String, $page: Int, $pageSize: Int, $sorts: [So
         factor
         scale
         unit
+      }
+      cameras{
+        id
+        deviceID
+        deviceName
       }
     }
   }
@@ -297,6 +320,28 @@ mutation removeDeviceDashboardTelemetry($ids:[Int!]!){
 }
 `
 
+const ADD_DEVICE_DASHBOARD_CAMERA = gql`
+mutation addDeviceDashboardCamera($input:NewDeviceDashboardCamera!){
+  addDeviceDashboardCamera(input:$input){
+     id
+   }
+}
+`
+
+const REMOVE_DEVICE_DASHBOARD_CAMERA = gql`
+mutation removeDeviceDashboardCamera($ids:[Int!]!){
+   removeDeviceDashboardCamera(ids:$ids){
+     id
+   }
+}
+`
+
+const CAMERA_CAPTURE = gql`
+mutation cameraCapture($deviceID:Int!){
+   cameraCapture(deviceID:$deviceID) 
+}
+`
+
 export {
   ADD_DEVICE_MODEL, UPDATE_DEVICE_MODEL,
   DEVICE_MODEL_COMBO,
@@ -307,5 +352,7 @@ export {
   LIST_DEVICE, LIST_DEVICE_SELECTOR, GET_DEVICE, GET_MOBILE_HOME_DEVICES,
   ADD_DEVICE_DASHBOARD, UPDATE_DEVICE_DASHBOARD, DELETE_DEVICE_DASHBOARD,
   LIST_DEVICE_DASHBOARD,
-  ADD_DEVICE_DASHBOARD_TELEMETRY, REMOVE_DEVICE_DASHBOARD_TELEMETRY
+  ADD_DEVICE_DASHBOARD_TELEMETRY, REMOVE_DEVICE_DASHBOARD_TELEMETRY,
+  ADD_DEVICE_DASHBOARD_CAMERA, REMOVE_DEVICE_DASHBOARD_CAMERA,
+  CAMERA_CAPTURE
 }

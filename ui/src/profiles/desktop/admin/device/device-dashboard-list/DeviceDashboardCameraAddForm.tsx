@@ -2,18 +2,18 @@ import { useQuery } from '@apollo/react-hooks';
 import { Modal, Form, Select } from 'antd';
 import React, { FC, useMemo } from 'react';
 import { LIST_DEVICE_SELECTOR } from 'src/consts/device.gql';
-import { IDeviceDashboardTelemetry, INewDeviceDashboardTelemetry } from 'src/models/device';
+import { IDeviceDashboardCamera, INewDeviceDashboardCamera } from 'src/models/device';
 
-const { Option, OptGroup } = Select;
+const { Option } = Select;
 
-interface IDeviceDashboardTelemetryAddFormProps {
-    existData: IDeviceDashboardTelemetry[]
+interface IDeviceDashboardCameraAddFormProps {
+    existData: IDeviceDashboardCamera[]
     visible: boolean
-    onCreate: (values: INewDeviceDashboardTelemetry) => void
+    onCreate: (values: INewDeviceDashboardCamera) => void
     onCancel: () => void
 }
 
-export const DeviceDashboardTelemetryAddForm: FC<IDeviceDashboardTelemetryAddFormProps> = ({
+export const DeviceDashboardCameraAddForm: FC<IDeviceDashboardCameraAddFormProps> = ({
     existData,
     visible,
     onCreate,
@@ -32,7 +32,7 @@ export const DeviceDashboardTelemetryAddForm: FC<IDeviceDashboardTelemetryAddFor
                     field: 'id',
                     isAsc: true
                 }],
-                deviceType: 0
+                deviceType: 1
             },
             fetchPolicy: "cache-and-network"
         })
@@ -43,7 +43,7 @@ export const DeviceDashboardTelemetryAddForm: FC<IDeviceDashboardTelemetryAddFor
     const existDataMap = useMemo(() => {
         const m = new Map<number, boolean>()
         for (const t of existData || []) {
-            m.set(t.telemetryID, true)
+            m.set(t.deviceID, true)
         }
         return m
     }, [existData])
@@ -51,18 +51,13 @@ export const DeviceDashboardTelemetryAddForm: FC<IDeviceDashboardTelemetryAddFor
     const optGroups = useMemo(() => {
         const d = data ? data.devices.edges : []
         return d.map((value: any) => {
-            const options = value.telemetries.map((t: any) => {
-                return <Option key={t.id} value={t.id} disabled={existDataMap.get(t.id)}>{t.name}({t.key})</Option>
-            })
-            return <OptGroup label={value.name} key={value.id}>
-                {options}
-            </OptGroup>
+            return <Option key={value.id} value={value.id} disabled={existDataMap.get(value.id)}>{value.name}</Option>
         })
     }, [existDataMap, data])
     return (
         <Modal
             visible={visible}
-            title="添加遥测"
+            title="添加摄像头"
             okText="确定"
             cancelText="取消"
             onCancel={
@@ -89,14 +84,15 @@ export const DeviceDashboardTelemetryAddForm: FC<IDeviceDashboardTelemetryAddFor
                 {...layout}
                 form={form}
                 layout="horizontal"
-                name="deviceDashboardTelemetryAddForm"
+                name="deviceDashboardCameraAddForm"
                 style={{ maxHeight: 600 }}
                 initialValues={{ isVisible: true }}
             >
-                <Form.Item name="telemetryIDs" label="遥测" valuePropName='checked'
-                    rules={[{ required: true, message: 'Please select your favourite colors!', type: 'array' }]}
+                <Form.Item name="deviceIDs" label="摄像头" valuePropName='checked'
+                    rules={[{ required: true, message: '请选择摄像头!', type: 'array' }]}
                 >
-                    <Select mode="multiple"
+                    <Select
+                        mode="multiple"
                         style={{ width: 200 }}
                         listItemHeight={10}
                         onChange={handleChange}>

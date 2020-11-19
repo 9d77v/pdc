@@ -19,7 +19,9 @@ const DeviceCards = (props: IDeviceCardsProps) => {
 
     const { data } = useQuery(GET_MOBILE_HOME_DEVICES,
         {
-            fetchPolicy: "cache-and-network"
+            variables: {
+                deviceType: 0
+            }
         })
 
     const height = useMemo(() => {
@@ -36,7 +38,7 @@ const DeviceCards = (props: IDeviceCardsProps) => {
 
     useEffect(() => {
         if (data) {
-            const deviceDashboards = data?.deviceDashboards.edges
+            const deviceDashboards = data?.appDeviceDashboards.edges
             const newDeviceDashboards: any[] = []
             for (let deviceDashboard of deviceDashboards) {
                 let newTelemetries: any[] = []
@@ -78,7 +80,7 @@ const DeviceCards = (props: IDeviceCardsProps) => {
 
     useEffect(() => {
         let telemetries: string[] = []
-        for (let element of data ? data.deviceDashboards.edges : []) {
+        for (let element of data ? data.appDeviceDashboards.edges : []) {
             for (let t of element.telemetries) {
                 telemetries.push(t.deviceID + "." + t.telemetryID)
             }

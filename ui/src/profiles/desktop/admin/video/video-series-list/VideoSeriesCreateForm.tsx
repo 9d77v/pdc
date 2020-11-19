@@ -1,18 +1,19 @@
 import { Modal, Form, Input } from 'antd'
-import React from 'react'
+import React, { FC } from 'react'
+
 
 interface Values {
     title: string
     description: string
 }
 
-interface VideoSeriesCreateFormProps {
+interface IVideoSeriesCreateFormProps {
     visible: boolean
     onCreate: (values: Values) => void
     onCancel: () => void
 }
 
-export const VideoSeriesCreateForm: React.FC<VideoSeriesCreateFormProps> = ({
+export const VideoSeriesCreateForm: FC<IVideoSeriesCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,

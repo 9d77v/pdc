@@ -1,24 +1,17 @@
 import { Modal, Form, Input, Select, InputNumber } from 'antd';
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks';
 import { DEVICE_MODEL_COMBO } from 'src/consts/device.gql';
+import { INewDevice } from 'src/models/device';
 
-
-export interface INewDevice {
-    name: string
-    deviceModelID: number
-    ip: string
-    port: number
-}
-
-interface DeviceCreateFormProps {
+interface IDeviceCreateFormProps {
     visible: boolean;
     onCreate: (values: INewDevice) => void;
     onCancel: () => void;
 }
 const { Option } = Select;
 
-export const DeviceCreateForm: React.FC<DeviceCreateFormProps> = ({
+export const DeviceCreateForm: FC<IDeviceCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
@@ -127,6 +120,18 @@ export const DeviceCreateForm: React.FC<DeviceCreateFormProps> = ({
                     >
                         {options}
                     </Select>
+                </Form.Item>
+                <Form.Item
+                    name="username"
+                    label="用户名"
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="password"
+                    label="密码"
+                >
+                    <Input.Password />
                 </Form.Item>
             </Form>
         </Modal>
