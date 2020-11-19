@@ -27,7 +27,7 @@ export default function DeviceIndex() {
                     onChange={(tab, index) => { console.log('onChange', index, tab); }}
                     onTabClick={(tab, index) => { console.log('onTabClick', index, tab); }}
                 >
-                    <DeviceCards width={200} />
+                    <DeviceCards width={160} />
                     <DeviceCameraList />
                 </Tabs>
             </div>
