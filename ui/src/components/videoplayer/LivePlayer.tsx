@@ -35,7 +35,7 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
         autoplay: autoplay,
         sources: [{
             src: url,
-            type: 'video/mp4',
+            type: 'application/vnd.apple.mpegurl',
         }],
         language: "zh-CN",
         controls: true,
