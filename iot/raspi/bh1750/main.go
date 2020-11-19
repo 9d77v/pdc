@@ -9,9 +9,10 @@ import (
 func main() {
 	iotSDK := sdk.NewIotSDK()
 	r := raspi.NewAdaptor()
-	iotSDK.Run([]func(){
+	works := []func(){
 		func() {
 			sensors.SHT3x(iotSDK, r)
 		},
-	})
+	}
+	iotSDK.Run(works, nil)
 }

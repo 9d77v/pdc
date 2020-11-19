@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
@@ -11,7 +13,10 @@ import (
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/9d77v/pdc/models"
+	"github.com/9d77v/pdc/models/mq"
 	"github.com/9d77v/pdc/utils"
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/proto"
 	"gorm.io/gorm"
 )
 
@@ -22,13 +27,122 @@ type DeviceService struct {
 //CreateDeviceModel  ..
 func (s DeviceService) CreateDeviceModel(ctx context.Context, input model.NewDeviceModel) (*model.DeviceModel, error) {
 	m := &models.DeviceModel{
-		Name:       input.Name,
-		Desc:       ptrs.String(input.Desc),
-		DeviceType: uint8(input.DeviceType),
+		Name:          input.Name,
+		Desc:          ptrs.String(input.Desc),
+		DeviceType:    uint8(input.DeviceType),
+		CameraCompany: uint8(input.CameraCompany),
 	}
 	err := models.Gorm.Create(m).Error
 	if err != nil {
 		return &model.DeviceModel{}, err
+	}
+	if input.DeviceType == 1 && input.CameraCompany == 0 {
+		attributes := []*models.AttributeModel{
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "device_name",
+				Name:          "设备名称",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "device_id",
+				Name:          "设备ID",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "device_description",
+				Name:          "设备描述",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "device_location",
+				Name:          "设备位置",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "system_contact",
+				Name:          "系统联系方",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "model",
+				Name:          "类型",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "serial_number",
+				Name:          "序列号",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "mac_address",
+				Name:          "MAC地址",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "firmware_version",
+				Name:          "固件版本",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "firmware_releasedDate",
+				Name:          "固件发布日期",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "encoder_version",
+				Name:          "编码器版本",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "encoder_released_date",
+				Name:          "编码器发布日期",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "boot_version",
+				Name:          "引导版本",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "boot_released_date",
+				Name:          "引导发布日期",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "hardware_version",
+				Name:          "硬件版本",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "device_type",
+				Name:          "设备类型",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "telecontrol_id",
+				Name:          "远程 ID",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "support beep",
+				Name:          "支持蜂鸣音",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "support_video_loss",
+				Name:          "支持视频丢失",
+			},
+			{
+				DeviceModelID: uint(m.ID),
+				Key:           "firmware_version_info",
+				Name:          "固件版本信息",
+			},
+		}
+		err = models.Gorm.Create(&attributes).Error
+		if err != nil {
+			return &model.DeviceModel{ID: int64(m.ID)}, err
+		}
 	}
 	return &model.DeviceModel{ID: int64(m.ID)}, err
 }
@@ -209,6 +323,8 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 		Name:          input.Name,
 		IP:            ptrs.String(input.IP),
 		Port:          uint16(ptrs.Int64(input.Port)),
+		Username:      ptrs.String(input.Username),
+		Password:      ptrs.String(input.Password),
 	}
 	deviceModel := new(models.DeviceModel)
 	if err := models.Gorm.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
@@ -238,10 +354,12 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 			AttributeModelID: v.ID,
 		})
 	}
-	err = tx.Create(&attributes).Error
-	if err != nil {
-		tx.Rollback()
-		return &model.Device{}, err
+	if len(attributes) > 0 {
+		err = tx.Create(&attributes).Error
+		if err != nil {
+			tx.Rollback()
+			return &model.Device{}, err
+		}
 	}
 	telemetries := make([]*models.Telemetry, 0, len(deviceModel.TelemetryModels))
 	for _, v := range deviceModel.TelemetryModels {
@@ -251,10 +369,12 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 		})
 
 	}
-	err = tx.Create(&telemetries).Error
-	if err != nil {
-		tx.Rollback()
-		return &model.Device{}, err
+	if len(telemetries) > 0 {
+		err = tx.Create(&telemetries).Error
+		if err != nil {
+			tx.Rollback()
+			return &model.Device{}, err
+		}
 	}
 	tx.Commit()
 	return &model.Device{ID: int64(m.ID)}, err
@@ -267,9 +387,11 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
-		"name": input.Name,
-		"ip":   ptrs.String(input.IP),
-		"port": uint(ptrs.Int64(input.Port)),
+		"name":     input.Name,
+		"ip":       ptrs.String(input.IP),
+		"port":     uint(ptrs.Int64(input.Port)),
+		"username": ptrs.String(input.Username),
+		"password": ptrs.String(input.Password),
 	}
 	err := models.Gorm.Model(m).Updates(updateMap).Error
 	return &model.Device{ID: int64(m.ID)}, err
@@ -277,7 +399,7 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 
 //ListDevice ..
 func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.Device, error) {
+	page, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (int64, []*model.Device, error) {
 	result := make([]*model.Device, 0)
 	data := make([]*models.Device, 0)
 	offset, limit := GetPageInfo(page, pageSize)
@@ -286,6 +408,12 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 	builder := models.Gorm
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
+	}
+	if deviceType != nil {
+		builder = builder.
+			Where(models.TablePrefix+"_device_model.device_type = ?", ptrs.Int64(deviceType)).
+			Joins("JOIN " + models.TablePrefix + "_device_model ON " + models.TablePrefix + "_device_model.id = " +
+				models.TablePrefix + "_device.device_model_id")
 	}
 	var total int64
 	if fieldMap["totalCount"] {
@@ -300,8 +428,16 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields,
-			"__typename", "attributes", "telemetries", "deviceModelName", "deviceModelDesc"))
+		fields := utils.ToDBFields(edgeFields,
+			"__typename", "attributes", "telemetries",
+			"deviceModelName", "deviceModelDesc",
+			"deviceModelDeviceType", "deviceModelCameraCompany")
+		if deviceType != nil {
+			for i, v := range fields {
+				fields[i] = models.TablePrefix + "_device." + v
+			}
+		}
+		builder = builder.Select(fields)
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
@@ -321,7 +457,8 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 		if edgeFieldMap["telemetries"] {
 			builder = builder.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
 		}
-		if edgeFieldMap["deviceModelName"] || edgeFieldMap["deviceModelDesc"] {
+		if edgeFieldMap["deviceModelName"] || edgeFieldMap["deviceModelDesc"] ||
+			edgeFieldMap["deviceModelDeviceType"] || edgeFieldMap["deviceModelCameraCompany"] {
 			builder = builder.Preload("DeviceModel")
 		}
 		err = builder.Find(&data).Error
@@ -337,14 +474,14 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 }
 
 //GetDeviceInfo ..
-func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceMSG, error) {
-	replyDeviceMsg := &pb.DeviceMSG{
-		DeviceID: deviceID,
+func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceDownMSG, error) {
+	replyDeviceMsg := &pb.DeviceDownMSG{
+		DeviceId: deviceID,
 	}
 	device := new(models.Device)
 	err := models.Gorm.Preload("Attributes").Preload("Attributes.AttributeModel").
-		Preload("Telemetries").Preload("Telemetries.TelemetryModel").
-		Where("id=?", replyDeviceMsg.DeviceID).First(device).Error
+		Preload("Telemetries").Preload("Telemetries.TelemetryModel").Preload("DeviceModel").
+		Where("id=?", replyDeviceMsg.DeviceId).First(device).Error
 	if err != nil {
 		log.Println("get device failed,err", err)
 		return replyDeviceMsg, err
@@ -357,12 +494,17 @@ func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceMSG, error) {
 	for _, v := range device.Telemetries {
 		telemetryConfig[v.TelemetryModel.Key] = uint32(v.ID)
 	}
-	replyDeviceMsg.DeviceInfo = &pb.DeviceInfo{
-		ID:              deviceID,
-		IP:              device.IP,
-		Port:            uint32(device.Port),
-		AttributeConfig: attributeConfig,
-		TelemetryConfig: telemetryConfig,
+	replyDeviceMsg.Payload = &pb.DeviceDownMSG_LoginReplyMsg{
+		LoginReplyMsg: &pb.LoginReplyMsg{
+			Id:              deviceID,
+			Ip:              device.IP,
+			Port:            uint32(device.Port),
+			AttributeConfig: attributeConfig,
+			TelemetryConfig: telemetryConfig,
+			Username:        device.Username,
+			Password:        device.Password,
+			CameraCompany:   uint32(device.DeviceModel.CameraCompany),
+		},
 	}
 	return replyDeviceMsg, nil
 }
@@ -382,8 +524,9 @@ func (s DeviceService) DeviceLogin(accessKey, secretKey string) (uint, error) {
 //CreateDeviceDashboard  ..
 func (s DeviceService) CreateDeviceDashboard(ctx context.Context, input model.NewDeviceDashboard) (*model.DeviceDashboard, error) {
 	m := &models.DeviceDashboard{
-		Name:      input.Name,
-		IsVisible: input.IsVisible,
+		Name:       input.Name,
+		IsVisible:  input.IsVisible,
+		DeviceType: uint8(input.DeviceType),
 	}
 	err := models.Gorm.Create(m).Error
 	if err != nil {
@@ -446,6 +589,33 @@ func (s DeviceService) RemoveDeviceDashboardTelemetry(ctx context.Context, ids [
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
 }
 
+//AddDeviceDashboardCamera  ..
+func (s DeviceService) AddDeviceDashboardCamera(ctx context.Context, input model.NewDeviceDashboardCamera) (*model.DeviceDashboard, error) {
+	if len(input.DeviceIDs) == 0 {
+		return &model.DeviceDashboard{}, nil
+	}
+	data := make([]*models.DeviceDashboardCamera, 0, len(input.DeviceIDs))
+	for _, v := range input.DeviceIDs {
+		m := &models.DeviceDashboardCamera{
+			DeviceDashboardID: uint(input.DeviceDashboardID),
+			DeviceID:          uint(v),
+		}
+		data = append(data, m)
+	}
+	err := models.Gorm.Create(data).Error
+	if err != nil {
+		return &model.DeviceDashboard{}, err
+	}
+	return &model.DeviceDashboard{ID: input.DeviceDashboardID}, err
+}
+
+//RemoveDeviceDashboardCamera ..
+func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
+	m := new(models.DeviceDashboardCamera)
+	err := models.Gorm.Delete(m, ids).Error
+	return &model.DeviceDashboard{ID: int64(m.ID)}, err
+}
+
 //ListDeviceDashboards ..
 func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string,
 	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceDashboard, error) {
@@ -472,7 +642,7 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
 		builder = builder.Select(utils.ToDBFields(edgeFields,
-			"__typename", "telemetries"))
+			"__typename", "telemetries", "cameras"))
 		if len(ids) > 0 {
 			builder = builder.Where("id in (?)", ids)
 		}
@@ -495,6 +665,13 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 				builder = builder.Preload("Telemetries.Telemetry.Device")
 			}
 		}
+		if edgeFieldMap["cameras"] {
+			builder = builder.Preload("Cameras")
+			cameraFieldMap, _ := utils.GetFieldData(ctx, "edges.cameras.")
+			if cameraFieldMap["deviceName"] {
+				builder = builder.Preload("Cameras.Device")
+			}
+		}
 		err = builder.Find(&data).Error
 		if err != nil {
 			return 0, result, err
@@ -505,4 +682,91 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 		result = append(result, r)
 	}
 	return total, result, nil
+}
+
+//AppDeviceDashboards ..
+func (s DeviceService) AppDeviceDashboards(ctx context.Context, deviceType *int64) (int64, []*model.DeviceDashboard, error) {
+	result := make([]*model.DeviceDashboard, 0)
+	data := make([]*models.DeviceDashboard, 0)
+	fieldMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	builder := models.Gorm
+	if deviceType != nil {
+		builder = builder.Where("device_type = ?", ptrs.Int64(deviceType))
+	}
+	builder = builder.Where("is_visible = true")
+	var total int64
+	if fieldMap["totalCount"] {
+		total = int64(len(data))
+	}
+	if fieldMap["edges"] {
+		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields,
+			"__typename", "telemetries", "cameras"))
+		if edgeFieldMap["telemetries"] {
+			builder = builder.Preload("Telemetries").
+				Preload("Telemetries.Telemetry").
+				Preload("Telemetries.Telemetry.TelemetryModel")
+			telemetryFieldMap, _ := utils.GetFieldData(ctx, "edges.telemetries.")
+			if telemetryFieldMap["deviceName"] {
+				builder = builder.Preload("Telemetries.Telemetry.Device")
+			}
+		}
+		if edgeFieldMap["cameras"] {
+			builder = builder.Preload("Cameras")
+			cameraFieldMap, _ := utils.GetFieldData(ctx, "edges.cameras.")
+			if cameraFieldMap["deviceName"] {
+				builder = builder.Preload("Cameras.Device")
+			}
+		}
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
+		}
+	}
+	for _, m := range data {
+		r := dtos.ToDeviceDashboardDto(m)
+		result = append(result, r)
+	}
+	return total, result, nil
+}
+
+//CameraCapture ..
+func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme string) (string, error) {
+	bucketName := "camera"
+	now := time.Now()
+	objectName := "picture/" + strconv.FormatInt(deviceID, 10) + "/" + now.Format("2006-01-02") + "/" + strconv.FormatInt(now.Unix(), 10) + ".jpg"
+	minioClient := models.MinioClient
+	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 10*time.Minute)
+	if err != nil {
+		return "", err
+	}
+	request := new(pb.DeviceDownMSG)
+	request.DeviceId = uint32(deviceID)
+	request.ActionTime = ptypes.TimestampNow()
+	request.Payload = &pb.DeviceDownMSG_CameraCaptureMsg{
+		CameraCaptureMsg: &pb.CameraCaptureMsg{
+			PictureUrl:      u.String(),
+			OssPrefix:       models.OssPrefix,
+			SecureOssPrefix: models.SecureOssPrerix,
+		},
+	}
+	requestMsg, err := proto.Marshal(request)
+	if err != nil {
+		log.Println("proto marshal error:", err)
+		return "", nil
+	}
+	subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(deviceID), 10)
+	log.Println("发送数据到主题", subject)
+	msg, err := mq.Client.NatsConn().Request(subject, requestMsg, 5*time.Second)
+	if err != nil {
+		log.Println("send data error:", err)
+		return dtos.GetOSSPrefix(scheme) + u.Path, nil
+	}
+	deviceMsg := new(pb.DeviceUpMsg)
+	err = proto.Unmarshal(msg.Data, deviceMsg)
+	if err != nil {
+		log.Println("unmarshal data error")
+	}
+	return dtos.GetOSSPrefix(scheme) + u.Path, nil
 }

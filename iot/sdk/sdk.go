@@ -15,7 +15,7 @@ import (
 	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/gorilla/websocket"
-	cron "github.com/robfig/cron/v3"
+	"github.com/robfig/cron/v3"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -24,7 +24,7 @@ import (
 type IotSDK struct {
 	conn       *websocket.Conn
 	mutex      *sync.Mutex
-	DeviceInfo *pb.DeviceInfo
+	DeviceInfo *pb.LoginReplyMsg
 }
 
 //NewIotSDK init iot sdk
@@ -36,7 +36,7 @@ func NewIotSDK() *IotSDK {
 }
 
 //Run 运行iot数据采集程序
-func (sdk *IotSDK) Run(works []func()) {
+func (sdk *IotSDK) Run(works []func(), handleMsg func(msg []byte)) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 	defer sdk.conn.Close()
@@ -60,6 +60,18 @@ func (sdk *IotSDK) Run(works []func()) {
 	}
 	cr.Start()
 	defer cr.Stop()
+	go func() {
+		if handleMsg != nil {
+			for {
+				_, msg, err := sdk.conn.ReadMessage()
+				if err != nil {
+					log.Println("read:", err)
+					break
+				}
+				handleMsg(msg)
+			}
+		}
+	}()
 	for {
 		select {
 		case <-done:
@@ -82,9 +94,14 @@ func (sdk *IotSDK) Run(works []func()) {
 
 //Login get device info by device id
 func (sdk *IotSDK) login() error {
-	request := new(pb.LoginMSG)
-	request.AccessKey = accessKey
-	request.SecretKey = secretKey
+	request := new(pb.DeviceUpMsg)
+	loginMsg := new(pb.LoginMsg)
+	loginMsg.AccessKey = accessKey
+	loginMsg.SecretKey = secretKey
+	request.ActionTime = ptypes.TimestampNow()
+	request.Payload = &pb.DeviceUpMsg_LoginMsg{
+		LoginMsg: loginMsg,
+	}
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
 		return err
@@ -99,26 +116,51 @@ func (sdk *IotSDK) login() error {
 		log.Println("receive login reply:", err)
 		return err
 	}
-	reply := new(pb.DeviceMSG)
+	reply := new(pb.DeviceDownMSG)
 	err = proto.Unmarshal(msg, reply)
 	if err != nil {
 		return err
 	}
 	fmt.Println(reply)
-	if reply.DeviceInfo == nil {
+	if reply.Payload == nil {
 		return errors.New("device info is nil")
 	}
-	sdk.DeviceInfo = reply.DeviceInfo
+	sdk.DeviceInfo = reply.GetLoginReplyMsg()
 	return nil
 }
 
 //SetDeviceAttributes set device attributes
 func (sdk *IotSDK) SetDeviceAttributes(attributeMap map[uint32]string) {
-	request := new(pb.DeviceMSG)
-	request.Action = pb.DeviceAction_SetAttributes
-	request.DeviceID = sdk.DeviceInfo.ID
-	request.AttributeMap = attributeMap
+	request := new(pb.DeviceUpMsg)
+	request.DeviceId = sdk.DeviceInfo.Id
 	request.ActionTime = ptypes.TimestampNow()
+	request.Payload = &pb.DeviceUpMsg_SetAttributesMsg{
+		SetAttributesMsg: &pb.SetAttributesMsg{
+			AttributeMap: attributeMap,
+		},
+	}
+	requestMsg, err := proto.Marshal(request)
+	if err != nil {
+		log.Println("proto marshal error:", err)
+		return
+	}
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
+	if err != nil {
+		log.Printf("SetDeviceAttributes error:%v/n", err)
+	}
+}
+
+//ReplyCameraCapture ..
+func (sdk *IotSDK) ReplyCameraCapture(subject string, ok bool) {
+	request := new(pb.DeviceUpMsg)
+	request.DeviceId = sdk.DeviceInfo.Id
+	request.ActionTime = ptypes.TimestampNow()
+	request.Payload = &pb.DeviceUpMsg_CameraCaptureReplyMsg{
+		CameraCaptureReplyMsg: &pb.CameraCaptureReplyMsg{
+			Subject: subject,
+			Ok:      ok,
+		},
+	}
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
 		log.Println("proto marshal error:", err)
@@ -132,11 +174,14 @@ func (sdk *IotSDK) SetDeviceAttributes(attributeMap map[uint32]string) {
 
 //SetDeviceTelemetries upload device telemetries
 func (sdk *IotSDK) SetDeviceTelemetries(telemetryMap map[uint32]float64, now *timestamppb.Timestamp) {
-	request := new(pb.DeviceMSG)
-	request.Action = pb.DeviceAction_SetTelemetries
-	request.DeviceID = sdk.DeviceInfo.ID
-	request.TelemetryMap = telemetryMap
+	request := new(pb.DeviceUpMsg)
+	request.DeviceId = sdk.DeviceInfo.Id
 	request.ActionTime = now
+	request.Payload = &pb.DeviceUpMsg_SetTelemetriesMsg{
+		SetTelemetriesMsg: &pb.SetTelemetriesMsg{
+			TelemetryMap: telemetryMap,
+		},
+	}
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
 		log.Println("proto marshal error:", err)
@@ -149,11 +194,14 @@ func (sdk *IotSDK) SetDeviceTelemetries(telemetryMap map[uint32]float64, now *ti
 }
 
 func (sdk *IotSDK) setDeviceHealth(health uint32, now *timestamppb.Timestamp) {
-	request := new(pb.DeviceMSG)
-	request.Action = pb.DeviceAction_SetHealth
-	request.DeviceID = sdk.DeviceInfo.ID
-	request.DeviceHealth = health
+	request := new(pb.DeviceUpMsg)
+	request.DeviceId = sdk.DeviceInfo.Id
 	request.ActionTime = now
+	request.Payload = &pb.DeviceUpMsg_SetHealthMsg{
+		SetHealthMsg: &pb.SetHealthMsg{
+			DeviceHealth: health,
+		},
+	}
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
 		log.Println("proto marshal error:", err)
@@ -171,7 +219,7 @@ func (sdk *IotSDK) pingCheck() {
 	}
 	now := ptypes.TimestampNow()
 	var flag uint32
-	if sdk.ping(sdk.DeviceInfo.IP) {
+	if sdk.ping(sdk.DeviceInfo.Ip) {
 		flag = 1
 	}
 	sdk.setDeviceHealth(flag, now)

@@ -1,13 +1,12 @@
-package nats
+package mq
 
 import (
 	"fmt"
 	"log"
 	"time"
 
-	"github.com/nats-io/stan.go"
-
 	"github.com/9d77v/pdc/utils"
+	"github.com/nats-io/stan.go"
 )
 
 var (
@@ -27,6 +26,7 @@ const (
 
 //device subject
 const (
+	SubjectDevicPrefix           = "device."
 	SubjectDeviceData            = "device.data"
 	SubjectDeviceTelemetryPrefix = "device.telemetry."
 	SubjectDeviceHealthPrefix    = "device.health."

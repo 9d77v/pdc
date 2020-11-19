@@ -73,19 +73,23 @@ type ComplexityRoot struct {
 	}
 
 	Device struct {
-		AccessKey       func(childComplexity int) int
-		Attributes      func(childComplexity int) int
-		CreatedAt       func(childComplexity int) int
-		DeviceModelDesc func(childComplexity int) int
-		DeviceModelID   func(childComplexity int) int
-		DeviceModelName func(childComplexity int) int
-		ID              func(childComplexity int) int
-		IP              func(childComplexity int) int
-		Name            func(childComplexity int) int
-		Port            func(childComplexity int) int
-		SecretKey       func(childComplexity int) int
-		Telemetries     func(childComplexity int) int
-		UpdatedAt       func(childComplexity int) int
+		AccessKey                func(childComplexity int) int
+		Attributes               func(childComplexity int) int
+		CreatedAt                func(childComplexity int) int
+		DeviceModelCameraCompany func(childComplexity int) int
+		DeviceModelDesc          func(childComplexity int) int
+		DeviceModelDeviceType    func(childComplexity int) int
+		DeviceModelID            func(childComplexity int) int
+		DeviceModelName          func(childComplexity int) int
+		ID                       func(childComplexity int) int
+		IP                       func(childComplexity int) int
+		Name                     func(childComplexity int) int
+		Password                 func(childComplexity int) int
+		Port                     func(childComplexity int) int
+		SecretKey                func(childComplexity int) int
+		Telemetries              func(childComplexity int) int
+		UpdatedAt                func(childComplexity int) int
+		Username                 func(childComplexity int) int
 	}
 
 	DeviceConnection struct {
@@ -94,12 +98,23 @@ type ComplexityRoot struct {
 	}
 
 	DeviceDashboard struct {
+		Cameras     func(childComplexity int) int
 		CreatedAt   func(childComplexity int) int
+		DeviceType  func(childComplexity int) int
 		ID          func(childComplexity int) int
 		IsVisible   func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Telemetries func(childComplexity int) int
 		UpdatedAt   func(childComplexity int) int
+	}
+
+	DeviceDashboardCamera struct {
+		CreatedAt         func(childComplexity int) int
+		DeviceDashboardID func(childComplexity int) int
+		DeviceID          func(childComplexity int) int
+		DeviceName        func(childComplexity int) int
+		ID                func(childComplexity int) int
+		UpdatedAt         func(childComplexity int) int
 	}
 
 	DeviceDashboardConnection struct {
@@ -126,6 +141,7 @@ type ComplexityRoot struct {
 
 	DeviceModel struct {
 		AttributeModels func(childComplexity int) int
+		CameraCompany   func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		Desc            func(childComplexity int) int
 		DeviceType      func(childComplexity int) int
@@ -180,8 +196,10 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddDeviceDashboardCamera       func(childComplexity int, input model.NewDeviceDashboardCamera) int
 		AddDeviceDashboardTelemetry    func(childComplexity int, input model.NewDeviceDashboardTelemetry) int
 		AddVideoResource               func(childComplexity int, input model.NewVideoResource) int
+		CameraCapture                  func(childComplexity int, deviceID int64) int
 		CreateAttributeModel           func(childComplexity int, input model.NewAttributeModel) int
 		CreateDevice                   func(childComplexity int, input model.NewDevice) int
 		CreateDeviceDashboard          func(childComplexity int, input model.NewDeviceDashboard) int
@@ -199,6 +217,7 @@ type ComplexityRoot struct {
 		Login                          func(childComplexity int, username string, password string) int
 		RecordHistory                  func(childComplexity int, input model.NewHistoryInput) int
 		RefreshToken                   func(childComplexity int, refreshToken string) int
+		RemoveDeviceDashboardCamera    func(childComplexity int, ids []int64) int
 		RemoveDeviceDashboardTelemetry func(childComplexity int, ids []int64) int
 		SaveSubtitles                  func(childComplexity int, input model.NewSaveSubtitles) int
 		UpdateAttributeModel           func(childComplexity int, input model.NewUpdateAttributeModel) int
@@ -224,21 +243,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		DeviceDashboards func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		DeviceModels     func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Devices          func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Histories        func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
-		HistoryInfo      func(childComplexity int, sourceType int64, sourceID int64) int
-		PresignedURL     func(childComplexity int, bucketName string, objectName string) int
-		SearchVideo      func(childComplexity int, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) int
-		SimilarVideos    func(childComplexity int, videoID int64, pageSize int64) int
-		ThingAnalyze     func(childComplexity int, dimension string, index string, start *int64, group string) int
-		ThingSeries      func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
-		Things           func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		UserInfo         func(childComplexity int, uid *int64) int
-		Users            func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		VideoSerieses    func(childComplexity int, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Videos           func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) int
+		AppDeviceDashboards func(childComplexity int, deviceType *int64) int
+		DeviceDashboards    func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		DeviceModels        func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Devices             func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) int
+		Histories           func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
+		HistoryInfo         func(childComplexity int, sourceType int64, sourceID int64) int
+		PresignedURL        func(childComplexity int, bucketName string, objectName string) int
+		SearchVideo         func(childComplexity int, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) int
+		SimilarVideos       func(childComplexity int, videoID int64, pageSize int64) int
+		ThingAnalyze        func(childComplexity int, dimension string, index string, start *int64, group string) int
+		ThingSeries         func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
+		Things              func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		UserInfo            func(childComplexity int, uid *int64) int
+		Users               func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		VideoSerieses       func(childComplexity int, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Videos              func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) int
 	}
 
 	SerieData struct {
@@ -420,6 +440,9 @@ type MutationResolver interface {
 	DeleteDeviceDashboard(ctx context.Context, id int64) (*model.DeviceDashboard, error)
 	AddDeviceDashboardTelemetry(ctx context.Context, input model.NewDeviceDashboardTelemetry) (*model.DeviceDashboard, error)
 	RemoveDeviceDashboardTelemetry(ctx context.Context, ids []int64) (*model.DeviceDashboard, error)
+	AddDeviceDashboardCamera(ctx context.Context, input model.NewDeviceDashboardCamera) (*model.DeviceDashboard, error)
+	RemoveDeviceDashboardCamera(ctx context.Context, ids []int64) (*model.DeviceDashboard, error)
+	CameraCapture(ctx context.Context, deviceID int64) (string, error)
 }
 type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
@@ -435,8 +458,9 @@ type QueryResolver interface {
 	HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 	Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error)
 	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceModelConnection, error)
-	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceConnection, error)
+	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (*model.DeviceConnection, error)
 	DeviceDashboards(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceDashboardConnection, error)
+	AppDeviceDashboards(ctx context.Context, deviceType *int64) (*model.DeviceDashboardConnection, error)
 }
 
 type executableSchema struct {
@@ -594,12 +618,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Device.CreatedAt(childComplexity), true
 
+	case "Device.deviceModelCameraCompany":
+		if e.complexity.Device.DeviceModelCameraCompany == nil {
+			break
+		}
+
+		return e.complexity.Device.DeviceModelCameraCompany(childComplexity), true
+
 	case "Device.deviceModelDesc":
 		if e.complexity.Device.DeviceModelDesc == nil {
 			break
 		}
 
 		return e.complexity.Device.DeviceModelDesc(childComplexity), true
+
+	case "Device.deviceModelDeviceType":
+		if e.complexity.Device.DeviceModelDeviceType == nil {
+			break
+		}
+
+		return e.complexity.Device.DeviceModelDeviceType(childComplexity), true
 
 	case "Device.deviceModelID":
 		if e.complexity.Device.DeviceModelID == nil {
@@ -636,6 +674,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Device.Name(childComplexity), true
 
+	case "Device.password":
+		if e.complexity.Device.Password == nil {
+			break
+		}
+
+		return e.complexity.Device.Password(childComplexity), true
+
 	case "Device.port":
 		if e.complexity.Device.Port == nil {
 			break
@@ -664,6 +709,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Device.UpdatedAt(childComplexity), true
 
+	case "Device.username":
+		if e.complexity.Device.Username == nil {
+			break
+		}
+
+		return e.complexity.Device.Username(childComplexity), true
+
 	case "DeviceConnection.edges":
 		if e.complexity.DeviceConnection.Edges == nil {
 			break
@@ -678,12 +730,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.DeviceConnection.TotalCount(childComplexity), true
 
+	case "DeviceDashboard.cameras":
+		if e.complexity.DeviceDashboard.Cameras == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboard.Cameras(childComplexity), true
+
 	case "DeviceDashboard.createdAt":
 		if e.complexity.DeviceDashboard.CreatedAt == nil {
 			break
 		}
 
 		return e.complexity.DeviceDashboard.CreatedAt(childComplexity), true
+
+	case "DeviceDashboard.deviceType":
+		if e.complexity.DeviceDashboard.DeviceType == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboard.DeviceType(childComplexity), true
 
 	case "DeviceDashboard.id":
 		if e.complexity.DeviceDashboard.ID == nil {
@@ -719,6 +785,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeviceDashboard.UpdatedAt(childComplexity), true
+
+	case "DeviceDashboardCamera.createdAt":
+		if e.complexity.DeviceDashboardCamera.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboardCamera.CreatedAt(childComplexity), true
+
+	case "DeviceDashboardCamera.deviceDashboardID":
+		if e.complexity.DeviceDashboardCamera.DeviceDashboardID == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboardCamera.DeviceDashboardID(childComplexity), true
+
+	case "DeviceDashboardCamera.deviceID":
+		if e.complexity.DeviceDashboardCamera.DeviceID == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboardCamera.DeviceID(childComplexity), true
+
+	case "DeviceDashboardCamera.deviceName":
+		if e.complexity.DeviceDashboardCamera.DeviceName == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboardCamera.DeviceName(childComplexity), true
+
+	case "DeviceDashboardCamera.id":
+		if e.complexity.DeviceDashboardCamera.ID == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboardCamera.ID(childComplexity), true
+
+	case "DeviceDashboardCamera.updatedAt":
+		if e.complexity.DeviceDashboardCamera.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.DeviceDashboardCamera.UpdatedAt(childComplexity), true
 
 	case "DeviceDashboardConnection.edges":
 		if e.complexity.DeviceDashboardConnection.Edges == nil {
@@ -838,6 +946,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.DeviceModel.AttributeModels(childComplexity), true
+
+	case "DeviceModel.cameraCompany":
+		if e.complexity.DeviceModel.CameraCompany == nil {
+			break
+		}
+
+		return e.complexity.DeviceModel.CameraCompany(childComplexity), true
 
 	case "DeviceModel.createdAt":
 		if e.complexity.DeviceModel.CreatedAt == nil {
@@ -1091,6 +1206,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.LoginResponse.RefreshToken(childComplexity), true
 
+	case "Mutation.addDeviceDashboardCamera":
+		if e.complexity.Mutation.AddDeviceDashboardCamera == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addDeviceDashboardCamera_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddDeviceDashboardCamera(childComplexity, args["input"].(model.NewDeviceDashboardCamera)), true
+
 	case "Mutation.addDeviceDashboardTelemetry":
 		if e.complexity.Mutation.AddDeviceDashboardTelemetry == nil {
 			break
@@ -1114,6 +1241,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddVideoResource(childComplexity, args["input"].(model.NewVideoResource)), true
+
+	case "Mutation.cameraCapture":
+		if e.complexity.Mutation.CameraCapture == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_cameraCapture_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CameraCapture(childComplexity, args["deviceID"].(int64)), true
 
 	case "Mutation.createAttributeModel":
 		if e.complexity.Mutation.CreateAttributeModel == nil {
@@ -1318,6 +1457,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.RefreshToken(childComplexity, args["refreshToken"].(string)), true
+
+	case "Mutation.removeDeviceDashboardCamera":
+		if e.complexity.Mutation.RemoveDeviceDashboardCamera == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeDeviceDashboardCamera_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RemoveDeviceDashboardCamera(childComplexity, args["ids"].([]int64)), true
 
 	case "Mutation.removeDeviceDashboardTelemetry":
 		if e.complexity.Mutation.RemoveDeviceDashboardTelemetry == nil {
@@ -1532,6 +1683,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PieLineSerieData.Y(childComplexity), true
 
+	case "Query.appDeviceDashboards":
+		if e.complexity.Query.AppDeviceDashboards == nil {
+			break
+		}
+
+		args, err := ec.field_Query_appDeviceDashboards_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AppDeviceDashboards(childComplexity, args["deviceType"].(*int64)), true
+
 	case "Query.deviceDashboards":
 		if e.complexity.Query.DeviceDashboards == nil {
 			break
@@ -1566,7 +1729,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.Devices(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort), args["deviceType"].(*int64)), true
 
 	case "Query.histories":
 		if e.complexity.Query.Histories == nil {
@@ -2462,6 +2625,7 @@ type AggResult{
   desc: String!
   attributeModels: [AttributeModel!]
   telemetryModels:[TelemetryModel]
+  cameraCompany: Int!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -2497,6 +2661,7 @@ input NewDeviceModel {
   name: String!  
   desc: String
   deviceType: Int!
+  cameraCompany: Int!
 }
 
 input NewAttributeModel {
@@ -2545,8 +2710,12 @@ type Device {
   secretKey: String!
   deviceModelName:String!
   deviceModelDesc:String!
+  deviceModelDeviceType: Int!
+  deviceModelCameraCompany: Int!
   attributes: [Attribute!]
   telemetries: [Telemetry!]
+  username: String!
+  password: String!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -2586,6 +2755,8 @@ input NewDevice {
   name: String!
   ip: String
   port: Int
+  username: String
+  password: String
 }
 
 input NewUpdateDevice {
@@ -2593,13 +2764,17 @@ input NewUpdateDevice {
   name: String!  
   ip: String
   port: Int
+  username: String
+  password: String
 }
 
 type DeviceDashboard {
   id: ID!
   name: String!
   isVisible: Boolean!
+  deviceType: Int!
   telemetries: [DeviceDashboardTelemetry!]
+  cameras:[DeviceDashboardCamera!]
   createdAt: Int!
   updatedAt: Int!
 }
@@ -2621,6 +2796,15 @@ type DeviceDashboardTelemetry {
   updatedAt: Int!
 }
 
+type DeviceDashboardCamera {
+  id: ID!
+  deviceDashboardID: ID!
+  deviceID: ID!
+  deviceName: String!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
 type DeviceDashboardConnection {
   totalCount: Int!
   edges:[DeviceDashboard!]!
@@ -2629,6 +2813,7 @@ type DeviceDashboardConnection {
 input NewDeviceDashboard {
   name: String!
   isVisible:Boolean!
+  deviceType: Int!
 }
 
 input NewUpdateDeviceDashboard {
@@ -2641,7 +2826,11 @@ input NewDeviceDashboardTelemetry {
   deviceDashboardID: ID!
   telemetryIDs: [ID!]!
 }
-`, BuiltIn: false},
+
+input NewDeviceDashboardCamera{
+  deviceDashboardID: ID!
+  deviceIDs: [ID!]!
+}`, BuiltIn: false},
 	&ast.Source{Name: "graph/history.graphql", Input: `type History {
 	uid: ID!
 	sourceType:Int!
@@ -2689,8 +2878,9 @@ type Query {
   historyInfo(sourceType:Int!,sourceID:ID!):History
   histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
   deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
-  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceConnection!
+  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!],deviceType: Int):DeviceConnection!
   deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
+  appDeviceDashboards(deviceType: Int):DeviceDashboardConnection!
 } 
 
 type Mutation {
@@ -2733,6 +2923,9 @@ type Mutation {
   deleteDeviceDashboard(id:Int!):DeviceDashboard!
   addDeviceDashboardTelemetry(input:NewDeviceDashboardTelemetry!):DeviceDashboard!
   removeDeviceDashboardTelemetry(ids:[Int!]!):DeviceDashboard!
+  addDeviceDashboardCamera(input:NewDeviceDashboardCamera!):DeviceDashboard!
+  removeDeviceDashboardCamera(ids:[Int!]!):DeviceDashboard!
+  cameraCapture(deviceID:Int!):String!
 }
 `, BuiltIn: false},
 	&ast.Source{Name: "graph/thing.graphql", Input: `type Thing {
@@ -3031,6 +3224,20 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
+func (ec *executionContext) field_Mutation_addDeviceDashboardCamera_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewDeviceDashboardCamera
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewDeviceDashboardCamera2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceDashboardCamera(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_addDeviceDashboardTelemetry_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3056,6 +3263,20 @@ func (ec *executionContext) field_Mutation_addVideoResource_args(ctx context.Con
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_cameraCapture_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["deviceID"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["deviceID"] = arg0
 	return args, nil
 }
 
@@ -3305,6 +3526,20 @@ func (ec *executionContext) field_Mutation_refreshToken_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_removeDeviceDashboardCamera_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []int64
+	if tmp, ok := rawArgs["ids"]; ok {
+		arg0, err = ec.unmarshalNInt2ᚕint64ᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_removeDeviceDashboardTelemetry_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3551,6 +3786,20 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_appDeviceDashboards_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *int64
+	if tmp, ok := rawArgs["deviceType"]; ok {
+		arg0, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["deviceType"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_deviceDashboards_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -3686,6 +3935,14 @@ func (ec *executionContext) field_Query_devices_args(ctx context.Context, rawArg
 		}
 	}
 	args["sorts"] = arg4
+	var arg5 *int64
+	if tmp, ok := rawArgs["deviceType"]; ok {
+		arg5, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["deviceType"] = arg5
 	return args, nil
 }
 
@@ -5049,6 +5306,74 @@ func (ec *executionContext) _Device_deviceModelDesc(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Device_deviceModelDeviceType(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelDeviceType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_deviceModelCameraCompany(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceModelCameraCompany, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Device_attributes(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5109,6 +5434,74 @@ func (ec *executionContext) _Device_telemetries(ctx context.Context, field graph
 	res := resTmp.([]*model.Telemetry)
 	fc.Result = res
 	return ec.marshalOTelemetry2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_username(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_password(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Password, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Device_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Device) (ret graphql.Marshaler) {
@@ -5349,6 +5742,40 @@ func (ec *executionContext) _DeviceDashboard_isVisible(ctx context.Context, fiel
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _DeviceDashboard_deviceType(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboard) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboard",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _DeviceDashboard_telemetries(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboard) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -5378,6 +5805,37 @@ func (ec *executionContext) _DeviceDashboard_telemetries(ctx context.Context, fi
 	res := resTmp.([]*model.DeviceDashboardTelemetry)
 	fc.Result = res
 	return ec.marshalODeviceDashboardTelemetry2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardTelemetryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboard_cameras(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboard) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboard",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cameras, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.DeviceDashboardCamera)
+	fc.Result = res
+	return ec.marshalODeviceDashboardCamera2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardCameraᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeviceDashboard_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboard) (ret graphql.Marshaler) {
@@ -5423,6 +5881,210 @@ func (ec *executionContext) _DeviceDashboard_updatedAt(ctx context.Context, fiel
 	}()
 	fc := &graphql.FieldContext{
 		Object:   "DeviceDashboard",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboardCamera_id(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboardCamera) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboardCamera",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboardCamera_deviceDashboardID(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboardCamera) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboardCamera",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceDashboardID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboardCamera_deviceID(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboardCamera) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboardCamera",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboardCamera_deviceName(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboardCamera) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboardCamera",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboardCamera_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboardCamera) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboardCamera",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceDashboardCamera_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.DeviceDashboardCamera) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceDashboardCamera",
 		Field:    field,
 		Args:     nil,
 		IsMethod: false,
@@ -6185,6 +6847,40 @@ func (ec *executionContext) _DeviceModel_telemetryModels(ctx context.Context, fi
 	res := resTmp.([]*model.TelemetryModel)
 	fc.Result = res
 	return ec.marshalOTelemetryModel2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐTelemetryModel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _DeviceModel_cameraCompany(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "DeviceModel",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CameraCompany, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _DeviceModel_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.DeviceModel) (ret graphql.Marshaler) {
@@ -8676,6 +9372,129 @@ func (ec *executionContext) _Mutation_removeDeviceDashboardTelemetry(ctx context
 	return ec.marshalNDeviceDashboard2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboard(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_addDeviceDashboardCamera(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addDeviceDashboardCamera_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddDeviceDashboardCamera(rctx, args["input"].(model.NewDeviceDashboardCamera))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceDashboard)
+	fc.Result = res
+	return ec.marshalNDeviceDashboard2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_removeDeviceDashboardCamera(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_removeDeviceDashboardCamera_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RemoveDeviceDashboardCamera(rctx, args["ids"].([]int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceDashboard)
+	fc.Result = res
+	return ec.marshalNDeviceDashboard2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboard(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_cameraCapture(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_cameraCapture_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CameraCapture(rctx, args["deviceID"].(int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _PieLineSerieData_x1(ctx context.Context, field graphql.CollectedField, obj *model.PieLineSerieData) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9332,7 +10151,7 @@ func (ec *executionContext) _Query_devices(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().Devices(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort), args["deviceType"].(*int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9374,6 +10193,47 @@ func (ec *executionContext) _Query_deviceDashboards(ctx context.Context, field g
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().DeviceDashboards(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.DeviceDashboardConnection)
+	fc.Result = res
+	return ec.marshalNDeviceDashboardConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_appDeviceDashboards(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_appDeviceDashboards_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AppDeviceDashboards(rctx, args["deviceType"].(*int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13734,6 +14594,18 @@ func (ec *executionContext) unmarshalInputNewDevice(ctx context.Context, obj int
 			if err != nil {
 				return it, err
 			}
+		case "username":
+			var err error
+			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -13755,6 +14627,36 @@ func (ec *executionContext) unmarshalInputNewDeviceDashboard(ctx context.Context
 		case "isVisible":
 			var err error
 			it.IsVisible, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "deviceType":
+			var err error
+			it.DeviceType, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewDeviceDashboardCamera(ctx context.Context, obj interface{}) (model.NewDeviceDashboardCamera, error) {
+	var it model.NewDeviceDashboardCamera
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "deviceDashboardID":
+			var err error
+			it.DeviceDashboardID, err = ec.unmarshalNID2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "deviceIDs":
+			var err error
+			it.DeviceIDs, err = ec.unmarshalNID2ᚕint64ᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13809,6 +14711,12 @@ func (ec *executionContext) unmarshalInputNewDeviceModel(ctx context.Context, ob
 		case "deviceType":
 			var err error
 			it.DeviceType, err = ec.unmarshalNInt2int64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cameraCompany":
+			var err error
+			it.CameraCompany, err = ec.unmarshalNInt2int64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14199,6 +15107,18 @@ func (ec *executionContext) unmarshalInputNewUpdateDevice(ctx context.Context, o
 		case "port":
 			var err error
 			it.Port, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "username":
+			var err error
+			it.Username, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+			it.Password, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15159,10 +16079,30 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deviceModelDeviceType":
+			out.Values[i] = ec._Device_deviceModelDeviceType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceModelCameraCompany":
+			out.Values[i] = ec._Device_deviceModelCameraCompany(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "attributes":
 			out.Values[i] = ec._Device_attributes(ctx, field, obj)
 		case "telemetries":
 			out.Values[i] = ec._Device_telemetries(ctx, field, obj)
+		case "username":
+			out.Values[i] = ec._Device_username(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "password":
+			out.Values[i] = ec._Device_password(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._Device_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15242,8 +16182,15 @@ func (ec *executionContext) _DeviceDashboard(ctx context.Context, sel ast.Select
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deviceType":
+			out.Values[i] = ec._DeviceDashboard_deviceType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "telemetries":
 			out.Values[i] = ec._DeviceDashboard_telemetries(ctx, field, obj)
+		case "cameras":
+			out.Values[i] = ec._DeviceDashboard_cameras(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._DeviceDashboard_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15251,6 +16198,58 @@ func (ec *executionContext) _DeviceDashboard(ctx context.Context, sel ast.Select
 			}
 		case "updatedAt":
 			out.Values[i] = ec._DeviceDashboard_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var deviceDashboardCameraImplementors = []string{"DeviceDashboardCamera"}
+
+func (ec *executionContext) _DeviceDashboardCamera(ctx context.Context, sel ast.SelectionSet, obj *model.DeviceDashboardCamera) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deviceDashboardCameraImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeviceDashboardCamera")
+		case "id":
+			out.Values[i] = ec._DeviceDashboardCamera_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceDashboardID":
+			out.Values[i] = ec._DeviceDashboardCamera_deviceDashboardID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceID":
+			out.Values[i] = ec._DeviceDashboardCamera_deviceID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceName":
+			out.Values[i] = ec._DeviceDashboardCamera_deviceName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._DeviceDashboardCamera_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._DeviceDashboardCamera_updatedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -15421,6 +16420,11 @@ func (ec *executionContext) _DeviceModel(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._DeviceModel_attributeModels(ctx, field, obj)
 		case "telemetryModels":
 			out.Values[i] = ec._DeviceModel_telemetryModels(ctx, field, obj)
+		case "cameraCompany":
+			out.Values[i] = ec._DeviceModel_cameraCompany(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createdAt":
 			out.Values[i] = ec._DeviceModel_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15887,6 +16891,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addDeviceDashboardCamera":
+			out.Values[i] = ec._Mutation_addDeviceDashboardCamera(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "removeDeviceDashboardCamera":
+			out.Values[i] = ec._Mutation_removeDeviceDashboardCamera(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "cameraCapture":
+			out.Values[i] = ec._Mutation_cameraCapture(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16152,6 +17171,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_deviceDashboards(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "appDeviceDashboards":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_appDeviceDashboards(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -17375,6 +18408,20 @@ func (ec *executionContext) marshalNDeviceDashboard2ᚖgithubᚗcomᚋ9d77vᚋpd
 	return ec._DeviceDashboard(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNDeviceDashboardCamera2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardCamera(ctx context.Context, sel ast.SelectionSet, v model.DeviceDashboardCamera) graphql.Marshaler {
+	return ec._DeviceDashboardCamera(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeviceDashboardCamera2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardCamera(ctx context.Context, sel ast.SelectionSet, v *model.DeviceDashboardCamera) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeviceDashboardCamera(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNDeviceDashboardConnection2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardConnection(ctx context.Context, sel ast.SelectionSet, v model.DeviceDashboardConnection) graphql.Marshaler {
 	return ec._DeviceDashboardConnection(ctx, sel, &v)
 }
@@ -17737,6 +18784,10 @@ func (ec *executionContext) unmarshalNNewDevice2githubᚗcomᚋ9d77vᚋpdcᚋgra
 
 func (ec *executionContext) unmarshalNNewDeviceDashboard2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceDashboard(ctx context.Context, v interface{}) (model.NewDeviceDashboard, error) {
 	return ec.unmarshalInputNewDeviceDashboard(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNNewDeviceDashboardCamera2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceDashboardCamera(ctx context.Context, v interface{}) (model.NewDeviceDashboardCamera, error) {
+	return ec.unmarshalInputNewDeviceDashboardCamera(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewDeviceDashboardTelemetry2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewDeviceDashboardTelemetry(ctx context.Context, v interface{}) (model.NewDeviceDashboardTelemetry, error) {
@@ -18789,6 +19840,46 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) marshalODeviceDashboardCamera2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardCameraᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DeviceDashboardCamera) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDeviceDashboardCamera2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardCamera(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalODeviceDashboardTelemetry2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐDeviceDashboardTelemetryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DeviceDashboardTelemetry) graphql.Marshaler {

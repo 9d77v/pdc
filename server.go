@@ -16,7 +16,7 @@ import (
 	"github.com/9d77v/pdc/graph/generated"
 	"github.com/9d77v/pdc/middleware"
 	"github.com/9d77v/pdc/models"
-	"github.com/9d77v/pdc/models/nats"
+	"github.com/9d77v/pdc/models/mq"
 	"github.com/9d77v/wspush/redishub"
 	"github.com/nats-io/stan.go"
 )
@@ -36,8 +36,8 @@ func main() {
 	mux.Handle("/api", middleware.Auth()(apiHandler))
 	mux.HandleFunc("/pdc/", middleware.HandleCard())
 	mux.HandleFunc("/ws/iot/device", middleware.HandleIotDevice())
-	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel(nats.SubjectDeviceTelemetryPrefix, middleware.CheckToken))
-	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel(nats.SubjectDeviceHealthPrefix, middleware.CheckToken))
+	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel(mq.SubjectDeviceTelemetryPrefix, middleware.CheckToken))
+	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel(mq.SubjectDeviceHealthPrefix, middleware.CheckToken))
 	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "ui/build/index.html")
 	})
@@ -59,8 +59,8 @@ func main() {
 		Addr:    ":" + port,
 		Handler: mux,
 	}
-	qsub1, err := nats.Client.QueueSubscribe(nats.SubjectVideo,
-		nats.GroupVideo, consumers.HandleVideoMSG)
+	qsub1, err := mq.Client.QueueSubscribe(mq.SubjectVideo,
+		mq.GroupVideo, consumers.HandleVideoMSG)
 	if err != nil {
 		log.Panicln("QueueSubscribe error:", err)
 	}
@@ -74,7 +74,8 @@ func main() {
 			log.Println("qsub1 Close error:", err)
 		}
 	}()
-	qsub2, err := nats.Client.QueueSubscribe(nats.SubjectDeviceData, nats.GroupSaveDeviceData, consumers.HandleDeviceMSG, stan.DurableName("dur"))
+	qsub2, err := mq.Client.QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
+		consumers.HandleDeviceMsg, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
@@ -88,7 +89,7 @@ func main() {
 			log.Println("qsub2 Close error:", err)
 		}
 	}()
-	qsub3, err := nats.Client.QueueSubscribe(nats.SubjectDeviceData, nats.GroupPublishDeviceData, consumers.PublishDeviceData, stan.DurableName("dur"))
+	qsub3, err := mq.Client.QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData, consumers.PublishDeviceData, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}

@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	wsURL     = GetEnvStr("WS_URL", "")
-	accessKey = GetEnvStr("PDC_DEVICE_ACCESSKEY", "")
-	secretKey = GetEnvStr("PDC_DEVICE_SECRETKEY", "")
+	//WSURL websocket服务地址
+	WSURL     = GetEnvStr("WS_URL", "ws://localhost:8080/ws/iot/device")
+	accessKey = GetEnvStr("PDC_DEVICE_ACCESSKEY", "Vz23KaqK0lZD")
+	secretKey = GetEnvStr("PDC_DEVICE_SECRETKEY", "TAHXZZYQRITZIBAMUXAEQRAAVARJRMTH")
 )
 
 var (
@@ -18,7 +19,7 @@ var (
 )
 
 func init() {
-	c, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	c, _, err := websocket.DefaultDialer.Dial(WSURL, nil)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}
