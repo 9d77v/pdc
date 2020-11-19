@@ -26,7 +26,7 @@ const DeviceCameraList = () => {
                         <div style={{ textAlign: "left", margin: 10 }}>{t.deviceName}</div>
                         <CameraPicture
                             border={"1px solid grey"}
-                            minHeight={180}
+                            minHeight={150}
                             deviceID={t.deviceID} />
                     </div>)
                 })
@@ -34,7 +34,7 @@ const DeviceCameraList = () => {
                     key={dataItem.id}
                     title={dataItem.name}
                     height={300}
-                    width={300}
+                    width={"100%"}
                     cardItems={cardItems}
                 />
                 )
@@ -48,7 +48,8 @@ const DeviceCameraList = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            padding: 5
         }}>
             {cards}
         </div >
