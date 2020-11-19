@@ -8,6 +8,7 @@ import { Layout, Menu } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
 import { AdminPath, AppPath, PathDict } from 'src/consts/path'
 
+
 const { Sider } = Layout
 const { SubMenu } = Menu
 
@@ -18,7 +19,15 @@ const locationMap = new Map<string, any>([
     }],
     [AppPath.DEVICE, {
         "defaultOpenKeys": ["device"],
-        "defaultSelectedKeys": ['device']
+        "defaultSelectedKeys": ['device-telemetry']
+    }],
+    [AppPath.DEVICE_TELEMETRY, {
+        "defaultOpenKeys": ["device"],
+        "defaultSelectedKeys": ['device-telemetry']
+    }],
+    [AppPath.DEVICE_CAMERA, {
+        "defaultOpenKeys": ["device"],
+        "defaultSelectedKeys": ['device-camera']
     }],
     [AppPath.UTIL, {
         "defaultOpenKeys": ["util"],
@@ -106,12 +115,12 @@ const locationMap = new Map<string, any>([
     }]
 ])
 
-interface AppHeaderProps {
+interface IAppHeaderProps {
     roleID: number
     config?: any
 }
 
-const AppMenu = (props: AppHeaderProps) => {
+const AppMenu = (props: IAppHeaderProps) => {
     const { config, roleID } = props
     return (
         <Menu
@@ -147,12 +156,23 @@ const AppMenu = (props: AppHeaderProps) => {
                     <Link to={AppPath.HISTORY}>{PathDict.get(AppPath.HISTORY)}</Link>
                 </Menu.Item>
             </SubMenu>
-            <Menu.Item key="device">
-                <Link to={AppPath.DEVICE}>  <span>
-                    <DashboardOutlined />
-                    <span>{PathDict.get(AppPath.DEVICE)}</span>
-                </span></Link>
-            </Menu.Item>
+            <SubMenu
+                key="device"
+                style={{ display: roleID > 0 ? "block" : "none" }}
+                title={
+                    <span>
+                        <DashboardOutlined />
+                        <span>{PathDict.get(AppPath.DEVICE)}</span>
+                    </span>
+                }
+            >
+                <Menu.Item key="device-telemetry">
+                    <Link to={AppPath.DEVICE_TELEMETRY}>{PathDict.get(AppPath.DEVICE_TELEMETRY)}</Link>
+                </Menu.Item>
+                <Menu.Item key="device-camera">
+                    <Link to={AppPath.DEVICE_CAMERA}>{PathDict.get(AppPath.DEVICE_CAMERA)}</Link>
+                </Menu.Item>
+            </SubMenu>
             {/* <SubMenu
                 key="thing"
                 style={{ display: roleID >= 1 && roleID <= 3 ? "block" : "none" }}
@@ -218,7 +238,7 @@ const AppMenu = (props: AppHeaderProps) => {
     )
 }
 
-const AdminMenu = (props: AppHeaderProps) => {
+const AdminMenu = (props: IAppHeaderProps) => {
     const { config, roleID } = props
     return (
         <Menu
@@ -229,7 +249,10 @@ const AdminMenu = (props: AppHeaderProps) => {
             style={{ height: '100%', borderRight: 0 }}
         >
             <Menu.Item key="home">
-                <Link to={AdminPath.HOME}>{PathDict.get(AdminPath.HOME)}</Link>
+                <Link to={AdminPath.HOME}>  <span>
+                    <HomeOutlined />
+                    <span>{PathDict.get(AdminPath.HOME)}</span>
+                </span></Link>
             </Menu.Item>
             <SubMenu
                 key="settings-user"
@@ -267,25 +290,27 @@ const AdminMenu = (props: AppHeaderProps) => {
                 style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
                 title={
                     <span>
+                        <DashboardOutlined />
                         <span>{PathDict.get(AdminPath.DEVICE)}</span>
                     </span>
                 }
             >
+                <Menu.Item key="device-dashboard-list" >
+                    <Link to={AdminPath.DEVICE_DASHBOARD_LIST}>{PathDict.get(AdminPath.DEVICE_DASHBOARD_LIST)}</Link>
+                </Menu.Item>
                 <Menu.Item key="device-list" >
                     <Link to={AdminPath.DEVICE_LIST}>{PathDict.get(AdminPath.DEVICE_LIST)}</Link>
                 </Menu.Item>
                 <Menu.Item key="device-model-list" >
                     <Link to={AdminPath.DEVICE_MODEL_LIST}>{PathDict.get(AdminPath.DEVICE_MODEL_LIST)}</Link>
                 </Menu.Item>
-                <Menu.Item key="device-dashboard-list" >
-                    <Link to={AdminPath.DEVICE_DASHBOARD_LIST}>{PathDict.get(AdminPath.DEVICE_DASHBOARD_LIST)}</Link>
-                </Menu.Item>
+
             </SubMenu>
         </Menu>
     )
 }
 
-export const AppSlider = (props: AppHeaderProps) => {
+export const AppSlider = (props: IAppHeaderProps) => {
     const [collapsed, setCollapsed] = useState(false)
     const location = useLocation()
     let config = locationMap.get(location.pathname) || []

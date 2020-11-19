@@ -1,17 +1,20 @@
-import { List, Button, Popconfirm, Tag } from 'antd';
+import { List, Button, Popconfirm, Tag, Modal } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { DeviceDashboardCreateForm, INewDeviceDashboard } from './DeviceDashboardCreateForm';
-import { ADD_DEVICE_DASHBOARD, ADD_DEVICE_DASHBOARD_TELEMETRY, DELETE_DEVICE_DASHBOARD, LIST_DEVICE_DASHBOARD, REMOVE_DEVICE_DASHBOARD_TELEMETRY, UPDATE_DEVICE_DASHBOARD } from 'src/consts/device.gql';
+import { DeviceDashboardCreateForm } from './DeviceDashboardCreateForm';
+import { ADD_DEVICE_DASHBOARD, ADD_DEVICE_DASHBOARD_CAMERA, ADD_DEVICE_DASHBOARD_TELEMETRY, DELETE_DEVICE_DASHBOARD, LIST_DEVICE_DASHBOARD, REMOVE_DEVICE_DASHBOARD_CAMERA, REMOVE_DEVICE_DASHBOARD_TELEMETRY, UPDATE_DEVICE_DASHBOARD } from 'src/consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { IDeviceDashboard } from 'src/consts/consts';
 import "src/styles/card.less"
-import { DeleteOutlined, EditOutlined, FileAddOutlined } from '@ant-design/icons';
-import { IUpdateDeviceDashboard, DeviceDashboardUpdateForm } from './DeviceDashboardUpdateForm';
+import { DeleteOutlined, EditOutlined, FileAddOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
+import { DeviceDashboardUpdateForm } from './DeviceDashboardUpdateForm';
 import { pb } from 'src/pb/compiled';
 import useWebSocket from 'react-use-websocket';
 import { iotTelemetrySocketURL } from 'src/utils/ws_client';
 import { blobToArrayBuffer } from 'src/utils/file';
-import { DeviceDashboardTelemetryAddForm, INewDeviceDashboardTelemetry } from './DeviceDashboardTelemetryAddForm';
+import { DeviceDashboardTelemetryAddForm } from './DeviceDashboardTelemetryAddForm';
+import { DeviceDashboardCameraAddForm } from './DeviceDashboardCameraAddForm';
+import { IDeviceDashboard, IDeviceDashboardCamera, IDeviceDashboardTelemetry, INewDeviceDashboard, INewDeviceDashboardCamera, INewDeviceDashboardTelemetry, IUpdateDeviceDashboard } from 'src/models/device';
+import CameraCard from 'src/profiles/common/device/CameraPicture';
+import { LivePlayer } from 'src/components/videoplayer/LivePlayer';
 
 export default function DeviceDashboardList() {
     const [dataResource, setDataResource] = useState<any[]>([])
@@ -20,6 +23,8 @@ export default function DeviceDashboardList() {
     const [deviceDashboardCreateFormVisible, setDeviceDashboardCreateFormVisible] = useState(false)
     const [deviceDashboardUpdateFormVisible, setDeviceDashboardUpdateFormVisible] = useState(false)
     const [deviceDashboardTelemetryAddFormVisible, setDeviceDashboardTelemetryAddFormVisible] = useState(false)
+    const [deviceDashboardCameraAddFormVisible, setDeviceDashboardCameraAddFormVisible] = useState(false)
+
     const [updateDeviceDashboardData, setUpdateDeviceDashboardData] = useState({
         id: 0,
         name: "",
@@ -30,8 +35,27 @@ export default function DeviceDashboardList() {
     const [deleteDeviceDashboard] = useMutation(DELETE_DEVICE_DASHBOARD)
     const [addDeviceDashboardTelemetry] = useMutation(ADD_DEVICE_DASHBOARD_TELEMETRY)
     const [removeDeviceDashboardTelemetry] = useMutation(REMOVE_DEVICE_DASHBOARD_TELEMETRY)
+    const [addDeviceDashboardCamera] = useMutation(ADD_DEVICE_DASHBOARD_CAMERA)
+    const [removeDeviceDashboardCamera] = useMutation(REMOVE_DEVICE_DASHBOARD_CAMERA)
 
-    const [currentDeviceDashboardID, setCurrentDeviceDashboardID] = useState(0)
+    const [currentDeviceDashboard, setCurrentDeviceDashboard] = useState<{
+        id: number,
+        deviceType: number,
+        telemetries: IDeviceDashboardTelemetry[],
+        cameras: IDeviceDashboardCamera[]
+    }>({
+        id: 0,
+        deviceType: 0,
+        telemetries: [],
+        cameras: []
+    })
+
+    const [currentCamera, setCurrentCamera] = useState({
+        url: "",
+        title: "",
+        visible: false
+    })
+
     const { loading, data, refetch, } = useQuery(LIST_DEVICE_DASHBOARD,
         {
             variables: {
@@ -49,6 +73,7 @@ export default function DeviceDashboardList() {
                 "input": {
                     "name": values.name,
                     "isVisible": values.isVisible,
+                    "deviceType": values.deviceType
                 }
             }
         });
@@ -74,7 +99,7 @@ export default function DeviceDashboardList() {
         await addDeviceDashboardTelemetry({
             variables: {
                 "input": {
-                    "deviceDashboardID": currentDeviceDashboardID,
+                    "deviceDashboardID": currentDeviceDashboard.id,
                     "telemetryIDs": values.telemetryIDs,
                 }
             }
@@ -82,8 +107,31 @@ export default function DeviceDashboardList() {
         setDeviceDashboardTelemetryAddFormVisible(false)
         await refetch()
     }
+
     const onDeviceDashboardTelemetryRemove = async (id: number) => {
         await removeDeviceDashboardTelemetry({
+            variables: {
+                "ids": [id]
+            }
+        });
+        await refetch()
+    }
+
+    const onDeviceDashboardCameraAdd = async (values: INewDeviceDashboardCamera) => {
+        await addDeviceDashboardCamera({
+            variables: {
+                "input": {
+                    "deviceDashboardID": currentDeviceDashboard.id,
+                    "deviceIDs": values.deviceIDs,
+                }
+            }
+        });
+        setDeviceDashboardCameraAddFormVisible(false)
+        await refetch()
+    }
+
+    const onDeviceDashboardCameraRemove = async (id: number) => {
+        await removeDeviceDashboardCamera({
             variables: {
                 "ids": [id]
             }
@@ -96,7 +144,7 @@ export default function DeviceDashboardList() {
             const newDataResource: any[] = []
             for (const element of data.deviceDashboards.edges) {
                 let telemetries: any[] = []
-                for (const t of element.telemetries) {
+                for (const t of element.telemetries || []) {
                     telemetries.push({
                         createdAt: t.createdAt,
                         id: t.id,
@@ -113,12 +161,22 @@ export default function DeviceDashboardList() {
                         deviceName: t.deviceName
                     })
                 }
+                let cameras: any[] = []
+                for (const t of element.cameras || []) {
+                    cameras.push({
+                        id: t.id,
+                        deviceID: t.deviceID,
+                        deviceName: t.deviceName
+                    })
+                }
                 let t: any = {
                     createdAt: element.createdAt,
                     id: element.id,
                     name: element.name,
                     isVisible: element.isVisible,
-                    telemetries: telemetries
+                    deviceType: element.deviceType,
+                    telemetries: telemetries,
+                    cameras: cameras
                 }
                 newDataResource.push(t)
             }
@@ -189,6 +247,40 @@ export default function DeviceDashboardList() {
             clearInterval(timer)
         }
     }, [])
+
+    const showActionButton = (item: {
+        id: number,
+        deviceType: number,
+        telemetries: IDeviceDashboardTelemetry[],
+        cameras: IDeviceDashboardCamera[]
+    }) => {
+        const actionButtonMap = new Map<number, JSX.Element>([
+            [0, <div onClick={
+                () => {
+                    setDeviceDashboardTelemetryAddFormVisible(true)
+                    setCurrentDeviceDashboard({
+                        id: item.id,
+                        deviceType: item.deviceType,
+                        telemetries: item.telemetries,
+                        cameras: item.cameras
+                    })
+                }
+            }><FileAddOutlined />添加遥测</div>],
+            [1, <div onClick={
+                () => {
+                    setDeviceDashboardCameraAddFormVisible(true)
+                    setCurrentDeviceDashboard({
+                        id: item.id,
+                        deviceType: item.deviceType,
+                        telemetries: item.telemetries,
+                        cameras: item.cameras
+                    })
+                }
+            }><VideoCameraAddOutlined />添加摄像头</div>]
+        ])
+        return actionButtonMap.get(item.deviceType)
+    }
+
     return (
         <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
@@ -223,11 +315,41 @@ export default function DeviceDashboardList() {
             />
             <DeviceDashboardTelemetryAddForm
                 visible={deviceDashboardTelemetryAddFormVisible}
+                existData={currentDeviceDashboard.telemetries}
                 onCreate={onDeviceDashboardTelemetryAdd}
                 onCancel={() => {
                     setDeviceDashboardTelemetryAddFormVisible(false)
                 }}
             />
+            <DeviceDashboardCameraAddForm
+                visible={deviceDashboardCameraAddFormVisible}
+                existData={currentDeviceDashboard.cameras}
+                onCreate={onDeviceDashboardCameraAdd}
+                onCancel={() => {
+                    setDeviceDashboardCameraAddFormVisible(false)
+                }}
+            />
+            <Modal
+                visible={currentCamera.visible}
+                title={currentCamera.title}
+                footer={null}
+                destroyOnClose={true}
+                getContainer={false}
+                width={1020}
+                onCancel={
+                    () => {
+                        setCurrentCamera({
+                            title: "",
+                            url: "",
+                            visible: false,
+                        })
+                    }
+                }
+            >  <LivePlayer
+                    url={currentCamera.url}
+                    height={540}
+                    width={960}
+                /></Modal>
             <List
                 itemLayout="vertical"
                 size="large"
@@ -237,19 +359,45 @@ export default function DeviceDashboardList() {
                     const telemetryList = <List
                         style={{ minHeight: 100 }}
                         itemLayout="horizontal"
-                        dataSource={item.telemetries}
-                        renderItem={t => {
-                            const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
-                            return (
-                                <List.Item
-                                    actions={[<div onClick={() => onDeviceDashboardTelemetryRemove(t.id)}
-                                    >移除</div>]}
-                                >
-                                    <Tag color="geekblue" style={{ width: 100 }}>{t.deviceName}</Tag>
-                                    <div key={t.id}>
-                                        {t.name}: {value}{t.unit}</div>
-                                </List.Item>
-                            )
+                        dataSource={item.deviceType === 0 ? item.telemetries : item.cameras}
+                        renderItem={(t: any) => {
+                            switch (item.deviceType) {
+                                case 0:
+                                    const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
+                                    return (
+                                        <List.Item
+                                            actions={[<div onClick={() => onDeviceDashboardTelemetryRemove(t.id)}
+                                            >移除</div>]}
+                                        >
+                                            <Tag color="geekblue" style={{ width: 100 }}>{t.deviceName}</Tag>
+                                            <div key={t.id}>
+                                                {t.name}: {value}{t.unit}</div>
+                                        </List.Item>
+                                    )
+                                case 1:
+                                    return (
+                                        <List.Item
+                                            actions={[<div onClick={() => onDeviceDashboardCameraRemove(t.id)}
+                                            >移除</div>]}
+                                        >
+                                            <div style={{ width: "100%" }} onClick={() => {
+                                                setCurrentCamera({
+                                                    title: t.deviceName,
+                                                    url: `/hls/stream${t.deviceID}.m3u8`,
+                                                    visible: true,
+                                                })
+                                            }} >
+                                                <div style={{ textAlign: "left", margin: 10 }}>{t.deviceName}</div>
+                                                <CameraCard
+                                                    border={"1px solid grey"}
+                                                    minHeight={100}
+                                                    deviceID={t.deviceID} />
+                                            </div>
+                                        </List.Item>)
+                                default:
+                                    return (<div />)
+                            }
+
                         }
                         }
                     />
@@ -257,12 +405,7 @@ export default function DeviceDashboardList() {
                         <List.Item
                             key={item.id}
                             actions={[
-                                <div onClick={
-                                    () => {
-                                        setDeviceDashboardTelemetryAddFormVisible(true)
-                                        setCurrentDeviceDashboardID(item.id)
-                                    }
-                                }><FileAddOutlined />添加遥测</div>,
+                                showActionButton(item),
                                 <div onClick={
                                     () => {
                                         setUpdateDeviceDashboardData({

@@ -9,6 +9,7 @@ export default function DeviceModelIndex() {
         name: "",
         desc: "",
         deviceType: 0,
+        cameraCompany: 0,
         createdAt: 0,
         updatedAt: 0,
     })

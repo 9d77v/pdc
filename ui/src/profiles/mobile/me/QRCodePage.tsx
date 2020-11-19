@@ -4,6 +4,8 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { UserBrief } from 'src/profiles/mobile/common/UserBrief'
 var QRCode = require('qrcode.react')
+
+
 interface IQRCodeProps {
     user: NewUser
 }

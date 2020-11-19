@@ -1,20 +1,15 @@
 import { Modal, Form, Input, Switch } from 'antd';
-import React, { useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
+import { IUpdateDeviceDashboard } from 'src/models/device';
 
-export interface IUpdateDeviceDashboard {
-    id: number
-    name: string
-    isVisible: boolean
-}
-
-interface DeviceDashboardUpdateFormProps {
+interface IDeviceDashboardUpdateFormProps {
     data: IUpdateDeviceDashboard
     visible: boolean;
     onUpdate: (values: IUpdateDeviceDashboard) => void;
     onCancel: () => void;
 }
 
-export const DeviceDashboardUpdateForm: React.FC<DeviceDashboardUpdateFormProps> = ({
+export const DeviceDashboardUpdateForm: FC<IDeviceDashboardUpdateFormProps> = ({
     data,
     visible,
     onUpdate,

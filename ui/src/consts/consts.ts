@@ -17,52 +17,6 @@ export interface IVideoPagination {
     selectedTags: string[]
 }
 
-export interface IDeviceModel {
-    id: number
-    name: string
-    desc: string
-    deviceType: number
-    createdAt: number
-    updatedAt: number
-}
-
-
-export interface IDevice {
-    id: number
-    name: string
-    ip: string
-    port: number
-    accessKey: string
-    secretKey: string
-    deviceModelName: string,
-    deviceModelDesc: string,
-    deviceModelID: number
-    deviceType: number
-    health?: number
-    createdAt: number
-    updatedAt: number
-}
-
-export interface IDeviceDashboard {
-    id: number
-    name: string
-    isVisible: boolean
-    telemetries: IDeviceDashboardTelemetry[]
-    createdAt: number
-    updatedAt: number
-}
-
-export interface IDeviceDashboardTelemetry {
-    id: number
-    deviceID: number
-    deviceName: string
-    name: string
-    value?: number
-    factor: number
-    unit: string
-    scale: number
-}
-
 const RubbishCategoryMap = new Map<number, TagStyle>([
     [0, {
         color: 'black',
@@ -148,7 +102,13 @@ const FullRoleMap = new Map<number, string>([
 const ThingStatusArr = ['待采购', '使用中', '已收纳', '故障', '维修中', '待清理', '已清理']
 
 const DeviceTypeMap = new Map<number, string>([
-    [0, "默认"]
+    [0, "默认"],
+    [1, "摄像头"]
+])
+
+const CameraCompanyMap = new Map<number, string>([
+    [0, "海康威视"],
+    [1, "大华"]
 ])
 
 const GesturePasswordKey = "gesture-password"
@@ -156,5 +116,5 @@ const GesturePasswordKey = "gesture-password"
 
 export {
     RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr,
-    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap, GesturePasswordKey
+    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap, GesturePasswordKey, CameraCompanyMap
 }

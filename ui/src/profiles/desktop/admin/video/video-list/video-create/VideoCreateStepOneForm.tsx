@@ -2,6 +2,7 @@ import { Form, Input, Switch, DatePicker, Select } from 'antd'
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
 
+
 const { TextArea } = Input
 
 interface Values {
@@ -9,11 +10,11 @@ interface Values {
     description: string
 }
 
-interface VideoCreateStepOneFormProps {
+interface IVideoCreateStepOneFormProps {
     onCreate?: (values: Values) => void
 }
 
-const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any>) => {
+const VideoCreateStepOneForm = (props: IVideoCreateStepOneFormProps, ref: Ref<any>) => {
     const [form] = Form.useForm()
     const getForm = () => {
         return form
@@ -72,7 +73,7 @@ const VideoCreateStepOneForm = (props: VideoCreateStepOneFormProps, ref: Ref<any
             <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                 <Switch />
             </Form.Item>
-            <Form.Item name="theme" label="主题">
+            <Form.Item name="theme" label="主题" hidden>
                 <Select onChange={() => { }}>
                     <Select.Option value="">默认</Select.Option>
                     <Select.Option value="vjs-theme-lemon">柠檬</Select.Option>

@@ -1,18 +1,15 @@
-import { Modal, Form, Input, Switch } from 'antd';
-import React from 'react';
+import { Modal, Form, Input, Switch, Select } from 'antd';
+import React, { FC } from 'react';
+import { DeviceTypeMap } from 'src/consts/consts';
+import { INewDeviceDashboard } from 'src/models/device';
 
-export interface INewDeviceDashboard {
-    name: string
-    isVisible: boolean
-}
-
-interface DeviceDashboardCreateFormProps {
+interface IDeviceDashboardCreateFormProps {
     visible: boolean;
     onCreate: (values: INewDeviceDashboard) => void;
     onCancel: () => void;
 }
 
-export const DeviceDashboardCreateForm: React.FC<DeviceDashboardCreateFormProps> = ({
+export const DeviceDashboardCreateForm: FC<IDeviceDashboardCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
@@ -23,7 +20,12 @@ export const DeviceDashboardCreateForm: React.FC<DeviceDashboardCreateFormProps>
         labelCol: { span: 5 },
         wrapperCol: { span: 15 },
     }
-
+    let deviceTypeOptions: any[] = []
+    DeviceTypeMap.forEach((value: string, key: number) => {
+        deviceTypeOptions.push(<Select.Option
+            value={key}
+            key={'deviceType_options_' + key}>{value}</Select.Option>)
+    })
     return (
         <Modal
             visible={visible}
@@ -56,7 +58,7 @@ export const DeviceDashboardCreateForm: React.FC<DeviceDashboardCreateFormProps>
                 layout="horizontal"
                 name="deviceDashboardCreateForm"
                 style={{ maxHeight: 600 }}
-                initialValues={{ isVisible: true }}
+                initialValues={{ isVisible: true, deviceType: 0 }}
             >
                 <Form.Item
                     name="name"
@@ -64,6 +66,16 @@ export const DeviceDashboardCreateForm: React.FC<DeviceDashboardCreateFormProps>
                     rules={[{ required: true, message: '请输入名称!' }]}
                 >
                     <Input />
+                </Form.Item>
+                <Form.Item
+                    name="deviceType"
+                    label="设备类型"
+                    hasFeedback
+                    rules={[{ required: true, message: '请选择设备类型!' }]}
+                >
+                    <Select >
+                        {deviceTypeOptions}
+                    </Select>
                 </Form.Item>
                 <Form.Item name="isVisible" label="是否显示" valuePropName='checked'>
                     <Switch />

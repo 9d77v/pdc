@@ -1,10 +1,11 @@
-import { Tabs, Layout } from 'antd';
+import { Tabs, Layout, Tag } from 'antd';
 import React from 'react';
 import { DeviceDetailDescriptions } from './DeviceDetailDescriptions';
 import { useQuery } from '@apollo/react-hooks';
 import { GET_DEVICE } from 'src/consts/device.gql';
 import TelemetryTable from './TelemetryTable';
 import AttributeTable from './AttributeTable';
+import { DeviceTypeMap } from 'src/consts/consts';
 
 const { TabPane } = Tabs;
 const { Header } = Layout;
@@ -25,6 +26,7 @@ export const DeviceTabs = (props: IDeviceTabsProps) => {
     return (
         <div style={{ width: "100%" }}>
             <Header style={{ color: "white", textAlign: "left" }}>
+                <Tag color="geekblue" style={{ width: "fit-content" }}>{DeviceTypeMap.get(device?.deviceModelDeviceType)}</Tag>
                 {device?.name}
             </Header>
             <Tabs type="card" style={{ backgroundColor: "#fff" }}>
@@ -36,11 +38,13 @@ export const DeviceTabs = (props: IDeviceTabsProps) => {
                         id={id}
                         data={device?.attributes || []} />
                 </TabPane>
-                <TabPane tab="遥测" key="3">
-                    <TelemetryTable
-                        id={id}
-                        data={device?.telemetries || []} />
-                </TabPane>
+                {
+                    device?.deviceModelDeviceType !== 1 ?
+                        <TabPane tab="遥测" key="3">
+                            <TelemetryTable
+                                id={id}
+                                data={device?.telemetries || []} />
+                        </TabPane> : null}
             </Tabs>
         </div>
     )

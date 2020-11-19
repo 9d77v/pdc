@@ -1,22 +1,15 @@
 import { Modal, Form, Input, InputNumber } from 'antd';
-import React from 'react'
+import React, { FC } from 'react'
+import { INewTelemetryModel } from 'src/models/device';
 
-export interface INewTelemetryModel {
-    key: string
-    name: string
-    factor: number
-    unit: string
-    unitName: string
-    scale: number
-}
 
-interface TelemetryModelCreateFormProps {
+interface ITelemetryModelCreateFormProps {
     visible: boolean;
     onCreate: (values: INewTelemetryModel) => void;
     onCancel: () => void;
 }
 
-export const TelemetryModelCreateForm: React.FC<TelemetryModelCreateFormProps> = ({
+export const TelemetryModelCreateForm: FC<ITelemetryModelCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,

@@ -37,12 +37,16 @@ export const DeviceModelTabs = (props: IDeviceModelTabsProps) => {
                         data={deviceModel?.attributeModels || []}
                         refetch={refetch} />
                 </TabPane>
-                <TabPane tab="遥测" key="3">
-                    <TelemetryModelTable
-                        id={id}
-                        data={deviceModel?.telemetryModels || []}
-                        refetch={refetch} />
-                </TabPane>
+                {
+                    deviceModel?.deviceType !== 1 ?
+                        <TabPane tab="遥测" key="3">
+                            <TelemetryModelTable
+                                id={id}
+                                data={deviceModel?.telemetryModels || []}
+                                refetch={refetch} />
+                        </TabPane> : null
+                }
+
             </Tabs>
         </div>
     )

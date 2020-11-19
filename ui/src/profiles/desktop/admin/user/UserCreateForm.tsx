@@ -1,16 +1,16 @@
 import { Modal, Form, Input, Select, DatePicker } from 'antd';
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { GenderMap, RoleMap } from 'src/consts/consts';
 import { Uploader } from 'src/components/Uploader';
 import { NewUser } from 'src/models/user';
 
-interface UserCreateFormProps {
+interface IUserCreateFormProps {
     visible: boolean;
     onCreate: (values: NewUser) => void;
     onCancel: () => void;
 }
 
-export const UserCreateForm: React.FC<UserCreateFormProps> = ({
+export const UserCreateForm: FC<IUserCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
@@ -84,7 +84,7 @@ export const UserCreateForm: React.FC<UserCreateFormProps> = ({
                     label="密码"
                     rules={[{ required: true, message: '请输入密码!' }]}
                 >
-                    <Input type="password" />
+                    <Input.Password />
                 </Form.Item>
                 <Form.Item
                     name="roleID"

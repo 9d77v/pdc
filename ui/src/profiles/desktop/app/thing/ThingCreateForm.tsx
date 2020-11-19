@@ -1,5 +1,5 @@
 import { Modal, Form, Input, DatePicker, InputNumber, Select, Tooltip } from 'antd'
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
 import { ConsumerExpenditureMap, RubbishCategoryMap, TagStyle, ThingStatusMap } from 'src/consts/consts'
 import dayjs from 'dayjs'
@@ -11,13 +11,13 @@ interface Values {
     description: string
 }
 
-interface ThingCreateFormProps {
+interface IThingCreateFormProps {
     visible: boolean
     onCreate: (values: Values) => void
     onCancel: () => void
 }
 
-export const ThingCreateForm: React.FC<ThingCreateFormProps> = ({
+export const ThingCreateForm: FC<IThingCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,

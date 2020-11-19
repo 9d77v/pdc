@@ -7,12 +7,8 @@ import {
     ContactsOutlined, LockOutlined, BookOutlined, CalculatorOutlined
 } from '@ant-design/icons'
 import { AppPath } from "src/consts/path"
+import { IApp } from "src/models/app"
 
-interface IApp {
-    text: string
-    icon: JSX.Element
-    url: string
-}
 
 const publicData: IApp[] = [
     {

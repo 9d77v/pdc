@@ -1,21 +1,15 @@
 import { Modal, Form, Input, InputNumber } from 'antd';
-import React, { useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
+import { IUpdateDevice } from 'src/models/device';
 
-export interface IUpdateDevice {
-    id: number
-    name: string
-    ip: string
-    port: number
-}
-
-interface DeviceUpdateFormProps {
+interface IDeviceUpdateFormProps {
     data: IUpdateDevice
     visible: boolean;
     onUpdate: (values: IUpdateDevice) => void;
     onCancel: () => void;
 }
 
-export const DeviceUpdateForm: React.FC<DeviceUpdateFormProps> = ({
+export const DeviceUpdateForm: FC<IDeviceUpdateFormProps> = ({
     data,
     visible,
     onUpdate,
@@ -31,7 +25,9 @@ export const DeviceUpdateForm: React.FC<DeviceUpdateFormProps> = ({
             "id": data.id,
             "name": data.name,
             "ip": data.ip,
-            "port": data.port
+            "port": data.port,
+            "username": data.username,
+            "password": data.password
         })
     }, [form, data]);
     return (
@@ -92,6 +88,18 @@ export const DeviceUpdateForm: React.FC<DeviceUpdateFormProps> = ({
                     label="端口"
                 >
                     <InputNumber />
+                </Form.Item>
+                <Form.Item
+                    name="username"
+                    label="用户名"
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="password"
+                    label="密码"
+                >
+                    <Input.Password />
                 </Form.Item>
             </Form>
         </Modal>

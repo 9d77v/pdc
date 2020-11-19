@@ -1,15 +1,15 @@
 import { Modal, Form } from 'antd'
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
 
-interface MobileVideoUpdateProps {
+interface IMobileVideoUpdateProps {
     visible: boolean
     videoID: number
     onUpdate: (values: any) => void
     onCancel: () => void
 }
 
-export const MobileVideoUpdateForm: React.FC<MobileVideoUpdateProps> = ({
+export const MobileVideoUpdateForm: FC<IMobileVideoUpdateProps> = ({
     visible,
     videoID,
     onUpdate,

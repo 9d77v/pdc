@@ -9,6 +9,7 @@ import VideoTagSuggest from 'src/profiles/common/video/VideoTagSuggest'
 import {
     HistoryOutlined, SearchOutlined
 } from '@ant-design/icons'
+import { IApp } from 'src/models/app'
 
 const VideoIndex = () => {
     const { error, data } = useQuery(GET_VIDEO_TAGS,
@@ -43,12 +44,6 @@ const VideoIndex = () => {
             return suggests
         }
     }, [data])
-
-    interface IApp {
-        text: string
-        icon: JSX.Element
-        url: string
-    }
 
     const pageData: IApp[] = [
         {

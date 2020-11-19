@@ -1,16 +1,16 @@
 import { List, Button, Tag, Badge } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
-import { DeviceCreateForm, INewDevice } from './DeviceCreateForm';
+import { DeviceCreateForm } from './DeviceCreateForm';
 import { ADD_DEVICE, LIST_DEVICE, UPDATE_DEVICE } from 'src/consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { IDevice } from 'src/consts/consts';
 import "src/styles/card.less"
 import { EditOutlined } from '@ant-design/icons';
-import { IUpdateDevice, DeviceUpdateForm } from './DeviceUpdateForm';
+import { DeviceUpdateForm } from './DeviceUpdateForm';
 import { pb } from 'src/pb/compiled';
 import useWebSocket from 'react-use-websocket';
 import { iotHealthSocketURL } from 'src/utils/ws_client';
 import { blobToArrayBuffer } from 'src/utils/file';
+import { IDevice, INewDevice, IUpdateDevice } from 'src/models/device';
 
 interface IDeviceListProps {
     currentSelectID: number
@@ -27,7 +27,9 @@ export const DeviceList = (props: IDeviceListProps) => {
         id: 0,
         name: "",
         ip: "",
-        port: 0
+        port: 0,
+        username: "",
+        password: ""
     })
     const [addDevice] = useMutation(ADD_DEVICE);
     const [updateDevice] = useMutation(UPDATE_DEVICE);
@@ -43,8 +45,7 @@ export const DeviceList = (props: IDeviceListProps) => {
                     field: 'id',
                     isAsc: false
                 }]
-            },
-            fetchPolicy: "cache-and-network"
+            }
         });
 
     const onDeviceCreate = async (values: INewDevice) => {
@@ -54,7 +55,9 @@ export const DeviceList = (props: IDeviceListProps) => {
                     "name": values.name,
                     "deviceModelID": values.deviceModelID,
                     "ip": values.ip,
-                    "port": values.port
+                    "port": values.port,
+                    "username": values.username,
+                    "password": values.password
                 }
             }
         });
@@ -69,7 +72,9 @@ export const DeviceList = (props: IDeviceListProps) => {
                     "id": values.id,
                     "name": values.name,
                     "ip": values.ip,
-                    "port": values.port
+                    "port": values.port,
+                    "username": values.username,
+                    "password": values.password
                 }
             }
         });
@@ -89,6 +94,8 @@ export const DeviceList = (props: IDeviceListProps) => {
                 port: element.port,
                 name: element.name,
                 health: null,
+                username: element.username,
+                password: element.password,
             }
             newDataResource.push(t)
         }
@@ -227,7 +234,9 @@ export const DeviceList = (props: IDeviceListProps) => {
                                             "id": item.id,
                                             "name": item.name,
                                             "ip": item.ip,
-                                            "port": item.port
+                                            "port": item.port,
+                                            "username": item.username,
+                                            "password": item.password
                                         })
                                         setDeviceUpdateFormVisible(true)
                                     }

@@ -1,18 +1,15 @@
 import { Modal, Form, Input } from 'antd';
-import React from 'react'
+import React, { FC } from 'react'
+import { INewAttributeModel } from 'src/models/device';
 
-export interface INewAttributeModel {
-    key: string
-    name: string
-}
 
-interface AttributeModelCreateFormProps {
+interface IAttributeModelCreateFormProps {
     visible: boolean;
     onCreate: (values: INewAttributeModel) => void;
     onCancel: () => void;
 }
 
-export const AttributeModelCreateForm: React.FC<AttributeModelCreateFormProps> = ({
+export const AttributeModelCreateForm: FC<IAttributeModelCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
@@ -53,7 +50,7 @@ export const AttributeModelCreateForm: React.FC<AttributeModelCreateFormProps> =
                 form={form}
                 layout="horizontal"
                 name="attributeModelCreateForm"
-                style={{ maxHeight: 600}}
+                style={{ maxHeight: 600 }}
                 initialValues={{ deviceType: 0 }}
             >
                 <Form.Item

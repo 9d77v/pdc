@@ -5,6 +5,7 @@ import QrReader from 'react-qr-reader'
 import { useHistory } from 'react-router-dom'
 import { AppPath } from 'src/consts/path';
 
+
 const Item = List.Item;
 
 interface IScannerProps {

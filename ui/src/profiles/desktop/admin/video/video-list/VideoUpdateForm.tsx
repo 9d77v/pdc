@@ -1,7 +1,8 @@
 import { Modal, Form, Input, Switch, DatePicker, Select } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import { Uploader } from 'src/components/Uploader'
 import dayjs from 'dayjs'
+
 
 const { TextArea } = Input
 
@@ -10,7 +11,7 @@ interface Values {
     description: string
 }
 
-interface UpdateVideoProps {
+interface IUpdateVideoProps {
     title: string,
     desc: string,
     cover: string,
@@ -19,14 +20,14 @@ interface UpdateVideoProps {
     isShow: boolean,
     theme: string
 }
-interface VideoUpdateFormProps {
+interface IVideoUpdateFormProps {
     visible: boolean
-    data: UpdateVideoProps,
+    data: IUpdateVideoProps,
     onUpdate: (values: Values) => void
     onCancel: () => void
 }
 
-export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
+export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
     visible,
     data,
     onUpdate,
@@ -118,7 +119,7 @@ export const VideoUpdateForm: React.FC<VideoUpdateFormProps> = ({
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
                     <Switch />
                 </Form.Item>
-                <Form.Item name="theme" label="主题">
+                <Form.Item name="theme" label="主题" hidden>
                     <Select onChange={() => { }}>
                         <Select.Option value="">默认</Select.Option>
                         <Select.Option value="vjs-theme-lemon">柠檬</Select.Option>

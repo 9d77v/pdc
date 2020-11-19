@@ -1,6 +1,6 @@
 import { useHistory } from "react-router-dom"
 import { AppPath } from "src/consts/path"
-import React from 'react'
+import React, { FC } from 'react'
 import Img from "src/components/img"
 interface IVideoCardProps {
     videoID: number
@@ -9,7 +9,7 @@ interface IVideoCardProps {
     totalNum: number
 }
 
-export const VideoCard: React.FC<IVideoCardProps> = ({
+export const VideoCard: FC<IVideoCardProps> = ({
     videoID,
     cover,
     title,

@@ -1,22 +1,17 @@
 import { Modal, Form, Input } from 'antd';
-import React, { useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
 import TextArea from 'antd/lib/input/TextArea';
+import { IUpdateDeviceModel } from 'src/models/device';
 
 
-export interface IUpdateDeviceModel {
-    id: number
-    name: string
-    desc: string
-}
-
-interface DeviceModelUpdateFormProps {
+interface IDeviceModelUpdateFormProps {
     data: IUpdateDeviceModel
     visible: boolean;
     onUpdate: (values: IUpdateDeviceModel) => void;
     onCancel: () => void;
 }
 
-export const DeviceModelUpdateForm: React.FC<DeviceModelUpdateFormProps> = ({
+export const DeviceModelUpdateForm: FC<IDeviceModelUpdateFormProps> = ({
     data,
     visible,
     onUpdate,

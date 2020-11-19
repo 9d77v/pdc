@@ -36,7 +36,7 @@ export default function AttributeTable(props: IAttributeTableProps) {
                 columns={columns}
                 bordered
                 pagination={{
-                    pageSize: 5,
+                    pageSize: 10,
                     hideOnSinglePage: true,
                     total: data.length
                 }}

@@ -1,24 +1,16 @@
 import { Modal, Form, Input, InputNumber } from 'antd';
-import React, { useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
+import { IUpdateTelemetryModel } from 'src/models/device';
 
-export interface IUpdateTelemetryModel {
-    id: number
-    key: string
-    name: string
-    factor: number
-    unit: string
-    unitName: string
-    scale: number
-}
 
-interface TelemetryModelUpdateFormProps {
+interface ITelemetryModelUpdateFormProps {
     data: IUpdateTelemetryModel
     visible: boolean;
     onUpdate: (values: IUpdateTelemetryModel) => void;
     onCancel: () => void;
 }
 
-export const TelemetryModelUpdateForm: React.FC<TelemetryModelUpdateFormProps> = ({
+export const TelemetryModelUpdateForm: FC<ITelemetryModelUpdateFormProps> = ({
     data,
     visible,
     onUpdate,

@@ -19,6 +19,7 @@ import VideoIndex from './video'
 import VideoList from './video/VideoList'
 import VideoDetail from './video/VideoDetail'
 import DeviceIndex from './device'
+import DeviceCameraDetail from './device/DeviceCameraDetail'
 
 
 const MeIndex = React.lazy(() => import('./me'))
@@ -65,6 +66,9 @@ const MobileIndex = () => {
             </Route>
             <Route exact path={AppPath.HISTORY} >
                 <HistoryPage />
+            </Route>
+            <Route exact path={AppPath.DEVICE_CAMERA}  >
+                <DeviceCameraDetail />
             </Route>
             <Route exact path={AppPath.DEVICE}  >
                 <DeviceIndex />

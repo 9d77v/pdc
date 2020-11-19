@@ -2,17 +2,18 @@ import { Form } from 'antd'
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
 
+
 interface Values {
     title: string
     description: string
 }
 
-interface VideoCreateStepTwoFormProps {
+interface IVideoCreateStepTwoFormProps {
     id: number
     onCreate?: (values: Values) => void
 }
 
-const VideoCreateStepTwoForm = (props: VideoCreateStepTwoFormProps, ref: Ref<any>) => {
+const VideoCreateStepTwoForm = (props: IVideoCreateStepTwoFormProps, ref: Ref<any>) => {
     const [form] = Form.useForm()
     const getForm = () => {
         return form

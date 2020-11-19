@@ -1,28 +1,19 @@
 import { Modal, Form, Input, Select, DatePicker } from 'antd';
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { GenderMap, RoleMap, FullRoleMap } from 'src/consts/consts';
 import { Uploader } from 'src/components/Uploader';
 import dayjs from 'dayjs';
+import { IUpdateUser } from 'src/models/user';
 
-interface UpdateUserProps {
-    id: number
-    name: string
-    avatar: string
-    password: string
-    roleID: number
-    gender: number
-    birthDate: number
-    ip: string
-}
 
-interface UserUpdateFormProps {
+interface IUserUpdateFormProps {
     visible: boolean;
-    data: UpdateUserProps,
-    onUpdate: (values: UpdateUserProps) => void;
+    data: IUpdateUser,
+    onUpdate: (values: IUpdateUser) => void;
     onCancel: () => void;
 }
 
-export const UserUpdateForm: React.FC<UserUpdateFormProps> = ({
+export const UserUpdateForm: FC<IUserUpdateFormProps> = ({
     visible,
     data,
     onUpdate,
@@ -121,7 +112,7 @@ export const UserUpdateForm: React.FC<UserUpdateFormProps> = ({
                     name="password"
                     label="密码"
                 >
-                    <Input type="password" />
+                    <Input.Password />
                 </Form.Item>
                 <Form.Item
                     name="roleID"

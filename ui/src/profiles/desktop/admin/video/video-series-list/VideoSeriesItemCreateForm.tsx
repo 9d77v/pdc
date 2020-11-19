@@ -1,16 +1,17 @@
 import { Modal, Form, Input, Select } from 'antd'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { VIDEO_COMBO } from 'src/consts/video.gql'
 
-interface VideoSeriesItemCreateFormProps {
+
+interface IVideoSeriesItemCreateFormProps {
     visible: boolean
     onCreate: (values: any) => void
     onCancel: () => void
     video_series_id: number,
 }
 const { Option } = Select
-export const VideoSeriesItemCreateForm: React.FC<VideoSeriesItemCreateFormProps> = ({
+export const VideoSeriesItemCreateForm: FC<IVideoSeriesItemCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
