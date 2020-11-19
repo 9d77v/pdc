@@ -11,14 +11,15 @@ import (
 
 func main() {
 	iotSDK := sdk.NewIotSDK()
-	iotSDK.Run([]func(){
+	works := []func(){
 		func() {
 			device := iotSDK.DeviceInfo
 			if device == nil {
 				return
 			}
-			r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.IP, device.Port))
+			r := firmata.NewTCPAdaptor(fmt.Sprintf("%s:%d", device.Ip, device.Port))
 			sensors.SHT3x(iotSDK, r, 0)
 		},
-	})
+	}
+	iotSDK.Run(works, nil)
 }

@@ -5,6 +5,7 @@ type DeviceModel {
   desc: String!
   attributeModels: [AttributeModel!]
   telemetryModels:[TelemetryModel]
+  cameraCompany: Int!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -40,6 +41,7 @@ input NewDeviceModel {
   name: String!  
   desc: String
   deviceType: Int!
+  cameraCompany: Int!
 }
 
 input NewAttributeModel {
@@ -88,8 +90,12 @@ type Device {
   secretKey: String!
   deviceModelName:String!
   deviceModelDesc:String!
+  deviceModelDeviceType: Int!
+  deviceModelCameraCompany: Int!
   attributes: [Attribute!]
   telemetries: [Telemetry!]
+  username: String!
+  password: String!
   createdAt: Int!
   updatedAt: Int!
 }
@@ -129,6 +135,8 @@ input NewDevice {
   name: String!
   ip: String
   port: Int
+  username: String
+  password: String
 }
 
 input NewUpdateDevice {
@@ -136,13 +144,17 @@ input NewUpdateDevice {
   name: String!  
   ip: String
   port: Int
+  username: String
+  password: String
 }
 
 type DeviceDashboard {
   id: ID!
   name: String!
   isVisible: Boolean!
+  deviceType: Int!
   telemetries: [DeviceDashboardTelemetry!]
+  cameras:[DeviceDashboardCamera!]
   createdAt: Int!
   updatedAt: Int!
 }
@@ -164,6 +176,15 @@ type DeviceDashboardTelemetry {
   updatedAt: Int!
 }
 
+type DeviceDashboardCamera {
+  id: ID!
+  deviceDashboardID: ID!
+  deviceID: ID!
+  deviceName: String!
+  createdAt: Int!
+  updatedAt: Int!
+}
+
 type DeviceDashboardConnection {
   totalCount: Int!
   edges:[DeviceDashboard!]!
@@ -172,6 +193,7 @@ type DeviceDashboardConnection {
 input NewDeviceDashboard {
   name: String!
   isVisible:Boolean!
+  deviceType: Int!
 }
 
 input NewUpdateDeviceDashboard {
@@ -183,4 +205,9 @@ input NewUpdateDeviceDashboard {
 input NewDeviceDashboardTelemetry {
   deviceDashboardID: ID!
   telemetryIDs: [ID!]!
+}
+
+input NewDeviceDashboardCamera{
+  deviceDashboardID: ID!
+  deviceIDs: [ID!]!
 }

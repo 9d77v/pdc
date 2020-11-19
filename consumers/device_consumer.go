@@ -13,6 +13,7 @@ import (
 	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/models/clickhouse"
+	"github.com/9d77v/pdc/models/mq"
 )
 
 var (
@@ -22,32 +23,63 @@ var (
 	duration      = 1 * time.Second
 )
 
-//HandleDeviceMSG ..
-func HandleDeviceMSG(m *stan.Msg) {
-	deviceMsg := new(pb.DeviceMSG)
+//HandleDeviceMsg ..
+func HandleDeviceMsg(m *stan.Msg) {
+	deviceMsg := new(pb.DeviceUpMsg)
 	err := proto.Unmarshal(m.Data, deviceMsg)
 	if err != nil {
 		log.Println("unmarshal data error")
 		return
 	}
-	switch deviceMsg.Action {
-	case pb.DeviceAction_SetAttributes:
-		setAttributes(deviceMsg)
-	case pb.DeviceAction_SetTelemetries:
-		for k, v := range deviceMsg.TelemetryMap {
+	if deviceMsg.Payload == nil {
+		return
+	}
+	switch deviceMsg.Payload.(type) {
+	case *pb.DeviceUpMsg_CameraCaptureReplyMsg:
+		msg := deviceMsg.GetCameraCaptureReplyMsg()
+		if msg == nil {
+			return
+		}
+		err = mq.Client.NatsConn().Publish(msg.Subject, m.Data)
+		if err != nil {
+			log.Println("publish DeviceUpMsg_CameraCaptureReplyMsg failed:", err)
+		}
+	case *pb.DeviceUpMsg_SetAttributesMsg:
+		attributeMsg := deviceMsg.GetSetAttributesMsg()
+		if attributeMsg == nil || attributeMsg.AttributeMap == nil {
+			return
+		}
+		for k, v := range attributeMsg.AttributeMap {
+			err := models.Gorm.Model(&models.Attribute{}).
+				Where("id=?", k).
+				Update("value", v).Error
+			if err != nil {
+				log.Printf("update attribute failed,id:%d,value:%s\n", deviceMsg.DeviceId, v)
+			}
+		}
+	case *pb.DeviceUpMsg_SetTelemetriesMsg:
+		telemetryMsg := deviceMsg.GetSetTelemetriesMsg()
+		if telemetryMsg == nil || telemetryMsg.TelemetryMap == nil {
+			return
+		}
+		for k, v := range telemetryMsg.TelemetryMap {
 			telemetry := &pb.Telemetry{
-				DeviceID:   deviceMsg.DeviceID,
+				DeviceID:   deviceMsg.DeviceId,
 				ActionTime: deviceMsg.ActionTime,
 				ID:         k,
 				Value:      v,
 			}
 			telemetryChan <- telemetry
 		}
-	case pb.DeviceAction_SetHealth:
+	case *pb.DeviceUpMsg_SetHealthMsg:
+		healthMsg := deviceMsg.GetSetHealthMsg()
+		if healthMsg == nil {
+			return
+		}
 		health := &pb.Health{
-			DeviceID:   deviceMsg.DeviceID,
+			DeviceID:   deviceMsg.DeviceId,
 			ActionTime: deviceMsg.ActionTime,
-			Value:      deviceMsg.DeviceHealth,
+			Value:      healthMsg.DeviceHealth,
 		}
 		healthChan <- health
 	}
@@ -58,17 +90,21 @@ const subjectDeviceHealthPrefix = "device.health"
 
 //PublishDeviceData push device data to redis
 func PublishDeviceData(m *stan.Msg) {
-	deviceMsg := new(pb.DeviceMSG)
+	deviceMsg := new(pb.DeviceUpMsg)
 	err := proto.Unmarshal(m.Data, deviceMsg)
 	if err != nil {
 		log.Println("unmarshal data error")
 		return
 	}
-	switch deviceMsg.Action {
-	case pb.DeviceAction_SetTelemetries:
-		for k, v := range deviceMsg.TelemetryMap {
+	switch deviceMsg.Payload.(type) {
+	case *pb.DeviceUpMsg_SetTelemetriesMsg:
+		telemetryMsg := deviceMsg.GetSetTelemetriesMsg()
+		if telemetryMsg == nil || telemetryMsg.TelemetryMap == nil {
+			return
+		}
+		for k, v := range telemetryMsg.TelemetryMap {
 			telemetry := &pb.Telemetry{
-				DeviceID:   deviceMsg.DeviceID,
+				DeviceID:   deviceMsg.DeviceId,
 				ActionTime: deviceMsg.ActionTime,
 				ID:         k,
 				Value:      v,
@@ -79,16 +115,20 @@ func PublishDeviceData(m *stan.Msg) {
 				return
 			}
 			err = models.RedisClient.Publish(context.Background(),
-				fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceMsg.DeviceID, k), requestMsg).Err()
+				fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceMsg.DeviceId, k), requestMsg).Err()
 			if err != nil {
 				log.Printf("publish error,err:%v/n", err)
 			}
 		}
-	case pb.DeviceAction_SetHealth:
+	case *pb.DeviceUpMsg_SetHealthMsg:
+		healthMsg := deviceMsg.GetSetHealthMsg()
+		if healthMsg == nil {
+			return
+		}
 		health := &pb.Health{
-			DeviceID:   deviceMsg.DeviceID,
+			DeviceID:   deviceMsg.DeviceId,
 			ActionTime: deviceMsg.ActionTime,
-			Value:      deviceMsg.DeviceHealth,
+			Value:      healthMsg.DeviceHealth,
 		}
 		requestMsg, err := proto.Marshal(health)
 		if err != nil {
@@ -96,20 +136,9 @@ func PublishDeviceData(m *stan.Msg) {
 			return
 		}
 		err = models.RedisClient.Publish(context.Background(),
-			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceID), requestMsg).Err()
+			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceId), requestMsg).Err()
 		if err != nil {
 			log.Printf("publish error,err:%v/n", err)
-		}
-	}
-}
-
-func setAttributes(deviceMsg *pb.DeviceMSG) {
-	for k, v := range deviceMsg.AttributeMap {
-		err := models.Gorm.Model(&models.Attribute{}).
-			Where("id=?", k).
-			Update("value", v).Error
-		if err != nil {
-			log.Printf("update attribute failed,id:%d,value:%s\n", deviceMsg.DeviceID, v)
 		}
 	}
 }

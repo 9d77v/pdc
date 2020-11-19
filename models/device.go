@@ -9,7 +9,8 @@ type DeviceModel struct {
 	gorm.Model
 	Name            string            `gorm:"size:50"`   //设备名称
 	Desc            string            `gorm:"size:5000"` //设备描述
-	DeviceType      uint8             //设备类型，0:默认设备
+	DeviceType      uint8             //设备类型，0:默认设备,1:摄像头
+	CameraCompany   uint8             //摄像头厂家，0：海康威视，1：大华
 	AttributeModels []*AttributeModel //属性模型
 	TelemetryModels []*TelemetryModel //遥测模型
 }
@@ -44,6 +45,9 @@ type Device struct {
 	AccessKey     string       `gorm:"size:12;NOT NULL;"` //设备key hashid(id,16)
 	SecretKey     string       `gorm:"size:32;NOT NULL;"` //设备访问密钥,randString()
 	Port          uint16       //设备端口
+	Username      string       `gorm:"size:32;"`
+	Password      string       `gorm:"size:32;"`
+	LivePath      string       `gorm:"size:100"` //直播路径
 	Attributes    []*Attribute //属性，由采集程序启动时注册
 	Telemetries   []*Telemetry //遥测，由采集程序按一定频率上传
 }
@@ -71,13 +75,23 @@ type DeviceDashboard struct {
 	gorm.Model
 	Name        string `gorm:"size:50"`
 	IsVisible   bool
+	DeviceType  uint8 //设备类型，0:默认设备,1:摄像头
 	Telemetries []*DeviceDashboardTelemetry
+	Cameras     []*DeviceDashboardCamera
 }
 
 //DeviceDashboardTelemetry 仪表盘遥测
 type DeviceDashboardTelemetry struct {
 	gorm.Model
-	DeviceDashboardID uint `gorm:"unique_index:dashboard_telemetry_uix"`
-	TelemetryID       uint `gorm:"unique_index:dashboard_telemetry_uix"`
+	DeviceDashboardID uint
+	TelemetryID       uint
 	Telemetry         Telemetry
+}
+
+//DeviceDashboardCamera 仪表盘摄像头
+type DeviceDashboardCamera struct {
+	gorm.Model
+	DeviceDashboardID uint
+	DeviceID          uint
+	Device            Device
 }

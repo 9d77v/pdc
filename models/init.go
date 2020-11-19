@@ -134,6 +134,7 @@ func initDB() {
 		&Telemetry{},
 		&DeviceDashboard{},
 		&DeviceDashboardTelemetry{},
+		&DeviceDashboardCamera{},
 	)
 	if err != nil {
 		log.Println("auto migrate error:", err)
@@ -180,7 +181,7 @@ func initMinio() {
 		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure: true,
 	})
-	preCreatedBuckets := []string{"image", "video", "vtt", "pan"}
+	preCreatedBuckets := []string{"image", "video", "vtt", "pan", "camera"}
 	location := "us-east-1"
 	for _, bucketName := range preCreatedBuckets {
 		err = MinioClient.MakeBucket(context.Background(), bucketName,

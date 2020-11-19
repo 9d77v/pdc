@@ -1,0 +1,31 @@
+syntax = "proto3";
+package pb;
+option go_package = ".;pb";
+import "google/protobuf/timestamp.proto";
+
+message DeviceDownMSG {
+  uint32 device_id = 1;
+  google.protobuf.Timestamp action_time = 2;
+  oneof payload {
+    LoginReplyMsg login_reply_msg = 3;
+    CameraCaptureMsg camera_capture_msg = 4;
+  }
+}
+
+message LoginReplyMsg {
+  uint32 id = 1;
+  string ip = 2;
+  uint32 port = 3;
+  map<string, uint32> attribute_config = 4;
+  map<string, uint32> telemetry_config = 5;
+  uint32 camera_company = 6;
+  string username = 7;
+  string password = 8;
+}
+
+message CameraCaptureMsg {
+  string picture_url = 1;
+  string oss_prefix = 2;
+  string secure_oss_prefix = 3;
+  string nats_reply = 4;
+}

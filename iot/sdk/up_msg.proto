@@ -1,0 +1,32 @@
+syntax = "proto3";
+package pb;
+option go_package = ".;pb";
+import "google/protobuf/timestamp.proto";
+
+message DeviceUpMsg {
+  uint32 device_id = 1;
+  google.protobuf.Timestamp action_time = 2;
+  oneof payload {
+    LoginMsg login_msg = 3;
+    SetAttributesMsg set_attributes_msg = 4;
+    SetTelemetriesMsg set_telemetries_msg = 5;
+    SetHealthMsg set_health_msg = 6;
+    CameraCaptureReplyMsg camera_capture_reply_msg = 7;
+  }
+}
+
+message LoginMsg {
+  string accessKey = 1;
+  string secretKey = 2;
+}
+
+message SetAttributesMsg { map<uint32, string> attribute_map = 1; }
+
+message SetTelemetriesMsg { map<uint32, double> telemetry_map = 1; }
+
+message SetHealthMsg { uint32 device_health = 1; }
+
+message CameraCaptureReplyMsg {
+  string subject = 1;
+  bool ok = 2;
+}

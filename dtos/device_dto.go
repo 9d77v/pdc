@@ -73,19 +73,23 @@ func ToDeviceDto(m *models.Device) *model.Device {
 		})
 	}
 	return &model.Device{
-		ID:              int64(m.ID),
-		Name:            m.Name,
-		IP:              m.IP,
-		Port:            int64(m.Port),
-		AccessKey:       m.AccessKey,
-		SecretKey:       m.SecretKey,
-		DeviceModelID:   int64(m.DeviceModelID),
-		DeviceModelName: m.DeviceModel.Name,
-		DeviceModelDesc: m.DeviceModel.Desc,
-		Attributes:      as,
-		Telemetries:     ts,
-		CreatedAt:       m.CreatedAt.Unix(),
-		UpdatedAt:       m.UpdatedAt.Unix(),
+		ID:                       int64(m.ID),
+		Name:                     m.Name,
+		IP:                       m.IP,
+		Port:                     int64(m.Port),
+		AccessKey:                m.AccessKey,
+		SecretKey:                m.SecretKey,
+		Username:                 m.Username,
+		Password:                 m.Password,
+		DeviceModelID:            int64(m.DeviceModelID),
+		DeviceModelName:          m.DeviceModel.Name,
+		DeviceModelDesc:          m.DeviceModel.Desc,
+		DeviceModelDeviceType:    int64(m.DeviceModel.DeviceType),
+		DeviceModelCameraCompany: int64(m.DeviceModel.CameraCompany),
+		Attributes:               as,
+		Telemetries:              ts,
+		CreatedAt:                m.CreatedAt.Unix(),
+		UpdatedAt:                m.UpdatedAt.Unix(),
 	}
 }
 
@@ -109,11 +113,24 @@ func ToDeviceDashboardDto(m *models.DeviceDashboard) *model.DeviceDashboard {
 			UpdatedAt:         v.UpdatedAt.Unix(),
 		})
 	}
+	cs := make([]*model.DeviceDashboardCamera, 0, len(m.Cameras))
+	for _, v := range m.Cameras {
+		cs = append(cs, &model.DeviceDashboardCamera{
+			ID:                int64(v.ID),
+			DeviceDashboardID: int64(v.DeviceDashboardID),
+			DeviceID:          int64(v.DeviceID),
+			DeviceName:        v.Device.Name,
+			CreatedAt:         v.CreatedAt.Unix(),
+			UpdatedAt:         v.UpdatedAt.Unix(),
+		})
+	}
 	return &model.DeviceDashboard{
 		ID:          int64(m.ID),
 		Name:        m.Name,
 		IsVisible:   m.IsVisible,
 		Telemetries: ts,
+		Cameras:     cs,
+		DeviceType:  int64(m.DeviceType),
 		CreatedAt:   m.CreatedAt.Unix(),
 		UpdatedAt:   m.UpdatedAt.Unix(),
 	}

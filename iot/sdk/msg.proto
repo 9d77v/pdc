@@ -1,0 +1,17 @@
+syntax = "proto3";
+package pb;
+option go_package = ".;pb";
+import "google/protobuf/timestamp.proto";
+
+message Telemetry {
+  uint32 DeviceID = 1;
+  google.protobuf.Timestamp ActionTime = 2;
+  uint32 ID = 3;
+  double value = 4;
+}
+
+message Health {
+  uint32 DeviceID = 1;
+  google.protobuf.Timestamp ActionTime = 2;
+  uint32 Value = 3;
+}

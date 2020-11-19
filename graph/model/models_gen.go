@@ -32,19 +32,23 @@ type Character struct {
 }
 
 type Device struct {
-	ID              int64        `json:"id"`
-	DeviceModelID   int64        `json:"deviceModelID"`
-	Name            string       `json:"name"`
-	IP              string       `json:"ip"`
-	Port            int64        `json:"port"`
-	AccessKey       string       `json:"accessKey"`
-	SecretKey       string       `json:"secretKey"`
-	DeviceModelName string       `json:"deviceModelName"`
-	DeviceModelDesc string       `json:"deviceModelDesc"`
-	Attributes      []*Attribute `json:"attributes"`
-	Telemetries     []*Telemetry `json:"telemetries"`
-	CreatedAt       int64        `json:"createdAt"`
-	UpdatedAt       int64        `json:"updatedAt"`
+	ID                       int64        `json:"id"`
+	DeviceModelID            int64        `json:"deviceModelID"`
+	Name                     string       `json:"name"`
+	IP                       string       `json:"ip"`
+	Port                     int64        `json:"port"`
+	AccessKey                string       `json:"accessKey"`
+	SecretKey                string       `json:"secretKey"`
+	DeviceModelName          string       `json:"deviceModelName"`
+	DeviceModelDesc          string       `json:"deviceModelDesc"`
+	DeviceModelDeviceType    int64        `json:"deviceModelDeviceType"`
+	DeviceModelCameraCompany int64        `json:"deviceModelCameraCompany"`
+	Attributes               []*Attribute `json:"attributes"`
+	Telemetries              []*Telemetry `json:"telemetries"`
+	Username                 string       `json:"username"`
+	Password                 string       `json:"password"`
+	CreatedAt                int64        `json:"createdAt"`
+	UpdatedAt                int64        `json:"updatedAt"`
 }
 
 type DeviceConnection struct {
@@ -56,9 +60,20 @@ type DeviceDashboard struct {
 	ID          int64                       `json:"id"`
 	Name        string                      `json:"name"`
 	IsVisible   bool                        `json:"isVisible"`
+	DeviceType  int64                       `json:"deviceType"`
 	Telemetries []*DeviceDashboardTelemetry `json:"telemetries"`
+	Cameras     []*DeviceDashboardCamera    `json:"cameras"`
 	CreatedAt   int64                       `json:"createdAt"`
 	UpdatedAt   int64                       `json:"updatedAt"`
+}
+
+type DeviceDashboardCamera struct {
+	ID                int64  `json:"id"`
+	DeviceDashboardID int64  `json:"deviceDashboardID"`
+	DeviceID          int64  `json:"deviceID"`
+	DeviceName        string `json:"deviceName"`
+	CreatedAt         int64  `json:"createdAt"`
+	UpdatedAt         int64  `json:"updatedAt"`
 }
 
 type DeviceDashboardConnection struct {
@@ -90,6 +105,7 @@ type DeviceModel struct {
 	Desc            string            `json:"desc"`
 	AttributeModels []*AttributeModel `json:"attributeModels"`
 	TelemetryModels []*TelemetryModel `json:"telemetryModels"`
+	CameraCompany   int64             `json:"cameraCompany"`
 	CreatedAt       int64             `json:"createdAt"`
 	UpdatedAt       int64             `json:"updatedAt"`
 }
@@ -149,11 +165,19 @@ type NewDevice struct {
 	Name          string  `json:"name"`
 	IP            *string `json:"ip"`
 	Port          *int64  `json:"port"`
+	Username      *string `json:"username"`
+	Password      *string `json:"password"`
 }
 
 type NewDeviceDashboard struct {
-	Name      string `json:"name"`
-	IsVisible bool   `json:"isVisible"`
+	Name       string `json:"name"`
+	IsVisible  bool   `json:"isVisible"`
+	DeviceType int64  `json:"deviceType"`
+}
+
+type NewDeviceDashboardCamera struct {
+	DeviceDashboardID int64   `json:"deviceDashboardID"`
+	DeviceIDs         []int64 `json:"deviceIDs"`
 }
 
 type NewDeviceDashboardTelemetry struct {
@@ -162,9 +186,10 @@ type NewDeviceDashboardTelemetry struct {
 }
 
 type NewDeviceModel struct {
-	Name       string  `json:"name"`
-	Desc       *string `json:"desc"`
-	DeviceType int64   `json:"deviceType"`
+	Name          string  `json:"name"`
+	Desc          *string `json:"desc"`
+	DeviceType    int64   `json:"deviceType"`
+	CameraCompany int64   `json:"cameraCompany"`
 }
 
 type NewEpisode struct {
@@ -235,10 +260,12 @@ type NewUpdateAttributeModel struct {
 }
 
 type NewUpdateDevice struct {
-	ID   int64   `json:"id"`
-	Name string  `json:"name"`
-	IP   *string `json:"ip"`
-	Port *int64  `json:"port"`
+	ID       int64   `json:"id"`
+	Name     string  `json:"name"`
+	IP       *string `json:"ip"`
+	Port     *int64  `json:"port"`
+	Username *string `json:"username"`
+	Password *string `json:"password"`
 }
 
 type NewUpdateDeviceDashboard struct {

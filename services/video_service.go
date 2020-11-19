@@ -17,7 +17,7 @@ import (
 	"github.com/9d77v/pdc/graph/model"
 	"github.com/9d77v/pdc/models"
 	"github.com/9d77v/pdc/models/elasticsearch"
-	"github.com/9d77v/pdc/models/nats"
+	"github.com/9d77v/pdc/models/mq"
 	"github.com/9d77v/pdc/utils"
 	elastic "github.com/olivere/elastic/v7"
 	"gorm.io/gorm"
@@ -475,10 +475,10 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 }
 
 func sendMsgToUpdateES(videoID int64) {
-	guid, err := nats.Client.PublishAsync(nats.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
+	guid, err := mq.Client.PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
 		AckHandler)
 	if err != nil {
-		log.Println("nats publish failed,guid:", guid, " error:", err)
+		log.Println("mq publish failed,guid:", guid, " error:", err)
 	}
 }
 

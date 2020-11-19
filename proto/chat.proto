@@ -1,0 +1,68 @@
+syntax = "proto3";
+package pb;
+option go_package = ".;pb";
+import "google/protobuf/timestamp.proto";
+
+message ChatMsg {
+  string MsgID = 1;
+  google.protobuf.Timestamp SendTime = 2;
+  repeated MsgBody MsgBody = 3;
+}
+
+message MsgBody {
+  MsgType MsgType = 1;
+  oneof MsgContent {
+    Text Text = 2;
+    Image Image = 3;
+    Voice Voice = 4;
+    Video Video = 5;
+    File File = 6;
+    Location Location = 7;
+    Face Face = 8;
+  }
+}
+
+enum MsgType {
+  TEXT = 0; IMAGE = 1; VOICE = 2; VIDEO = 3; FILE = 4; LOCATION = 5; FACE = 6;
+}
+
+message Text { string Text = 1; }
+
+message Image {
+  string UUID = 1;
+  ImageFormat ImageFormat = 2;
+  repeated ImageInfo ImageInfoArray = 3;
+}
+
+enum ImageFormat { Other = 0; JPG = 1; GIF = 2; PNG = 3; BMP = 4; WEBP = 5; }
+message ImageInfo {
+  int32 Type = 1;
+  int32 Size = 2;
+  int32 Width = 3;
+  int32 Height = 4;
+  string URL = 5;
+}
+message Voice {
+  string URL = 1;
+  int32 Size = 2;
+  int32 Second = 3;
+}
+
+message Video { string URL = 1; }
+
+message File {
+  string URL = 1;
+  int32 FileSize = 2;
+  string FileName = 3;
+}
+
+message Location {
+  string Desc = 1;
+  double Latitude = 2;
+  double Longitude = 3;
+}
+
+message Face {
+  int32 Index = 1;
+  string Data = 2;
+}

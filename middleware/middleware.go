@@ -7,85 +7,18 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/9d77v/pdc/iot/sdk/pb"
 	"github.com/9d77v/pdc/models"
-	"github.com/9d77v/pdc/models/nats"
+	"github.com/9d77v/pdc/models/mq"
 	"github.com/9d77v/pdc/services"
 	"github.com/9d77v/pdc/utils"
 	"github.com/gorilla/websocket"
+	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 )
-
-var userCtxKey = &contextKey{"user"}
-var schemeCtxKey = &contextKey{"scheme"}
-
-type contextKey struct {
-	name string
-}
-
-//GraphReq ..
-type GraphReq struct {
-	OperationName string `json:"operationName"`
-}
-
-var (
-	userService   = services.UserService{}
-	deviceService = services.DeviceService{}
-)
-
-var publicOperationArr = []string{"login", "refreshToken", "IntrospectionQuery"}
-var permissonMap = map[string][]int{
-	"presignedUrl":                   {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"users":                          {models.RoleAdmin},
-	"userInfo":                       {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"videos":                         {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"videoSerieses":                  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"searchVideo":                    {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"similarVideos":                  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"things":                         {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"thingSeries":                    {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"thingAnalyze":                   {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"createUser":                     {models.RoleAdmin},
-	"updateUser":                     {models.RoleAdmin},
-	"updateProfile":                  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"updatePassword":                 {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"createVideo":                    {models.RoleAdmin, models.RoleManager},
-	"addVideoResource":               {models.RoleAdmin, models.RoleManager},
-	"saveSubtitles":                  {models.RoleAdmin, models.RoleManager},
-	"updateVideo":                    {models.RoleAdmin, models.RoleManager},
-	"createEpisode":                  {models.RoleAdmin, models.RoleManager},
-	"updateEpisode":                  {models.RoleAdmin, models.RoleManager},
-	"updateMobileVideo":              {models.RoleAdmin, models.RoleManager},
-	"createVideoSeries":              {models.RoleAdmin, models.RoleManager},
-	"updateVideoSeries":              {models.RoleAdmin, models.RoleManager},
-	"createVideoSeriesItem":          {models.RoleAdmin, models.RoleManager},
-	"updateVideoSeriesItem":          {models.RoleAdmin, models.RoleManager},
-	"createThing":                    {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"updateThing":                    {models.RoleAdmin, models.RoleManager, models.RoleUser},
-	"recordHistory":                  {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"historyInfo":                    {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"histories":                      {models.RoleAdmin, models.RoleManager, models.RoleUser, models.RoleGuest},
-	"createDeviceModel":              {models.RoleAdmin, models.RoleManager},
-	"updateDeviceModel":              {models.RoleAdmin, models.RoleManager},
-	"createAttributeModel":           {models.RoleAdmin, models.RoleManager},
-	"updateAttributeModel":           {models.RoleAdmin, models.RoleManager},
-	"deleteAttributeModel":           {models.RoleAdmin, models.RoleManager},
-	"createTelemetryModel":           {models.RoleAdmin, models.RoleManager},
-	"updateTelemetryModel":           {models.RoleAdmin, models.RoleManager},
-	"deleteTelemetryModel":           {models.RoleAdmin, models.RoleManager},
-	"deviceModels":                   {models.RoleAdmin, models.RoleManager},
-	"createDevice":                   {models.RoleAdmin, models.RoleManager},
-	"updateDevice":                   {models.RoleAdmin, models.RoleManager},
-	"devices":                        {models.RoleAdmin, models.RoleManager},
-	"createDeviceDashboard":          {models.RoleAdmin, models.RoleManager},
-	"updateDeviceDashboard":          {models.RoleAdmin, models.RoleManager},
-	"deleteDeviceDashboard":          {models.RoleAdmin, models.RoleManager},
-	"addDeviceDashboardTelemetry":    {models.RoleAdmin, models.RoleManager},
-	"removeDeviceDashboardTelemetry": {models.RoleAdmin, models.RoleManager},
-	"deviceDashboards":               {models.RoleAdmin, models.RoleManager},
-}
 
 //Error ...
 type Error struct {
@@ -199,6 +132,11 @@ func ForSchemeContext(ctx context.Context) string {
 	return raw
 }
 
+//GraphReq ..
+type GraphReq struct {
+	OperationName string `json:"operationName"`
+}
+
 //parseBody ..
 func parseBody(r *http.Request) (*GraphReq, error) {
 	req := new(GraphReq)
@@ -231,12 +169,13 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 		defer c.Close()
 		//check accessKey and secretKey
 		_, msg, err := c.ReadMessage()
-		loginMsg := new(pb.LoginMSG)
-		err = proto.Unmarshal(msg, loginMsg)
+		upMsg := new(pb.DeviceUpMsg)
+		err = proto.Unmarshal(msg, upMsg)
 		if err != nil {
 			log.Println("unmarshal data error")
 			return
 		}
+		loginMsg := upMsg.GetLoginMsg()
 		id, err := deviceService.DeviceLogin(loginMsg.AccessKey, loginMsg.SecretKey)
 		if id == 0 || err != nil {
 			log.Println("login error:", err)
@@ -257,7 +196,42 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 			log.Println("websocket write error:", err)
 			return
 		}
-
+		subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(id), 10)
+		log.Println("开启监听主题：", subject)
+		qsub, err := mq.Client.NatsConn().QueueSubscribe(subject,
+			mq.GroupDevice, func(m *nats.Msg) {
+				deviceMsg := new(pb.DeviceDownMSG)
+				err := proto.Unmarshal(m.Data, deviceMsg)
+				if err != nil {
+					log.Println("unmarshal data error")
+					return
+				}
+				switch deviceMsg.Payload.(type) {
+				case *pb.DeviceDownMSG_CameraCaptureMsg:
+					if deviceMsg.GetCameraCaptureMsg() == nil {
+						return
+					}
+					deviceMsg.GetCameraCaptureMsg().NatsReply = m.Reply
+					requestMsg, err := proto.Marshal(deviceMsg)
+					if err != nil {
+						log.Println("proto marshal error:", err)
+						return
+					}
+					err = c.WriteMessage(websocket.BinaryMessage, requestMsg)
+					if err != nil {
+						log.Println("websocket write error:", err)
+					}
+				}
+			})
+		if err != nil {
+			log.Panicln("QueueSubscribe error:", err)
+		}
+		defer func() {
+			err = qsub.Unsubscribe()
+			if err != nil {
+				log.Println("qsub2 Unsubscribe error:", err)
+			}
+		}()
 		for {
 			_, msg, err := c.ReadMessage()
 			if err != nil {
@@ -265,7 +239,7 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			//透传到mq
-			_, err = nats.Client.PublishAsync(nats.SubjectDeviceData, msg, services.AckHandler)
+			_, err = mq.Client.PublishAsync(mq.SubjectDeviceData, msg, services.AckHandler)
 			if err != nil {
 				log.Println("send data error:", err)
 			}
