@@ -8,6 +8,7 @@ import { Icon, NavBar, SearchBar } from "antd-mobile"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
 import { MobileVideoCard } from "src/profiles/common/video/VideoCard"
+import { isMobile } from "src/utils/util"
 
 
 export default function VideoList() {
@@ -21,10 +22,13 @@ export default function VideoList() {
     const { error, data } = useQuery(LIST_VIDEO_CARD,
         {
             variables: {
-                keyword: pagination.keyword,
-                page: pagination.page,
-                pageSize: pagination.pageSize,
-                tags: pagination.selectedTags
+                input: {
+                    keyword: pagination.keyword,
+                    page: pagination.page,
+                    pageSize: pagination.pageSize,
+                    tags: pagination.selectedTags,
+                    isMobile: isMobile()
+                }
             },
             fetchPolicy: "cache-and-network"
         }

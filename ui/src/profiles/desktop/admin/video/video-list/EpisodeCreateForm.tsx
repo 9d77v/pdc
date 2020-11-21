@@ -62,7 +62,7 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
         form.setFieldsValue({ subtitles: [...subtitles] })
     }
 
-    const videoPathPrefix = "desktop/" + currentVideoID.toString() + "/"
+    const videoPathPrefix = currentVideoID.toString() + "/"
     return (
         <Modal
             visible={visible}

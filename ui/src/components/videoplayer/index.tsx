@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
 import "video.js/dist/video-js.min.css"
 import "./index.less"
@@ -52,21 +52,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()
 
-    const props: VideoJsPlayerOptions = {
-        autoplay: autoplay,
-        sources: [{
-            src: url,
-            type: 'video/mp4',
-        }],
-        language: "zh-CN",
-        controls: true,
-        playbackRates: [0.5, 1, 2, 4, 16],
-        loop: false,
-    };
+    const props: VideoJsPlayerOptions = useMemo(() => {
+        return {
+            autoplay: autoplay,
+            sources: [{
+                src: url,
+                type: 'video/mp4',
+            }],
+            language: "zh-CN",
+            controls: true,
+            playbackRates: [0.5, 1, 2, 4, 16],
+            loop: false,
+        }
+    }, [autoplay, url])
 
     if (autoDestroy === undefined) {
         autoDestroy = true
     }
+
     useEffect(() => {
         if (videoNode && url) {
             if (!player) {

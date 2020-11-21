@@ -36,7 +36,7 @@ const VideoCreateStepTwoForm = (props: IVideoCreateStepTwoFormProps, ref: Ref<an
         wrapperCol: { span: 16 },
     }
 
-    const videoPathPrefix = "desktop/" + props.id.toString() + "/"
+    const videoPathPrefix = props.id.toString() + "/"
     return (
         <Form
             {...layout}

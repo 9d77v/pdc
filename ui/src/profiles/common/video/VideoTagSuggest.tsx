@@ -30,8 +30,13 @@ const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
     const { error, data, refetch } = useQuery(VIDEO_RANDOM_TAG_SUGGEST,
         {
             variables: {
-                tag: tag,
-                pageSize: pageSize
+                input: {
+                    pageSize: pageSize,
+                    tags: [tag],
+                    page: 1,
+                    isRandom: true,
+                    isMobile: isMobile()
+                }
             }
         }
     )

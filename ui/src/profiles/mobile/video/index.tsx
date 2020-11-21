@@ -10,11 +10,16 @@ import {
     HistoryOutlined, SearchOutlined
 } from '@ant-design/icons'
 import { IApp } from 'src/models/app'
+import { isMobile } from 'src/utils/util'
 
 const VideoIndex = () => {
     const { error, data } = useQuery(GET_VIDEO_TAGS,
         {
-            variables: {}
+            variables: {
+                input: {
+                    isMobile: isMobile()
+                }
+            }
         }
     )
     useEffect(() => {

@@ -2,6 +2,7 @@ import { Modal, Form, Input, Switch, DatePicker, Select } from 'antd'
 import React, { useState, useEffect, FC } from 'react'
 import { Uploader } from 'src/components/Uploader'
 import dayjs from 'dayjs'
+import { IUpdateVideo } from 'src/models/video'
 
 
 const { TextArea } = Input
@@ -11,18 +12,9 @@ interface Values {
     description: string
 }
 
-interface IUpdateVideoProps {
-    title: string,
-    desc: string,
-    cover: string,
-    pubDate: number,
-    tags: string[],
-    isShow: boolean,
-    theme: string
-}
 interface IVideoUpdateFormProps {
     visible: boolean
-    data: IUpdateVideoProps,
+    data: IUpdateVideo,
     onUpdate: (values: Values) => void
     onCancel: () => void
 }
@@ -46,6 +38,7 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
             "tags": data.tags,
             "pubDate": dayjs(data.pubDate * 1000),
             "isShow": data.isShow,
+            "isHideOnMobile": data.isHideOnMobile,
             "theme": data.theme
         })
     }, [form, data])
@@ -117,6 +110,9 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
                     </Select>
                 </Form.Item>
                 <Form.Item name="isShow" label="是否显示" valuePropName='checked'>
+                    <Switch />
+                </Form.Item>
+                <Form.Item name="isHideOnMobile" label="是否手机隐藏" valuePropName='checked'>
                     <Switch />
                 </Form.Item>
                 <Form.Item name="theme" label="主题" hidden>

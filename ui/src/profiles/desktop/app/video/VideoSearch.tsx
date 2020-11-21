@@ -9,6 +9,7 @@ import Search from "antd/lib/input/Search"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
 import { VideoCard } from "src/profiles/common/video/VideoCard"
+import { isMobile } from "src/utils/util"
 
 
 const VideoSearch = () => {
@@ -23,10 +24,13 @@ const VideoSearch = () => {
     const { error, data } = useQuery(LIST_VIDEO_CARD,
         {
             variables: {
-                keyword: pagination.keyword,
-                page: pagination.page,
-                pageSize: pagination.pageSize,
-                tags: pagination.selectedTags
+                input: {
+                    keyword: pagination.keyword,
+                    page: pagination.page,
+                    pageSize: pagination.pageSize,
+                    tags: pagination.selectedTags,
+                    isMobile: isMobile(),
+                }
             },
             fetchPolicy: "cache-and-network"
         }

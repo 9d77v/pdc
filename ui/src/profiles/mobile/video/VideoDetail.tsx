@@ -15,7 +15,6 @@ export default function VideoDetail() {
     const [episodeItem, setEpisodeItem] = useState({
         id: 0,
         url: "",
-        mobileURL: "",
         subtitles: null
     })
     const location = useLocation()
@@ -82,7 +81,6 @@ export default function VideoDetail() {
             setEpisodeItem({
                 id: video.episodes[num].id,
                 url: video.episodes[num].url,
-                mobileURL: video.episodes[num].mobileURL || "",
                 subtitles: video.episodes[num].subtitles,
             })
         }
@@ -101,7 +99,7 @@ export default function VideoDetail() {
                     theme={videoItem.theme}
                     videoID={videoItem.id}
                     episodeID={episodeItem.id}
-                    url={(episodeItem.mobileURL !== "") ? episodeItem.mobileURL : episodeItem.url}
+                    url={episodeItem.url}
                     subtitles={episodeItem.subtitles}
                     height={231}
                     width={"100%"}
