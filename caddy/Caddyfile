@@ -1,7 +1,8 @@
 domain.local {
     encode gzip
     tls internal
-    reverse_proxy pdc:8080 
+    reverse_proxy /hls/* nginx-rtmp-hls:8080
+    reverse_proxy /* pdc:8080
     log {
         output file         access.log
         format single_field common_log

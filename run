@@ -51,6 +51,12 @@ case $1 in
         $sudo docker build -t 9d77v/pdc-device-raspi:$IMAGE_TAG -f Dockerfile.raspi .
         $sudo docker push 9d77v/pdc-device-raspi:$IMAGE_TAG   
         ;;
+    camera)
+       IMAGE_TAG=`git log --pretty=format:"%ad_%h" -1 --date=short`
+        echo "build pdc-device-camera"
+        $sudo docker build -t 9d77v/pdc-device-camera:$IMAGE_TAG -f Dockerfile.camera .
+        $sudo docker push 9d77v/pdc-device-camera:$IMAGE_TAG   
+        ;;
     gosec)
        gosec -exclude=G204 -conf gosec.json ./...
        ;;

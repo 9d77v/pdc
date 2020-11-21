@@ -7,6 +7,7 @@ type Video {
   episodes: [Episode!]!
   tags: [String!]
   isShow: Boolean!
+  isHideOnMobile: Boolean!
   theme: String!
   createdAt: Int!
   updatedAt: Int!
@@ -35,7 +36,6 @@ type Episode {
   desc: String!
   cover: String!
   url: String!
-  mobileURL: String!
   subtitles:  [Subtitle!]!
   createdAt: Int!
   updatedAt: Int!
@@ -58,6 +58,7 @@ input NewVideo {
   cover: String
   tags: [String!]
   isShow: Boolean!
+  isHideOnMobile: Boolean!
   theme: String!
 }
 
@@ -95,6 +96,7 @@ input NewUpdateVideo{
   cover: String
   tags: [String!]
   isShow: Boolean 
+  isHideOnMobile: Boolean
   theme: String!
 }
 
@@ -106,11 +108,6 @@ input NewUpdateEpisode{
   cover: String
   url: String!
   subtitles:  [NewSubtitle!]  
-}
-
-input NewUpdateMobileVideos{
-  id:ID!
-  videoURLs:[String!]!
 }
 
 type VideoSeries {
@@ -167,4 +164,13 @@ type VideoIndexConnection {
   totalCount: Int!
   edges:[VideoIndex!]!
   aggResults:[AggResult!]
+}
+
+input VideoSearchParam{
+  keyword: String
+  tags:[String!]
+  page: Int
+  pageSize: Int
+  isRandom: Boolean
+  isMobile: Boolean
 }

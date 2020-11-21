@@ -16,7 +16,6 @@ type Episode struct {
 	Desc      string `gorm:"size:5000;NOT NULL;"`
 	Cover     string `gorm:"size:500;NOT NULL;"`
 	URL       string `gorm:"size:500;NOT NULL;"`
-	MobileURL string `gorm:"size:500;"`
 	Subtitles []*Subtitle
 }
 
@@ -31,14 +30,15 @@ type Subtitle struct {
 //Video 视频
 type Video struct {
 	gorm.Model
-	Title    string `gorm:"size:50;NOT NULL;"`
-	Desc     string `gorm:"size:5000;NOT NULL;"`
-	PubDate  time.Time
-	Cover    string `gorm:"size:500;NOT NULL;"`
-	Episodes []*Episode
-	Tags     pq.StringArray `gorm:"type:varchar(10)[]"`
-	IsShow   bool
-	Theme    string `gorm:"size:50;"`
+	Title          string `gorm:"size:50;NOT NULL;"`
+	Desc           string `gorm:"size:5000;NOT NULL;"`
+	PubDate        time.Time
+	Cover          string `gorm:"size:500;NOT NULL;"`
+	Episodes       []*Episode
+	Tags           pq.StringArray `gorm:"type:varchar(10)[]"`
+	IsShow         bool
+	IsHideOnMobile bool
+	Theme          string `gorm:"size:50;"`
 }
 
 //VideoSeriesItem 视频系列视频列表

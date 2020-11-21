@@ -161,7 +161,6 @@ type ComplexityRoot struct {
 		CreatedAt func(childComplexity int) int
 		Desc      func(childComplexity int) int
 		ID        func(childComplexity int) int
-		MobileURL func(childComplexity int) int
 		Num       func(childComplexity int) int
 		Subtitles func(childComplexity int) int
 		Title     func(childComplexity int) int
@@ -225,7 +224,6 @@ type ComplexityRoot struct {
 		UpdateDeviceDashboard          func(childComplexity int, input model.NewUpdateDeviceDashboard) int
 		UpdateDeviceModel              func(childComplexity int, input model.NewUpdateDeviceModel) int
 		UpdateEpisode                  func(childComplexity int, input model.NewUpdateEpisode) int
-		UpdateMobileVideo              func(childComplexity int, input *model.NewUpdateMobileVideos) int
 		UpdatePassword                 func(childComplexity int, oldPassword string, newPassword string) int
 		UpdateProfile                  func(childComplexity int, input model.NewUpdateProfile) int
 		UpdateTelemetryModel           func(childComplexity int, input model.NewUpdateTelemetryModel) int
@@ -250,7 +248,7 @@ type ComplexityRoot struct {
 		Histories           func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
 		HistoryInfo         func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL        func(childComplexity int, bucketName string, objectName string) int
-		SearchVideo         func(childComplexity int, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) int
+		SearchVideo         func(childComplexity int, input model.VideoSearchParam) int
 		SimilarVideos       func(childComplexity int, videoID int64, pageSize int64) int
 		ThingAnalyze        func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries         func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
@@ -350,17 +348,18 @@ type ComplexityRoot struct {
 	}
 
 	Video struct {
-		Cover     func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		Desc      func(childComplexity int) int
-		Episodes  func(childComplexity int) int
-		ID        func(childComplexity int) int
-		IsShow    func(childComplexity int) int
-		PubDate   func(childComplexity int) int
-		Tags      func(childComplexity int) int
-		Theme     func(childComplexity int) int
-		Title     func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
+		Cover          func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		Desc           func(childComplexity int) int
+		Episodes       func(childComplexity int) int
+		ID             func(childComplexity int) int
+		IsHideOnMobile func(childComplexity int) int
+		IsShow         func(childComplexity int) int
+		PubDate        func(childComplexity int) int
+		Tags           func(childComplexity int) int
+		Theme          func(childComplexity int) int
+		Title          func(childComplexity int) int
+		UpdatedAt      func(childComplexity int) int
 	}
 
 	VideoConnection struct {
@@ -417,7 +416,6 @@ type MutationResolver interface {
 	UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error)
 	CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error)
 	UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error)
-	UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error)
 	CreateVideoSeries(ctx context.Context, input model.NewVideoSeries) (*model.VideoSeries, error)
 	UpdateVideoSeries(ctx context.Context, input model.NewUpdateVideoSeries) (*model.VideoSeries, error)
 	CreateVideoSeriesItem(ctx context.Context, input model.NewVideoSeriesItem) (*model.VideoSeriesItem, error)
@@ -450,7 +448,7 @@ type QueryResolver interface {
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
 	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error)
 	VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
-	SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) (*model.VideoIndexConnection, error)
+	SearchVideo(ctx context.Context, input model.VideoSearchParam) (*model.VideoIndexConnection, error)
 	SimilarVideos(ctx context.Context, videoID int64, pageSize int64) (*model.VideoIndexConnection, error)
 	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
@@ -1045,13 +1043,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Episode.ID(childComplexity), true
 
-	case "Episode.mobileURL":
-		if e.complexity.Episode.MobileURL == nil {
-			break
-		}
-
-		return e.complexity.Episode.MobileURL(childComplexity), true
-
 	case "Episode.num":
 		if e.complexity.Episode.Num == nil {
 			break
@@ -1554,18 +1545,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateEpisode(childComplexity, args["input"].(model.NewUpdateEpisode)), true
 
-	case "Mutation.updateMobileVideo":
-		if e.complexity.Mutation.UpdateMobileVideo == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateMobileVideo_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateMobileVideo(childComplexity, args["input"].(*model.NewUpdateMobileVideos)), true
-
 	case "Mutation.updatePassword":
 		if e.complexity.Mutation.UpdatePassword == nil {
 			break
@@ -1777,7 +1756,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.SearchVideo(childComplexity, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64), args["isRandom"].(*bool)), true
+		return e.complexity.Query.SearchVideo(childComplexity, args["input"].(model.VideoSearchParam)), true
 
 	case "Query.similarVideos":
 		if e.complexity.Query.SimilarVideos == nil {
@@ -2337,6 +2316,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Video.ID(childComplexity), true
 
+	case "Video.isHideOnMobile":
+		if e.complexity.Video.IsHideOnMobile == nil {
+			break
+		}
+
+		return e.complexity.Video.IsHideOnMobile(childComplexity), true
+
 	case "Video.isShow":
 		if e.complexity.Video.IsShow == nil {
 			break
@@ -2617,7 +2603,8 @@ type PieLineSerieData{
 type AggResult{
     key: String!
     value: Int!
-}`, BuiltIn: false},
+}
+`, BuiltIn: false},
 	&ast.Source{Name: "graph/device.graphql", Input: `type DeviceModel {
   id: ID!
   name: String!
@@ -2870,7 +2857,7 @@ type Query {
   userInfo(uid:ID):User!
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
   videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
-  searchVideo(keyword:String,tags:[String!],page: Int, pageSize: Int,isRandom:Boolean):VideoIndexConnection!
+  searchVideo(input:VideoSearchParam!):VideoIndexConnection!
   similarVideos(videoID:ID!,pageSize:Int!):VideoIndexConnection!
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
@@ -2897,7 +2884,6 @@ type Mutation {
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
-  updateMobileVideo(input:NewUpdateMobileVideos):Video!
   createVideoSeries(input: NewVideoSeries!): VideoSeries!
   updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!
   createVideoSeriesItem(input:NewVideoSeriesItem!):VideoSeriesItem!
@@ -3055,6 +3041,7 @@ type LoginResponse{
   episodes: [Episode!]!
   tags: [String!]
   isShow: Boolean!
+  isHideOnMobile: Boolean!
   theme: String!
   createdAt: Int!
   updatedAt: Int!
@@ -3083,7 +3070,6 @@ type Episode {
   desc: String!
   cover: String!
   url: String!
-  mobileURL: String!
   subtitles:  [Subtitle!]!
   createdAt: Int!
   updatedAt: Int!
@@ -3106,6 +3092,7 @@ input NewVideo {
   cover: String
   tags: [String!]
   isShow: Boolean!
+  isHideOnMobile: Boolean!
   theme: String!
 }
 
@@ -3143,6 +3130,7 @@ input NewUpdateVideo{
   cover: String
   tags: [String!]
   isShow: Boolean 
+  isHideOnMobile: Boolean
   theme: String!
 }
 
@@ -3154,11 +3142,6 @@ input NewUpdateEpisode{
   cover: String
   url: String!
   subtitles:  [NewSubtitle!]  
-}
-
-input NewUpdateMobileVideos{
-  id:ID!
-  videoURLs:[String!]!
 }
 
 type VideoSeries {
@@ -3216,7 +3199,15 @@ type VideoIndexConnection {
   edges:[VideoIndex!]!
   aggResults:[AggResult!]
 }
-`, BuiltIn: false},
+
+input VideoSearchParam{
+  keyword: String
+  tags:[String!]
+  page: Int
+  pageSize: Int
+  isRandom: Boolean
+  isMobile: Boolean
+}`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -3638,20 +3629,6 @@ func (ec *executionContext) field_Mutation_updateEpisode_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateMobileVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *model.NewUpdateMobileVideos
-	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalONewUpdateMobileVideos2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateMobileVideos(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updatePassword_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4023,46 +4000,14 @@ func (ec *executionContext) field_Query_presignedUrl_args(ctx context.Context, r
 func (ec *executionContext) field_Query_searchVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["keyword"]; ok {
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	var arg0 model.VideoSearchParam
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNVideoSearchParam2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoSearchParam(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["keyword"] = arg0
-	var arg1 []string
-	if tmp, ok := rawArgs["tags"]; ok {
-		arg1, err = ec.unmarshalOString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["tags"] = arg1
-	var arg2 *int64
-	if tmp, ok := rawArgs["page"]; ok {
-		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["page"] = arg2
-	var arg3 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
-		arg3, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["pageSize"] = arg3
-	var arg4 *bool
-	if tmp, ok := rawArgs["isRandom"]; ok {
-		arg4, err = ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["isRandom"] = arg4
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -7257,40 +7202,6 @@ func (ec *executionContext) _Episode_url(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Episode_mobileURL(ctx context.Context, field graphql.CollectedField, obj *model.Episode) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Episode",
-		Field:    field,
-		Args:     nil,
-		IsMethod: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.MobileURL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Episode_subtitles(ctx context.Context, field graphql.CollectedField, obj *model.Episode) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -8427,47 +8338,6 @@ func (ec *executionContext) _Mutation_updateEpisode(ctx context.Context, field g
 	res := resTmp.(*model.Episode)
 	fc.Result = res
 	return ec.marshalNEpisode2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Mutation_updateMobileVideo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Mutation",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_updateMobileVideo_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateMobileVideo(rctx, args["input"].(*model.NewUpdateMobileVideos))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Video)
-	fc.Result = res
-	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createVideoSeries(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -9826,7 +9696,7 @@ func (ec *executionContext) _Query_searchVideo(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SearchVideo(rctx, args["keyword"].(*string), args["tags"].([]string), args["page"].(*int64), args["pageSize"].(*int64), args["isRandom"].(*bool))
+		return ec.resolvers.Query().SearchVideo(rctx, args["input"].(model.VideoSearchParam))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12632,6 +12502,40 @@ func (ec *executionContext) _Video_isShow(ctx context.Context, field graphql.Col
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Video_isHideOnMobile(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Video",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsHideOnMobile, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Video_theme(ctx context.Context, field graphql.CollectedField, obj *model.Video) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -15242,30 +15146,6 @@ func (ec *executionContext) unmarshalInputNewUpdateEpisode(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputNewUpdateMobileVideos(ctx context.Context, obj interface{}) (model.NewUpdateMobileVideos, error) {
-	var it model.NewUpdateMobileVideos
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "id":
-			var err error
-			it.ID, err = ec.unmarshalNID2int64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "videoURLs":
-			var err error
-			it.VideoURLs, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputNewUpdateProfile(ctx context.Context, obj interface{}) (model.NewUpdateProfile, error) {
 	var it model.NewUpdateProfile
 	var asMap = obj.(map[string]interface{})
@@ -15572,6 +15452,12 @@ func (ec *executionContext) unmarshalInputNewUpdateVideo(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "isHideOnMobile":
+			var err error
+			it.IsHideOnMobile, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "theme":
 			var err error
 			it.Theme, err = ec.unmarshalNString2string(ctx, v)
@@ -15734,6 +15620,12 @@ func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "isHideOnMobile":
+			var err error
+			it.IsHideOnMobile, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "theme":
 			var err error
 			it.Theme, err = ec.unmarshalNString2string(ctx, v)
@@ -15833,6 +15725,54 @@ func (ec *executionContext) unmarshalInputSort(ctx context.Context, obj interfac
 		case "isAsc":
 			var err error
 			it.IsAsc, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputVideoSearchParam(ctx context.Context, obj interface{}) (model.VideoSearchParam, error) {
+	var it model.VideoSearchParam
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "keyword":
+			var err error
+			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tags":
+			var err error
+			it.Tags, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "page":
+			var err error
+			it.Page, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "pageSize":
+			var err error
+			it.PageSize, err = ec.unmarshalOInt2ᚖint64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRandom":
+			var err error
+			it.IsRandom, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isMobile":
+			var err error
+			it.IsMobile, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16524,11 +16464,6 @@ func (ec *executionContext) _Episode(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "mobileURL":
-			out.Values[i] = ec._Episode_mobileURL(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "subtitles":
 			out.Values[i] = ec._Episode_subtitles(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16773,11 +16708,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "updateEpisode":
 			out.Values[i] = ec._Mutation_updateEpisode(ctx, field)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "updateMobileVideo":
-			out.Values[i] = ec._Mutation_updateMobileVideo(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17723,6 +17653,11 @@ func (ec *executionContext) _Video(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = ec._Video_tags(ctx, field, obj)
 		case "isShow":
 			out.Values[i] = ec._Video_isShow(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isHideOnMobile":
+			out.Values[i] = ec._Video_isHideOnMobile(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19357,6 +19292,10 @@ func (ec *executionContext) marshalNVideoIndexConnection2ᚖgithubᚗcomᚋ9d77v
 	return ec._VideoIndexConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNVideoSearchParam2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoSearchParam(ctx context.Context, v interface{}) (model.VideoSearchParam, error) {
+	return ec.unmarshalInputVideoSearchParam(ctx, v)
+}
+
 func (ec *executionContext) marshalNVideoSeries2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐVideoSeries(ctx context.Context, sel ast.SelectionSet, v model.VideoSeries) graphql.Marshaler {
 	return ec._VideoSeries(ctx, sel, &v)
 }
@@ -20095,18 +20034,6 @@ func (ec *executionContext) unmarshalONewSubtitles2ᚖgithubᚗcomᚋ9d77vᚋpdc
 		return nil, nil
 	}
 	res, err := ec.unmarshalONewSubtitles2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewSubtitles(ctx, v)
-	return &res, err
-}
-
-func (ec *executionContext) unmarshalONewUpdateMobileVideos2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateMobileVideos(ctx context.Context, v interface{}) (model.NewUpdateMobileVideos, error) {
-	return ec.unmarshalInputNewUpdateMobileVideos(ctx, v)
-}
-
-func (ec *executionContext) unmarshalONewUpdateMobileVideos2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateMobileVideos(ctx context.Context, v interface{}) (*model.NewUpdateMobileVideos, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalONewUpdateMobileVideos2githubᚗcomᚋ9d77vᚋpdcᚋgraphᚋmodelᚐNewUpdateMobileVideos(ctx, v)
 	return &res, err
 }
 
