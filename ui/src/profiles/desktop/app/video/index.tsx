@@ -3,11 +3,16 @@ import { message } from 'antd'
 import React, { useEffect, useMemo } from 'react'
 import { GET_VIDEO_TAGS } from 'src/consts/video.gql'
 import VideoTagSuggest from 'src/profiles/common/video/VideoTagSuggest'
+import { isMobile } from 'src/utils/util'
 
 const VideoIndex = () => {
     const { error, data } = useQuery(GET_VIDEO_TAGS,
         {
-            variables: {}
+            variables: {
+                input: {
+                    isMobile: isMobile()
+                }
+            }
         }
     )
     useEffect(() => {

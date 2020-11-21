@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import {
     LIST_VIDEO, UPDATE_VIDEO,
     ADD_EPISODE, UPDATE_EPISODE,
-    SAVE_SUBTITLES, UPDATE_MOBILE_VIDEO
+    SAVE_SUBTITLES
 } from 'src/consts/video.gql'
 import { useQuery } from '@apollo/react-hooks'
 import { useMutation } from '@apollo/react-hooks'
@@ -18,9 +18,9 @@ import { TablePaginationConfig } from 'antd/lib/table'
 import { PlaySquareTwoTone } from '@ant-design/icons'
 import { SubtitleUpdateForm } from './SubtitleUpdateForm'
 import Search from 'antd/lib/input/Search'
-import { MobileVideoUpdateForm } from './MobileVideoUpdateForm'
 import { useHistory } from 'react-router-dom'
 import { AdminPath } from 'src/consts/path'
+import { IUpdateVideo } from 'src/models/video'
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -109,6 +109,7 @@ export default function VideoTable() {
         pubDate: 0,
         tags: [],
         isShow: false,
+        isHideOnMobile: false,
         theme: ""
     })
     const [updateEpisodeVisible, setUpdateEpisodeVisible] = useState(false)
@@ -123,7 +124,6 @@ export default function VideoTable() {
         subtitles: [],
     })
     const [updateSubtitleVisible, setUpdateSubtitleVisible] = useState(false)
-    const [updateMobileVideoVisible, setUpdateMobileVideoVisible] = useState(false)
 
     const [pagination, setPagination] = useState({
         current: 1,
@@ -146,7 +146,6 @@ export default function VideoTable() {
     const [addEpisode] = useMutation(ADD_EPISODE)
     const [updateEpisode] = useMutation(UPDATE_EPISODE)
     const [saveSubtitles] = useMutation(SAVE_SUBTITLES)
-    const [updateMobileVideo] = useMutation(UPDATE_MOBILE_VIDEO)
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
             variables: {
@@ -178,6 +177,7 @@ export default function VideoTable() {
                     "pubDate": values.pubDate ? values.pubDate.unix() : 0,
                     "tags": values.tags || [],
                     "isShow": values.isShow,
+                    "isHideOnMobile": values.isHideOnMobile,
                     "theme": values.theme
                 }
             }
@@ -235,18 +235,6 @@ export default function VideoTable() {
         })
         setUpdateSubtitleVisible(false)
         await refetch()
-    }
-
-    const onMobileVideoUpdate = async (values: any) => {
-        await updateMobileVideo({
-            variables: {
-                "input": {
-                    "id": currentVideoID,
-                    "videoURLs": values.videoURLs,
-                }
-            }
-        })
-        setUpdateMobileVideoVisible(false)
     }
 
     const onChange = (pageConfig: TablePaginationConfig) => {
@@ -341,6 +329,12 @@ export default function VideoTable() {
                 value ? "是" : "否"
             )
         },
+        {
+            title: '是否手机隐藏', dataIndex: 'isHideOnMobile', key: 'isHideOnMobile',
+            render: (value: Boolean, record: any) => (
+                value ? "是" : "否"
+            )
+        },
         // {
         //     title: '主题', dataIndex: 'theme', key: 'theme', width: 80,
         //     render: (value: string, record: any) => (
@@ -367,6 +361,7 @@ export default function VideoTable() {
                             pubDate: record.pubDate,
                             tags: record.tags || [],
                             isShow: record.isShow,
+                            isHideOnMobile: record.isHideOnMobile,
                             theme: record.theme
                         })
                         setUpdateVideoVisible(true)
@@ -382,11 +377,6 @@ export default function VideoTable() {
                             setCurrentVideoID(record.id)
                             setUpdateSubtitleVisible(true)
                         }}>更换字幕</Button>
-                    <Button
-                        onClick={() => {
-                            setCurrentVideoID(record.id)
-                            setUpdateMobileVideoVisible(true)
-                        }}>更换视频</Button>
                 </span>
         }
     ]
@@ -436,14 +426,6 @@ export default function VideoTable() {
                 onUpdate={onSubtitleUpdate}
                 onCancel={() => {
                     setUpdateSubtitleVisible(false)
-                }}
-            />
-            <MobileVideoUpdateForm
-                visible={updateMobileVideoVisible}
-                videoID={currentVideoID}
-                onUpdate={onMobileVideoUpdate}
-                onCancel={() => {
-                    setUpdateMobileVideoVisible(false)
                 }}
             />
             <Modal

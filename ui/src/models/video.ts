@@ -22,3 +22,14 @@ export interface VideoCardModel {
     cover: string
     totalNum: number
 }
+
+export interface IUpdateVideo {
+    title: string,
+    desc: string,
+    cover: string,
+    pubDate: number,
+    tags: string[],
+    isShow: boolean,
+    isHideOnMobile: boolean,
+    theme: string
+}

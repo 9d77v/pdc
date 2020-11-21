@@ -48,13 +48,6 @@ mutation updateEpisode($input:NewUpdateEpisode!){
 }
 `
 
-const UPDATE_MOBILE_VIDEO = gql`
-mutation updateMobileVideo($input:NewUpdateMobileVideos!){
-  updateMobileVideo(input:$input){
-     id
-   }
-}
-`
 const LIST_VIDEO = gql`
  query videos($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
    videos(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
@@ -80,6 +73,7 @@ const LIST_VIDEO = gql`
             updatedAt
             }
             isShow
+            isHideOnMobile
             theme
             tags
             createdAt
@@ -90,8 +84,8 @@ const LIST_VIDEO = gql`
 `;
 
 const LIST_VIDEO_CARD = gql`
- query searchVideo($keyword:String,$tags:[String!],  $page: Int, $pageSize: Int) {
-   searchVideo(keyword:$keyword,tags:$tags,page: $page, pageSize: $pageSize){
+ query searchVideo($input:VideoSearchParam!) {
+   searchVideo(input:$input){
        edges{
             id
             title
@@ -109,8 +103,8 @@ const LIST_VIDEO_CARD = gql`
 `;
 
 const GET_VIDEO_TAGS = gql`
- query searchVideo($page:Int=1) {
-   searchVideo(page: $page){
+ query searchVideo($input:VideoSearchParam!) {
+   searchVideo(input:$input){
     aggResults{
          key
          value
@@ -120,8 +114,8 @@ const GET_VIDEO_TAGS = gql`
 `;
 
 const VIDEO_RANDOM_TAG_SUGGEST = gql`
- query searchVideo($tag:String!,$pageSize:Int!) {
-   searchVideo(tags:[$tag],page: 1, pageSize:$pageSize,isRandom:true){
+    query searchVideo($input:VideoSearchParam!) {
+   searchVideo(input:$input){
        edges{
             id
             title
@@ -174,7 +168,6 @@ const GET_VIDEO = gql`
               desc
               cover
               url
-              mobileURL
               subtitles{
                   name
                   url
@@ -262,7 +255,7 @@ export {
   ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES,
   LIST_VIDEO, VIDEO_COMBO, UPDATE_VIDEO, ADD_EPISODE,
   UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, GET_VIDEO_TAGS,
-  UPDATE_MOBILE_VIDEO, VIDEO_RANDOM_TAG_SUGGEST, SIMILAR_VIDEOS,
+  VIDEO_RANDOM_TAG_SUGGEST, SIMILAR_VIDEOS,
   LIST_VIDEO_SERIES, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
   ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
 }
