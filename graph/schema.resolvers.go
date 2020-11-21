@@ -63,10 +63,6 @@ func (r *mutationResolver) UpdateEpisode(ctx context.Context, input model.NewUpd
 	return videoService.UpdateEpisode(ctx, input)
 }
 
-func (r *mutationResolver) UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error) {
-	return videoService.UpdateMobileVideo(ctx, input)
-}
-
 func (r *mutationResolver) CreateVideoSeries(ctx context.Context, input model.NewVideoSeries) (*model.VideoSeries, error) {
 	return videoService.CreateVideoSeries(ctx, input)
 }
@@ -213,11 +209,10 @@ func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, vide
 	return con, err
 }
 
-func (r *queryResolver) SearchVideo(ctx context.Context, keyword *string, tags []string, page *int64, pageSize *int64, isRandom *bool) (*model.VideoIndexConnection, error) {
+func (r *queryResolver) SearchVideo(ctx context.Context, input model.VideoSearchParam) (*model.VideoIndexConnection, error) {
 	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, aggResults, err := videoService.ListVideoIndex(ctx, keyword, tags,
-		page, pageSize, scheme, isRandom)
+	total, data, aggResults, err := videoService.ListVideoIndex(ctx, input, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	con.AggResults = aggResults

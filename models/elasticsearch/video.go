@@ -14,23 +14,24 @@ import (
 
 //VideoIndex 视频索引
 type VideoIndex struct {
-	ID          uint           `json:"id"`
-	Title       string         `json:"title"`
-	Desc        string         `json:"desc"`
-	PubDate     int64          `json:"pub_date"`
-	Cover       string         `json:"cover"`
-	TotalNum    int32          `json:"total_num"`
-	Tags        pq.StringArray `gorm:"type:varchar(10)[]" json:"tags"`
-	IsShow      bool           `json:"is_show"`
-	SeriesID    uint           `json:"series_id"`
-	SeriesName  string         `json:"series_name"`
-	SeriesAlias string         `json:"series_alias"`
-	SeriesNum   uint           `json:"series_num"`
+	ID             uint           `json:"id"`
+	Title          string         `json:"title"`
+	Desc           string         `json:"desc"`
+	PubDate        int64          `json:"pub_date"`
+	Cover          string         `json:"cover"`
+	TotalNum       int32          `json:"total_num"`
+	Tags           pq.StringArray `gorm:"type:varchar(10)[]" json:"tags"`
+	IsShow         bool           `json:"is_show"`
+	IsHideOnMobile bool           `json:"is_hide_on_mobile"`
+	SeriesID       uint           `json:"series_id"`
+	SeriesName     string         `json:"series_name"`
+	SeriesAlias    string         `json:"series_alias"`
+	SeriesNum      uint           `json:"series_num"`
 }
 
 //GetByID ..
 func (v *VideoIndex) GetByID(id string) error {
-	return models.Gorm.Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,c.video_series_id series_id,
+	return models.Gorm.Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,a.is_hide_on_mobile,c.video_series_id series_id,
 	c.alias series_alias,c.num series_num,d.name series_name`).
 		Table(models.TablePrefix+"_video a").
 		Joins("left join (select video_id,count(video_id) total_num from "+models.TablePrefix+"_episode where video_id=? group by video_id) b on a.id=b.video_id", id).
@@ -42,7 +43,7 @@ func (v *VideoIndex) GetByID(id string) error {
 //Find ..
 func (v *VideoIndex) Find() ([]*VideoIndex, error) {
 	data := make([]*VideoIndex, 0)
-	err := models.Gorm.Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,c.video_series_id series_id,
+	err := models.Gorm.Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,a.is_hide_on_mobile,c.video_series_id series_id,
 	c.alias series_alias,c.num series_num,d.name series_name`).
 		Table(models.TablePrefix+"_video a").
 		Joins("left join (select video_id,count(video_id) total_num from "+models.TablePrefix+"_episode  group by video_id) b on a.id=b.video_id").

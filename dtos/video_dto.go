@@ -24,10 +24,6 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 		if e.URL != "" {
 			url = GetOSSPrefix(scheme) + e.URL
 		}
-		mobileURL := ""
-		if e.MobileURL != "" {
-			mobileURL = GetOSSPrefix(scheme) + e.MobileURL
-		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
 			Num:       e.Num,
@@ -35,7 +31,6 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 			Desc:      e.Desc,
 			Cover:     cover,
 			URL:       url,
-			MobileURL: mobileURL,
 			Subtitles: sArr,
 			CreatedAt: e.CreatedAt.Unix(),
 			UpdatedAt: e.UpdatedAt.Unix(),
@@ -46,17 +41,18 @@ func ToVideoDto(m *models.Video, scheme string) *model.Video {
 		cover = GetOSSPrefix(scheme) + m.Cover
 	}
 	return &model.Video{
-		ID:        int64(m.ID),
-		Title:     m.Title,
-		Desc:      m.Desc,
-		PubDate:   m.PubDate.Unix(),
-		Episodes:  es,
-		Cover:     cover,
-		Tags:      m.Tags,
-		IsShow:    m.IsShow,
-		Theme:     m.Theme,
-		CreatedAt: m.CreatedAt.Unix(),
-		UpdatedAt: m.UpdatedAt.Unix(),
+		ID:             int64(m.ID),
+		Title:          m.Title,
+		Desc:           m.Desc,
+		PubDate:        m.PubDate.Unix(),
+		Episodes:       es,
+		Cover:          cover,
+		Tags:           m.Tags,
+		IsShow:         m.IsShow,
+		IsHideOnMobile: m.IsHideOnMobile,
+		Theme:          m.Theme,
+		CreatedAt:      m.CreatedAt.Unix(),
+		UpdatedAt:      m.UpdatedAt.Unix(),
 	}
 }
 

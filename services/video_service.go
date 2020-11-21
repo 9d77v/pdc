@@ -30,13 +30,14 @@ type VideoService struct {
 //CreateVideo ..
 func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*model.Video, error) {
 	m := &models.Video{
-		Title:   input.Title,
-		Desc:    ptrs.String(input.Desc),
-		PubDate: time.Unix(ptrs.Int64(input.PubDate), 0),
-		Cover:   ptrs.String(input.Cover),
-		Tags:    input.Tags,
-		IsShow:  input.IsShow,
-		Theme:   input.Theme,
+		Title:          input.Title,
+		Desc:           ptrs.String(input.Desc),
+		PubDate:        time.Unix(ptrs.Int64(input.PubDate), 0),
+		Cover:          ptrs.String(input.Cover),
+		Tags:           input.Tags,
+		IsShow:         input.IsShow,
+		IsHideOnMobile: input.IsHideOnMobile,
+		Theme:          input.Theme,
 	}
 	err := models.Gorm.Create(m).Error
 	if err != nil {
@@ -124,12 +125,13 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
-		"title":    ptrs.String(input.Title),
-		"pub_date": time.Unix(ptrs.Int64(input.PubDate), 0),
-		"desc":     ptrs.String(input.Desc),
-		"tags":     &input.Tags,
-		"theme":    input.Theme,
-		"is_show":  ptrs.Bool(input.IsShow),
+		"title":             ptrs.String(input.Title),
+		"pub_date":          time.Unix(ptrs.Int64(input.PubDate), 0),
+		"desc":              ptrs.String(input.Desc),
+		"tags":              &input.Tags,
+		"theme":             input.Theme,
+		"is_show":           ptrs.Bool(input.IsShow),
+		"is_hide_on_mobile": ptrs.Bool(input.IsHideOnMobile),
 	}
 	if input.Cover != nil {
 		updateMap["cover"] = ptrs.String(input.Cover)
@@ -155,18 +157,20 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 		tx.Rollback()
 		return nil, err
 	}
-	subtitles := make([]*models.Subtitle, 0, len(input.Subtitles))
-	for _, v := range input.Subtitles {
-		subtitles = append(subtitles, &models.Subtitle{
-			EpisodeID: e.ID,
-			Name:      v.Name,
-			URL:       v.URL,
-		})
-	}
-	err = tx.Create(&subtitles).Error
-	if err != nil {
-		tx.Rollback()
-		return nil, err
+	if len(input.Subtitles) > 0 {
+		subtitles := make([]*models.Subtitle, 0, len(input.Subtitles))
+		for _, v := range input.Subtitles {
+			subtitles = append(subtitles, &models.Subtitle{
+				EpisodeID: e.ID,
+				Name:      v.Name,
+				URL:       v.URL,
+			})
+		}
+		err = tx.Create(&subtitles).Error
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
 	}
 	tx.Commit()
 	sendMsgToUpdateES(input.VideoID)
@@ -218,37 +222,6 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 	}
 	tx.Commit()
 	return &model.Episode{ID: int64(episode.ID)}, err
-}
-
-//UpdateMobileVideo ..
-func (s VideoService) UpdateMobileVideo(ctx context.Context, input *model.NewUpdateMobileVideos) (*model.Video, error) {
-	data := make([]*models.Episode, 0)
-	if err := models.Gorm.Select("id,subtitles").Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
-		return nil, err
-	}
-	if len(input.VideoURLs) > 0 && len(input.VideoURLs) != len(data) {
-		return nil, errors.New("移动端视频与已有视频数量不一致")
-	}
-	if len(input.VideoURLs) == 0 {
-		for _, d := range data {
-			err := models.Gorm.Model(d).Updates(map[string]interface{}{
-				"mobile_url": "",
-			}).Error
-			if err != nil {
-				return nil, err
-			}
-		}
-	} else {
-		for i, d := range data {
-			err := models.Gorm.Model(d).Updates(map[string]interface{}{
-				"mobile_url": input.VideoURLs[i],
-			}).Error
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-	return &model.Video{ID: int64(input.ID)}, nil
 }
 
 //ListVideo ..
@@ -483,12 +456,10 @@ func sendMsgToUpdateES(videoID int64) {
 }
 
 //ListVideoIndex ..
-func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
-	tags []string, page *int64, pageSize *int64, scheme string,
-	isRandom *bool) (int64, []*model.VideoIndex, []*model.AggResult, error) {
+func (s VideoService) ListVideoIndex(ctx context.Context, input model.VideoSearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	boolQuery := elastic.NewBoolQuery()
-	keywordStr := strings.ReplaceAll(ptrs.String(keyword), " ", "")
+	keywordStr := strings.ReplaceAll(ptrs.String(input.Keyword), " ", "")
 	if keywordStr != "" {
 		subBoolQuery := elastic.NewMultiMatchQuery(keywordStr, []string{
 			"title^10",
@@ -511,18 +482,24 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
 
 		boolQuery.Must(subBoolQuery)
 	}
-	offset, limit := GetElasticPageInfo(page, pageSize)
+	offset, limit := GetElasticPageInfo(input.Page, input.PageSize)
 	filterQueries := make([]elastic.Query, 0)
 	filterQueries = append(filterQueries, elastic.NewTermQuery("is_show", true))
-	if len(tags) > 0 {
-		for _, v := range tags {
+
+	if len(input.Tags) > 0 {
+		for _, v := range input.Tags {
 			if v != "" {
 				filterQueries = append(filterQueries, elastic.NewTermQuery("tags", v))
 			}
 		}
 	}
+
+	mustNotFilterQueries := make([]elastic.Query, 0)
+	if ptrs.Bool(input.IsMobile) {
+		mustNotFilterQueries = append(mustNotFilterQueries, elastic.NewTermQuery("is_hide_on_mobile", true))
+	}
 	filterQuery := elastic.NewBoolQuery().
-		Must(filterQueries...)
+		Must(filterQueries...).MustNot(mustNotFilterQueries...)
 	boolQuery.Filter(filterQuery)
 	searchService := elasticsearch.ESClient.Search().
 		Index(elasticsearch.AliasVideo).
@@ -537,7 +514,7 @@ func (s VideoService) ListVideoIndex(ctx context.Context, keyword *string,
 		searchService = es.Aggs(searchService, aggsParams...)
 	}
 	if fieldMap["edges"] {
-		if ptrs.Bool(isRandom) {
+		if ptrs.Bool(input.IsRandom) {
 			searchService.SortBy(elastic.NewScriptSort(elastic.NewScript("Math.random()"), "number").Order(true))
 		} else {
 			searchService.Sort("_score", false).

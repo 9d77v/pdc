@@ -8,7 +8,7 @@ type Query {
   userInfo(uid:ID):User!
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
   videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
-  searchVideo(keyword:String,tags:[String!],page: Int, pageSize: Int,isRandom:Boolean):VideoIndexConnection!
+  searchVideo(input:VideoSearchParam!):VideoIndexConnection!
   similarVideos(videoID:ID!,pageSize:Int!):VideoIndexConnection!
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
@@ -35,7 +35,6 @@ type Mutation {
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!
   updateEpisode(input:NewUpdateEpisode!):Episode!
-  updateMobileVideo(input:NewUpdateMobileVideos):Video!
   createVideoSeries(input: NewVideoSeries!): VideoSeries!
   updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!
   createVideoSeriesItem(input:NewVideoSeriesItem!):VideoSeriesItem!

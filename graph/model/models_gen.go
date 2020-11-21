@@ -123,7 +123,6 @@ type Episode struct {
 	Desc      string      `json:"desc"`
 	Cover     string      `json:"cover"`
 	URL       string      `json:"url"`
-	MobileURL string      `json:"mobileURL"`
 	Subtitles []*Subtitle `json:"subtitles"`
 	CreatedAt int64       `json:"createdAt"`
 	UpdatedAt int64       `json:"updatedAt"`
@@ -290,11 +289,6 @@ type NewUpdateEpisode struct {
 	Subtitles []*NewSubtitle `json:"subtitles"`
 }
 
-type NewUpdateMobileVideos struct {
-	ID        int64    `json:"id"`
-	VideoURLs []string `json:"videoURLs"`
-}
-
 type NewUpdateProfile struct {
 	Avatar    *string `json:"avatar"`
 	Gender    *int64  `json:"gender"`
@@ -343,14 +337,15 @@ type NewUpdateUser struct {
 }
 
 type NewUpdateVideo struct {
-	ID      int64    `json:"id"`
-	Title   *string  `json:"title"`
-	Desc    *string  `json:"desc"`
-	PubDate *int64   `json:"pubDate"`
-	Cover   *string  `json:"cover"`
-	Tags    []string `json:"tags"`
-	IsShow  *bool    `json:"isShow"`
-	Theme   string   `json:"theme"`
+	ID             int64    `json:"id"`
+	Title          *string  `json:"title"`
+	Desc           *string  `json:"desc"`
+	PubDate        *int64   `json:"pubDate"`
+	Cover          *string  `json:"cover"`
+	Tags           []string `json:"tags"`
+	IsShow         *bool    `json:"isShow"`
+	IsHideOnMobile *bool    `json:"isHideOnMobile"`
+	Theme          string   `json:"theme"`
 }
 
 type NewUpdateVideoSeries struct {
@@ -375,13 +370,14 @@ type NewUser struct {
 }
 
 type NewVideo struct {
-	Title   string   `json:"title"`
-	Desc    *string  `json:"desc"`
-	PubDate *int64   `json:"pubDate"`
-	Cover   *string  `json:"cover"`
-	Tags    []string `json:"tags"`
-	IsShow  bool     `json:"isShow"`
-	Theme   string   `json:"theme"`
+	Title          string   `json:"title"`
+	Desc           *string  `json:"desc"`
+	PubDate        *int64   `json:"pubDate"`
+	Cover          *string  `json:"cover"`
+	Tags           []string `json:"tags"`
+	IsShow         bool     `json:"isShow"`
+	IsHideOnMobile bool     `json:"isHideOnMobile"`
+	Theme          string   `json:"theme"`
 }
 
 type NewVideoResource struct {
@@ -499,17 +495,18 @@ type UserConnection struct {
 }
 
 type Video struct {
-	ID        int64      `json:"id"`
-	Title     string     `json:"title"`
-	Desc      string     `json:"desc"`
-	PubDate   int64      `json:"pubDate"`
-	Cover     string     `json:"cover"`
-	Episodes  []*Episode `json:"episodes"`
-	Tags      []string   `json:"tags"`
-	IsShow    bool       `json:"isShow"`
-	Theme     string     `json:"theme"`
-	CreatedAt int64      `json:"createdAt"`
-	UpdatedAt int64      `json:"updatedAt"`
+	ID             int64      `json:"id"`
+	Title          string     `json:"title"`
+	Desc           string     `json:"desc"`
+	PubDate        int64      `json:"pubDate"`
+	Cover          string     `json:"cover"`
+	Episodes       []*Episode `json:"episodes"`
+	Tags           []string   `json:"tags"`
+	IsShow         bool       `json:"isShow"`
+	IsHideOnMobile bool       `json:"isHideOnMobile"`
+	Theme          string     `json:"theme"`
+	CreatedAt      int64      `json:"createdAt"`
+	UpdatedAt      int64      `json:"updatedAt"`
 }
 
 type VideoConnection struct {
@@ -529,6 +526,15 @@ type VideoIndexConnection struct {
 	TotalCount int64         `json:"totalCount"`
 	Edges      []*VideoIndex `json:"edges"`
 	AggResults []*AggResult  `json:"aggResults"`
+}
+
+type VideoSearchParam struct {
+	Keyword  *string  `json:"keyword"`
+	Tags     []string `json:"tags"`
+	Page     *int64   `json:"page"`
+	PageSize *int64   `json:"pageSize"`
+	IsRandom *bool    `json:"isRandom"`
+	IsMobile *bool    `json:"isMobile"`
 }
 
 type VideoSeries struct {
