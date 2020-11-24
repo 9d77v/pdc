@@ -39,11 +39,11 @@ docs https://domain.local/docs
 # Develop 
 ## run server
 ```
-./run dev
+make dev
 ```
-## run ui
+## run web
 ```
-./run ui
+make web
 ```
 ## reference docs
 gqlgen https://gqlgen.com/
