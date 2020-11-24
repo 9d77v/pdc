@@ -45,8 +45,8 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./elasticsearch/analysis-ik/custom:/usr/share/elasticsearch/config/analysis-ik/custom
-      - ./elasticsearch/analysis:/usr/share/elasticsearch/config/analysis
+      - ./configs/elasticsearch/analysis-ik/custom:/usr/share/elasticsearch/config/analysis-ik/custom
+      - ./configs/elasticsearch/analysis:/usr/share/elasticsearch/config/analysis
     container_name: elasticsearch
   db:
     image: postgres:12.1-alpine
@@ -71,12 +71,12 @@ services:
         - ./redis/data:/data
     container_name: redis
   pdc:
-    image: 9d77v/pdc:2020-11-19_4a72645
+    image: 9d77v/pdc:2020-11-24_162bfdd
     restart: always
     ports: 
       - 8080:8080
     env_file:
-      - pdc.env
+      - ./configs/pdc.env
     container_name: pdc
   # pdc-device-esp8266-sht3x:
   #   image: 9d77v/pdc-device-esp8266-sht3x:2020-11-19_7b2dda6
@@ -123,7 +123,7 @@ services:
       - ALICLOUD_ACCESS_KEY=
       - ALICLOUD_SECRET_KEY=
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy/config:/config/caddy
-      - ./caddy/data:/data/caddy
+      - ./configs/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./configs/caddy/config:/config/caddy
+      - ./configs/caddy/data:/data/caddy
     container_name: caddy

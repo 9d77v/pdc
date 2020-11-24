@@ -1,1 +1,5 @@
-ui/node_modules
+api
+build
+configs
+web/node_modules
+scripts
