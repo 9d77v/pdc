@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	minio "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -51,4 +52,19 @@ func initMinio() {
 			}
 		}
 	}
+}
+
+//GetPresignedURL ..
+func GetPresignedURL(ctx context.Context, bucketName, objectName, scheme string) (string, error) {
+	var minioClient *minio.Client
+	if scheme == "https" {
+		minioClient = SecureMinioClient
+	} else {
+		minioClient = MinioClient
+	}
+	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 6*time.Hour)
+	if err != nil {
+		return "", err
+	}
+	return u.String(), nil
 }

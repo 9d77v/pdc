@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -35,8 +38,14 @@ func NewIotSDK() *IotSDK {
 	}
 }
 
+//CronJob ..
+type CronJob struct {
+	Spec string
+	Cmd  func()
+}
+
 //Run 运行iot数据采集程序
-func (sdk *IotSDK) Run(works []func(), handleMsg func(msg []byte)) {
+func (sdk *IotSDK) Run(works []func(), jobs []*CronJob, handleMsg func(iotSDK *IotSDK, msg []byte)) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 	defer sdk.conn.Close()
@@ -52,11 +61,20 @@ func (sdk *IotSDK) Run(works []func(), handleMsg func(msg []byte)) {
 		go v()
 	}
 	cr := cron.New(cron.WithSeconds())
-	id, err := cr.AddFunc("*/10 * * * * *", func() {
-		sdk.pingCheck()
+	if jobs == nil {
+		jobs = make([]*CronJob, 0, 0)
+	}
+	jobs = append(jobs, &CronJob{
+		Spec: "*/10 * * * * *",
+		Cmd: func() {
+			sdk.pingCheck()
+		},
 	})
-	if err != nil {
-		log.Println("cron add func error,entityID:", id, " error:", err)
+	for _, job := range jobs {
+		id, err := cr.AddFunc(job.Spec, job.Cmd)
+		if err != nil {
+			log.Println("cron add func error,entityID:", id, " error:", err)
+		}
 	}
 	cr.Start()
 	defer cr.Stop()
@@ -68,7 +86,7 @@ func (sdk *IotSDK) Run(works []func(), handleMsg func(msg []byte)) {
 					log.Println("read:", err)
 					break
 				}
-				handleMsg(msg)
+				handleMsg(sdk, msg)
 			}
 		}
 	}()
@@ -137,28 +155,6 @@ func (sdk *IotSDK) SetDeviceAttributes(attributeMap map[uint32]string) {
 	request.Payload = &pb.DeviceUpMsg_SetAttributesMsg{
 		SetAttributesMsg: &pb.SetAttributesMsg{
 			AttributeMap: attributeMap,
-		},
-	}
-	requestMsg, err := proto.Marshal(request)
-	if err != nil {
-		log.Println("proto marshal error:", err)
-		return
-	}
-	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
-	if err != nil {
-		log.Printf("SetDeviceAttributes error:%v/n", err)
-	}
-}
-
-//ReplyCameraCapture ..
-func (sdk *IotSDK) ReplyCameraCapture(subject string, ok bool) {
-	request := new(pb.DeviceUpMsg)
-	request.DeviceId = sdk.DeviceInfo.Id
-	request.ActionTime = ptypes.TimestampNow()
-	request.Payload = &pb.DeviceUpMsg_CameraCaptureReplyMsg{
-		CameraCaptureReplyMsg: &pb.CameraCaptureReplyMsg{
-			Subject: subject,
-			Ok:      ok,
 		},
 	}
 	requestMsg, err := proto.Marshal(request)
@@ -249,4 +245,81 @@ func (sdk *IotSDK) ping(ip string) bool {
 		return statisticsArr[2] == " 0% packet loss"
 	}
 	return false
+}
+
+//ReplyCameraCapture ..
+func (sdk *IotSDK) ReplyCameraCapture(subject string, ok bool) {
+	request := new(pb.DeviceUpMsg)
+	request.DeviceId = sdk.DeviceInfo.Id
+	request.ActionTime = ptypes.TimestampNow()
+	request.Payload = &pb.DeviceUpMsg_CameraCaptureReplyMsg{
+		CameraCaptureReplyMsg: &pb.CameraCaptureReplyMsg{
+			Subject: subject,
+			Ok:      ok,
+		},
+	}
+	requestMsg, err := proto.Marshal(request)
+	if err != nil {
+		log.Println("proto marshal error:", err)
+		return
+	}
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
+	if err != nil {
+		log.Printf("SetDeviceAttributes error:%v/n", err)
+	}
+}
+
+//SendPresignedURLMsg ..
+func (sdk *IotSDK) SendPresignedURLMsg() {
+	request := new(pb.DeviceUpMsg)
+	presignedURLMsg := new(pb.PresignedUrlMsg)
+	now := time.Now()
+	presignedURLMsg.BucketName = "camera"
+	presignedURLMsg.ObjectName = "picture/" + strconv.FormatInt(int64(sdk.DeviceInfo.Id), 10) +
+		"/" + now.Format("2006-01-02") + "/tmp/" + strconv.FormatInt(now.Unix(), 10) + ".jpg"
+	request.DeviceId = sdk.DeviceInfo.Id
+	request.ActionTime = ptypes.TimestampNow()
+	request.Payload = &pb.DeviceUpMsg_PresignedUrlMsg{
+		PresignedUrlMsg: presignedURLMsg,
+	}
+	requestMsg, err := proto.Marshal(request)
+	if err != nil {
+		return
+	}
+	err = sdk.conn.WriteMessage(websocket.BinaryMessage, requestMsg)
+	if err != nil {
+		log.Println("send login msg:", err)
+		return
+	}
+}
+
+//PictureRequest ..
+type PictureRequest struct {
+	RequestURL      string
+	OssPrefix       string
+	SecureOssPrefix string
+	Picture         []byte
+}
+
+//SavePicture ..
+func (sdk *IotSDK) SavePicture(pr PictureRequest) error {
+	if pr.Picture == nil {
+		return errors.New("image should not be empty")
+	}
+	if strings.Contains(WSURL, "wss") {
+		pr.RequestURL = strings.Replace(pr.RequestURL,
+			pr.OssPrefix,
+			pr.SecureOssPrefix, 1)
+	}
+	req, err := http.NewRequest("PUT", pr.RequestURL, bytes.NewReader(pr.Picture))
+	if err != nil {
+		return err
+	}
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	_, err = ioutil.ReadAll(res.Body)
+	return err
 }

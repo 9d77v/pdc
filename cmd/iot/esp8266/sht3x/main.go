@@ -21,5 +21,5 @@ func main() {
 			sensors.SHT3x(iotSDK, r, 0)
 		},
 	}
-	iotSDK.Run(works, nil)
+	iotSDK.Run(works, nil, nil)
 }

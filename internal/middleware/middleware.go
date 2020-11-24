@@ -208,9 +208,6 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 				}
 				switch deviceMsg.Payload.(type) {
 				case *pb.DeviceDownMSG_CameraCaptureMsg:
-					if deviceMsg.GetCameraCaptureMsg() == nil {
-						return
-					}
 					deviceMsg.GetCameraCaptureMsg().NatsReply = m.Reply
 					requestMsg, err := proto.Marshal(deviceMsg)
 					if err != nil {
@@ -218,6 +215,11 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 					err = c.WriteMessage(websocket.BinaryMessage, requestMsg)
+					if err != nil {
+						log.Println("websocket write error:", err)
+					}
+				case *pb.DeviceDownMSG_PresignedUrlReplyMsg:
+					err = c.WriteMessage(websocket.BinaryMessage, m.Data)
 					if err != nil {
 						log.Println("websocket write error:", err)
 					}

@@ -43,7 +43,8 @@ make dev
 ```
 ## run web
 ```
-make web
+cd web
+yarn start
 ```
 ## reference docs
 gqlgen https://gqlgen.com/

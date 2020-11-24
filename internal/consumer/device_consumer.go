@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -100,7 +101,7 @@ func PublishDeviceData(m *stan.Msg) {
 	switch deviceMsg.Payload.(type) {
 	case *pb.DeviceUpMsg_SetTelemetriesMsg:
 		telemetryMsg := deviceMsg.GetSetTelemetriesMsg()
-		if telemetryMsg == nil || telemetryMsg.TelemetryMap == nil {
+		if telemetryMsg.TelemetryMap == nil {
 			return
 		}
 		for k, v := range telemetryMsg.TelemetryMap {
@@ -123,9 +124,6 @@ func PublishDeviceData(m *stan.Msg) {
 		}
 	case *pb.DeviceUpMsg_SetHealthMsg:
 		healthMsg := deviceMsg.GetSetHealthMsg()
-		if healthMsg == nil {
-			return
-		}
 		health := &pb.Health{
 			DeviceID:   deviceMsg.DeviceId,
 			ActionTime: deviceMsg.ActionTime,
@@ -140,6 +138,34 @@ func PublishDeviceData(m *stan.Msg) {
 			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceId), requestMsg).Err()
 		if err != nil {
 			log.Printf("publish error,err:%v/n", err)
+		}
+	case *pb.DeviceUpMsg_PresignedUrlMsg:
+		presignedURLMsg := deviceMsg.GetPresignedUrlMsg()
+		requestURL, err := db.GetPresignedURL(context.Background(), presignedURLMsg.BucketName, presignedURLMsg.ObjectName, "")
+		if err != nil {
+			return
+		}
+		subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(deviceMsg.DeviceId), 10)
+		request := new(pb.DeviceDownMSG)
+		presignedURLReplyMsg := &pb.DeviceDownMSG_PresignedUrlReplyMsg{
+			PresignedUrlReplyMsg: &pb.PresignedUrlReplyMsg{
+				PictureUrl:      requestURL,
+				OssPrefix:       db.OssPrefix,
+				SecureOssPrefix: db.SecureOssPrerix,
+			},
+		}
+		request.DeviceId = deviceMsg.DeviceId
+		request.ActionTime = ptypes.TimestampNow()
+		request.Payload = presignedURLReplyMsg
+		requestMsg, err := proto.Marshal(request)
+		if err != nil {
+			log.Println("marshal error:", err)
+			return
+		}
+		_, err = mq.Client.NatsConn().Request(subject, requestMsg, 5*time.Second)
+		if err != nil {
+			log.Println("send data error:", err)
+			return
 		}
 	}
 }

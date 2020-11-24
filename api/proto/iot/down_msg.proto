@@ -9,6 +9,7 @@ message DeviceDownMSG {
   oneof payload {
     LoginReplyMsg login_reply_msg = 3;
     CameraCaptureMsg camera_capture_msg = 4;
+    PresignedUrlReplyMsg presigned_url_reply_msg = 5;
   }
 }
 
@@ -28,4 +29,10 @@ message CameraCaptureMsg {
   string oss_prefix = 2;
   string secure_oss_prefix = 3;
   string nats_reply = 4;
+}
+
+message PresignedUrlReplyMsg {
+  string picture_url = 1;
+  string oss_prefix = 2;
+  string secure_oss_prefix = 3;
 }

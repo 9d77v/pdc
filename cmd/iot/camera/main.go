@@ -1,11 +1,7 @@
 package main
 
 import (
-	"bytes"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"strings"
 
 	"google.golang.org/protobuf/proto"
 
@@ -21,19 +17,14 @@ func main() {
 			updateDeviceAttributes(iotSDK)
 		},
 	}
-	iotSDK.Run(works, func(msg []byte) {
-		deviceMsg := new(pb.DeviceDownMSG)
-		err := proto.Unmarshal(msg, deviceMsg)
-		if err != nil {
-			log.Println("unmarshal data error")
-			return
-		}
-		switch deviceMsg.Payload.(type) {
-		case *pb.DeviceDownMSG_CameraCaptureMsg:
-			msg := deviceMsg.GetCameraCaptureMsg()
-			cameraCapture(iotSDK, msg)
-		}
+	cronJobs := make([]*sdk.CronJob, 0)
+	cronJobs = append(cronJobs, &sdk.CronJob{
+		Spec: "0 * * * * *",
+		Cmd: func() {
+			iotSDK.SendPresignedURLMsg()
+		},
 	})
+	iotSDK.Run(works, cronJobs, cameraMsgHandler)
 }
 
 func updateDeviceAttributes(iotSDK *sdk.IotSDK) {
@@ -50,38 +41,51 @@ func updateDeviceAttributes(iotSDK *sdk.IotSDK) {
 	}
 }
 
-//cameraCapture get picture from camera,then send to minio
-func cameraCapture(iotSDK *sdk.IotSDK, msg *pb.CameraCaptureMsg) {
+func cameraMsgHandler(iotSDK *sdk.IotSDK, msg []byte) {
+	deviceMsg := new(pb.DeviceDownMSG)
+	err := proto.Unmarshal(msg, deviceMsg)
+	if err != nil {
+		log.Println("unmarshal data error")
+		return
+	}
+	switch deviceMsg.Payload.(type) {
+	case *pb.DeviceDownMSG_CameraCaptureMsg:
+		msg := deviceMsg.GetCameraCaptureMsg()
+		handleCameraCaptureMsg(iotSDK, msg)
+	case *pb.DeviceDownMSG_PresignedUrlReplyMsg:
+		msg := deviceMsg.GetPresignedUrlReplyMsg()
+		handlePresignedURLReplyMsg(iotSDK, msg)
+	}
+}
+
+func handleCameraCaptureMsg(iotSDK *sdk.IotSDK, msg *pb.CameraCaptureMsg) {
 	device := iotSDK.DeviceInfo
-	imageByte := camera.Capture(int(device.CameraCompany), device.Ip, device.Username, device.Password)
-	if imageByte != nil {
-		requestURL := msg.GetPictureUrl()
-		if strings.Contains(sdk.WSURL, "wss") {
-			requestURL = strings.Replace(requestURL,
-				msg.GetOssPrefix(),
-				msg.GetSecureOssPrefix(), 1)
-		}
-		req, err := http.NewRequest("PUT", requestURL, bytes.NewReader(imageByte))
-		if err != nil {
-			log.Println("build http request faield,err:", err)
-			iotSDK.ReplyCameraCapture(msg.NatsReply, false)
-			return
-		}
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			log.Println("http request faield,err:", err)
-			iotSDK.ReplyCameraCapture(msg.NatsReply, false)
-			return
-		}
-		defer res.Body.Close()
-		_, err = ioutil.ReadAll(res.Body)
-		if err != nil {
-			log.Println("read body faield,err:", err)
-			iotSDK.ReplyCameraCapture(msg.NatsReply, false)
-			return
-		}
-		iotSDK.ReplyCameraCapture(msg.NatsReply, true)
+	picture := camera.Capture(int(device.CameraCompany), device.Ip, device.Username, device.Password)
+	captureOk := false
+	err := iotSDK.SavePicture(sdk.PictureRequest{
+		RequestURL:      msg.GetPictureUrl(),
+		OssPrefix:       msg.GetOssPrefix(),
+		SecureOssPrefix: msg.GetSecureOssPrefix(),
+		Picture:         picture,
+	})
+	if err != nil {
+		log.Println("Save Picture failed, ", err)
 	} else {
-		iotSDK.ReplyCameraCapture(msg.NatsReply, false)
+		captureOk = true
+	}
+	iotSDK.ReplyCameraCapture(msg.NatsReply, captureOk)
+}
+
+func handlePresignedURLReplyMsg(iotSDK *sdk.IotSDK, msg *pb.PresignedUrlReplyMsg) {
+	device := iotSDK.DeviceInfo
+	picture := camera.Capture(int(device.CameraCompany), device.Ip, device.Username, device.Password)
+	err := iotSDK.SavePicture(sdk.PictureRequest{
+		RequestURL:      msg.GetPictureUrl(),
+		OssPrefix:       msg.GetOssPrefix(),
+		SecureOssPrefix: msg.GetSecureOssPrefix(),
+		Picture:         picture,
+	})
+	if err != nil {
+		log.Println("Save Picture failed, ", err)
 	}
 }

@@ -12,6 +12,7 @@ message DeviceUpMsg {
     SetTelemetriesMsg set_telemetries_msg = 5;
     SetHealthMsg set_health_msg = 6;
     CameraCaptureReplyMsg camera_capture_reply_msg = 7;
+    PresignedUrlMsg presigned_url_msg = 8;
   }
 }
 
@@ -29,4 +30,9 @@ message SetHealthMsg { uint32 device_health = 1; }
 message CameraCaptureReplyMsg {
   string subject = 1;
   bool ok = 2;
+}
+
+message PresignedUrlMsg {
+  string bucketName = 1;
+  string objectName = 2;
 }
