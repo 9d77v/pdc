@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/9d77v/pdc/internal/consts"
+	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/module/user-service/models"
-	"github.com/9d77v/pdc/internal/mq"
 	"github.com/9d77v/pdc/internal/utils"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 	"github.com/gorilla/websocket"

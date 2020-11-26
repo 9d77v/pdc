@@ -11,10 +11,12 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/nats-io/stan.go"
 
-	"github.com/9d77v/pdc/internal/db"
 	"github.com/9d77v/pdc/internal/db/clickhouse"
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/db/mq"
+	"github.com/9d77v/pdc/internal/db/oss"
+	"github.com/9d77v/pdc/internal/db/redis"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
-	"github.com/9d77v/pdc/internal/mq"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 )
 
@@ -116,7 +118,7 @@ func PublishDeviceData(m *stan.Msg) {
 				log.Println("proto marshal error:", err)
 				return
 			}
-			err = db.RedisClient.Publish(context.Background(),
+			err = redis.Client.Publish(context.Background(),
 				fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceMsg.DeviceId, k), requestMsg).Err()
 			if err != nil {
 				log.Printf("publish error,err:%v/n", err)
@@ -134,14 +136,14 @@ func PublishDeviceData(m *stan.Msg) {
 			log.Println("proto marshal error:", err)
 			return
 		}
-		err = db.RedisClient.Publish(context.Background(),
+		err = redis.Client.Publish(context.Background(),
 			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceId), requestMsg).Err()
 		if err != nil {
 			log.Printf("publish error,err:%v/n", err)
 		}
 	case *pb.DeviceUpMsg_PresignedUrlMsg:
 		presignedURLMsg := deviceMsg.GetPresignedUrlMsg()
-		requestURL, err := db.GetPresignedURL(context.Background(), presignedURLMsg.BucketName, presignedURLMsg.ObjectName, "")
+		requestURL, err := oss.GetPresignedURL(context.Background(), presignedURLMsg.BucketName, presignedURLMsg.ObjectName, "")
 		if err != nil {
 			return
 		}
@@ -150,8 +152,8 @@ func PublishDeviceData(m *stan.Msg) {
 		presignedURLReplyMsg := &pb.DeviceDownMSG_PresignedUrlReplyMsg{
 			PresignedUrlReplyMsg: &pb.PresignedUrlReplyMsg{
 				PictureUrl:      requestURL,
-				OssPrefix:       db.OssPrefix,
-				SecureOssPrefix: db.SecureOssPrerix,
+				OssPrefix:       oss.OssPrefix,
+				SecureOssPrefix: oss.SecureOssPrerix,
 			},
 		}
 		request.DeviceId = deviceMsg.DeviceId

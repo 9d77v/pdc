@@ -12,8 +12,8 @@ import (
 
 	es "github.com/9d77v/go-lib/clients/elastic/v7"
 	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/db"
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 	"github.com/9d77v/pdc/internal/utils"
@@ -145,7 +145,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context, input model.VideoSearch
 			if err != nil {
 				log.Println("elastic search result json unmarshal error:", err)
 			}
-			vi.Cover = db.GetOSSPrefix(scheme) + vi.Cover
+			vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
 			vis = append(vis, &model.VideoIndex{
 				ID:       int64(vi.ID),
 				Title:    vi.Title,
@@ -232,7 +232,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context, input model.VideoSim
 		if err != nil {
 			log.Println("elastic search result json unmarshal error:", err)
 		}
-		vi.Cover = db.GetOSSPrefix(scheme) + vi.Cover
+		vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
 		vis = append(vis, &model.VideoIndex{
 			ID:       int64(vi.ID),
 			Title:    vi.Title,

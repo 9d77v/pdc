@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 )
 
 //User public user info
@@ -40,7 +40,7 @@ func HandleCard() func(w http.ResponseWriter, r *http.Request) {
 		}
 		user.UID = consts.GetEncodeUID(u.ID)
 		scheme := req.Header.Get("X-Forwarded-Proto")
-		user.Avatar = db.GetOSSPrefix(scheme) + u.Avatar
+		user.Avatar = oss.GetOSSPrefix(scheme) + u.Avatar
 		user.Name = u.Name
 		user.Gender = u.Gender
 		ret, err := json.Marshal(user)

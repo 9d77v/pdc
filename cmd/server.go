@@ -14,12 +14,12 @@ import (
 	"github.com/9d77v/wspush/redishub"
 	"github.com/nats-io/stan.go"
 
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/consumer"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph"
 	"github.com/9d77v/pdc/internal/graph/generated"
 	"github.com/9d77v/pdc/internal/middleware"
-	"github.com/9d77v/pdc/internal/mq"
 )
 
 const defaultPort = "8080"
@@ -29,28 +29,7 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-	mux := http.NewServeMux()
-	apiHandler := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
-	if db.DEBUG {
-		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
-	}
-	mux.Handle("/api", middleware.Auth()(apiHandler))
-	mux.HandleFunc("/pdc/", middleware.HandleCard())
-	mux.HandleFunc("/ws/iot/device", middleware.HandleIotDevice())
-	mux.HandleFunc("/ws/iot/telemetry", redishub.Hub.HandlerDynamicChannel(mq.SubjectDeviceTelemetryPrefix, middleware.CheckToken))
-	mux.HandleFunc("/ws/iot/health", redishub.Hub.HandlerDynamicChannel(mq.SubjectDeviceHealthPrefix, middleware.CheckToken))
-	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/build/index.html")
-	})
-	mux.HandleFunc("/app/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/build/index.html")
-	})
-	mux.HandleFunc("/admin/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/build/index.html")
-	})
-	mux.Handle("/", http.FileServer(http.Dir("web/build")))
 	errc := make(chan error)
-
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, os.Interrupt)
@@ -58,7 +37,7 @@ func main() {
 	}()
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: mux,
+		Handler: getServerMux(),
 	}
 	qsub1, err := mq.Client.QueueSubscribe(mq.SubjectVideo,
 		mq.GroupVideo, consumer.HandleVideoMSG)
@@ -90,7 +69,8 @@ func main() {
 			log.Println("qsub2 Close error:", err)
 		}
 	}()
-	qsub3, err := mq.Client.QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData, consumer.PublishDeviceData, stan.DurableName("dur"))
+	qsub3, err := mq.Client.QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
+		consumer.PublishDeviceData, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
@@ -119,4 +99,36 @@ func main() {
 		log.Println("server shut down error:", err)
 	}
 	log.Println("exited")
+}
+
+func getServerMux() *http.ServeMux {
+	mux := http.NewServeMux()
+	apiHandler := handler.NewDefaultServer(
+		generated.NewExecutableSchema(
+			generated.Config{
+				Resolvers: &graph.Resolver{},
+			},
+		),
+	)
+	if consts.DEBUG {
+		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
+	}
+	mux.Handle("/api", middleware.Auth()(apiHandler))
+	mux.HandleFunc("/pdc/", middleware.HandleCard())
+	mux.HandleFunc("/ws/iot/device", middleware.HandleIotDevice())
+	mux.HandleFunc("/ws/iot/telemetry",
+		redishub.Hub.HandlerDynamicChannel(mq.SubjectDeviceTelemetryPrefix, middleware.CheckToken))
+	mux.HandleFunc("/ws/iot/health",
+		redishub.Hub.HandlerDynamicChannel(mq.SubjectDeviceHealthPrefix, middleware.CheckToken))
+	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "web/build/index.html")
+	})
+	mux.HandleFunc("/app/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "web/build/index.html")
+	})
+	mux.HandleFunc("/admin/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "web/build/index.html")
+	})
+	mux.Handle("/", http.FileServer(http.Dir("web/build")))
+	return mux
 }

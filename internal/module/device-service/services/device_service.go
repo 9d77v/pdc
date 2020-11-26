@@ -13,10 +13,11 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/db/mq"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
-	"github.com/9d77v/pdc/internal/mq"
 	"github.com/9d77v/pdc/internal/utils"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 )
@@ -736,7 +737,7 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	bucketName := "camera"
 	now := time.Now()
 	objectName := "picture/" + strconv.FormatInt(deviceID, 10) + "/" + now.Format("2006-01-02") + "/" + strconv.FormatInt(now.Unix(), 10) + ".jpg"
-	minioClient := db.MinioClient
+	minioClient := oss.MinioClient
 	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 10*time.Minute)
 	if err != nil {
 		return "", err
@@ -747,8 +748,8 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	request.Payload = &pb.DeviceDownMSG_CameraCaptureMsg{
 		CameraCaptureMsg: &pb.CameraCaptureMsg{
 			PictureUrl:      u.String(),
-			OssPrefix:       db.OssPrefix,
-			SecureOssPrefix: db.SecureOssPrerix,
+			OssPrefix:       oss.OssPrefix,
+			SecureOssPrefix: oss.SecureOssPrerix,
 		},
 	}
 	requestMsg, err := proto.Marshal(request)
@@ -761,12 +762,12 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	msg, err := mq.Client.NatsConn().Request(subject, requestMsg, 5*time.Second)
 	if err != nil {
 		log.Println("send data error:", err)
-		return db.GetOSSPrefix(scheme) + u.Path, nil
+		return oss.GetOSSPrefix(scheme) + u.Path, nil
 	}
 	deviceMsg := new(pb.DeviceUpMsg)
 	err = proto.Unmarshal(msg.Data, deviceMsg)
 	if err != nil {
 		log.Println("unmarshal data error")
 	}
-	return db.GetOSSPrefix(scheme) + u.Path, nil
+	return oss.GetOSSPrefix(scheme) + u.Path, nil
 }

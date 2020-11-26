@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

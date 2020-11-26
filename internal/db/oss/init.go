@@ -1,4 +1,4 @@
-package db
+package oss
 
 import (
 	"context"
@@ -6,11 +6,29 @@ import (
 	"log"
 	"time"
 
+	"github.com/9d77v/pdc/internal/utils"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-func initMinio() {
+//minio env
+var (
+	minioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
+	secureMinioAddress   = utils.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
+	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
+	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
+	OssPrefix            = ""
+	SecureOssPrerix      = ""
+)
+
+var (
+	//MinioClient S3 OSS by http
+	MinioClient *minio.Client
+	//SecureMinioClient S3 OSS by https
+	SecureMinioClient *minio.Client
+)
+
+func init() {
 	accessKeyID := minioAccessKeyID
 	secretAccessKey := minioSecretAccessKey
 
@@ -67,4 +85,12 @@ func GetPresignedURL(ctx context.Context, bucketName, objectName, scheme string)
 		return "", err
 	}
 	return u.String(), nil
+}
+
+//GetOSSPrefix ..
+func GetOSSPrefix(sheme string) string {
+	if sheme == "https" {
+		return SecureOssPrerix
+	}
+	return OssPrefix
 }

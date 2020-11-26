@@ -12,10 +12,10 @@ import (
 	"github.com/9d77v/go-lib/ptrs"
 	"gorm.io/gorm"
 
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
-	"github.com/9d77v/pdc/internal/mq"
 	"github.com/9d77v/pdc/internal/utils"
 )
 

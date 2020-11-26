@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/lib/pq"
 )
 

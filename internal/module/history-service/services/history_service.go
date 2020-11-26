@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/history-service/models"
 	"github.com/9d77v/pdc/internal/utils"
@@ -81,7 +82,7 @@ func (s HistoryService) ListHistory(ctx context.Context, sourceType, page, pageS
 		}
 	}
 	for _, v := range result {
-		v.Cover = db.GetOSSPrefix(scheme) + v.Cover
+		v.Cover = oss.GetOSSPrefix(scheme) + v.Cover
 	}
 	return total, result, nil
 }

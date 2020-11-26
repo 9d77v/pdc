@@ -10,7 +10,8 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/db/redis"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/user-service/models"
 	"github.com/9d77v/pdc/internal/utils"
@@ -86,8 +87,8 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 		updateMap["password"] = string(bytes)
 	}
 	err := db.Gorm.Model(user).Updates(updateMap).Error
-	key := fmt.Sprintf("%s:%d", db.PrefixUser, input.ID)
-	redisErr := db.RedisClient.Del(ctx, key).Err()
+	key := fmt.Sprintf("%s:%d", redis.PrefixUser, input.ID)
+	redisErr := redis.Client.Del(ctx, key).Err()
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
@@ -187,13 +188,13 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 //GetByID ..
 func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, error) {
 	user := new(models.User)
-	key := fmt.Sprintf("%s:%d", db.PrefixUser, uid)
-	err := db.RedisClient.Get(ctx, key).Scan(user)
+	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
+	err := redis.Client.Get(ctx, key).Scan(user)
 	if err != nil {
 		if err := user.GetByID(uid); err != nil {
 			return user, err
 		}
-		err = db.RedisClient.Set(ctx, key, user, time.Hour).Err()
+		err = redis.Client.Set(ctx, key, user, time.Hour).Err()
 		if err != nil {
 			log.Printf("set redis key %s error：%v", key, err)
 		}
@@ -223,8 +224,8 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 		updateMap["avatar"] = ptrs.String(input.Avatar)
 	}
 	err := db.Gorm.Model(user).Updates(updateMap).Error
-	key := fmt.Sprintf("%s:%d", db.PrefixUser, uid)
-	redisErr := db.RedisClient.Del(ctx, key).Err()
+	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
+	redisErr := redis.Client.Del(ctx, key).Err()
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}

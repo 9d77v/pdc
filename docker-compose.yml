@@ -78,27 +78,33 @@ services:
     env_file:
       - ./configs/pdc.env
     container_name: pdc
-  # pdc-device-esp8266-sht3x:
-  #   image: 9d77v/pdc-device-esp8266-sht3x:2020-11-19_7b2dda6
+  # pdc-iot-esp8266-sht3x:
+  #   image: 9d77v/pdc-iot-esp8266-sht3x:2020-11-24_a1ba7d0
   #   restart: always
   #   env_file:
   #     - esp8266-sht3x.env
-  #   container_name: pdc-device-esp8266-sht3x
-  # pdc-device-raspi:
-  #   image: 9d77v/pdc-device-raspi:2020-11-19_7b2dda6
+  #   container_name: pdc-iot-esp8266-sht3x
+  # pdc-iot-raspi:
+  #   image: 9d77v/pdc-iot-raspi:2020-11-24_a1ba7d0
   #   restart: always
   #   env_file:
   #     - raspi.env
   #   devices:
   #     - /dev/i2c-0
   #     - /dev/i2c-1  
-  #   container_name: pdc-device-raspi
-  # pdc-device-camera:
-  #   image: 9d77v/pdc-device-camera:2020-11-19_7b2dda6
+  #   container_name: pdc-iot-raspi
+  # pdc-iot-camera:
+  #   image: 9d77v/pdc-iot-camera:2020-11-24_a1ba7d0
   #   restart: always
   #   env_file:
   #     - camera.env
-  #   container_name: pdc-device-camera
+  #   container_name: pdc-iot-camera
+  # pdc-cron-camera:
+  #   image: 9d77v/pdc-cron-camera:2020-11-24_a1ba7d0
+  #   restart: always
+  #   env_file:
+  #     - pdc.env
+  #   container_name: pdc-cron-camera
   # ffmpeg:
   #   image: linuxserver/ffmpeg:4.3-cli-ls43
   #   restart: always

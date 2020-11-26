@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/generated"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/middleware"
@@ -169,7 +169,7 @@ func (r *mutationResolver) CameraCapture(ctx context.Context, deviceID int64) (s
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return db.GetPresignedURL(ctx, bucketName, objectName, scheme)
+	return oss.GetPresignedURL(ctx, bucketName, objectName, scheme)
 }
 
 func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {

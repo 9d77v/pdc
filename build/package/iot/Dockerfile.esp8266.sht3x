@@ -1,14 +1,14 @@
 FROM 9d77v/pdc-base:0.0.12
 COPY . /app
 
-ENV APP_NAME=pdc-device-esp8266-sht3x
+ENV APP_NAME=pdc-iot-esp8266-sht3x
 RUN cd /app \
     && go build  -o $APP_NAME -ldflags "-s -w" cmd/iot/esp8266/sht3x/main.go \
     && upx -9 $APP_NAME
 
-FROM 9d77v/pdc-base-deploy:0.0.1
-ENV APP_NAME=pdc-device-esp8266-sht3x
+FROM 9d77v/pdc-base-deploy:0.0.2
+ENV APP_NAME=pdc-iot-esp8266-sht3x
 COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
 
 WORKDIR /app
-CMD [ "pdc-device-esp8266-sht3x" ]
+CMD [ "pdc-iot-esp8266-sht3x" ]

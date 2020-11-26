@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/user-service/models"
 )
@@ -9,7 +9,7 @@ import (
 func toUserDto(m *models.User, scheme string) *model.User {
 	avatar := ""
 	if m.Avatar != "" {
-		avatar = db.GetOSSPrefix(scheme) + m.Avatar
+		avatar = oss.GetOSSPrefix(scheme) + m.Avatar
 	}
 	return &model.User{
 		ID:        int64(m.ID),
