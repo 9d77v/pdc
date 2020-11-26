@@ -2,6 +2,7 @@ import { Icon, NavBar } from "antd-mobile"
 import React from "react"
 import { useHistory, useLocation } from "react-router-dom"
 import { LivePlayer } from "src/components/videoplayer/LivePlayer"
+import CameraTimeLapseVideoList from "./CameraTimeLapseVideoList"
 
 
 const DeviceCameraDetail = () => {
@@ -19,12 +20,15 @@ const DeviceCameraDetail = () => {
                 onLeftClick={() => history.goBack()}
             >{deviceName}</NavBar>
             <div style={{ marginTop: 45 }}>
-                <LivePlayer
-                    url={`/hls/stream${deviceID}.m3u8`}
-                    height={231}
-                    width={"100%"}
-                    autoDestroy={true}
-                />
+                <div style={{ height: 231 }}>
+                    <LivePlayer
+                        url={`/hls/stream${deviceID}.m3u8`}
+                        height={231}
+                        width={"100%"}
+                        autoDestroy={true}
+                    />
+                </div>
+                <CameraTimeLapseVideoList deviceID={Number(deviceID)} />
             </div>
         </div >
     )
