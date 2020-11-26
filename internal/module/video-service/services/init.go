@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 )
@@ -13,16 +13,16 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 		for _, v := range e.Subtitles {
 			sArr = append(sArr, &model.Subtitle{
 				Name: v.Name,
-				URL:  db.GetOSSPrefix(scheme) + v.URL,
+				URL:  oss.GetOSSPrefix(scheme) + v.URL,
 			})
 		}
 		cover := ""
 		if e.Cover != "" {
-			cover = db.GetOSSPrefix(scheme) + e.Cover
+			cover = oss.GetOSSPrefix(scheme) + e.Cover
 		}
 		url := ""
 		if e.URL != "" {
-			url = db.GetOSSPrefix(scheme) + e.URL
+			url = oss.GetOSSPrefix(scheme) + e.URL
 		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
@@ -38,7 +38,7 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 	}
 	cover := ""
 	if m.Cover != "" {
-		cover = db.GetOSSPrefix(scheme) + m.Cover
+		cover = oss.GetOSSPrefix(scheme) + m.Cover
 	}
 	return &model.Video{
 		ID:             int64(m.ID),

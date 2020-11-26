@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/lib/pq"
 )
 
@@ -24,7 +24,7 @@ type VideoIndex struct {
 
 //GetByID ..
 func (v *VideoIndex) GetByID(id string) error {
-	return db.Gorm.Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,a.is_hide_on_mobile,c.video_series_id series_id,
+	return db.GetDB().Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,a.is_hide_on_mobile,c.video_series_id series_id,
 	c.alias series_alias,c.num series_num,d.name series_name`).
 		Table(db.TablePrefix+"_video a").
 		Joins("left join (select video_id,count(video_id) total_num from "+db.TablePrefix+"_episode where video_id=? group by video_id) b on a.id=b.video_id", id).
@@ -36,7 +36,7 @@ func (v *VideoIndex) GetByID(id string) error {
 //Find ..
 func (v *VideoIndex) Find() ([]*VideoIndex, error) {
 	data := make([]*VideoIndex, 0)
-	err := db.Gorm.Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,a.is_hide_on_mobile,c.video_series_id series_id,
+	err := db.GetDB().Select(`a.id,a.title,a.desc,cast(EXTRACT(epoch FROM CAST( a.pub_date AS TIMESTAMP)) as bigint) pub_date,a.cover,b.total_num,a.tags,a.is_show,a.is_hide_on_mobile,c.video_series_id series_id,
 	c.alias series_alias,c.num series_num,d.name series_name`).
 		Table(db.TablePrefix+"_video a").
 		Joins("left join (select video_id,count(video_id) total_num from "+db.TablePrefix+"_episode  group by video_id) b on a.id=b.video_id").

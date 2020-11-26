@@ -26,6 +26,18 @@ type AttributeModel struct {
 	UpdatedAt     int64  `json:"updatedAt"`
 }
 
+type CameraTimeLapseVideo struct {
+	ID       int64  `json:"id"`
+	DeviceID int64  `json:"deviceID"`
+	Date     string `json:"date"`
+	VideoURL string `json:"videoURL"`
+}
+
+type CameraTimeLapseVideoConnection struct {
+	TotalCount int64                   `json:"totalCount"`
+	Edges      []*CameraTimeLapseVideo `json:"edges"`
+}
+
 type Character struct {
 	CharacterName string `json:"characterName"`
 	OriginalName  string `json:"originalName"`

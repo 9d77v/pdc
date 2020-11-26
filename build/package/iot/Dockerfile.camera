@@ -1,14 +1,14 @@
 FROM 9d77v/pdc-base:0.0.12
 COPY . /app
 
-ENV APP_NAME=pdc-device-camera
+ENV APP_NAME=pdc-iot-camera
 RUN cd /app \
     && go build  -o $APP_NAME -ldflags "-s -w" cmd/iot/camera/main.go \
     && upx -9 $APP_NAME
 
-FROM 9d77v/pdc-base-deploy:0.0.1
-ENV APP_NAME=pdc-device-camera
+FROM 9d77v/pdc-base-deploy:0.0.2
+ENV APP_NAME=pdc-iot-camera
 COPY --from=0  /app/$APP_NAME /usr/bin/$APP_NAME
 
 WORKDIR /app
-CMD [ "pdc-device-camera" ]
+CMD [ "pdc-iot-camera" ]

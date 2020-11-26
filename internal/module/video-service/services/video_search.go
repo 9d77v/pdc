@@ -12,8 +12,8 @@ import (
 
 	es "github.com/9d77v/go-lib/clients/elastic/v7"
 	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/db"
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 	"github.com/9d77v/pdc/internal/utils"
@@ -33,7 +33,7 @@ func (v VideoSearch) BulkSaveES(ctx context.Context, vis []*models.VideoIndex, i
 		}
 		bds = append(bds, bd)
 	}
-	errs := elasticsearch.ESClient.BulkInsert(ctx, bds, indexName, bulkNum, workerNum)
+	errs := elasticsearch.GetClient().BulkInsert(ctx, bds, indexName, bulkNum, workerNum)
 	for _, v := range errs {
 		fmt.Println(v)
 	}
@@ -41,7 +41,7 @@ func (v VideoSearch) BulkSaveES(ctx context.Context, vis []*models.VideoIndex, i
 
 //GetByIDFromElastic ...
 func (v VideoSearch) GetByIDFromElastic(ctx context.Context, videoID string) (*models.VideoIndex, error) {
-	result, err := elasticsearch.ESClient.Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
+	result, err := elasticsearch.GetClient().Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context, input model.VideoSearch
 	filterQuery := elastic.NewBoolQuery().
 		Must(filterQueries...).MustNot(ignoreQueries...)
 	boolQuery.Filter(filterQuery)
-	searchService := elasticsearch.ESClient.Search().
+	searchService := elasticsearch.GetClient().Search().
 		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
 		From(int(offset)).
@@ -145,7 +145,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context, input model.VideoSearch
 			if err != nil {
 				log.Println("elastic search result json unmarshal error:", err)
 			}
-			vi.Cover = db.GetOSSPrefix(scheme) + vi.Cover
+			vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
 			vis = append(vis, &model.VideoIndex{
 				ID:       int64(vi.ID),
 				Title:    vi.Title,
@@ -211,7 +211,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context, input model.VideoSim
 		Must(filterQueries...).
 		MustNot(ignoreQueries...)
 	boolQuery.Must(fsQuery.Query(mltQuery)).Filter(filterQuery)
-	searchService := elasticsearch.ESClient.Search().
+	searchService := elasticsearch.GetClient().Search().
 		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
 		Size(int(input.PageSize)).
@@ -232,7 +232,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context, input model.VideoSim
 		if err != nil {
 			log.Println("elastic search result json unmarshal error:", err)
 		}
-		vi.Cover = db.GetOSSPrefix(scheme) + vi.Cover
+		vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
 		vis = append(vis, &model.VideoIndex{
 			ID:       int64(vi.ID),
 			Title:    vi.Title,

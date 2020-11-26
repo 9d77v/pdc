@@ -15,5 +15,5 @@ func main() {
 			sensors.BME280(iotSDK, r)
 		},
 	}
-	iotSDK.Run(works, nil)
+	iotSDK.Run(works, nil, nil)
 }

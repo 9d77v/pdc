@@ -5,14 +5,12 @@ package graph
 
 import (
 	"context"
-	"time"
 
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/generated"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/middleware"
-	minio "github.com/minio/minio-go/v7"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -171,17 +169,7 @@ func (r *mutationResolver) CameraCapture(ctx context.Context, deviceID int64) (s
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	var minioClient *minio.Client
-	if scheme == "https" {
-		minioClient = db.SecureMinioClient
-	} else {
-		minioClient = db.MinioClient
-	}
-	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 6*time.Hour)
-	if err != nil {
-		return "", err
-	}
-	return u.String(), nil
+	return oss.GetPresignedURL(ctx, bucketName, objectName, scheme)
 }
 
 func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {
@@ -302,6 +290,15 @@ func (r *queryResolver) DeviceDashboards(ctx context.Context, keyword *string, p
 func (r *queryResolver) AppDeviceDashboards(ctx context.Context, deviceType *int64) (*model.DeviceDashboardConnection, error) {
 	con := new(model.DeviceDashboardConnection)
 	total, data, err := deviceService.AppDeviceDashboards(ctx, deviceType)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
+}
+
+func (r *queryResolver) CameraTimeLapseVideos(ctx context.Context, deviceID int64) (*model.CameraTimeLapseVideoConnection, error) {
+	con := new(model.CameraTimeLapseVideoConnection)
+	scheme := middleware.ForSchemeContext(ctx)
+	total, data, err := deviceService.CameraTimeLapseVideos(ctx, deviceID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

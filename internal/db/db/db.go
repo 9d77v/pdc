@@ -5,15 +5,41 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 
 	"github.com/9d77v/go-lib/clients/config"
+	"github.com/9d77v/pdc/internal/consts"
+	"github.com/9d77v/pdc/internal/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
-func initDB() {
+//环境变量
+var (
+	dbHost      = utils.GetEnvStr("DB_HOST", "domain.local")
+	dbPort      = utils.GetEnvInt("DB_PORT", 5432)
+	dbUser      = utils.GetEnvStr("DB_USER", "postgres")
+	dbPassword  = utils.GetEnvStr("DB_PASSWORD", "123456")
+	dbName      = utils.GetEnvStr("DB_NAME", "pdc")
+	TablePrefix = utils.GetEnvStr("DB_PREFIX", "pdc")
+)
+
+var (
+	client *gorm.DB
+	once   sync.Once
+)
+
+//GetDB get db connection
+func GetDB() *gorm.DB {
+	once.Do(func() {
+		client = initClient()
+	})
+	return client
+}
+
+func initClient() *gorm.DB {
 	dbConfig := &config.DBConfig{
 		Driver:       "postgres",
 		Host:         dbHost,
@@ -23,17 +49,17 @@ func initDB() {
 		Name:         dbName,
 		MaxIdleConns: 10,
 		MaxOpenConns: 100,
-		EnableLog:    DEBUG,
+		EnableLog:    consts.DEBUG,
 	}
 	var err error
-	Gorm, err = NewClient(dbConfig)
+	db, err := newClient(dbConfig)
 	if err != nil {
 		log.Printf("Could not initialize gorm: %s", err.Error())
 	}
+	return db
 }
 
-//NewClient gorm client
-func NewClient(config *config.DBConfig) (*gorm.DB, error) {
+func newClient(config *config.DBConfig) (*gorm.DB, error) {
 	if config == nil {
 		return nil, errors.New("db config is not exist")
 	}
@@ -67,7 +93,7 @@ func NewClient(config *config.DBConfig) (*gorm.DB, error) {
 			SingularTable: true,
 		},
 	}
-	if DEBUG {
+	if consts.DEBUG {
 		gormConfig.Logger = logger.Default.LogMode(logger.Info)
 	} else {
 		gormConfig.DisableForeignKeyConstraintWhenMigrating = true

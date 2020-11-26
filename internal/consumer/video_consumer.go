@@ -16,7 +16,7 @@ var videoSearch = new(services.VideoSearch)
 //HandleVideoMSG ...
 func HandleVideoMSG(m *stan.Msg) {
 	ctx := context.Background()
-	client := elasticsearch.ESClient
+	client := elasticsearch.GetClient()
 	indexNames := client.FindIndexesByAlias(ctx,
 		elasticsearch.AliasVideo, elasticsearch.ESLayout)
 	id := string(m.Data)

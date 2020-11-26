@@ -3,6 +3,7 @@ package mq
 import (
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/9d77v/pdc/internal/utils"
@@ -13,8 +14,8 @@ var (
 	natsURL = utils.GetEnvStr("NATS_URL", "domain.local:4222")
 )
 var (
-	//Client ..
-	Client stan.Conn
+	client stan.Conn
+	once   sync.Once
 )
 
 //video subject
@@ -35,9 +36,16 @@ const (
 	GroupPublishDeviceData       = "group.device.data.pub"
 )
 
-func init() {
-	var err error
-	Client, err = stan.Connect("test-cluster",
+//GetClient get mq connection
+func GetClient() stan.Conn {
+	once.Do(func() {
+		client = initClient()
+	})
+	return client
+}
+
+func initClient() stan.Conn {
+	conn, err := stan.Connect("test-cluster",
 		fmt.Sprintf("client-%d", time.Now().Unix()),
 		stan.Pings(10, 5),
 		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
@@ -48,4 +56,5 @@ func init() {
 	if err != nil {
 		log.Println("nats connect error:", err)
 	}
+	return conn
 }

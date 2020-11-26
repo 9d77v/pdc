@@ -44,7 +44,8 @@ func CamelToSnack(s string) string {
 			newStr += string(s[i])
 		}
 	}
-	return strings.ReplaceAll(newStr, "_i_d", "_id")
+	newStr = strings.ReplaceAll(newStr, "_i_d", "_id")
+	return strings.ReplaceAll(newStr, "_u_r_l", "_url")
 }
 
 //ToDBFields ..

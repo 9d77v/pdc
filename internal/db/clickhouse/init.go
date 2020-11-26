@@ -4,58 +4,70 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"sync"
 
 	"github.com/ClickHouse/clickhouse-go"
 
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/utils"
 )
 
 var (
-	//Client Clickhouse Client
-	Client *sql.DB
-	//CHAddr Clickhouse Server Address
-	CHAddr = utils.GetEnvStr("CLICKHOUSE_ADDR", "domain.local:9001")
-	//DEBUG ..
-	DEBUG = utils.GetEnvBool("DEBUG", true)
+	client *sql.DB
+	chAddr = utils.GetEnvStr("CLICKHOUSE_ADDR", "domain.local:9001")
+	once   sync.Once
 )
 
-func init() {
+//GetDB get clickhouse connection
+func GetDB() *sql.DB {
+	once.Do(func() {
+		client = initClient()
+	})
+	return client
+}
+
+func initClient() *sql.DB {
 	debug := "false"
-	if DEBUG {
+	if consts.DEBUG {
 		debug = "true"
 	}
-	dbInit, err := sql.Open("clickhouse", fmt.Sprintf("tcp://%s?debug=%s", CHAddr, debug))
+	dbInit, err := sql.Open("clickhouse", fmt.Sprintf("tcp://%s?debug=%s", chAddr, debug))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer dbInit.Close()
 	if err := dbInit.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			log.Panicf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println(err)
+			log.Panicln(err)
 		}
-		return
+		return nil
 	}
 	dbname := "pdc"
 	_, err = dbInit.Exec(fmt.Sprintf("CREATE DATABASE  IF NOT EXISTS %s", dbname))
 	if err != nil {
 		log.Println(err)
 	}
-	db, err := sql.Open("clickhouse", fmt.Sprintf("tcp://%s?debug=%s&database=%s", CHAddr, debug, "pdc"))
+	db, err := sql.Open("clickhouse", fmt.Sprintf("tcp://%s?debug=%s&database=%s", chAddr, debug, "pdc"))
 	if err != nil {
 		log.Fatal(err)
 	}
 	if err := db.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			log.Panicf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Println(err)
+			log.Panicln(err)
 		}
-		return
+		return nil
 	}
 
-	_, err = db.Exec(`
+	return db
+}
+
+//CreateTables create tables
+func CreateTables() {
+	_, err := GetDB().Exec(`
 		CREATE TABLE IF NOT EXISTS device_telemetry (
 			device_id UInt32,
 			telemetry_id UInt32,
@@ -71,7 +83,7 @@ func init() {
 	if err != nil {
 		log.Panicln("create table error:", err)
 	}
-	_, err = db.Exec(`
+	_, err = GetDB().Exec(`
 		CREATE TABLE IF NOT EXISTS device_health (
 			device_id UInt32,
 			action_time  DateTime CODEC(DoubleDelta),
@@ -86,5 +98,4 @@ func init() {
 	if err != nil {
 		log.Panicln("create table error:", err)
 	}
-	Client = db
 }

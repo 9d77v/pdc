@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -35,12 +35,13 @@ func (u *User) UnmarshalBinary(data []byte) error {
 
 //GetByID ..
 func (u *User) GetByID(uid int64) error {
-	return db.Gorm.Where("id=?", uid).First(u).Error
+	return db.GetDB().Where("id=?", uid).First(u).Error
 }
 
-func (u *User) generateAdminAccount(ownerName, ownerPassword string) {
+//GenerateAdminAccount ..
+func (u *User) GenerateAdminAccount(ownerName, ownerPassword string) {
 	var total int64
-	err := db.Gorm.Model(&User{}).Count(&total).Error
+	err := db.GetDB().Model(&User{}).Count(&total).Error
 	if err != nil {
 		log.Panicf("Get User total failed:%v/n", err)
 	}
@@ -54,7 +55,7 @@ func (u *User) generateAdminAccount(ownerName, ownerPassword string) {
 			Password: string(bytes),
 			RoleID:   1,
 		}
-		err = db.Gorm.Create(user).Error
+		err = db.GetDB().Create(user).Error
 		if err != nil {
 			log.Panicf("create owner failed:%v/n", err)
 		}

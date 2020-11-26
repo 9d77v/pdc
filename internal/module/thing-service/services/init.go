@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/thing-service/models"
 )
@@ -9,7 +9,7 @@ import (
 func toThingDto(m *models.Thing, scheme string) *model.Thing {
 	newPics := make([]string, 0)
 	for _, v := range m.Pics {
-		newPics = append(newPics, db.GetOSSPrefix(scheme)+v)
+		newPics = append(newPics, oss.GetOSSPrefix(scheme)+v)
 	}
 	return &model.Thing{
 		ID:                  int64(m.ID),

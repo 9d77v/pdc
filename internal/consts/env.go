@@ -2,8 +2,10 @@ package consts
 
 import "github.com/9d77v/pdc/internal/utils"
 
-//system environments
+//环境变量
 var (
+	DEBUG = utils.GetEnvBool("DEBUG", true)
+
 	JWTtAccessSecret = utils.GetEnvStr("JWT_ACCESS_SECRET", "JWT_ACCESS_SECRET")
 	JWTRefreshSecret = utils.GetEnvStr("JWT_REFRESH_SECRET", "JWT_REFRESH_SECRET")
 	JWTIssuer        = utils.GetEnvStr("JWT_ISSUER", "domain.local")

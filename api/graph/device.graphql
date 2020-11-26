@@ -211,3 +211,15 @@ input NewDeviceDashboardCamera{
   deviceDashboardID: ID!
   deviceIDs: [ID!]!
 }
+
+type CameraTimeLapseVideo {
+  id: ID!
+  deviceID: ID!
+  date: String!
+  videoURL: String!
+}
+
+type CameraTimeLapseVideoConnection {
+  totalCount: Int!
+  edges:[CameraTimeLapseVideo!]!
+}

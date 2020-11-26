@@ -7,7 +7,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/db"
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/thing-service/models"
 	"github.com/9d77v/pdc/internal/utils"
@@ -37,7 +37,7 @@ func (s ThingService) CreateThing(ctx context.Context, input model.NewThing, uid
 		RefOrderID:          ptrs.String(input.RefOrderID),
 		RubbishCategory:     input.RubbishCategory,
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.Thing{}, err
 	}
@@ -52,7 +52,7 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(thing, "id=? and uid=?", input.ID, uid).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(thing, "id=? and uid=?", input.ID, uid).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -74,7 +74,7 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 	if len(input.Pics) > 0 {
 		updateMap["pics"] = input.Pics
 	}
-	err := db.Gorm.Model(thing).Updates(updateMap).Error
+	err := db.GetDB().Model(thing).Updates(updateMap).Error
 	return &model.Thing{ID: int64(thing.ID)}, err
 }
 
@@ -87,7 +87,7 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string,
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	builder = builder.Where("uid=?", uid)
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
@@ -134,7 +134,7 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string,
 //ThingSeries 获取物品数据
 func (s ThingService) ThingSeries(ctx context.Context, dimension, index string, start *int64, end *int64, status []int64, uid int64) ([]*model.SerieData, error) {
 	data := make([]*model.SerieData, 0)
-	builder := db.Gorm.Model(&models.Thing{})
+	builder := db.GetDB().Model(&models.Thing{})
 	if index == "num" {
 		builder = builder.Select(fmt.Sprintf("%s as name, sum(num) as value ", dimension))
 	} else if index == "price" {
@@ -177,7 +177,7 @@ func (s ThingService) ThingAnalyze(ctx context.Context, dimension, index string,
 		endTime = time.Now()
 		format = "YYYY"
 	}
-	builder := db.Gorm.Model(&models.Thing{})
+	builder := db.GetDB().Model(&models.Thing{})
 	if index == "num" {
 		builder = builder.Select(
 			fmt.Sprintf("to_char(purchase_date,'%s') as x1, %s as x2, sum(num) as y ",

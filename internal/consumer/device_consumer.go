@@ -4,16 +4,19 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/nats-io/stan.go"
 
-	"github.com/9d77v/pdc/internal/db"
 	"github.com/9d77v/pdc/internal/db/clickhouse"
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/db/mq"
+	"github.com/9d77v/pdc/internal/db/oss"
+	"github.com/9d77v/pdc/internal/db/redis"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
-	"github.com/9d77v/pdc/internal/mq"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 )
 
@@ -41,7 +44,7 @@ func HandleDeviceMsg(m *stan.Msg) {
 		if msg == nil {
 			return
 		}
-		err = mq.Client.NatsConn().Publish(msg.Subject, m.Data)
+		err = mq.GetClient().NatsConn().Publish(msg.Subject, m.Data)
 		if err != nil {
 			log.Println("publish DeviceUpMsg_CameraCaptureReplyMsg failed:", err)
 		}
@@ -51,7 +54,7 @@ func HandleDeviceMsg(m *stan.Msg) {
 			return
 		}
 		for k, v := range attributeMsg.AttributeMap {
-			err := db.Gorm.Model(&models.Attribute{}).
+			err := db.GetDB().Model(&models.Attribute{}).
 				Where("id=?", k).
 				Update("value", v).Error
 			if err != nil {
@@ -100,7 +103,7 @@ func PublishDeviceData(m *stan.Msg) {
 	switch deviceMsg.Payload.(type) {
 	case *pb.DeviceUpMsg_SetTelemetriesMsg:
 		telemetryMsg := deviceMsg.GetSetTelemetriesMsg()
-		if telemetryMsg == nil || telemetryMsg.TelemetryMap == nil {
+		if telemetryMsg.TelemetryMap == nil {
 			return
 		}
 		for k, v := range telemetryMsg.TelemetryMap {
@@ -115,7 +118,7 @@ func PublishDeviceData(m *stan.Msg) {
 				log.Println("proto marshal error:", err)
 				return
 			}
-			err = db.RedisClient.Publish(context.Background(),
+			err = redis.GetClient().Publish(context.Background(),
 				fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceMsg.DeviceId, k), requestMsg).Err()
 			if err != nil {
 				log.Printf("publish error,err:%v/n", err)
@@ -123,9 +126,6 @@ func PublishDeviceData(m *stan.Msg) {
 		}
 	case *pb.DeviceUpMsg_SetHealthMsg:
 		healthMsg := deviceMsg.GetSetHealthMsg()
-		if healthMsg == nil {
-			return
-		}
 		health := &pb.Health{
 			DeviceID:   deviceMsg.DeviceId,
 			ActionTime: deviceMsg.ActionTime,
@@ -136,10 +136,38 @@ func PublishDeviceData(m *stan.Msg) {
 			log.Println("proto marshal error:", err)
 			return
 		}
-		err = db.RedisClient.Publish(context.Background(),
+		err = redis.GetClient().Publish(context.Background(),
 			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceId), requestMsg).Err()
 		if err != nil {
 			log.Printf("publish error,err:%v/n", err)
+		}
+	case *pb.DeviceUpMsg_PresignedUrlMsg:
+		presignedURLMsg := deviceMsg.GetPresignedUrlMsg()
+		requestURL, err := oss.GetPresignedURL(context.Background(), presignedURLMsg.BucketName, presignedURLMsg.ObjectName, "")
+		if err != nil {
+			return
+		}
+		subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(deviceMsg.DeviceId), 10)
+		request := new(pb.DeviceDownMSG)
+		presignedURLReplyMsg := &pb.DeviceDownMSG_PresignedUrlReplyMsg{
+			PresignedUrlReplyMsg: &pb.PresignedUrlReplyMsg{
+				PictureUrl:      requestURL,
+				OssPrefix:       oss.OssPrefix,
+				SecureOssPrefix: oss.SecureOssPrerix,
+			},
+		}
+		request.DeviceId = deviceMsg.DeviceId
+		request.ActionTime = ptypes.TimestampNow()
+		request.Payload = presignedURLReplyMsg
+		requestMsg, err := proto.Marshal(request)
+		if err != nil {
+			log.Println("marshal error:", err)
+			return
+		}
+		_, err = mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
+		if err != nil {
+			log.Println("send data error:", err)
+			return
 		}
 	}
 }
@@ -176,7 +204,7 @@ func SaveDeviceTelemetry() {
 
 //batchSaveTelemetry ..
 func batchSaveTelemetry(telemetries []*pb.Telemetry) {
-	tx, err := clickhouse.Client.Begin()
+	tx, err := clickhouse.GetDB().Begin()
 	if err != nil {
 		log.Println("clickhouse tx begin error:", err)
 		return
@@ -247,7 +275,7 @@ func SaveDeviceHealth() {
 
 //batchSaveHealth ..
 func batchSaveHealth(healths []*pb.Health) {
-	tx, err := clickhouse.Client.Begin()
+	tx, err := clickhouse.GetDB().Begin()
 	if err != nil {
 		log.Println("clickhouse tx begin error:", err)
 		return

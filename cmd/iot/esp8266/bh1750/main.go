@@ -21,5 +21,5 @@ func main() {
 			sensors.BH1750(iotSDK, r)
 		},
 	}
-	iotSDK.Run(works, nil)
+	iotSDK.Run(works, nil, nil)
 }
