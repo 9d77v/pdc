@@ -44,7 +44,7 @@ func HandleDeviceMsg(m *stan.Msg) {
 		if msg == nil {
 			return
 		}
-		err = mq.Client.NatsConn().Publish(msg.Subject, m.Data)
+		err = mq.GetClient().NatsConn().Publish(msg.Subject, m.Data)
 		if err != nil {
 			log.Println("publish DeviceUpMsg_CameraCaptureReplyMsg failed:", err)
 		}
@@ -54,7 +54,7 @@ func HandleDeviceMsg(m *stan.Msg) {
 			return
 		}
 		for k, v := range attributeMsg.AttributeMap {
-			err := db.Gorm.Model(&models.Attribute{}).
+			err := db.GetDB().Model(&models.Attribute{}).
 				Where("id=?", k).
 				Update("value", v).Error
 			if err != nil {
@@ -118,7 +118,7 @@ func PublishDeviceData(m *stan.Msg) {
 				log.Println("proto marshal error:", err)
 				return
 			}
-			err = redis.Client.Publish(context.Background(),
+			err = redis.GetClient().Publish(context.Background(),
 				fmt.Sprintf("%s.%d.%d", subjectDeviceTelemetryPrefix, deviceMsg.DeviceId, k), requestMsg).Err()
 			if err != nil {
 				log.Printf("publish error,err:%v/n", err)
@@ -136,7 +136,7 @@ func PublishDeviceData(m *stan.Msg) {
 			log.Println("proto marshal error:", err)
 			return
 		}
-		err = redis.Client.Publish(context.Background(),
+		err = redis.GetClient().Publish(context.Background(),
 			fmt.Sprintf("%s.%d", subjectDeviceHealthPrefix, deviceMsg.DeviceId), requestMsg).Err()
 		if err != nil {
 			log.Printf("publish error,err:%v/n", err)
@@ -164,7 +164,7 @@ func PublishDeviceData(m *stan.Msg) {
 			log.Println("marshal error:", err)
 			return
 		}
-		_, err = mq.Client.NatsConn().Request(subject, requestMsg, 5*time.Second)
+		_, err = mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
 		if err != nil {
 			log.Println("send data error:", err)
 			return
@@ -204,7 +204,7 @@ func SaveDeviceTelemetry() {
 
 //batchSaveTelemetry ..
 func batchSaveTelemetry(telemetries []*pb.Telemetry) {
-	tx, err := clickhouse.Client.Begin()
+	tx, err := clickhouse.GetDB().Begin()
 	if err != nil {
 		log.Println("clickhouse tx begin error:", err)
 		return
@@ -275,7 +275,7 @@ func SaveDeviceHealth() {
 
 //batchSaveHealth ..
 func batchSaveHealth(healths []*pb.Health) {
-	tx, err := clickhouse.Client.Begin()
+	tx, err := clickhouse.GetDB().Begin()
 	if err != nil {
 		log.Println("clickhouse tx begin error:", err)
 		return

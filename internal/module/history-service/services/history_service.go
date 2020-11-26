@@ -28,7 +28,7 @@ func (s HistoryService) RecordHistory(ctx context.Context, input model.NewHistor
 		RemainingTime: input.RemainingTime,
 		UpdatedAt:     time.Now(),
 	}
-	err := db.Gorm.Save(m).Error
+	err := db.GetDB().Save(m).Error
 	if err != nil {
 		return &model.History{}, err
 	}
@@ -38,7 +38,7 @@ func (s HistoryService) RecordHistory(ctx context.Context, input model.NewHistor
 //GetHistory ..
 func (s HistoryService) GetHistory(ctx context.Context, sourceType int64, sourceID int64, uid uint) (*model.History, error) {
 	history := new(models.History)
-	err := db.Gorm.Where("uid=? and source_type=? and source_id=?", uid, sourceType, sourceID).Take(history).Error
+	err := db.GetDB().Where("uid=? and source_type=? and source_id=?", uid, sourceType, sourceID).Take(history).Error
 	if err != nil {
 		log.Println("get history error", err)
 		return nil, nil
@@ -52,7 +52,7 @@ func (s HistoryService) ListHistory(ctx context.Context, sourceType, page, pageS
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
+	builder := db.GetDB().Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {

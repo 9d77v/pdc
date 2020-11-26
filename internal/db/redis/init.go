@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"sync"
+
 	"github.com/9d77v/pdc/internal/utils"
 	redisGo "github.com/go-redis/redis/v8"
 )
@@ -12,8 +14,8 @@ var (
 )
 
 var (
-	//Client ..
-	Client *redisGo.Client
+	client *redisGo.Client
+	once   sync.Once
 )
 
 //redis前缀
@@ -21,8 +23,15 @@ const (
 	PrefixUser = "USER"
 )
 
-func init() {
-	Client = redisGo.NewClient(&redisGo.Options{
+//GetClient get redis connection
+func GetClient() *redisGo.Client {
+	once.Do(func() {
+		client = initClient()
+	})
+	return client
+}
+func initClient() *redisGo.Client {
+	return redisGo.NewClient(&redisGo.Options{
 		Addr:     redisAddress,
 		Password: redisPassword,
 		DB:       0, // use default DB

@@ -91,7 +91,7 @@ func synthesizeJPGsIntoMP4(ids []uint, yesterdayStr string) {
 func getCameraIDs() []uint {
 	ids := make([]uint, 0, 0)
 	devices := make([]*models.Device, 0, 0)
-	err := db.Gorm.Select(db.TablePrefix + "_device.id").
+	err := db.GetDB().Select(db.TablePrefix + "_device.id").
 		Where(db.TablePrefix + "_device_model.device_type = 1").
 		Joins("JOIN " + db.TablePrefix + "_device_model ON " + db.TablePrefix + "_device_model.id = " +
 			db.TablePrefix + "_device.device_model_id").Find(&devices).Error
@@ -160,5 +160,5 @@ func generateVideo(pictureTmpDir, videoFilePath string) error {
 }
 
 func saveVideoPath(deviceID uint, date, videoURL string) error {
-	return db.Gorm.Save(models.NewCameraTimeLapseVideo(deviceID, date, videoURL)).Error
+	return db.GetDB().Save(models.NewCameraTimeLapseVideo(deviceID, date, videoURL)).Error
 }

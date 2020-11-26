@@ -34,7 +34,7 @@ func (s DeviceService) CreateDeviceModel(ctx context.Context, input model.NewDev
 		DeviceType:    uint8(input.DeviceType),
 		CameraCompany: uint8(input.CameraCompany),
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.DeviceModel{}, err
 	}
@@ -141,7 +141,7 @@ func (s DeviceService) CreateDeviceModel(ctx context.Context, input model.NewDev
 				Name:          "固件版本信息",
 			},
 		}
-		err = db.Gorm.Create(&attributes).Error
+		err = db.GetDB().Create(&attributes).Error
 		if err != nil {
 			return &model.DeviceModel{ID: int64(m.ID)}, err
 		}
@@ -157,14 +157,14 @@ func (s DeviceService) UpdateDeviceModel(ctx context.Context, input model.NewUpd
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
 		"desc": ptrs.String(input.Desc),
 	}
-	err := db.Gorm.Model(m).Updates(updateMap).Error
+	err := db.GetDB().Model(m).Updates(updateMap).Error
 	return &model.DeviceModel{ID: int64(m.ID)}, err
 }
 
@@ -175,7 +175,7 @@ func (s DeviceService) CreateAttributeModel(ctx context.Context, input model.New
 		Key:           input.Key,
 		Name:          input.Name,
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.AttributeModel{}, err
 	}
@@ -190,13 +190,13 @@ func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.New
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
 	}
-	err := db.Gorm.Model(m).Updates(updateMap).Error
+	err := db.GetDB().Model(m).Updates(updateMap).Error
 	return &model.AttributeModel{ID: int64(m.ID)}, err
 }
 
@@ -204,7 +204,7 @@ func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.New
 func (s DeviceService) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
 	m := new(models.AttributeModel)
 	m.ID = uint(id)
-	err := db.Gorm.Delete(m).Error
+	err := db.GetDB().Delete(m).Error
 	return &model.AttributeModel{ID: int64(m.ID)}, err
 }
 
@@ -219,7 +219,7 @@ func (s DeviceService) CreateTelemetryModel(ctx context.Context, input model.New
 		UnitName:      ptrs.String(input.UnitName),
 		Scale:         uint8(input.Scale),
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.TelemetryModel{}, err
 	}
@@ -234,7 +234,7 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -244,7 +244,7 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 		"unit_name": input.UnitName,
 		"scale":     input.Scale,
 	}
-	err := db.Gorm.Model(m).Updates(updateMap).Error
+	err := db.GetDB().Model(m).Updates(updateMap).Error
 	return &model.TelemetryModel{ID: int64(m.ID)}, err
 }
 
@@ -252,7 +252,7 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 func (s DeviceService) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
 	m := new(models.TelemetryModel)
 	m.ID = uint(id)
-	err := db.Gorm.Delete(m).Error
+	err := db.GetDB().Delete(m).Error
 	return &model.TelemetryModel{ID: int64(m.ID)}, err
 }
 
@@ -264,7 +264,7 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -328,14 +328,14 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 		Password:      ptrs.String(input.Password),
 	}
 	deviceModel := new(models.DeviceModel)
-	if err := db.Gorm.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
+	if err := db.GetDB().Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
 		return db.Model(&models.AttributeModel{})
 	}).Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
 		return db.Model(&models.TelemetryModel{})
 	}).First(deviceModel, "id=?", input.DeviceModelID).Error; err != nil {
 		return nil, err
 	}
-	tx := db.Gorm.Begin()
+	tx := db.GetDB().Begin()
 	err := tx.Create(m).Error
 	if err != nil {
 		tx.Rollback()
@@ -384,7 +384,7 @@ func (s DeviceService) CreateDevice(ctx context.Context, input model.NewDevice) 
 //UpdateDevice ..
 func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error) {
 	m := new(models.Device)
-	if err := db.Gorm.Select("id").First(m, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select("id").First(m, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -394,7 +394,7 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 		"username": ptrs.String(input.Username),
 		"password": ptrs.String(input.Password),
 	}
-	err := db.Gorm.Model(m).Updates(updateMap).Error
+	err := db.GetDB().Model(m).Updates(updateMap).Error
 	return &model.Device{ID: int64(m.ID)}, err
 }
 
@@ -406,7 +406,7 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -480,7 +480,7 @@ func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceDownMSG, error)
 		DeviceId: deviceID,
 	}
 	device := new(models.Device)
-	err := db.Gorm.Preload("Attributes").Preload("Attributes.AttributeModel").
+	err := db.GetDB().Preload("Attributes").Preload("Attributes.AttributeModel").
 		Preload("Telemetries").Preload("Telemetries.TelemetryModel").Preload("DeviceModel").
 		Where("id=?", replyDeviceMsg.DeviceId).First(device).Error
 	if err != nil {
@@ -513,7 +513,7 @@ func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceDownMSG, error)
 //DeviceLogin ..
 func (s DeviceService) DeviceLogin(accessKey, secretKey string) (uint, error) {
 	device := new(models.Device)
-	err := db.Gorm.Select("id,access_key,secret_key").
+	err := db.GetDB().Select("id,access_key,secret_key").
 		Where("access_key=? and secret_key=?", accessKey, secretKey).First(device).Error
 	if err != nil {
 		log.Println("get device failed,err", err)
@@ -529,7 +529,7 @@ func (s DeviceService) CreateDeviceDashboard(ctx context.Context, input model.Ne
 		IsVisible:  input.IsVisible,
 		DeviceType: uint8(input.DeviceType),
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.DeviceDashboard{}, err
 	}
@@ -544,14 +544,14 @@ func (s DeviceService) UpdateDeviceDashboard(ctx context.Context, input model.Ne
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name":       input.Name,
 		"is_visible": input.IsVisible,
 	}
-	err := db.Gorm.Model(m).Updates(updateMap).Error
+	err := db.GetDB().Model(m).Updates(updateMap).Error
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
 }
 
@@ -559,7 +559,7 @@ func (s DeviceService) UpdateDeviceDashboard(ctx context.Context, input model.Ne
 func (s DeviceService) DeleteDeviceDashboard(ctx context.Context, id int64) (*model.DeviceDashboard, error) {
 	m := new(models.DeviceDashboard)
 	m.ID = uint(id)
-	err := db.Gorm.Delete(m).Error
+	err := db.GetDB().Delete(m).Error
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
 }
 
@@ -576,7 +576,7 @@ func (s DeviceService) AddDeviceDashboardTelemetry(ctx context.Context, input mo
 		}
 		data = append(data, m)
 	}
-	err := db.Gorm.Create(data).Error
+	err := db.GetDB().Create(data).Error
 	if err != nil {
 		return &model.DeviceDashboard{}, err
 	}
@@ -586,7 +586,7 @@ func (s DeviceService) AddDeviceDashboardTelemetry(ctx context.Context, input mo
 //RemoveDeviceDashboardTelemetry ..
 func (s DeviceService) RemoveDeviceDashboardTelemetry(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
 	m := new(models.DeviceDashboardTelemetry)
-	err := db.Gorm.Delete(m, ids).Error
+	err := db.GetDB().Delete(m, ids).Error
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
 }
 
@@ -603,7 +603,7 @@ func (s DeviceService) AddDeviceDashboardCamera(ctx context.Context, input model
 		}
 		data = append(data, m)
 	}
-	err := db.Gorm.Create(data).Error
+	err := db.GetDB().Create(data).Error
 	if err != nil {
 		return &model.DeviceDashboard{}, err
 	}
@@ -613,7 +613,7 @@ func (s DeviceService) AddDeviceDashboardCamera(ctx context.Context, input model
 //RemoveDeviceDashboardCamera ..
 func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
 	m := new(models.DeviceDashboardCamera)
-	err := db.Gorm.Delete(m, ids).Error
+	err := db.GetDB().Delete(m, ids).Error
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
 }
 
@@ -625,7 +625,7 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -691,7 +691,7 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context, deviceType *int6
 	data := make([]*models.DeviceDashboard, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if deviceType != nil {
 		builder = builder.Where("device_type = ?", ptrs.Int64(deviceType))
 	}
@@ -737,7 +737,7 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	bucketName := "camera"
 	now := time.Now()
 	objectName := "picture/" + strconv.FormatInt(deviceID, 10) + "/" + now.Format("2006-01-02") + "/" + strconv.FormatInt(now.Unix(), 10) + ".jpg"
-	minioClient := oss.MinioClient
+	minioClient := oss.GetMinioClient()
 	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 10*time.Minute)
 	if err != nil {
 		return "", err
@@ -759,7 +759,7 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	}
 	subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(deviceID), 10)
 	log.Println("发送数据到主题", subject)
-	msg, err := mq.Client.NatsConn().Request(subject, requestMsg, 5*time.Second)
+	msg, err := mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
 	if err != nil {
 		log.Println("send data error:", err)
 		return oss.GetOSSPrefix(scheme) + u.Path, nil

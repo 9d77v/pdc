@@ -198,7 +198,7 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 		}
 		subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(id), 10)
 		log.Println("开启监听主题：", subject)
-		qsub, err := mq.Client.NatsConn().QueueSubscribe(subject,
+		qsub, err := mq.GetClient().NatsConn().QueueSubscribe(subject,
 			mq.GroupDevice, func(m *nats.Msg) {
 				deviceMsg := new(pb.DeviceDownMSG)
 				err := proto.Unmarshal(m.Data, deviceMsg)
@@ -241,7 +241,7 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			//透传到mq
-			_, err = mq.Client.PublishAsync(mq.SubjectDeviceData, msg, utils.AckHandler)
+			_, err = mq.GetClient().PublishAsync(mq.SubjectDeviceData, msg, utils.AckHandler)
 			if err != nil {
 				log.Println("send data error:", err)
 			}

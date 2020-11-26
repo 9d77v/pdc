@@ -35,7 +35,7 @@ func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*m
 		IsHideOnMobile: input.IsHideOnMobile,
 		Theme:          input.Theme,
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.Video{}, err
 	}
@@ -45,7 +45,7 @@ func (s VideoService) CreateVideo(ctx context.Context, input model.NewVideo) (*m
 //AddVideoResource ..
 func (s VideoService) AddVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error) {
 	video := new(models.Video)
-	if err := db.Gorm.Select("id").
+	if err := db.GetDB().Select("id").
 		First(video, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (s VideoService) AddVideoResource(ctx context.Context, input model.NewVideo
 			URL:     url,
 		})
 	}
-	err := db.Gorm.Create(&episodes).Error
+	err := db.GetDB().Create(&episodes).Error
 	if err != nil {
 		return &model.Video{}, err
 	}
@@ -68,7 +68,7 @@ func (s VideoService) AddVideoResource(ctx context.Context, input model.NewVideo
 //SaveSubtitles ..
 func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubtitles) (*model.Video, error) {
 	data := make([]*models.Episode, 0)
-	if err := db.Gorm.Select("id").Preload("Subtitles", "name=?", input.Subtitles.Name).
+	if err := db.GetDB().Select("id").Preload("Subtitles", "name=?", input.Subtitles.Name).
 		Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 		for _, v := range data {
 			ids = append(ids, v.ID)
 		}
-		err := db.Gorm.Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).Delete(&models.Subtitle{}).Error
+		err := db.GetDB().Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).Delete(&models.Subtitle{}).Error
 		if err != nil {
 			return nil, err
 		}
@@ -100,7 +100,7 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 				}
 			}
 		}
-		err := db.Gorm.Save(&subtitles).Error
+		err := db.GetDB().Save(&subtitles).Error
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +116,7 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).
 		First(video, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 	if input.Cover != nil {
 		updateMap["cover"] = ptrs.String(input.Cover)
 	}
-	err := db.Gorm.Model(video).Updates(updateMap).Error
+	err := db.GetDB().Model(video).Updates(updateMap).Error
 	sendMsgToUpdateES(input.ID)
 	return &model.Video{ID: int64(video.ID)}, err
 }
@@ -147,7 +147,7 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 		Cover:   ptrs.String(input.Cover),
 		URL:     input.URL,
 	}
-	tx := db.Gorm.Begin()
+	tx := db.GetDB().Begin()
 	err := tx.Create(e).Error
 	if err != nil {
 		tx.Rollback()
@@ -176,7 +176,7 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 //UpdateEpisode ..
 func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
-	if err := db.Gorm.Select("id,video_id").First(episode, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select("id,video_id").First(episode, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -184,7 +184,7 @@ func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEp
 		"title": ptrs.String(input.Title),
 		"desc":  ptrs.String(input.Desc),
 	}
-	tx := db.Gorm.Begin()
+	tx := db.GetDB().Begin()
 	err := tx.Where("episode_id=?", episode.ID).Delete(&models.Subtitle{}).Error
 	if err != nil {
 		tx.Rollback()
@@ -229,7 +229,7 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("title like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -285,7 +285,7 @@ func (s VideoService) CreateVideoSeries(ctx context.Context, input model.NewVide
 	m := &models.VideoSeries{
 		Name: input.Name,
 	}
-	err := db.Gorm.Create(m).Error
+	err := db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.VideoSeries{}, err
 	}
@@ -300,14 +300,14 @@ func (s VideoService) UpdateVideoSeries(ctx context.Context, input model.NewUpda
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).
 		First(videoSeries, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
 	}
-	err := db.Gorm.Model(videoSeries).Updates(updateMap).Error
+	err := db.GetDB().Model(videoSeries).Updates(updateMap).Error
 	return &model.VideoSeries{ID: int64(videoSeries.ID)}, err
 }
 
@@ -319,12 +319,12 @@ func (s VideoService) CreateVideoSeriesItem(ctx context.Context, input model.New
 		Alias:         input.Alias,
 	}
 	maxItem := &models.VideoSeriesItem{}
-	err := db.Gorm.Select("max(num) num").Where("video_series_id=?", input.VideoSeriesID).Take(maxItem).Error
+	err := db.GetDB().Select("max(num) num").Where("video_series_id=?", input.VideoSeriesID).Take(maxItem).Error
 	if err != nil {
 		return nil, err
 	}
 	e.Num = maxItem.Num + 1
-	err = db.Gorm.Create(e).Error
+	err = db.GetDB().Create(e).Error
 	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
 }
@@ -337,14 +337,14 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context, input model.New
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(item, "video_id=? and video_series_id=?",
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(item, "video_id=? and video_series_id=?",
 		input.VideoID, input.VideoSeriesID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"alias": input.Alias,
 	}
-	err := db.Gorm.Model(item).Updates(updateMap).Error
+	err := db.GetDB().Model(item).Updates(updateMap).Error
 	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
 }
@@ -359,14 +359,14 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 	if videoID != nil && ptrs.Int64(videoID) > 0 {
 		//获取视频所属系列
 		item := new(models.VideoSeriesItem)
-		err := db.Gorm.Select("video_series_id").Where("video_id=?", ptrs.Int64(videoID)).Take(item).Error
+		err := db.GetDB().Select("video_series_id").Where("video_id=?", ptrs.Int64(videoID)).Take(item).Error
 		if err != nil {
 			return 0, result, nil
 		}
 		ids = []int64{int64(item.VideoSeriesID)}
 	}
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -408,7 +408,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 				ids = append(ids, v.ID)
 			}
 			items := make([]*models.VideoSeriesItem, 0)
-			itemBuilder := db.Gorm
+			itemBuilder := db.GetDB()
 			videoTableName := db.TablePrefix + "_video"
 			videoSeriesItemTableName := db.TablePrefix + "_video_series_item"
 			if itemFIeldMap["title"] {
@@ -444,7 +444,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string, vide
 }
 
 func sendMsgToUpdateES(videoID int64) {
-	guid, err := mq.Client.PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
+	guid, err := mq.GetClient().PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
 		utils.AckHandler)
 	if err != nil {
 		log.Println("mq publish failed,guid:", guid, " error:", err)

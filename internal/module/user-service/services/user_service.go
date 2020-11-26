@@ -50,7 +50,7 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 		BirthDate: time.Unix(ptrs.Int64(input.BirthDate), 0),
 		IP:        ptrs.String(input.IP),
 	}
-	err = db.Gorm.Create(m).Error
+	err = db.GetDB().Create(m).Error
 	if err != nil {
 		return &model.User{}, err
 	}
@@ -65,7 +65,7 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(user, "id=?", input.ID).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(user, "id=?", input.ID).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -86,9 +86,9 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 		}
 		updateMap["password"] = string(bytes)
 	}
-	err := db.Gorm.Model(user).Updates(updateMap).Error
+	err := db.GetDB().Model(user).Updates(updateMap).Error
 	key := fmt.Sprintf("%s:%d", redis.PrefixUser, input.ID)
-	redisErr := redis.Client.Del(ctx, key).Err()
+	redisErr := redis.GetClient().Del(ctx, key).Err()
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
@@ -104,7 +104,7 @@ func (s UserService) ListUser(ctx context.Context, keyword *string,
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.Gorm
+	builder := db.GetDB()
 	if keyword != nil && ptrs.String(keyword) != "" {
 		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -149,7 +149,7 @@ func (s UserService) ListUser(ctx context.Context, keyword *string,
 
 func (s UserService) checkUserName(ctx context.Context, name string) (bool, error) {
 	var total int64
-	if err := db.Gorm.Model(&models.User{}).Select("name").Where("name=?", name).Count(&total).Error; err != nil {
+	if err := db.GetDB().Model(&models.User{}).Select("name").Where("name=?", name).Count(&total).Error; err != nil {
 		return false, err
 	}
 	return total == 0, nil
@@ -159,7 +159,7 @@ func (s UserService) checkUserName(ctx context.Context, name string) (bool, erro
 func (s UserService) Login(ctx context.Context, username string, password string) (*model.LoginResponse, error) {
 	res := new(model.LoginResponse)
 	user := new(models.User)
-	if err := db.Gorm.Select("id,name,password").Where("name=?", username).First(user).Error; err != nil {
+	if err := db.GetDB().Select("id,name,password").Where("name=?", username).First(user).Error; err != nil {
 		return res, errors.New("用户名或密码错误")
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
@@ -189,12 +189,12 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, error) {
 	user := new(models.User)
 	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
-	err := redis.Client.Get(ctx, key).Scan(user)
+	err := redis.GetClient().Get(ctx, key).Scan(user)
 	if err != nil {
 		if err := user.GetByID(uid); err != nil {
 			return user, err
 		}
-		err = redis.Client.Set(ctx, key, user, time.Hour).Err()
+		err = redis.GetClient().Set(ctx, key, user, time.Hour).Err()
 		if err != nil {
 			log.Printf("set redis key %s error：%v", key, err)
 		}
@@ -211,7 +211,7 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 		fields = append(fields, k)
 	}
 	fields = append(fields, "id")
-	if err := db.Gorm.Select(utils.ToDBFields(fields)).First(user, "id=?", uid).Error; err != nil {
+	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(user, "id=?", uid).Error; err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -223,9 +223,9 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 	if input.Avatar != nil {
 		updateMap["avatar"] = ptrs.String(input.Avatar)
 	}
-	err := db.Gorm.Model(user).Updates(updateMap).Error
+	err := db.GetDB().Model(user).Updates(updateMap).Error
 	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
-	redisErr := redis.Client.Del(ctx, key).Err()
+	redisErr := redis.GetClient().Del(ctx, key).Err()
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
@@ -241,7 +241,7 @@ func (s UserService) UpdatePassword(ctx context.Context, oldPassword string, new
 		return nil, errors.New("新旧密码长度不能相同")
 	}
 	user := new(models.User)
-	if err := db.Gorm.Select("id,password").First(user, "id=?", uid).Error; err != nil {
+	if err := db.GetDB().Select("id,password").First(user, "id=?", uid).Error; err != nil {
 		return nil, err
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(oldPassword))
@@ -256,7 +256,7 @@ func (s UserService) UpdatePassword(ctx context.Context, oldPassword string, new
 	updateMap := map[string]interface{}{
 		"password": string(bytes),
 	}
-	err = db.Gorm.Model(user).Updates(updateMap).Error
+	err = db.GetDB().Model(user).Updates(updateMap).Error
 	if err != nil {
 		log.Println("update password failed")
 		return nil, err

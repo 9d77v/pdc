@@ -33,7 +33,7 @@ func (v VideoSearch) BulkSaveES(ctx context.Context, vis []*models.VideoIndex, i
 		}
 		bds = append(bds, bd)
 	}
-	errs := elasticsearch.ESClient.BulkInsert(ctx, bds, indexName, bulkNum, workerNum)
+	errs := elasticsearch.GetClient().BulkInsert(ctx, bds, indexName, bulkNum, workerNum)
 	for _, v := range errs {
 		fmt.Println(v)
 	}
@@ -41,7 +41,7 @@ func (v VideoSearch) BulkSaveES(ctx context.Context, vis []*models.VideoIndex, i
 
 //GetByIDFromElastic ...
 func (v VideoSearch) GetByIDFromElastic(ctx context.Context, videoID string) (*models.VideoIndex, error) {
-	result, err := elasticsearch.ESClient.Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
+	result, err := elasticsearch.GetClient().Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context, input model.VideoSearch
 	filterQuery := elastic.NewBoolQuery().
 		Must(filterQueries...).MustNot(ignoreQueries...)
 	boolQuery.Filter(filterQuery)
-	searchService := elasticsearch.ESClient.Search().
+	searchService := elasticsearch.GetClient().Search().
 		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
 		From(int(offset)).
@@ -211,7 +211,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context, input model.VideoSim
 		Must(filterQueries...).
 		MustNot(ignoreQueries...)
 	boolQuery.Must(fsQuery.Query(mltQuery)).Filter(filterQuery)
-	searchService := elasticsearch.ESClient.Search().
+	searchService := elasticsearch.GetClient().Search().
 		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
 		Size(int(input.PageSize)).

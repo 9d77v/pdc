@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/9d77v/pdc/internal/utils"
@@ -17,41 +18,63 @@ var (
 	secureMinioAddress   = utils.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
-	OssPrefix            = ""
-	SecureOssPrerix      = ""
+	OssPrefix            = fmt.Sprintf("http://%s", minioAddress)
+	SecureOssPrerix      = fmt.Sprintf("https://%s", secureMinioAddress)
 )
 
 var (
-	//MinioClient S3 OSS by http
-	MinioClient *minio.Client
-	//SecureMinioClient S3 OSS by https
-	SecureMinioClient *minio.Client
+	client       *minio.Client
+	once         sync.Once
+	secureClient *minio.Client
+	secureOnce   sync.Once
 )
 
-func init() {
-	accessKeyID := minioAccessKeyID
-	secretAccessKey := minioSecretAccessKey
+//GetMinioClient get S3 OSS by http
+func GetMinioClient() *minio.Client {
+	once.Do(func() {
+		client = initMinioCLient()
+	})
+	return client
+}
 
-	OssPrefix = fmt.Sprintf("http://%s", minioAddress)
-	SecureOssPrerix = fmt.Sprintf("https://%s", secureMinioAddress)
-	var err error
-	MinioClient, err = minio.New(minioAddress, &minio.Options{
-		Creds: credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+func initMinioCLient() *minio.Client {
+	conn, err := minio.New(minioAddress, &minio.Options{
+		Creds: credentials.NewStaticV4(minioAccessKeyID, minioSecretAccessKey, ""),
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	SecureMinioClient, err = minio.New(secureMinioAddress, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
+	return conn
+}
+
+//GetSecureMinioClient get S3 OSS by https
+func GetSecureMinioClient() *minio.Client {
+	secureOnce.Do(func() {
+		secureClient = initSecureMinioClient()
+	})
+	return secureClient
+}
+
+func initSecureMinioClient() *minio.Client {
+	conn, err := minio.New(secureMinioAddress, &minio.Options{
+		Creds:  credentials.NewStaticV4(minioAccessKeyID, minioSecretAccessKey, ""),
 		Secure: true,
 	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return conn
+}
+
+//InitMinioBuckets ..
+func InitMinioBuckets() {
 	preCreatedBuckets := []string{"image", "video", "vtt", "pan", "camera"}
 	location := "us-east-1"
 	for _, bucketName := range preCreatedBuckets {
-		err = MinioClient.MakeBucket(context.Background(), bucketName,
+		err := GetMinioClient().MakeBucket(context.Background(), bucketName,
 			minio.MakeBucketOptions{Region: location})
 		if err != nil {
-			exists, errBucketExists := MinioClient.BucketExists(context.Background(), bucketName)
+			exists, errBucketExists := GetMinioClient().BucketExists(context.Background(), bucketName)
 			if errBucketExists == nil && exists {
 				log.Printf("We already own %s\n", bucketName)
 			} else {
@@ -64,7 +87,7 @@ func init() {
 			//mc  policy  set  download  minio/mybucket
 			policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
 ["s3:GetObject"],"Resource":["arn:aws:s3:::` + bucketName + `/*"]}]}`
-			err := MinioClient.SetBucketPolicy(context.Background(), bucketName, policy)
+			err := GetMinioClient().SetBucketPolicy(context.Background(), bucketName, policy)
 			if err != nil {
 				log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
 			}
@@ -76,9 +99,9 @@ func init() {
 func GetPresignedURL(ctx context.Context, bucketName, objectName, scheme string) (string, error) {
 	var minioClient *minio.Client
 	if scheme == "https" {
-		minioClient = SecureMinioClient
+		minioClient = GetSecureMinioClient()
 	} else {
-		minioClient = MinioClient
+		minioClient = GetMinioClient()
 	}
 	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 6*time.Hour)
 	if err != nil {

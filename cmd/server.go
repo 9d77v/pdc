@@ -19,6 +19,7 @@ import (
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph"
 	"github.com/9d77v/pdc/internal/graph/generated"
+	_ "github.com/9d77v/pdc/internal/init"
 	"github.com/9d77v/pdc/internal/middleware"
 )
 
@@ -39,7 +40,7 @@ func main() {
 		Addr:    ":" + port,
 		Handler: getServerMux(),
 	}
-	qsub1, err := mq.Client.QueueSubscribe(mq.SubjectVideo,
+	qsub1, err := mq.GetClient().QueueSubscribe(mq.SubjectVideo,
 		mq.GroupVideo, consumer.HandleVideoMSG)
 	if err != nil {
 		log.Panicln("QueueSubscribe error:", err)
@@ -54,7 +55,7 @@ func main() {
 			log.Println("qsub1 Close error:", err)
 		}
 	}()
-	qsub2, err := mq.Client.QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
+	qsub2, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
 		consumer.HandleDeviceMsg, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
@@ -69,7 +70,7 @@ func main() {
 			log.Println("qsub2 Close error:", err)
 		}
 	}()
-	qsub3, err := mq.Client.QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
+	qsub3, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
 		consumer.PublishDeviceData, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
