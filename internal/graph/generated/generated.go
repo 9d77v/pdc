@@ -67,6 +67,18 @@ type ComplexityRoot struct {
 		UpdatedAt     func(childComplexity int) int
 	}
 
+	CameraTimeLapseVideo struct {
+		Date     func(childComplexity int) int
+		DeviceID func(childComplexity int) int
+		ID       func(childComplexity int) int
+		VideoURL func(childComplexity int) int
+	}
+
+	CameraTimeLapseVideoConnection struct {
+		Edges      func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
 	Character struct {
 		CharacterName func(childComplexity int) int
 		OriginalName  func(childComplexity int) int
@@ -241,22 +253,23 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		AppDeviceDashboards func(childComplexity int, deviceType *int64) int
-		DeviceDashboards    func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		DeviceModels        func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Devices             func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) int
-		Histories           func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
-		HistoryInfo         func(childComplexity int, sourceType int64, sourceID int64) int
-		PresignedURL        func(childComplexity int, bucketName string, objectName string) int
-		SearchVideo         func(childComplexity int, input model.VideoSearchParam) int
-		SimilarVideos       func(childComplexity int, input model.VideoSimilarParam) int
-		ThingAnalyze        func(childComplexity int, dimension string, index string, start *int64, group string) int
-		ThingSeries         func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
-		Things              func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		UserInfo            func(childComplexity int, uid *int64) int
-		Users               func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		VideoSerieses       func(childComplexity int, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		Videos              func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) int
+		AppDeviceDashboards   func(childComplexity int, deviceType *int64) int
+		CameraTimeLapseVideos func(childComplexity int, deviceID int64) int
+		DeviceDashboards      func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		DeviceModels          func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Devices               func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) int
+		Histories             func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
+		HistoryInfo           func(childComplexity int, sourceType int64, sourceID int64) int
+		PresignedURL          func(childComplexity int, bucketName string, objectName string) int
+		SearchVideo           func(childComplexity int, input model.VideoSearchParam) int
+		SimilarVideos         func(childComplexity int, input model.VideoSimilarParam) int
+		ThingAnalyze          func(childComplexity int, dimension string, index string, start *int64, group string) int
+		ThingSeries           func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
+		Things                func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		UserInfo              func(childComplexity int, uid *int64) int
+		Users                 func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		VideoSerieses         func(childComplexity int, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		Videos                func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) int
 	}
 
 	SerieData struct {
@@ -459,6 +472,7 @@ type QueryResolver interface {
 	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (*model.DeviceConnection, error)
 	DeviceDashboards(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceDashboardConnection, error)
 	AppDeviceDashboards(ctx context.Context, deviceType *int64) (*model.DeviceDashboardConnection, error)
+	CameraTimeLapseVideos(ctx context.Context, deviceID int64) (*model.CameraTimeLapseVideoConnection, error)
 }
 
 type executableSchema struct {
@@ -580,6 +594,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AttributeModel.UpdatedAt(childComplexity), true
+
+	case "CameraTimeLapseVideo.date":
+		if e.complexity.CameraTimeLapseVideo.Date == nil {
+			break
+		}
+
+		return e.complexity.CameraTimeLapseVideo.Date(childComplexity), true
+
+	case "CameraTimeLapseVideo.deviceID":
+		if e.complexity.CameraTimeLapseVideo.DeviceID == nil {
+			break
+		}
+
+		return e.complexity.CameraTimeLapseVideo.DeviceID(childComplexity), true
+
+	case "CameraTimeLapseVideo.id":
+		if e.complexity.CameraTimeLapseVideo.ID == nil {
+			break
+		}
+
+		return e.complexity.CameraTimeLapseVideo.ID(childComplexity), true
+
+	case "CameraTimeLapseVideo.videoURL":
+		if e.complexity.CameraTimeLapseVideo.VideoURL == nil {
+			break
+		}
+
+		return e.complexity.CameraTimeLapseVideo.VideoURL(childComplexity), true
+
+	case "CameraTimeLapseVideoConnection.edges":
+		if e.complexity.CameraTimeLapseVideoConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.CameraTimeLapseVideoConnection.Edges(childComplexity), true
+
+	case "CameraTimeLapseVideoConnection.totalCount":
+		if e.complexity.CameraTimeLapseVideoConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.CameraTimeLapseVideoConnection.TotalCount(childComplexity), true
 
 	case "Character.characterName":
 		if e.complexity.Character.CharacterName == nil {
@@ -1673,6 +1729,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.AppDeviceDashboards(childComplexity, args["deviceType"].(*int64)), true
+
+	case "Query.cameraTimeLapseVideos":
+		if e.complexity.Query.CameraTimeLapseVideos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_cameraTimeLapseVideos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.CameraTimeLapseVideos(childComplexity, args["deviceID"].(int64)), true
 
 	case "Query.deviceDashboards":
 		if e.complexity.Query.DeviceDashboards == nil {
@@ -2817,7 +2885,20 @@ input NewDeviceDashboardTelemetry {
 input NewDeviceDashboardCamera{
   deviceDashboardID: ID!
   deviceIDs: [ID!]!
-}`, BuiltIn: false},
+}
+
+type CameraTimeLapseVideo {
+  id: ID!
+  deviceID: ID!
+  date: String!
+  videoURL: String!
+}
+
+type CameraTimeLapseVideoConnection {
+  totalCount: Int!
+  edges:[CameraTimeLapseVideo!]!
+}
+`, BuiltIn: false},
 	&ast.Source{Name: "api/graph/history.graphql", Input: `type History {
 	uid: ID!
 	sourceType:Int!
@@ -2868,6 +2949,7 @@ type Query {
   devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!],deviceType: Int):DeviceConnection!
   deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
   appDeviceDashboards(deviceType: Int):DeviceDashboardConnection!
+  cameraTimeLapseVideos(deviceID:Int!):CameraTimeLapseVideoConnection!
 } 
 
 type Mutation {
@@ -3780,6 +3862,20 @@ func (ec *executionContext) field_Query_appDeviceDashboards_args(ctx context.Con
 		}
 	}
 	args["deviceType"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_cameraTimeLapseVideos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["deviceID"]; ok {
+		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["deviceID"] = arg0
 	return args, nil
 }
 
@@ -4873,6 +4969,210 @@ func (ec *executionContext) _AttributeModel_updatedAt(ctx context.Context, field
 	res := resTmp.(int64)
 	fc.Result = res
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CameraTimeLapseVideo_id(ctx context.Context, field graphql.CollectedField, obj *model.CameraTimeLapseVideo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CameraTimeLapseVideo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CameraTimeLapseVideo_deviceID(ctx context.Context, field graphql.CollectedField, obj *model.CameraTimeLapseVideo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CameraTimeLapseVideo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeviceID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CameraTimeLapseVideo_date(ctx context.Context, field graphql.CollectedField, obj *model.CameraTimeLapseVideo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CameraTimeLapseVideo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Date, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CameraTimeLapseVideo_videoURL(ctx context.Context, field graphql.CollectedField, obj *model.CameraTimeLapseVideo) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CameraTimeLapseVideo",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VideoURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CameraTimeLapseVideoConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.CameraTimeLapseVideoConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CameraTimeLapseVideoConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _CameraTimeLapseVideoConnection_edges(ctx context.Context, field graphql.CollectedField, obj *model.CameraTimeLapseVideoConnection) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "CameraTimeLapseVideoConnection",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.CameraTimeLapseVideo)
+	fc.Result = res
+	return ec.marshalNCameraTimeLapseVideo2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideoᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Character_characterName(ctx context.Context, field graphql.CollectedField, obj *model.Character) (ret graphql.Marshaler) {
@@ -10116,6 +10416,47 @@ func (ec *executionContext) _Query_appDeviceDashboards(ctx context.Context, fiel
 	res := resTmp.(*model.DeviceDashboardConnection)
 	fc.Result = res
 	return ec.marshalNDeviceDashboardConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐDeviceDashboardConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_cameraTimeLapseVideos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_cameraTimeLapseVideos_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().CameraTimeLapseVideos(rctx, args["deviceID"].(int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CameraTimeLapseVideoConnection)
+	fc.Result = res
+	return ec.marshalNCameraTimeLapseVideoConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideoConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -15959,6 +16300,80 @@ func (ec *executionContext) _AttributeModel(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var cameraTimeLapseVideoImplementors = []string{"CameraTimeLapseVideo"}
+
+func (ec *executionContext) _CameraTimeLapseVideo(ctx context.Context, sel ast.SelectionSet, obj *model.CameraTimeLapseVideo) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cameraTimeLapseVideoImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CameraTimeLapseVideo")
+		case "id":
+			out.Values[i] = ec._CameraTimeLapseVideo_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deviceID":
+			out.Values[i] = ec._CameraTimeLapseVideo_deviceID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "date":
+			out.Values[i] = ec._CameraTimeLapseVideo_date(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "videoURL":
+			out.Values[i] = ec._CameraTimeLapseVideo_videoURL(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var cameraTimeLapseVideoConnectionImplementors = []string{"CameraTimeLapseVideoConnection"}
+
+func (ec *executionContext) _CameraTimeLapseVideoConnection(ctx context.Context, sel ast.SelectionSet, obj *model.CameraTimeLapseVideoConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cameraTimeLapseVideoConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CameraTimeLapseVideoConnection")
+		case "totalCount":
+			out.Values[i] = ec._CameraTimeLapseVideoConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "edges":
+			out.Values[i] = ec._CameraTimeLapseVideoConnection_edges(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var characterImplementors = []string{"Character"}
 
 func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet, obj *model.Character) graphql.Marshaler {
@@ -17148,6 +17563,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "cameraTimeLapseVideos":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_cameraTimeLapseVideos(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "__type":
 			out.Values[i] = ec._Query___type(ctx, field)
 		case "__schema":
@@ -18253,6 +18682,71 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNCameraTimeLapseVideo2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideo(ctx context.Context, sel ast.SelectionSet, v model.CameraTimeLapseVideo) graphql.Marshaler {
+	return ec._CameraTimeLapseVideo(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCameraTimeLapseVideo2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideoᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.CameraTimeLapseVideo) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCameraTimeLapseVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideo(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNCameraTimeLapseVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideo(ctx context.Context, sel ast.SelectionSet, v *model.CameraTimeLapseVideo) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CameraTimeLapseVideo(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCameraTimeLapseVideoConnection2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideoConnection(ctx context.Context, sel ast.SelectionSet, v model.CameraTimeLapseVideoConnection) graphql.Marshaler {
+	return ec._CameraTimeLapseVideoConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCameraTimeLapseVideoConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐCameraTimeLapseVideoConnection(ctx context.Context, sel ast.SelectionSet, v *model.CameraTimeLapseVideoConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CameraTimeLapseVideoConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDevice2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐDevice(ctx context.Context, sel ast.SelectionSet, v model.Device) graphql.Marshaler {

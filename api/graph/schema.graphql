@@ -19,6 +19,7 @@ type Query {
   devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!],deviceType: Int):DeviceConnection!
   deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
   appDeviceDashboards(deviceType: Int):DeviceDashboardConnection!
+  cameraTimeLapseVideos(deviceID:Int!):CameraTimeLapseVideoConnection!
 } 
 
 type Mutation {

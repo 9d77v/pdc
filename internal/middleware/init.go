@@ -73,4 +73,5 @@ var permissonMap = map[string][]int{
 	"addDeviceDashboardCamera":       {consts.RoleAdmin, consts.RoleManager},
 	"removeDeviceDashboardCamera":    {consts.RoleAdmin, consts.RoleManager},
 	"cameraCapture":                  {consts.RoleAdmin, consts.RoleManager, consts.RoleUser, consts.RoleGuest},
+	"cameraTimeLapseVideos":          {consts.RoleAdmin, consts.RoleManager, consts.RoleUser, consts.RoleGuest},
 }

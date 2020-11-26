@@ -8,7 +8,7 @@ IMAGE_TAG=$(shell git log --pretty=format:"%ad_%h" -1 --date=short)
 deps:
 	go mod download
 api: api/graph/*.graphql
-	go genereate ./...
+	go generate ./...
 dev:
 	go run cmd/server.go
 test:

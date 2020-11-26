@@ -295,6 +295,15 @@ func (r *queryResolver) AppDeviceDashboards(ctx context.Context, deviceType *int
 	return con, err
 }
 
+func (r *queryResolver) CameraTimeLapseVideos(ctx context.Context, deviceID int64) (*model.CameraTimeLapseVideoConnection, error) {
+	con := new(model.CameraTimeLapseVideoConnection)
+	scheme := middleware.ForSchemeContext(ctx)
+	total, data, err := deviceService.CameraTimeLapseVideos(ctx, deviceID, scheme)
+	con.TotalCount = total
+	con.Edges = data
+	return con, err
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

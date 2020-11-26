@@ -771,3 +771,33 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	}
 	return oss.GetOSSPrefix(scheme) + u.Path, nil
 }
+
+//CameraTimeLapseVideos ..
+func (s DeviceService) CameraTimeLapseVideos(ctx context.Context, deviceID int64,scheme string) (int64,
+	[]*model.CameraTimeLapseVideo, error) {
+	result := make([]*model.CameraTimeLapseVideo, 0)
+	data := make([]*models.CameraTimeLapseVideo, 0)
+	fieldMap, _ := utils.GetFieldData(ctx, "")
+	var err error
+	builder := db.GetDB()
+	builder = builder.Where("device_id = ?", deviceID).Where("created_at>=?", time.Now().AddDate(0, 0, -7))
+	var total int64
+	if fieldMap["totalCount"] {
+		total = int64(len(data))
+	}
+	if fieldMap["edges"] {
+		builder = builder.Order("id DESC")
+		_, edgeFields := utils.GetFieldData(ctx, "edges.")
+		builder = builder.Select(utils.ToDBFields(edgeFields,
+			"__typename"))
+		err = builder.Find(&data).Error
+		if err != nil {
+			return 0, result, err
+		}
+	}
+	for _, m := range data {
+		r := toCameraTimeLapseVideoDto(m,scheme)
+		result = append(result, r)
+	}
+	return total, result, nil
+}

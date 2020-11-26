@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 )
@@ -130,5 +131,14 @@ func toDeviceDashboardDto(m *models.DeviceDashboard) *model.DeviceDashboard {
 		DeviceType:  int64(m.DeviceType),
 		CreatedAt:   m.CreatedAt.Unix(),
 		UpdatedAt:   m.UpdatedAt.Unix(),
+	}
+}
+
+func toCameraTimeLapseVideoDto(m *models.CameraTimeLapseVideo, scheme string) *model.CameraTimeLapseVideo {
+	return &model.CameraTimeLapseVideo{
+		ID:       int64(m.ID),
+		DeviceID: int64(m.DeviceID),
+		Date:     m.Date,
+		VideoURL: oss.GetOSSPrefix(scheme) + m.VideoURL,
 	}
 }
