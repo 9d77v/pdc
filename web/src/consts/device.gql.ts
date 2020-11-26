@@ -342,6 +342,20 @@ mutation cameraCapture($deviceID:Int!){
 }
 `
 
+const GET_CAMERA_TIME_LAPSE_VIDEOS = gql`
+query cameraTimeLapseVideos($deviceID: Int!) {
+  cameraTimeLapseVideos(deviceID: $deviceID) {
+    totalCount
+    edges {
+      id
+      deviceID
+      date
+      videoURL
+    }
+  }
+}
+`
+
 export {
   ADD_DEVICE_MODEL, UPDATE_DEVICE_MODEL,
   DEVICE_MODEL_COMBO,
@@ -354,5 +368,5 @@ export {
   LIST_DEVICE_DASHBOARD,
   ADD_DEVICE_DASHBOARD_TELEMETRY, REMOVE_DEVICE_DASHBOARD_TELEMETRY,
   ADD_DEVICE_DASHBOARD_CAMERA, REMOVE_DEVICE_DASHBOARD_CAMERA,
-  CAMERA_CAPTURE
+  CAMERA_CAPTURE, GET_CAMERA_TIME_LAPSE_VIDEOS
 }
