@@ -83,6 +83,11 @@ func synthesizeJPGsIntoMP4(ids []uint, yesterdayStr string) {
 			err = saveVideoPath(id, yesterdayStr, "/camera/"+videoFilePath)
 			if err != nil {
 				log.Println("saveVideoPath failed: ", err)
+			} else {
+				err = os.RemoveAll(pictureTmpDir)
+				if err != nil {
+					log.Println("remove tmp path error:", err)
+				}
 			}
 		}
 	}
@@ -121,7 +126,6 @@ func renamePictureFileNames(pictureTmpDir string) error {
 		return err
 	}
 	for i, fi := range rd {
-		fmt.Println(fi.Name())
 		os.Rename(pictureTmpDir+fi.Name(), pictureTmpDir+getNewFileName(i)+".jpg")
 	}
 	return nil
@@ -151,7 +155,6 @@ func getVideoPath(id uint, day string) string {
 func generateVideo(pictureTmpDir, videoFilePath string) error {
 	cmd := exec.Command("ffmpeg",
 		"-f", "image2",
-		"-threads", "2",
 		"-i", pictureTmpDir+"%04d.jpg",
 		"-vcodec", "libx264",
 		"-r", "10",

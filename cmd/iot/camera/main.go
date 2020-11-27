@@ -19,7 +19,7 @@ func main() {
 	}
 	cronJobs := make([]*sdk.CronJob, 0)
 	cronJobs = append(cronJobs, &sdk.CronJob{
-		Spec: "0 * * * * *",
+		Spec: "*/10 * * * * *",
 		Cmd: func() {
 			iotSDK.SendPresignedURLMsg()
 		},
