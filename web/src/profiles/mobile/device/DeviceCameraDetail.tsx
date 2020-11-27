@@ -19,7 +19,7 @@ const DeviceCameraDetail = () => {
                 icon={<Icon type="left" />}
                 onLeftClick={() => history.goBack()}
             >{deviceName}</NavBar>
-            <div style={{ marginTop: 45 }}>
+            <div style={{ marginTop: 45, textAlign: 'left' }}>
                 <div style={{ height: 231 }}>
                     <LivePlayer
                         url={`/hls/stream${deviceID}.m3u8`}
@@ -28,6 +28,7 @@ const DeviceCameraDetail = () => {
                         autoDestroy={true}
                     />
                 </div>
+                <span style={{ padding: 10, fontSize: 16, fontWeight: 100, color: "black" }}>历史回放</span>
                 <CameraTimeLapseVideoList deviceID={Number(deviceID)} />
             </div>
         </div >
