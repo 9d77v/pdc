@@ -40,51 +40,8 @@ func main() {
 		Addr:    ":" + port,
 		Handler: getServerMux(),
 	}
-	qsub1, err := mq.GetClient().QueueSubscribe(mq.SubjectVideo,
-		mq.GroupVideo, consumer.HandleVideoMSG)
-	if err != nil {
-		log.Panicln("QueueSubscribe error:", err)
-	}
-	defer func() {
-		err = qsub1.Unsubscribe()
-		if err != nil {
-			log.Println("qsub1 Unsubscribe error:", err)
-		}
-		err = qsub1.Close()
-		if err != nil {
-			log.Println("qsub1 Close error:", err)
-		}
-	}()
-	qsub2, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
-		consumer.HandleDeviceMsg, stan.DurableName("dur"))
-	if err != nil {
-		log.Panicln("SubscribeDeviceAttribute error:", err)
-	}
-	defer func() {
-		err = qsub2.Unsubscribe()
-		if err != nil {
-			log.Println("qsub2 Unsubscribe error:", err)
-		}
-		err = qsub2.Close()
-		if err != nil {
-			log.Println("qsub2 Close error:", err)
-		}
-	}()
-	qsub3, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
-		consumer.PublishDeviceData, stan.DurableName("dur"))
-	if err != nil {
-		log.Panicln("SubscribeDeviceAttribute error:", err)
-	}
-	defer func() {
-		err = qsub3.Unsubscribe()
-		if err != nil {
-			log.Println("qsub3 Unsubscribe error:", err)
-		}
-		err = qsub3.Close()
-		if err != nil {
-			log.Println("qsub3 Close error:", err)
-		}
-	}()
+	qsubs := initSubScriptions()
+	defer unSubscribe(qsubs)
 	go consumer.SaveDeviceTelemetry()
 	go consumer.SaveDeviceHealth()
 	go func() {
@@ -95,7 +52,7 @@ func main() {
 	log.Printf("exiting (%v)", <-errc)
 	srvCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	err = srv.Shutdown(srvCtx)
+	err := srv.Shutdown(srvCtx)
 	if err != nil {
 		log.Println("server shut down error:", err)
 	}
@@ -132,4 +89,32 @@ func getServerMux() *http.ServeMux {
 	})
 	mux.Handle("/", http.FileServer(http.Dir("web/build")))
 	return mux
+}
+
+func initSubScriptions() []stan.Subscription {
+	qsub1, err := mq.GetClient().QueueSubscribe(mq.SubjectVideo,
+		mq.GroupVideo, consumer.HandleVideoMSG)
+	if err != nil {
+		log.Panicln("QueueSubscribe error:", err)
+	}
+	qsub2, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
+		consumer.HandleDeviceMsg, stan.DurableName("dur"))
+	if err != nil {
+		log.Panicln("SubscribeDeviceAttribute error:", err)
+	}
+	qsub3, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
+		consumer.PublishDeviceData, stan.DurableName("dur"))
+	if err != nil {
+		log.Panicln("SubscribeDeviceAttribute error:", err)
+	}
+	return []stan.Subscription{qsub1, qsub2, qsub3}
+}
+
+func unSubscribe(qsubs []stan.Subscription) {
+	for _, qsub := range qsubs {
+		err := qsub.Unsubscribe()
+		if err != nil {
+			log.Println("qsub Unsubscribe error:", err)
+		}
+	}
 }
