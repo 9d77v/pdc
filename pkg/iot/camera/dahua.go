@@ -14,13 +14,15 @@ type Dahua struct {
 
 //NewDahua with ip,user,password
 func NewDahua(ip, user, password string) *Dahua {
-	return &Dahua{
+	d := &Dahua{
 		camera: camera{
 			ip:       ip,
 			user:     user,
 			password: password,
 		},
 	}
+	d.requester = d
+	return d
 }
 
 //Capture ..
@@ -38,15 +40,6 @@ func (d *Dahua) Capture() []byte {
 func (d *Dahua) GetDeviceInfo() map[string]string {
 	deviceInfoMap := make(map[string]string, 0)
 	return deviceInfoMap
-}
-
-func (d *Dahua) fetch(cameraURI string) ([]byte, error) {
-	header, err := d.getHeaderFromRequest(cameraURI)
-	if err != nil {
-		return nil, err
-	}
-	authorization := d.getAuthorization(header, cameraURI)
-	return d.getBodyFromRequest(cameraURI, authorization)
 }
 
 func (d *Dahua) getAuthorization(header http.Header, cameraURI string) string {
