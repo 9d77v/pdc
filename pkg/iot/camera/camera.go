@@ -27,10 +27,32 @@ type Cameraer interface {
 	GetDeviceInfo() map[string]string
 }
 
+type requester interface {
+	getAuthorization(header http.Header, cameraURI string) string
+}
+
 type camera struct {
 	ip       string
 	user     string
 	password string
+	requester
+}
+
+func (c *camera) fetch(cameraURI string) ([]byte, error) {
+	header, err := c.getHeaderFromRequest(cameraURI)
+	if err != nil {
+		return nil, err
+	}
+	authorization := c.getAuthorization(header, cameraURI)
+	return c.getBodyFromRequest(cameraURI, authorization)
+}
+
+func (c *camera) getHeaderFromRequest(cameraURI string, authorization ...string) (http.Header, error) {
+	resp, err := c.request(cameraURI, authorization...)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Header, nil
 }
 
 func (c *camera) request(cameraURI string, authorization ...string) (*http.Response, error) {
@@ -46,14 +68,6 @@ func (c *camera) request(cameraURI string, authorization ...string) (*http.Respo
 	client := &http.Client{Timeout: time.Second * 3}
 	resp, err := client.Do(req)
 	return resp, err
-}
-
-func (c *camera) getHeaderFromRequest(cameraURI string, authorization ...string) (http.Header, error) {
-	resp, err := c.request(cameraURI, authorization...)
-	if err != nil {
-		return nil, err
-	}
-	return resp.Header, nil
 }
 
 func (c *camera) getBodyFromRequest(cameraURI string, authorization ...string) ([]byte, error) {

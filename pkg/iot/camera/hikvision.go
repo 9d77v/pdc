@@ -36,13 +36,15 @@ type Hikvision struct {
 
 //NewHikvision with ip,user,password
 func NewHikvision(ip, user, password string) *Hikvision {
-	return &Hikvision{
+	hik := &Hikvision{
 		camera: camera{
 			ip:       ip,
 			user:     user,
 			password: password,
 		},
 	}
+	hik.requester = hik
+	return hik
 }
 
 //Capture ..
@@ -65,15 +67,6 @@ func (h *Hikvision) GetDeviceInfo() map[string]string {
 		return nil
 	}
 	return h.parseDeviceInfo(body)
-}
-
-func (h *Hikvision) fetch(cameraURI string) ([]byte, error) {
-	header, err := h.getHeaderFromRequest(cameraURI)
-	if err != nil {
-		return nil, err
-	}
-	authorization := h.getAuthorization(header, cameraURI)
-	return h.getBodyFromRequest(cameraURI, authorization)
 }
 
 func (h *Hikvision) getAuthorization(header http.Header, cameraURI string) string {
