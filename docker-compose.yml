@@ -71,7 +71,7 @@ services:
         - ./redis/data:/data
     container_name: redis
   pdc:
-    image: 9d77v/pdc:2020-11-26_4d48619
+    image: 9d77v/pdc:2020-11-27_53aadea
     restart: always
     ports: 
       - 8080:8080
@@ -94,7 +94,7 @@ services:
   #     - /dev/i2c-1  
   #   container_name: pdc-iot-raspi
   # pdc-iot-camera:
-  #   image: 9d77v/pdc-iot-camera:2020-11-27_19fc62a
+  #   image: 9d77v/pdc-iot-camera:2020-11-27_53aadea
   #   restart: always
   #   env_file:
   #     - camera.env

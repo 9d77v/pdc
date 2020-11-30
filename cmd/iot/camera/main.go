@@ -19,7 +19,7 @@ func main() {
 	}
 	cronJobs := make([]*sdk.CronJob, 0)
 	cronJobs = append(cronJobs, &sdk.CronJob{
-		Spec: "*/10 * * * * *",
+		Spec: "*/15 * * * * *",
 		Cmd: func() {
 			iotSDK.SendPresignedURLMsg()
 		},
@@ -29,7 +29,10 @@ func main() {
 
 func updateDeviceAttributes(iotSDK *sdk.IotSDK) {
 	device := iotSDK.DeviceInfo
-	cameraDeviceMap := camera.GetDeviceInfo(int(device.CameraCompany), device.Ip, device.Username, device.Password)
+	cameraDeviceMap := make(map[string]string, 0)
+
+	c := newCameraer(device)
+	cameraDeviceMap = c.GetDeviceInfo()
 	attributeMap := make(map[uint32]string, 0)
 	for k, v := range cameraDeviceMap {
 		if device.AttributeConfig[k] != 0 {
@@ -60,7 +63,8 @@ func cameraMsgHandler(iotSDK *sdk.IotSDK, msg []byte) {
 
 func handleCameraCaptureMsg(iotSDK *sdk.IotSDK, msg *pb.CameraCaptureMsg) {
 	device := iotSDK.DeviceInfo
-	picture := camera.Capture(int(device.CameraCompany), device.Ip, device.Username, device.Password)
+	c := newCameraer(device)
+	picture := c.Capture()
 	captureOk := false
 	err := iotSDK.SavePicture(sdk.PictureRequest{
 		RequestURL:      msg.GetPictureUrl(),
@@ -78,7 +82,8 @@ func handleCameraCaptureMsg(iotSDK *sdk.IotSDK, msg *pb.CameraCaptureMsg) {
 
 func handlePresignedURLReplyMsg(iotSDK *sdk.IotSDK, msg *pb.PresignedUrlReplyMsg) {
 	device := iotSDK.DeviceInfo
-	picture := camera.Capture(int(device.CameraCompany), device.Ip, device.Username, device.Password)
+	c := newCameraer(device)
+	picture := c.Capture()
 	err := iotSDK.SavePicture(sdk.PictureRequest{
 		RequestURL:      msg.GetPictureUrl(),
 		OssPrefix:       msg.GetOssPrefix(),
@@ -88,4 +93,15 @@ func handlePresignedURLReplyMsg(iotSDK *sdk.IotSDK, msg *pb.PresignedUrlReplyMsg
 	if err != nil {
 		log.Println("Save Picture failed, ", err)
 	}
+}
+
+func newCameraer(device *pb.LoginReplyMsg) camera.Cameraer {
+	var c camera.Cameraer
+	switch device.CameraCompany {
+	case camera.CameraCompanyHikvision:
+		c = camera.NewHikvision(device.Ip, device.Username, device.Password)
+	case camera.CameraCompanyDaHua:
+		c = camera.NewDahua(device.Ip, device.Username, device.Password)
+	}
+	return c
 }
