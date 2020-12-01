@@ -12,7 +12,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/9d77v/wspush/redishub"
-	"github.com/nats-io/stan.go"
 
 	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/mq"
@@ -20,8 +19,6 @@ import (
 	"github.com/9d77v/pdc/internal/graph/generated"
 	_ "github.com/9d77v/pdc/internal/init"
 	"github.com/9d77v/pdc/internal/middleware"
-	device_consumers "github.com/9d77v/pdc/internal/module/device-service/consumers"
-	video_consumers "github.com/9d77v/pdc/internal/module/video-service/consumers"
 )
 
 const defaultPort = "8080"
@@ -41,10 +38,6 @@ func main() {
 		Addr:    ":" + port,
 		Handler: getServerMux(),
 	}
-
-	qsubs := initSubScriptions()
-	defer unSubscribeMQQueues(qsubs)
-
 	go func() {
 		errc <- srv.ListenAndServe()
 		log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
@@ -90,32 +83,4 @@ func getServerMux() *http.ServeMux {
 	})
 	mux.Handle("/", http.FileServer(http.Dir("web/build")))
 	return mux
-}
-
-func initSubScriptions() []stan.Subscription {
-	qsub1, err := mq.GetClient().QueueSubscribe(mq.SubjectVideo,
-		mq.GroupVideo, video_consumers.HandleVideoMSG)
-	if err != nil {
-		log.Panicln("QueueSubscribe error:", err)
-	}
-	qsub2, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
-		device_consumers.HandleDeviceMsg, stan.DurableName("dur"))
-	if err != nil {
-		log.Panicln("SubscribeDeviceAttribute error:", err)
-	}
-	qsub3, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
-		device_consumers.PublishDeviceData, stan.DurableName("dur"))
-	if err != nil {
-		log.Panicln("SubscribeDeviceAttribute error:", err)
-	}
-	return []stan.Subscription{qsub1, qsub2, qsub3}
-}
-
-func unSubscribeMQQueues(qsubs []stan.Subscription) {
-	for _, qsub := range qsubs {
-		err := qsub.Unsubscribe()
-		if err != nil {
-			log.Println("qsub Unsubscribe error:", err)
-		}
-	}
 }
