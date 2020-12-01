@@ -15,12 +15,13 @@ import (
 	"github.com/nats-io/stan.go"
 
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/consumer"
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph"
 	"github.com/9d77v/pdc/internal/graph/generated"
 	_ "github.com/9d77v/pdc/internal/init"
 	"github.com/9d77v/pdc/internal/middleware"
+	device_consumers "github.com/9d77v/pdc/internal/module/device-service/consumers"
+	video_consumers "github.com/9d77v/pdc/internal/module/video-service/consumers"
 )
 
 const defaultPort = "8080"
@@ -40,10 +41,10 @@ func main() {
 		Addr:    ":" + port,
 		Handler: getServerMux(),
 	}
+
 	qsubs := initSubScriptions()
-	defer unSubscribe(qsubs)
-	go consumer.SaveDeviceTelemetry()
-	go consumer.SaveDeviceHealth()
+	defer unSubscribeMQQueues(qsubs)
+
 	go func() {
 		errc <- srv.ListenAndServe()
 		log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
@@ -93,24 +94,24 @@ func getServerMux() *http.ServeMux {
 
 func initSubScriptions() []stan.Subscription {
 	qsub1, err := mq.GetClient().QueueSubscribe(mq.SubjectVideo,
-		mq.GroupVideo, consumer.HandleVideoMSG)
+		mq.GroupVideo, video_consumers.HandleVideoMSG)
 	if err != nil {
 		log.Panicln("QueueSubscribe error:", err)
 	}
 	qsub2, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
-		consumer.HandleDeviceMsg, stan.DurableName("dur"))
+		device_consumers.HandleDeviceMsg, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	qsub3, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
-		consumer.PublishDeviceData, stan.DurableName("dur"))
+		device_consumers.PublishDeviceData, stan.DurableName("dur"))
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
 	return []stan.Subscription{qsub1, qsub2, qsub3}
 }
 
-func unSubscribe(qsubs []stan.Subscription) {
+func unSubscribeMQQueues(qsubs []stan.Subscription) {
 	for _, qsub := range qsubs {
 		err := qsub.Unsubscribe()
 		if err != nil {

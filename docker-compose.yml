@@ -94,7 +94,7 @@ services:
   #     - /dev/i2c-1  
   #   container_name: pdc-iot-raspi
   # pdc-iot-camera:
-  #   image: 9d77v/pdc-iot-camera:2020-11-27_53aadea
+  #   image: 9d77v/pdc-iot-camera:2020-11-30_3513c42
   #   restart: always
   #   env_file:
   #     - camera.env

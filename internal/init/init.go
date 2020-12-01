@@ -11,7 +11,6 @@ import (
 	thing "github.com/9d77v/pdc/internal/module/thing-service/models"
 	user "github.com/9d77v/pdc/internal/module/user-service/models"
 	video "github.com/9d77v/pdc/internal/module/video-service/models"
-
 	"github.com/9d77v/pdc/internal/utils"
 )
 
