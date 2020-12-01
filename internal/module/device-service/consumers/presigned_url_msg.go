@@ -14,14 +14,6 @@ import (
 )
 
 type setPresignedURLSignedMsg struct {
-	*deviceUpMsg
-}
-
-//GetSetPresignedURLSignedMsg ..
-func getSetPresignedURLSignedMsg() *setPresignedURLSignedMsg {
-	return &setPresignedURLSignedMsg{
-		getDeviceMsg(),
-	}
 }
 
 func (m *setPresignedURLSignedMsg) sendData(deviceMsg *pb.DeviceUpMsg) {

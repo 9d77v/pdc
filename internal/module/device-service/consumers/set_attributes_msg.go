@@ -9,13 +9,6 @@ import (
 )
 
 type setAttributesMsg struct {
-	*deviceUpMsg
-}
-
-func getSetAttributesMsg() *setAttributesMsg {
-	return &setAttributesMsg{
-		getDeviceMsg(),
-	}
 }
 
 func (m *setAttributesMsg) handleMsg(deviceMsg *pb.DeviceUpMsg) {

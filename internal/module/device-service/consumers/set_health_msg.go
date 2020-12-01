@@ -15,13 +15,6 @@ import (
 )
 
 type setHealthMsg struct {
-	*deviceUpMsg
-}
-
-func getSetHealthMsg() *setHealthMsg {
-	return &setHealthMsg{
-		getDeviceMsg(),
-	}
 }
 
 func (m *setHealthMsg) handleMsg(deviceMsg *pb.DeviceUpMsg) {
@@ -31,10 +24,10 @@ func (m *setHealthMsg) handleMsg(deviceMsg *pb.DeviceUpMsg) {
 		ActionTime: deviceMsg.ActionTime,
 		Value:      healthMsg.DeviceHealth,
 	}
-	m.healthChan <- health
+	healthChan <- health
 }
 
-func (m *setHealthMsg) publishData(deviceMsg *pb.DeviceUpMsg) {
+func (m *setHealthMsg) sendData(deviceMsg *pb.DeviceUpMsg) {
 	healthMsg := deviceMsg.GetSetHealthMsg()
 	health := &pb.Health{
 		DeviceID:   deviceMsg.DeviceId,
@@ -62,11 +55,11 @@ func (m *setHealthMsg) saveDeviceHealth() {
 	defer timer.Stop()
 	for {
 		select {
-		case health := <-m.healthChan:
+		case health := <-healthChan:
 			healths = append(healths, health)
-			if len(healths) != m.batchSize {
+			if len(healths) != batchSize {
 				if len(healths) == 1 {
-					timer.Reset(m.duration)
+					timer.Reset(duration)
 				}
 				break
 			}

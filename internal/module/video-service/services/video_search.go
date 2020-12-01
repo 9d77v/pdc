@@ -24,7 +24,8 @@ type VideoSearch struct {
 }
 
 //BulkSaveES 批量保存到es
-func (v VideoSearch) BulkSaveES(ctx context.Context, vis []*models.VideoIndex, indexName string, bulkNum, workerNum int) {
+func (v VideoSearch) BulkSaveES(ctx context.Context,
+	vis []*models.VideoIndex, indexName string, bulkNum, workerNum int) {
 	bds := make([]*es.BulkDoc, 0, len(vis))
 	for _, v := range vis {
 		bd := &es.BulkDoc{
@@ -40,7 +41,8 @@ func (v VideoSearch) BulkSaveES(ctx context.Context, vis []*models.VideoIndex, i
 }
 
 //GetByIDFromElastic ...
-func (v VideoSearch) GetByIDFromElastic(ctx context.Context, videoID string) (*models.VideoIndex, error) {
+func (v VideoSearch) GetByIDFromElastic(ctx context.Context,
+	videoID string) (*models.VideoIndex, error) {
 	result, err := elasticsearch.GetClient().Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
 	if err != nil {
 		return nil, err
@@ -60,7 +62,8 @@ func (v VideoSearch) GetByIDFromElastic(ctx context.Context, videoID string) (*m
 }
 
 //ListVideoIndex ..
-func (v VideoSearch) ListVideoIndex(ctx context.Context, input model.VideoSearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
+func (v VideoSearch) ListVideoIndex(ctx context.Context,
+	input model.VideoSearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	boolQuery := elastic.NewBoolQuery()
 	keywordStr := strings.ReplaceAll(ptrs.String(input.Keyword), " ", "")
@@ -172,7 +175,8 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context, input model.VideoSearch
 }
 
 //SimilarVideoIndex ..
-func (v VideoSearch) SimilarVideoIndex(ctx context.Context, input model.VideoSimilarParam, scheme string) (int64, []*model.VideoIndex, error) {
+func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
+	input model.VideoSimilarParam, scheme string) (int64, []*model.VideoIndex, error) {
 	id := strconv.FormatInt(input.VideoID, 10)
 	vis := make([]*model.VideoIndex, 0)
 

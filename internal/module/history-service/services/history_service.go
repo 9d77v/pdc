@@ -17,7 +17,8 @@ import (
 type HistoryService struct{}
 
 //RecordHistory ..
-func (s HistoryService) RecordHistory(ctx context.Context, input model.NewHistoryInput, uid uint) (*model.History, error) {
+func (s HistoryService) RecordHistory(ctx context.Context,
+	input model.NewHistoryInput, uid uint) (*model.History, error) {
 	m := &models.History{
 		UID:           uid,
 		SourceType:    uint8(input.SourceType),
@@ -36,7 +37,8 @@ func (s HistoryService) RecordHistory(ctx context.Context, input model.NewHistor
 }
 
 //GetHistory ..
-func (s HistoryService) GetHistory(ctx context.Context, sourceType int64, sourceID int64, uid uint) (*model.History, error) {
+func (s HistoryService) GetHistory(ctx context.Context,
+	sourceType int64, sourceID int64, uid uint) (*model.History, error) {
 	history := new(models.History)
 	err := db.GetDB().Where("uid=? and source_type=? and source_id=?", uid, sourceType, sourceID).Take(history).Error
 	if err != nil {
@@ -47,7 +49,8 @@ func (s HistoryService) GetHistory(ctx context.Context, sourceType int64, source
 }
 
 //ListHistory ..
-func (s HistoryService) ListHistory(ctx context.Context, sourceType, page, pageSize *int64, uid int64, scheme string) (int64, []*model.History, error) {
+func (s HistoryService) ListHistory(ctx context.Context,
+	sourceType, page, pageSize *int64, uid int64, scheme string) (int64, []*model.History, error) {
 	result := make([]*model.History, 0)
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
