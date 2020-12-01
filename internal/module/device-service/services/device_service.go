@@ -27,7 +27,8 @@ type DeviceService struct {
 }
 
 //CreateDeviceModel  ..
-func (s DeviceService) CreateDeviceModel(ctx context.Context, input model.NewDeviceModel) (*model.DeviceModel, error) {
+func (s DeviceService) CreateDeviceModel(ctx context.Context,
+	input model.NewDeviceModel) (*model.DeviceModel, error) {
 	m := &models.DeviceModel{
 		Name:          input.Name,
 		Desc:          ptrs.String(input.Desc),
@@ -39,108 +40,7 @@ func (s DeviceService) CreateDeviceModel(ctx context.Context, input model.NewDev
 		return &model.DeviceModel{}, err
 	}
 	if input.DeviceType == 1 && input.CameraCompany == 0 {
-		attributes := []*models.AttributeModel{
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "device_name",
-				Name:          "设备名称",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "device_id",
-				Name:          "设备ID",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "device_description",
-				Name:          "设备描述",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "device_location",
-				Name:          "设备位置",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "system_contact",
-				Name:          "系统联系方",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "model",
-				Name:          "类型",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "serial_number",
-				Name:          "序列号",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "mac_address",
-				Name:          "MAC地址",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "firmware_version",
-				Name:          "固件版本",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "firmware_releasedDate",
-				Name:          "固件发布日期",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "encoder_version",
-				Name:          "编码器版本",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "encoder_released_date",
-				Name:          "编码器发布日期",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "boot_version",
-				Name:          "引导版本",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "boot_released_date",
-				Name:          "引导发布日期",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "hardware_version",
-				Name:          "硬件版本",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "device_type",
-				Name:          "设备类型",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "telecontrol_id",
-				Name:          "远程 ID",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "support beep",
-				Name:          "支持蜂鸣音",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "support_video_loss",
-				Name:          "支持视频丢失",
-			},
-			{
-				DeviceModelID: uint(m.ID),
-				Key:           "firmware_version_info",
-				Name:          "固件版本信息",
-			},
-		}
+		attributes := s.getDefaultHikvisionAttributeModels(m.ID)
 		err = db.GetDB().Create(&attributes).Error
 		if err != nil {
 			return &model.DeviceModel{ID: int64(m.ID)}, err
@@ -149,8 +49,114 @@ func (s DeviceService) CreateDeviceModel(ctx context.Context, input model.NewDev
 	return &model.DeviceModel{ID: int64(m.ID)}, err
 }
 
+func (s DeviceService) getDefaultHikvisionAttributeModels(id uint) []*models.AttributeModel {
+	return []*models.AttributeModel{
+		{
+			DeviceModelID: id,
+			Key:           "device_name",
+			Name:          "设备名称",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "device_id",
+			Name:          "设备ID",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "device_description",
+			Name:          "设备描述",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "device_location",
+			Name:          "设备位置",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "system_contact",
+			Name:          "系统联系方",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "model",
+			Name:          "类型",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "serial_number",
+			Name:          "序列号",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "mac_address",
+			Name:          "MAC地址",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "firmware_version",
+			Name:          "固件版本",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "firmware_releasedDate",
+			Name:          "固件发布日期",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "encoder_version",
+			Name:          "编码器版本",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "encoder_released_date",
+			Name:          "编码器发布日期",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "boot_version",
+			Name:          "引导版本",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "boot_released_date",
+			Name:          "引导发布日期",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "hardware_version",
+			Name:          "硬件版本",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "device_type",
+			Name:          "设备类型",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "telecontrol_id",
+			Name:          "远程 ID",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "support beep",
+			Name:          "支持蜂鸣音",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "support_video_loss",
+			Name:          "支持视频丢失",
+		},
+		{
+			DeviceModelID: id,
+			Key:           "firmware_version_info",
+			Name:          "固件版本信息",
+		},
+	}
+}
+
 //UpdateDeviceModel ..
-func (s DeviceService) UpdateDeviceModel(ctx context.Context, input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
+func (s DeviceService) UpdateDeviceModel(ctx context.Context,
+	input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
 	m := new(models.DeviceModel)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
@@ -201,7 +207,8 @@ func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.New
 }
 
 //DeleteAttributeModel ..
-func (s DeviceService) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
+func (s DeviceService) DeleteAttributeModel(ctx context.Context,
+	id int64) (*model.AttributeModel, error) {
 	m := new(models.AttributeModel)
 	m.ID = uint(id)
 	err := db.GetDB().Delete(m).Error
@@ -209,7 +216,8 @@ func (s DeviceService) DeleteAttributeModel(ctx context.Context, id int64) (*mod
 }
 
 //CreateTelemetryModel  ..
-func (s DeviceService) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
+func (s DeviceService) CreateTelemetryModel(ctx context.Context,
+	input model.NewTelemetryModel) (*model.TelemetryModel, error) {
 	m := &models.TelemetryModel{
 		DeviceModelID: uint(input.DeviceModelID),
 		Key:           input.Key,
@@ -227,7 +235,8 @@ func (s DeviceService) CreateTelemetryModel(ctx context.Context, input model.New
 }
 
 //UpdateTelemetryModel ..
-func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
+func (s DeviceService) UpdateTelemetryModel(ctx context.Context,
+	input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
 	m := new(models.TelemetryModel)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
@@ -249,7 +258,8 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context, input model.New
 }
 
 //DeleteTelemetryModel ..
-func (s DeviceService) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
+func (s DeviceService) DeleteTelemetryModel(ctx context.Context,
+	id int64) (*model.TelemetryModel, error) {
 	m := new(models.TelemetryModel)
 	m.ID = uint(id)
 	err := db.GetDB().Delete(m).Error
@@ -523,7 +533,8 @@ func (s DeviceService) DeviceLogin(accessKey, secretKey string) (uint, error) {
 }
 
 //CreateDeviceDashboard  ..
-func (s DeviceService) CreateDeviceDashboard(ctx context.Context, input model.NewDeviceDashboard) (*model.DeviceDashboard, error) {
+func (s DeviceService) CreateDeviceDashboard(ctx context.Context,
+	input model.NewDeviceDashboard) (*model.DeviceDashboard, error) {
 	m := &models.DeviceDashboard{
 		Name:       input.Name,
 		IsVisible:  input.IsVisible,
@@ -584,14 +595,16 @@ func (s DeviceService) AddDeviceDashboardTelemetry(ctx context.Context, input mo
 }
 
 //RemoveDeviceDashboardTelemetry ..
-func (s DeviceService) RemoveDeviceDashboardTelemetry(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
+func (s DeviceService) RemoveDeviceDashboardTelemetry(ctx context.Context,
+	ids []int64) (*model.DeviceDashboard, error) {
 	m := new(models.DeviceDashboardTelemetry)
 	err := db.GetDB().Delete(m, ids).Error
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
 }
 
 //AddDeviceDashboardCamera  ..
-func (s DeviceService) AddDeviceDashboardCamera(ctx context.Context, input model.NewDeviceDashboardCamera) (*model.DeviceDashboard, error) {
+func (s DeviceService) AddDeviceDashboardCamera(ctx context.Context,
+	input model.NewDeviceDashboardCamera) (*model.DeviceDashboard, error) {
 	if len(input.DeviceIDs) == 0 {
 		return &model.DeviceDashboard{}, nil
 	}
@@ -611,7 +624,8 @@ func (s DeviceService) AddDeviceDashboardCamera(ctx context.Context, input model
 }
 
 //RemoveDeviceDashboardCamera ..
-func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
+func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context,
+	ids []int64) (*model.DeviceDashboard, error) {
 	m := new(models.DeviceDashboardCamera)
 	err := db.GetDB().Delete(m, ids).Error
 	return &model.DeviceDashboard{ID: int64(m.ID)}, err
@@ -686,7 +700,8 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 }
 
 //AppDeviceDashboards ..
-func (s DeviceService) AppDeviceDashboards(ctx context.Context, deviceType *int64) (int64, []*model.DeviceDashboard, error) {
+func (s DeviceService) AppDeviceDashboards(ctx context.Context,
+	deviceType *int64) (int64, []*model.DeviceDashboard, error) {
 	result := make([]*model.DeviceDashboard, 0)
 	data := make([]*models.DeviceDashboard, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
@@ -736,7 +751,8 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context, deviceType *int6
 func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme string) (string, error) {
 	bucketName := "camera"
 	now := time.Now()
-	objectName := "picture/" + strconv.FormatInt(deviceID, 10) + "/" + now.Format("2006-01-02") + "/" + strconv.FormatInt(now.Unix(), 10) + ".jpg"
+	objectName := "picture/" + strconv.FormatInt(deviceID, 10) + "/" + now.Format("2006-01-02") + "/" +
+		strconv.FormatInt(now.Unix(), 10) + ".jpg"
 	minioClient := oss.GetMinioClient()
 	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 10*time.Minute)
 	if err != nil {
@@ -773,8 +789,8 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 }
 
 //CameraTimeLapseVideos ..
-func (s DeviceService) CameraTimeLapseVideos(ctx context.Context, deviceID int64,scheme string) (int64,
-	[]*model.CameraTimeLapseVideo, error) {
+func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
+	deviceID int64, scheme string) (int64, []*model.CameraTimeLapseVideo, error) {
 	result := make([]*model.CameraTimeLapseVideo, 0)
 	data := make([]*models.CameraTimeLapseVideo, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
@@ -796,7 +812,7 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context, deviceID int64
 		}
 	}
 	for _, m := range data {
-		r := toCameraTimeLapseVideoDto(m,scheme)
+		r := toCameraTimeLapseVideoDto(m, scheme)
 		result = append(result, r)
 	}
 	return total, result, nil

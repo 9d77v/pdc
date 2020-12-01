@@ -97,8 +97,7 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 
 //ListUser ..
 func (s UserService) ListUser(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort,
-	scheme string) (int64, []*model.User, error) {
+	page, pageSize *int64, ids []int64, sorts []*model.Sort, scheme string) (int64, []*model.User, error) {
 	result := make([]*model.User, 0)
 	data := make([]*models.User, 0)
 	offset, limit := utils.GetPageInfo(page, pageSize)
@@ -233,7 +232,8 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 }
 
 //UpdatePassword ..
-func (s UserService) UpdatePassword(ctx context.Context, oldPassword string, newPassword string, uid uint) (*model.User, error) {
+func (s UserService) UpdatePassword(ctx context.Context,
+	oldPassword string, newPassword string, uid uint) (*model.User, error) {
 	if len(newPassword) < 10 || len(newPassword) > 32 {
 		return nil, errors.New("新旧密码长度需要在10-32之间")
 	}

@@ -15,13 +15,6 @@ import (
 )
 
 type setTelemetriesMsg struct {
-	*deviceUpMsg
-}
-
-func getSetTelemetriesMsg() *setTelemetriesMsg {
-	return &setTelemetriesMsg{
-		getDeviceMsg(),
-	}
 }
 
 func (m *setTelemetriesMsg) handleMsg(deviceMsg *pb.DeviceUpMsg) {
@@ -36,11 +29,11 @@ func (m *setTelemetriesMsg) handleMsg(deviceMsg *pb.DeviceUpMsg) {
 			ID:         k,
 			Value:      v,
 		}
-		m.telemetryChan <- telemetry
+		telemetryChan <- telemetry
 	}
 }
 
-func (m *setTelemetriesMsg) publishData(deviceMsg *pb.DeviceUpMsg) {
+func (m *setTelemetriesMsg) sendData(deviceMsg *pb.DeviceUpMsg) {
 	telemetryMsg := deviceMsg.GetSetTelemetriesMsg()
 	if telemetryMsg.TelemetryMap == nil {
 		return
@@ -74,11 +67,11 @@ func (m *setTelemetriesMsg) saveDeviceTelemetry() {
 	defer timer.Stop()
 	for {
 		select {
-		case telemetry := <-m.telemetryChan:
+		case telemetry := <-telemetryChan:
 			telemetries = append(telemetries, telemetry)
-			if len(telemetries) != m.batchSize {
+			if len(telemetries) != batchSize {
 				if len(telemetries) == 1 {
-					timer.Reset(m.duration)
+					timer.Reset(duration)
 				}
 				break
 			}

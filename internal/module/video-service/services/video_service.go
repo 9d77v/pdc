@@ -77,7 +77,8 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 		for _, v := range data {
 			ids = append(ids, v.ID)
 		}
-		err := db.GetDB().Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).Delete(&models.Subtitle{}).Error
+		err := db.GetDB().Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).
+			Delete(&models.Subtitle{}).Error
 		if err != nil {
 			return nil, err
 		}
@@ -109,7 +110,8 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 }
 
 //UpdateVideo ..
-func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVideo) (*model.Video, error) {
+func (s VideoService) UpdateVideo(ctx context.Context,
+	input model.NewUpdateVideo) (*model.Video, error) {
 	video := new(models.Video)
 	fields := make([]string, 0)
 	varibales := graphql.GetRequestContext(ctx).Variables
@@ -138,7 +140,8 @@ func (s VideoService) UpdateVideo(ctx context.Context, input model.NewUpdateVide
 }
 
 //CreateEpisode ..
-func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode) (*model.Episode, error) {
+func (s VideoService) CreateEpisode(ctx context.Context,
+	input model.NewEpisode) (*model.Episode, error) {
 	e := &models.Episode{
 		Num:     input.Num,
 		VideoID: input.VideoID,
@@ -174,7 +177,8 @@ func (s VideoService) CreateEpisode(ctx context.Context, input model.NewEpisode)
 }
 
 //UpdateEpisode ..
-func (s VideoService) UpdateEpisode(ctx context.Context, input model.NewUpdateEpisode) (*model.Episode, error) {
+func (s VideoService) UpdateEpisode(ctx context.Context,
+	input model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
 	if err := db.GetDB().Select("id,video_id").First(episode, "id=?", input.ID).Error; err != nil {
 		return nil, err
@@ -281,7 +285,8 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 }
 
 //CreateVideoSeries ..
-func (s VideoService) CreateVideoSeries(ctx context.Context, input model.NewVideoSeries) (*model.VideoSeries, error) {
+func (s VideoService) CreateVideoSeries(ctx context.Context,
+	input model.NewVideoSeries) (*model.VideoSeries, error) {
 	m := &models.VideoSeries{
 		Name: input.Name,
 	}
@@ -293,7 +298,8 @@ func (s VideoService) CreateVideoSeries(ctx context.Context, input model.NewVide
 }
 
 //UpdateVideoSeries ..
-func (s VideoService) UpdateVideoSeries(ctx context.Context, input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
+func (s VideoService) UpdateVideoSeries(ctx context.Context,
+	input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
 	videoSeries := new(models.VideoSeries)
 	fields := make([]string, 0)
 	varibales := graphql.GetRequestContext(ctx).Variables
@@ -312,7 +318,8 @@ func (s VideoService) UpdateVideoSeries(ctx context.Context, input model.NewUpda
 }
 
 //CreateVideoSeriesItem ..
-func (s VideoService) CreateVideoSeriesItem(ctx context.Context, input model.NewVideoSeriesItem) (*model.VideoSeriesItem, error) {
+func (s VideoService) CreateVideoSeriesItem(ctx context.Context,
+	input model.NewVideoSeriesItem) (*model.VideoSeriesItem, error) {
 	e := &models.VideoSeriesItem{
 		VideoSeriesID: uint(input.VideoSeriesID),
 		VideoID:       uint(input.VideoID),
@@ -330,7 +337,8 @@ func (s VideoService) CreateVideoSeriesItem(ctx context.Context, input model.New
 }
 
 //UpdateVideoSeriesItem ..
-func (s VideoService) UpdateVideoSeriesItem(ctx context.Context, input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error) {
+func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
+	input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error) {
 	item := new(models.VideoSeriesItem)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
