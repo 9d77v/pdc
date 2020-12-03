@@ -61,6 +61,7 @@ func toVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {
 	for _, item := range m.Items {
 		items = append(items, &model.VideoSeriesItem{
 			VideoID:       int64(item.VideoID),
+			EpisodeID:     int64(item.EpisodeID),
 			VideoSeriesID: int64(item.VideoSeriesID),
 			Alias:         item.Alias,
 			Title:         item.Title,
@@ -73,5 +74,16 @@ func toVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {
 		Items:     items,
 		CreatedAt: m.CreatedAt.Unix(),
 		UpdatedAt: m.UpdatedAt.Unix(),
+	}
+}
+
+func toVideoIndexDto(vi *models.VideoIndex) *model.VideoIndex {
+	return &model.VideoIndex{
+		ID:        int64(vi.ID),
+		Title:     vi.Title,
+		Desc:      vi.Desc,
+		Cover:     vi.Cover,
+		TotalNum:  int64(vi.TotalNum),
+		EpisodeID: int64(vi.EpisodeID),
 	}
 }

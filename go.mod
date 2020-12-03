@@ -19,6 +19,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.19
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/speps/go-hashids v2.0.0+incompatible
+	github.com/stretchr/testify v1.6.1
 	github.com/vektah/gqlparser/v2 v2.0.1
 	gobot.io/x/gobot v1.14.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9

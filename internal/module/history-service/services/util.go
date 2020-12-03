@@ -7,7 +7,7 @@ import (
 
 func toHistoryDto(m *models.History) *model.History {
 	if m == nil {
-		return nil
+		return &model.History{}
 	}
 	return &model.History{
 		UID:           int64(m.UID),

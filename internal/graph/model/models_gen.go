@@ -149,7 +149,7 @@ type History struct {
 	SubTitle      string  `json:"subTitle"`
 	Cover         string  `json:"cover"`
 	SubSourceID   int64   `json:"subSourceID"`
-	DeviceType    string  `json:"deviceType"`
+	Platform      string  `json:"platform"`
 	CurrentTime   float64 `json:"currentTime"`
 	RemainingTime float64 `json:"remainingTime"`
 	UpdatedAt     int64   `json:"updatedAt"`
@@ -217,7 +217,7 @@ type NewHistoryInput struct {
 	SourceType    int64   `json:"sourceType"`
 	SourceID      int64   `json:"sourceID"`
 	SubSourceID   int64   `json:"subSourceID"`
-	DeviceType    string  `json:"deviceType"`
+	Platform      string  `json:"platform"`
 	CurrentTime   float64 `json:"currentTime"`
 	RemainingTime float64 `json:"remainingTime"`
 }
@@ -526,12 +526,19 @@ type VideoConnection struct {
 	Edges      []*Video `json:"edges"`
 }
 
+type VideoDetail struct {
+	Video         *Video         `json:"video"`
+	VideoSerieses []*VideoSeries `json:"videoSerieses"`
+	HistoryInfo   *History       `json:"historyInfo"`
+}
+
 type VideoIndex struct {
-	ID       int64  `json:"id"`
-	Title    string `json:"title"`
-	Desc     string `json:"desc"`
-	Cover    string `json:"cover"`
-	TotalNum int64  `json:"totalNum"`
+	ID        int64  `json:"id"`
+	Title     string `json:"title"`
+	Desc      string `json:"desc"`
+	Cover     string `json:"cover"`
+	TotalNum  int64  `json:"totalNum"`
+	EpisodeID int64  `json:"episodeID"`
 }
 
 type VideoIndexConnection struct {
@@ -565,6 +572,7 @@ type VideoSeriesConnection struct {
 type VideoSeriesItem struct {
 	VideoSeriesID int64  `json:"videoSeriesID"`
 	VideoID       int64  `json:"videoID"`
+	EpisodeID     int64  `json:"episodeID"`
 	Title         string `json:"title"`
 	Alias         string `json:"alias"`
 	Num           int64  `json:"num"`

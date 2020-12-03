@@ -63,7 +63,7 @@ func getServerMux() *http.ServeMux {
 		),
 	)
 	if consts.DEBUG {
-		http.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
+		mux.Handle("/docs", playground.Handler("GraphQL playground", "/api"))
 	}
 	mux.Handle("/api", middleware.Auth()(apiHandler))
 	mux.HandleFunc("/pdc/", middleware.HandleCard())
