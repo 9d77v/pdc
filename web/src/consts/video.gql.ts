@@ -92,6 +92,7 @@ const LIST_VIDEO_CARD = gql`
             desc
             cover
             totalNum
+            episodeID
        }
        totalCount
        aggResults{
@@ -122,6 +123,7 @@ const VIDEO_RANDOM_TAG_SUGGEST = gql`
             desc
             cover
             totalNum
+            episodeID
        }
    }
   }
@@ -136,6 +138,7 @@ const SIMILAR_VIDEOS = gql`
             desc
             cover
             totalNum
+            episodeID
        }
    }
   }
@@ -152,49 +155,48 @@ const VIDEO_COMBO = gql`
   }
 `;
 
-const GET_VIDEO = gql`
- query videos($videoID:ID!,$sourceType:Int!=1) {
-   videos(ids:[$videoID]){
-       edges{
-            id
-            title
-            desc
-            cover
-            pubDate
-            episodes{
-              id
-              num
-              title
-              desc
-              cover
-              url
-              subtitles{
-                  name
-                  url
-              }
-            }
-            tags
-            theme
-       }
-   }
-   videoSerieses(videoID:$videoID){
-       edges{
-            id
-            name
-            items{
-              videoID
-              videoSeriesID
-              alias
-            }
-       }
-   }
-   historyInfo(sourceType:$sourceType,sourceID:$videoID){
+const GET_VIDEO_DETAIL = gql`
+query videoDetail($episodeID: ID!) {
+  videoDetail(episodeID: $episodeID) {
+    video {
+      id
+      title
+      desc
+      cover
+      pubDate
+      episodes {
+        id
+        num
+        title
+        desc
+        cover
+        url
+        subtitles {
+          name
+          url
+        }
+      }
+      tags
+      theme
+    }
+    videoSerieses {
+      id
+      name
+      items {
+        videoID
+        videoSeriesID
+        alias
+        episodeID
+      }
+    }
+    historyInfo {
       subSourceID
       currentTime
       remainingTime
       updatedAt
-   }
+    }
   }
+}
 `;
 
 const LIST_VIDEO_SERIES = gql`
@@ -254,8 +256,8 @@ mutation updateVideoSeriesItem($input:NewUpdateVideoSeriesItem!){
 export {
   ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES,
   LIST_VIDEO, VIDEO_COMBO, UPDATE_VIDEO, ADD_EPISODE,
-  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO, GET_VIDEO_TAGS,
-  VIDEO_RANDOM_TAG_SUGGEST, SIMILAR_VIDEOS,
+  UPDATE_EPISODE, LIST_VIDEO_CARD, GET_VIDEO_DETAIL,
+  GET_VIDEO_TAGS, VIDEO_RANDOM_TAG_SUGGEST, SIMILAR_VIDEOS,
   LIST_VIDEO_SERIES, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
   ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
 }

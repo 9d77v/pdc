@@ -1,17 +1,20 @@
 import React from "react"
+import { useHistory } from "react-router-dom"
+import { AppPath } from "src/consts/path"
 import "src/styles/button.less"
 
 interface IVideoSelectProps {
     data?: any[]
     num: number
-    setNum: (num: number) => void
 }
 
 const VideoSelect = (props: IVideoSelectProps) => {
-    const { data, num, setNum } = props
+    const { data, num } = props
+    const history = useHistory()
     let buttons: any[] = []
     if (data && data.length > 0) {
         buttons = data.map((value: any, index: number) => {
+            const link = AppPath.VIDEO_DETAIL + "?episode_id=" + value.id + "&next=true"
             if (index === num) {
                 return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"}  >
                     {value.num}
@@ -19,7 +22,7 @@ const VideoSelect = (props: IVideoSelectProps) => {
             }
             return <div key={"pdc-button-" + value.id}
                 className={"pdc-button"}
-                onClick={() => { setNum(index) }} >
+                onClick={() => { history.replace(link) }} >
                 {value.num}
             </div>
         })

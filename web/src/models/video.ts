@@ -21,6 +21,7 @@ export interface VideoCardModel {
     desc: string
     cover: string
     totalNum: number
+    episodeID: number
 }
 
 export interface IUpdateVideo {

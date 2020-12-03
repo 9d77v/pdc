@@ -53,7 +53,7 @@ const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
             if (isMobile()) {
                 return <MobileVideoCard
                     key={index}
-                    videoID={item.id}
+                    episodeID={item.episodeID}
                     cover={item.cover}
                     title={item.title}
                     totalNum={item.totalNum}
@@ -61,7 +61,7 @@ const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
             }
             return <VideoCard
                 key={index}
-                videoID={item.id}
+                episodeID={item.episodeID}
                 cover={item.cover}
                 title={item.title}
                 totalNum={item.totalNum}

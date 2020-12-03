@@ -25,7 +25,6 @@ const DeviceCameraDetail = () => {
                         url={`/hls/stream${deviceID}.m3u8`}
                         height={231}
                         width={"100%"}
-                        autoDestroy={true}
                     />
                 </div>
                 <span style={{ padding: 10, fontSize: 16, fontWeight: 100, color: "black" }}>历史回放</span>

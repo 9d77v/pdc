@@ -51,7 +51,7 @@ export const recordHistory = async (
                 "sourceType": sourceType,
                 "sourceID": sourceID,
                 "subSourceID": subSourceID,
-                "deviceType": isMobile() ? "mobile" : "desktop",
+                "platform": isMobile() ? "mobile" : "desktop",
                 "currentTime": currentTime,
                 "remainingTime": remainingTime
             }

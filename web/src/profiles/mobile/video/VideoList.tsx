@@ -30,7 +30,6 @@ export default function VideoList() {
                     isMobile: isMobile()
                 }
             },
-            fetchPolicy: "cache-and-network"
         }
     )
 
@@ -47,7 +46,7 @@ export default function VideoList() {
             setCards(videos.map((item: any, index: number) =>
                 <MobileVideoCard
                     key={index}
-                    videoID={item.id}
+                    episodeID={item.episodeID}
                     cover={item.cover}
                     title={item.title}
                     totalNum={item.totalNum}

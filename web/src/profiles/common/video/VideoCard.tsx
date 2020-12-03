@@ -3,22 +3,25 @@ import { AppPath } from "src/consts/path"
 import React, { FC } from 'react'
 import Img from "src/components/img"
 interface IVideoCardProps {
-    videoID: number
+    episodeID: number
     cover: string
     title: string
     totalNum: number
 }
 
 export const VideoCard: FC<IVideoCardProps> = ({
-    videoID,
+    episodeID,
     cover,
     title,
     totalNum
 }) => {
     const history = useHistory()
+    const link = AppPath.VIDEO_DETAIL + "?episode_id=" + episodeID
     return (
         <div
-            onClick={() => history.push(AppPath.VIDEO_DETAIL + "?video_id=" + videoID)}
+            onClick={() => {
+                history.push(link)
+            }}
             className={"card"}
         >
             <div style={{ clear: "both" }} />
@@ -30,15 +33,18 @@ export const VideoCard: FC<IVideoCardProps> = ({
 }
 
 export const MobileVideoCard: React.FC<IVideoCardProps> = ({
-    videoID,
+    episodeID,
     cover,
     title,
     totalNum
 }) => {
     const history = useHistory()
+    const link = AppPath.VIDEO_DETAIL + "?episode_id=" + episodeID
     return (
         <div
-            onClick={() => history.push(AppPath.VIDEO_DETAIL + "?video_id=" + videoID)}
+            onClick={() => {
+                history.push(link)
+            }}
             style={{
                 width: "30%",
                 margin: "2.5% 0 0 2.5%",
