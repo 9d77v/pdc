@@ -20,7 +20,7 @@ const LIST_HISTORY = gql`
             subTitle
             cover
             subSourceID  
-            deviceType
+            platform
             currentTime
             remainingTime
             updatedAt

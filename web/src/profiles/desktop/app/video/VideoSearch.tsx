@@ -32,7 +32,6 @@ const VideoSearch = () => {
                     isMobile: isMobile(),
                 }
             },
-            fetchPolicy: "cache-and-network"
         }
     )
 
@@ -49,7 +48,7 @@ const VideoSearch = () => {
             setCards(videos.map((item: any, index: number) =>
                 <VideoCard
                     key={index}
-                    videoID={item.id}
+                    episodeID={item.episodeID}
                     cover={item.cover}
                     title={item.title}
                     totalNum={item.totalNum}

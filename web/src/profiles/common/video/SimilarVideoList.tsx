@@ -39,8 +39,9 @@ const SimilarVideoList: FC<ISimilarVideoListProps> = ({
     const videos: JSX.Element[] = useMemo(() => {
         if (data) {
             return data.similarVideos.edges.map((video: VideoCardModel, index: number) => {
+                const link = AppPath.VIDEO_DETAIL + "?episode_id=" + video.episodeID
                 return (<div key={index}
-                    onClick={() => history.push(AppPath.VIDEO_DETAIL + "?video_id=" + video.id)}
+                    onClick={() => history.push(link)}
                     style={{ display: "flex", cursor: "pointer", paddingBottom: 10 }}>
                     <div style={{ width: 160 }}
                     >

@@ -17,6 +17,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
         const items = data[0].items
         seriesName = data[0].name
         seriesButtons = items.map((value: any, index: number) => {
+            const link = AppPath.VIDEO_DETAIL + "?episode_id=" + value.episodeID
             if (videoID === Number(value.videoID)) {
                 return <div
                     key={"pdc-button-" + value.videoID}
@@ -27,7 +28,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
             return <div
                 key={"pdc-button-" + value.videoID}
                 className={"pdc-button"}
-                onClick={() => { history.replace(AppPath.VIDEO_DETAIL + "?video_id=" + value.videoID) }}
+                onClick={() => { history.replace(link) }}
             >
                 {value.alias}
             </div>
