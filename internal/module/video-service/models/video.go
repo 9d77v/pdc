@@ -3,29 +3,11 @@ package models
 import (
 	"time"
 
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/utils"
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
-
-//Episode 分集
-type Episode struct {
-	gorm.Model
-	VideoID   int64
-	Num       float64
-	Title     string `gorm:"size:50;NOT NULL;"`
-	Desc      string `gorm:"size:5000;NOT NULL;"`
-	Cover     string `gorm:"size:500;NOT NULL;"`
-	URL       string `gorm:"size:500;NOT NULL;"`
-	Subtitles []*Subtitle
-}
-
-//Subtitle 字幕
-type Subtitle struct {
-	gorm.Model
-	EpisodeID uint
-	Name      string `gorm:"size:50;NOT NULL;"`
-	URL       string `gorm:"size:500;NOT NULL;"`
-}
 
 //Video 视频
 type Video struct {
@@ -41,11 +23,18 @@ type Video struct {
 	Theme          string `gorm:"size:50;"`
 }
 
+//GetByID Get video by id
+func (v *Video) GetByID(id uint, columns []string) error {
+	return db.GetDB().Select(utils.ToDBFields(columns)).
+		First(v, "id=?", id).Error
+}
+
 //VideoSeriesItem 视频系列视频列表
 type VideoSeriesItem struct {
 	VideoSeriesID uint   `gorm:"primary_key;auto_increment:false"`
 	VideoID       uint   `gorm:"primary_key;auto_increment:false"`
-	Title         string `gorm:"-"`
+	EpisodeID     uint   `gorm:"<-:false"`
+	Title         string `gorm:"<-:false"`
 	Alias         string
 	Num           int
 }

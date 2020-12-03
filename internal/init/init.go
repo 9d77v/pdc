@@ -33,6 +33,7 @@ func init() {
 	oss.InitMinioBuckets()
 	initSubscribe()
 	initConsumers()
+	initElasticSearchIndexes()
 }
 
 func autoMergeTables() {
@@ -50,6 +51,7 @@ func autoMergeTables() {
 		&device.CameraTimeLapseVideo{},
 		//history
 		&history.History{},
+		&history.HistoryLog{},
 		//thing
 		&thing.Thing{},
 		//user
@@ -107,4 +109,12 @@ func unSubscribeMQQueues(qsubs []stan.Subscription) {
 func initConsumers() {
 	go device_consumers.SaveDeviceTelemetry()
 	go device_consumers.SaveDeviceHealth()
+}
+
+func initElasticSearchIndexes() {
+	guid, err := mq.GetClient().PublishAsync(mq.SubjectVideo, []byte("0"),
+		utils.AckHandler)
+	if err != nil {
+		log.Println("mq publish failed,guid:", guid, " error:", err)
+	}
 }

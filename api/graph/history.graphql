@@ -7,22 +7,22 @@ type History {
 	subTitle:String!
 	cover:String!
 	subSourceID: Int!  
-	deviceType:String!
+	platform:String!
     currentTime: Float!
     remainingTime: Float!
 	updatedAt: Int!
 }
 
 type HistoryConnection {
-  totalCount: Int!
-  edges:[History!]!
+    totalCount: Int!
+    edges:[History!]!
 }
 
 input NewHistoryInput{
 	sourceType:Int!
 	sourceID: Int!
 	subSourceID: Int!  
-	deviceType:String!
+	platform:String!
     currentTime: Float!
     remainingTime: Float!
 }

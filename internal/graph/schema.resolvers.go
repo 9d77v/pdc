@@ -200,10 +200,15 @@ func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64
 	return con, err
 }
 
-func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error) {
+func (r *queryResolver) VideoDetail(ctx context.Context, episodeID int64) (*model.VideoDetail, error) {
+	scheme := middleware.ForSchemeContext(ctx)
+	user := middleware.ForContext(ctx)
+	return videoService.VideoDetail(ctx, episodeID, scheme, user.ID)
+}
+
+func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error) {
 	con := new(model.VideoSeriesConnection)
-	total, data, err := videoService.ListVideoSeries(ctx, keyword, videoID,
-		page, pageSize, ids, sorts)
+	total, data, err := videoService.ListVideoSeries(ctx, keyword, page, pageSize, ids, sorts)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -246,11 +251,6 @@ func (r *queryResolver) ThingSeries(ctx context.Context, dimension string, index
 func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error) {
 	user := middleware.ForContext(ctx)
 	return thingService.ThingAnalyze(ctx, dimension, index, start, group, int64(user.ID))
-}
-
-func (r *queryResolver) HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error) {
-	user := middleware.ForContext(ctx)
-	return historyService.GetHistory(ctx, sourceType, sourceID, user.ID)
 }
 
 func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error) {

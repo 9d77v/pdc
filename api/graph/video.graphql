@@ -121,6 +121,7 @@ type VideoSeries {
 type VideoSeriesItem {
   videoSeriesID: ID!
   videoID: ID!
+  episodeID: ID!
   title: String!
   alias: String!
   num: Int!
@@ -158,6 +159,7 @@ type VideoIndex {
 	desc: String!
 	cover: String!
 	totalNum: Int!
+  episodeID:  ID!
 }
 
 type VideoIndexConnection {
@@ -179,4 +181,10 @@ input VideoSimilarParam{
   videoID:ID!
   pageSize:Int!
   isMobile: Boolean
+}
+
+type VideoDetail{
+  video: Video!
+  videoSerieses:[VideoSeries!]
+  historyInfo: History
 }

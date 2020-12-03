@@ -4,17 +4,22 @@
 
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
+
   users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   userInfo(uid:ID):User!
+
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
-  videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
+  videoDetail(episodeID:ID!):VideoDetail!
+  videoSerieses(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
   searchVideo(input:VideoSearchParam!):VideoIndexConnection!
   similarVideos(input:VideoSimilarParam!):VideoIndexConnection!
+
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
-  historyInfo(sourceType:Int!,sourceID:ID!):History
-  histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
+
+  histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection! 
+  
   deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
   devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!],deviceType: Int):DeviceConnection!
   deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
@@ -40,7 +45,7 @@ type Mutation {
   updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!
   createVideoSeriesItem(input:NewVideoSeriesItem!):VideoSeriesItem!
   updateVideoSeriesItem(input:NewUpdateVideoSeriesItem!):VideoSeriesItem!
-  
+
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
 

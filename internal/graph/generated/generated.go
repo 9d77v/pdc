@@ -184,8 +184,8 @@ type ComplexityRoot struct {
 	History struct {
 		Cover         func(childComplexity int) int
 		CurrentTime   func(childComplexity int) int
-		DeviceType    func(childComplexity int) int
 		Num           func(childComplexity int) int
+		Platform      func(childComplexity int) int
 		RemainingTime func(childComplexity int) int
 		SourceID      func(childComplexity int) int
 		SourceType    func(childComplexity int) int
@@ -259,7 +259,6 @@ type ComplexityRoot struct {
 		DeviceModels          func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Devices               func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) int
 		Histories             func(childComplexity int, sourceType *int64, page *int64, pageSize *int64) int
-		HistoryInfo           func(childComplexity int, sourceType int64, sourceID int64) int
 		PresignedURL          func(childComplexity int, bucketName string, objectName string) int
 		SearchVideo           func(childComplexity int, input model.VideoSearchParam) int
 		SimilarVideos         func(childComplexity int, input model.VideoSimilarParam) int
@@ -268,7 +267,8 @@ type ComplexityRoot struct {
 		Things                func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		UserInfo              func(childComplexity int, uid *int64) int
 		Users                 func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
-		VideoSerieses         func(childComplexity int, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
+		VideoDetail           func(childComplexity int, episodeID int64) int
+		VideoSerieses         func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) int
 		Videos                func(childComplexity int, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) int
 	}
 
@@ -380,12 +380,19 @@ type ComplexityRoot struct {
 		TotalCount func(childComplexity int) int
 	}
 
+	VideoDetail struct {
+		HistoryInfo   func(childComplexity int) int
+		Video         func(childComplexity int) int
+		VideoSerieses func(childComplexity int) int
+	}
+
 	VideoIndex struct {
-		Cover    func(childComplexity int) int
-		Desc     func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Title    func(childComplexity int) int
-		TotalNum func(childComplexity int) int
+		Cover     func(childComplexity int) int
+		Desc      func(childComplexity int) int
+		EpisodeID func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Title     func(childComplexity int) int
+		TotalNum  func(childComplexity int) int
 	}
 
 	VideoIndexConnection struct {
@@ -409,6 +416,7 @@ type ComplexityRoot struct {
 
 	VideoSeriesItem struct {
 		Alias         func(childComplexity int) int
+		EpisodeID     func(childComplexity int) int
 		Num           func(childComplexity int) int
 		Title         func(childComplexity int) int
 		VideoID       func(childComplexity int) int
@@ -460,13 +468,13 @@ type QueryResolver interface {
 	Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error)
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
 	Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error)
-	VideoSerieses(ctx context.Context, keyword *string, videoID *int64, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
+	VideoDetail(ctx context.Context, episodeID int64) (*model.VideoDetail, error)
+	VideoSerieses(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error)
 	SearchVideo(ctx context.Context, input model.VideoSearchParam) (*model.VideoIndexConnection, error)
 	SimilarVideos(ctx context.Context, input model.VideoSimilarParam) (*model.VideoIndexConnection, error)
 	Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
-	HistoryInfo(ctx context.Context, sourceType int64, sourceID int64) (*model.History, error)
 	Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error)
 	DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceModelConnection, error)
 	Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (*model.DeviceConnection, error)
@@ -1155,19 +1163,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.History.CurrentTime(childComplexity), true
 
-	case "History.deviceType":
-		if e.complexity.History.DeviceType == nil {
-			break
-		}
-
-		return e.complexity.History.DeviceType(childComplexity), true
-
 	case "History.num":
 		if e.complexity.History.Num == nil {
 			break
 		}
 
 		return e.complexity.History.Num(childComplexity), true
+
+	case "History.platform":
+		if e.complexity.History.Platform == nil {
+			break
+		}
+
+		return e.complexity.History.Platform(childComplexity), true
 
 	case "History.remainingTime":
 		if e.complexity.History.RemainingTime == nil {
@@ -1790,18 +1798,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Histories(childComplexity, args["sourceType"].(*int64), args["page"].(*int64), args["pageSize"].(*int64)), true
 
-	case "Query.historyInfo":
-		if e.complexity.Query.HistoryInfo == nil {
-			break
-		}
-
-		args, err := ec.field_Query_historyInfo_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.HistoryInfo(childComplexity, args["sourceType"].(int64), args["sourceID"].(int64)), true
-
 	case "Query.presignedUrl":
 		if e.complexity.Query.PresignedURL == nil {
 			break
@@ -1898,6 +1894,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
+	case "Query.videoDetail":
+		if e.complexity.Query.VideoDetail == nil {
+			break
+		}
+
+		args, err := ec.field_Query_videoDetail_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.VideoDetail(childComplexity, args["episodeID"].(int64)), true
+
 	case "Query.videoSerieses":
 		if e.complexity.Query.VideoSerieses == nil {
 			break
@@ -1908,7 +1916,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.VideoSerieses(childComplexity, args["keyword"].(*string), args["videoID"].(*int64), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
+		return e.complexity.Query.VideoSerieses(childComplexity, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort)), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -2447,6 +2455,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.VideoConnection.TotalCount(childComplexity), true
 
+	case "VideoDetail.historyInfo":
+		if e.complexity.VideoDetail.HistoryInfo == nil {
+			break
+		}
+
+		return e.complexity.VideoDetail.HistoryInfo(childComplexity), true
+
+	case "VideoDetail.video":
+		if e.complexity.VideoDetail.Video == nil {
+			break
+		}
+
+		return e.complexity.VideoDetail.Video(childComplexity), true
+
+	case "VideoDetail.videoSerieses":
+		if e.complexity.VideoDetail.VideoSerieses == nil {
+			break
+		}
+
+		return e.complexity.VideoDetail.VideoSerieses(childComplexity), true
+
 	case "VideoIndex.cover":
 		if e.complexity.VideoIndex.Cover == nil {
 			break
@@ -2460,6 +2489,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.VideoIndex.Desc(childComplexity), true
+
+	case "VideoIndex.episodeID":
+		if e.complexity.VideoIndex.EpisodeID == nil {
+			break
+		}
+
+		return e.complexity.VideoIndex.EpisodeID(childComplexity), true
 
 	case "VideoIndex.id":
 		if e.complexity.VideoIndex.ID == nil {
@@ -2558,6 +2594,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.VideoSeriesItem.Alias(childComplexity), true
+
+	case "VideoSeriesItem.episodeID":
+		if e.complexity.VideoSeriesItem.EpisodeID == nil {
+			break
+		}
+
+		return e.complexity.VideoSeriesItem.EpisodeID(childComplexity), true
 
 	case "VideoSeriesItem.num":
 		if e.complexity.VideoSeriesItem.Num == nil {
@@ -2908,43 +2951,47 @@ type CameraTimeLapseVideoConnection {
 	subTitle:String!
 	cover:String!
 	subSourceID: Int!  
-	deviceType:String!
+	platform:String!
     currentTime: Float!
     remainingTime: Float!
 	updatedAt: Int!
 }
 
 type HistoryConnection {
-  totalCount: Int!
-  edges:[History!]!
+    totalCount: Int!
+    edges:[History!]!
 }
 
 input NewHistoryInput{
 	sourceType:Int!
 	sourceID: Int!
 	subSourceID: Int!  
-	deviceType:String!
+	platform:String!
     currentTime: Float!
     remainingTime: Float!
-}
-`, BuiltIn: false},
+}`, BuiltIn: false},
 	&ast.Source{Name: "api/graph/schema.graphql", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
 
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
+
   users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
   userInfo(uid:ID):User!
+
   videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
-  videoSerieses(keyword:String,videoID:ID,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
+  videoDetail(episodeID:ID!):VideoDetail!
+  videoSerieses(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
   searchVideo(input:VideoSearchParam!):VideoIndexConnection!
   similarVideos(input:VideoSimilarParam!):VideoIndexConnection!
+
   things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
-  historyInfo(sourceType:Int!,sourceID:ID!):History
-  histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection!
+
+  histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection! 
+  
   deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
   devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!],deviceType: Int):DeviceConnection!
   deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
@@ -2970,7 +3017,7 @@ type Mutation {
   updateVideoSeries(input:NewUpdateVideoSeries!):VideoSeries!
   createVideoSeriesItem(input:NewVideoSeriesItem!):VideoSeriesItem!
   updateVideoSeriesItem(input:NewUpdateVideoSeriesItem!):VideoSeriesItem!
-  
+
   createThing(input:NewThing!):Thing!
   updateThing(input:NewUpdateThing!):Thing!
 
@@ -3237,6 +3284,7 @@ type VideoSeries {
 type VideoSeriesItem {
   videoSeriesID: ID!
   videoID: ID!
+  episodeID: ID!
   title: String!
   alias: String!
   num: Int!
@@ -3274,6 +3322,7 @@ type VideoIndex {
 	desc: String!
 	cover: String!
 	totalNum: Int!
+  episodeID:  ID!
 }
 
 type VideoIndexConnection {
@@ -3295,7 +3344,14 @@ input VideoSimilarParam{
   videoID:ID!
   pageSize:Int!
   isMobile: Boolean
-}`, BuiltIn: false},
+}
+
+type VideoDetail{
+  video: Video!
+  videoSerieses:[VideoSeries!]
+  historyInfo: History
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -4055,28 +4111,6 @@ func (ec *executionContext) field_Query_histories_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_historyInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 int64
-	if tmp, ok := rawArgs["sourceType"]; ok {
-		arg0, err = ec.unmarshalNInt2int64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sourceType"] = arg0
-	var arg1 int64
-	if tmp, ok := rawArgs["sourceID"]; ok {
-		arg1, err = ec.unmarshalNID2int64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["sourceID"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_presignedUrl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4317,6 +4351,20 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_videoDetail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int64
+	if tmp, ok := rawArgs["episodeID"]; ok {
+		arg0, err = ec.unmarshalNID2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["episodeID"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_videoSerieses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4329,45 +4377,37 @@ func (ec *executionContext) field_Query_videoSerieses_args(ctx context.Context, 
 	}
 	args["keyword"] = arg0
 	var arg1 *int64
-	if tmp, ok := rawArgs["videoID"]; ok {
-		arg1, err = ec.unmarshalOID2ᚖint64(ctx, tmp)
+	if tmp, ok := rawArgs["page"]; ok {
+		arg1, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["videoID"] = arg1
+	args["page"] = arg1
 	var arg2 *int64
-	if tmp, ok := rawArgs["page"]; ok {
+	if tmp, ok := rawArgs["pageSize"]; ok {
 		arg2, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["page"] = arg2
-	var arg3 *int64
-	if tmp, ok := rawArgs["pageSize"]; ok {
-		arg3, err = ec.unmarshalOInt2ᚖint64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["pageSize"] = arg3
-	var arg4 []int64
+	args["pageSize"] = arg2
+	var arg3 []int64
 	if tmp, ok := rawArgs["ids"]; ok {
-		arg4, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
+		arg3, err = ec.unmarshalOID2ᚕint64ᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["ids"] = arg4
-	var arg5 []*model.Sort
+	args["ids"] = arg3
+	var arg4 []*model.Sort
 	if tmp, ok := rawArgs["sorts"]; ok {
-		arg5, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
+		arg4, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐSortᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["sorts"] = arg5
+	args["sorts"] = arg4
 	return args, nil
 }
 
@@ -7874,7 +7914,7 @@ func (ec *executionContext) _History_subSourceID(ctx context.Context, field grap
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _History_deviceType(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
+func (ec *executionContext) _History_platform(ctx context.Context, field graphql.CollectedField, obj *model.History) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -7891,7 +7931,7 @@ func (ec *executionContext) _History_deviceType(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DeviceType, nil
+		return obj.Platform, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9929,6 +9969,47 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	return ec.marshalNVideoConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoConnection(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_videoDetail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Query",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_videoDetail_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().VideoDetail(rctx, args["episodeID"].(int64))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.VideoDetail)
+	fc.Result = res
+	return ec.marshalNVideoDetail2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoDetail(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_videoSerieses(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -9953,7 +10034,7 @@ func (ec *executionContext) _Query_videoSerieses(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().VideoSerieses(rctx, args["keyword"].(*string), args["videoID"].(*int64), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
+		return ec.resolvers.Query().VideoSerieses(rctx, args["keyword"].(*string), args["page"].(*int64), args["pageSize"].(*int64), args["ids"].([]int64), args["sorts"].([]*model.Sort))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10173,44 +10254,6 @@ func (ec *executionContext) _Query_thingAnalyze(ctx context.Context, field graph
 	res := resTmp.(*model.PieLineSerieData)
 	fc.Result = res
 	return ec.marshalNPieLineSerieData2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐPieLineSerieData(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_historyInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Query",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_historyInfo_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().HistoryInfo(rctx, args["sourceType"].(int64), args["sourceID"].(int64))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.History)
-	fc.Result = res
-	return ec.marshalOHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐHistory(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_histories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -13045,6 +13088,102 @@ func (ec *executionContext) _VideoConnection_edges(ctx context.Context, field gr
 	return ec.marshalNVideo2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoᚄ(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _VideoDetail_video(ctx context.Context, field graphql.CollectedField, obj *model.VideoDetail) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoDetail",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Video, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Video)
+	fc.Result = res
+	return ec.marshalNVideo2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _VideoDetail_videoSerieses(ctx context.Context, field graphql.CollectedField, obj *model.VideoDetail) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoDetail",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.VideoSerieses, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.VideoSeries)
+	fc.Result = res
+	return ec.marshalOVideoSeries2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSeriesᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _VideoDetail_historyInfo(ctx context.Context, field graphql.CollectedField, obj *model.VideoDetail) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoDetail",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HistoryInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.History)
+	fc.Result = res
+	return ec.marshalOHistory2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐHistory(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _VideoIndex_id(ctx context.Context, field graphql.CollectedField, obj *model.VideoIndex) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -13213,6 +13352,40 @@ func (ec *executionContext) _VideoIndex_totalNum(ctx context.Context, field grap
 	res := resTmp.(int64)
 	fc.Result = res
 	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _VideoIndex_episodeID(ctx context.Context, field graphql.CollectedField, obj *model.VideoIndex) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoIndex",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EpisodeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _VideoIndexConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *model.VideoIndexConnection) (ret graphql.Marshaler) {
@@ -13604,6 +13777,40 @@ func (ec *executionContext) _VideoSeriesItem_videoID(ctx context.Context, field 
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.VideoID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNID2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _VideoSeriesItem_episodeID(ctx context.Context, field graphql.CollectedField, obj *model.VideoSeriesItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "VideoSeriesItem",
+		Field:    field,
+		Args:     nil,
+		IsMethod: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EpisodeID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15047,9 +15254,9 @@ func (ec *executionContext) unmarshalInputNewHistoryInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "deviceType":
+		case "platform":
 			var err error
-			it.DeviceType, err = ec.unmarshalNString2string(ctx, v)
+			it.Platform, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16984,8 +17191,8 @@ func (ec *executionContext) _History(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "deviceType":
-			out.Values[i] = ec._History_deviceType(ctx, field, obj)
+		case "platform":
+			out.Values[i] = ec._History_platform(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -17398,6 +17605,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
+		case "videoDetail":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_videoDetail(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "videoSerieses":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -17480,17 +17701,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
-				return res
-			})
-		case "historyInfo":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_historyInfo(ctx, field)
 				return res
 			})
 		case "histories":
@@ -18176,6 +18386,37 @@ func (ec *executionContext) _VideoConnection(ctx context.Context, sel ast.Select
 	return out
 }
 
+var videoDetailImplementors = []string{"VideoDetail"}
+
+func (ec *executionContext) _VideoDetail(ctx context.Context, sel ast.SelectionSet, obj *model.VideoDetail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, videoDetailImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VideoDetail")
+		case "video":
+			out.Values[i] = ec._VideoDetail_video(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "videoSerieses":
+			out.Values[i] = ec._VideoDetail_videoSerieses(ctx, field, obj)
+		case "historyInfo":
+			out.Values[i] = ec._VideoDetail_historyInfo(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var videoIndexImplementors = []string{"VideoIndex"}
 
 func (ec *executionContext) _VideoIndex(ctx context.Context, sel ast.SelectionSet, obj *model.VideoIndex) graphql.Marshaler {
@@ -18209,6 +18450,11 @@ func (ec *executionContext) _VideoIndex(ctx context.Context, sel ast.SelectionSe
 			}
 		case "totalNum":
 			out.Values[i] = ec._VideoIndex_totalNum(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "episodeID":
+			out.Values[i] = ec._VideoIndex_episodeID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -18354,6 +18600,11 @@ func (ec *executionContext) _VideoSeriesItem(ctx context.Context, sel ast.Select
 			}
 		case "videoID":
 			out.Values[i] = ec._VideoSeriesItem_videoID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "episodeID":
+			out.Values[i] = ec._VideoSeriesItem_episodeID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -19749,6 +20000,20 @@ func (ec *executionContext) marshalNVideoConnection2ᚖgithubᚗcomᚋ9d77vᚋpd
 	return ec._VideoConnection(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNVideoDetail2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoDetail(ctx context.Context, sel ast.SelectionSet, v model.VideoDetail) graphql.Marshaler {
+	return ec._VideoDetail(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNVideoDetail2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoDetail(ctx context.Context, sel ast.SelectionSet, v *model.VideoDetail) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._VideoDetail(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNVideoIndex2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoIndex(ctx context.Context, sel ast.SelectionSet, v model.VideoIndex) graphql.Marshaler {
 	return ec._VideoIndex(ctx, sel, &v)
 }
@@ -20727,6 +20992,46 @@ func (ec *executionContext) marshalOTelemetryModel2ᚖgithubᚗcomᚋ9d77vᚋpdc
 		return graphql.Null
 	}
 	return ec._TelemetryModel(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOVideoSeries2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSeriesᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.VideoSeries) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVideoSeries2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSeries(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

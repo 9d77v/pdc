@@ -149,13 +149,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 				log.Println("elastic search result json unmarshal error:", err)
 			}
 			vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
-			vis = append(vis, &model.VideoIndex{
-				ID:       int64(vi.ID),
-				Title:    vi.Title,
-				Desc:     vi.Desc,
-				Cover:    vi.Cover,
-				TotalNum: int64(vi.TotalNum),
-			})
+			vis = append(vis, toVideoIndexDto(vi))
 		}
 	}
 	if fieldMap["aggResults"] {
@@ -237,13 +231,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
 			log.Println("elastic search result json unmarshal error:", err)
 		}
 		vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
-		vis = append(vis, &model.VideoIndex{
-			ID:       int64(vi.ID),
-			Title:    vi.Title,
-			Desc:     vi.Desc,
-			Cover:    vi.Cover,
-			TotalNum: int64(vi.TotalNum),
-		})
+		vis = append(vis, toVideoIndexDto(vi))
 	}
 	return result.TotalHits(), vis, nil
 }

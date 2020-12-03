@@ -12,7 +12,7 @@ api: api/graph/*.graphql
 dev:
 	go run cmd/server.go
 test:
-	go test -v ./...
+	go test -v ./internal/...
 gosec:
 	gosec -exclude=G204 -conf gosec.json ./...
 
@@ -23,7 +23,7 @@ protoc-server: api/proto/server/*.proto
 	protoc --go_out=internal/pb api/proto/server/*.proto
 
 #docker
-docker-deploy: cmd/server.go
+docker-deploy: test cmd/server.go
 	docker build -t 9d77v/$(APP):$(IMAGE_TAG) -f $(DOCKER_DIR)/Dockerfile .
 	docker push 9d77v/$(APP):$(IMAGE_TAG)
 #base
