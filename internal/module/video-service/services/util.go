@@ -56,6 +56,15 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 	}
 }
 
+func toVideoSeriesDtos(data []*models.VideoSeries) []*model.VideoSeries {
+	result := make([]*model.VideoSeries, 0, len(data))
+	for _, m := range data {
+		r := toVideoSeriesDto(m)
+		result = append(result, r)
+	}
+	return result
+}
+
 func toVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {
 	items := make([]*model.VideoSeriesItem, 0, len(m.Items))
 	for _, item := range m.Items {

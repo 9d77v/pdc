@@ -60,6 +60,8 @@ func ToDBFields(fields []string, omitFields ...string) []string {
 			value := CamelToSnack(v)
 			if strings.Contains(value, "price") {
 				dbFields = append(dbFields, fmt.Sprintf("\"%s\"::money::numeric::float8", CamelToSnack(v)))
+			} else if strings.Contains(value, ".") {
+				dbFields = append(dbFields, CamelToSnack(v))
 			} else {
 				dbFields = append(dbFields, fmt.Sprintf("\"%s\"", CamelToSnack(v)))
 			}
