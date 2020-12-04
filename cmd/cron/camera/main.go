@@ -163,5 +163,9 @@ func generateVideo(pictureTmpDir, videoFilePath string) error {
 }
 
 func saveVideoPath(deviceID uint, date, videoURL string) error {
-	return db.GetDB().Save(models.NewCameraTimeLapseVideo(deviceID, date, videoURL)).Error
+	return db.GetDB().Save(&models.CameraTimeLapseVideo{
+		DeviceID: deviceID,
+		Date:     date,
+		VideoURL: videoURL,
+	}).Error
 }

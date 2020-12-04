@@ -59,13 +59,13 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 
 //UpdateUser ..
 func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error) {
-	user := new(models.User)
+	user := models.NewUser()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(user, "id=?", input.ID).Error; err != nil {
+	if err := user.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -103,16 +103,14 @@ func (s UserService) ListUser(ctx context.Context, keyword *string,
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	if keyword != nil && ptrs.String(keyword) != "" {
-		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
-	}
+	user := models.NewUser()
+	user.FuzzyQuery(keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = builder.Model(&models.User{}).Count(&total).Error
+			total, err = user.Count(user)
 			if err != nil {
 				return 0, result, err
 			}
@@ -120,21 +118,11 @@ func (s UserService) ListUser(ctx context.Context, keyword *string,
 	}
 	if fieldMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			sort := " DESC"
-			if v.IsAsc {
-				sort = " ASC"
-			}
-			builder = builder.Order(v.Field + sort)
-		}
-		err = builder.Find(&data).Error
+		err = user.Select(edgeFields).
+			IDArrayQuery(user.ToUintIDs(ids)).
+			Pagination(offset, limit).
+			Sort(sorts).
+			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
@@ -186,11 +174,11 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 
 //GetByID ..
 func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, error) {
-	user := new(models.User)
+	user := models.NewUser()
 	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
 	err := redis.GetClient().Get(ctx, key).Scan(user)
 	if err != nil {
-		if err := user.GetByID(uid); err != nil {
+		if err := user.IDQuery(uint(uid)).First(user); err != nil {
 			return user, err
 		}
 		err = redis.GetClient().Set(ctx, key, user, time.Hour).Err()
@@ -203,14 +191,14 @@ func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, erro
 
 //UpdateProfile ..
 func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdateProfile, uid uint) (*model.User, error) {
-	user := new(models.User)
+	user := models.NewUser()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
 	fields = append(fields, "id")
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(user, "id=?", uid).Error; err != nil {
+	if err := user.GetByID(uid, fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{

@@ -3,13 +3,13 @@ package models
 import (
 	"time"
 
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/lib/pq"
-	"gorm.io/gorm"
 )
 
 //Thing 物品
 type Thing struct {
-	gorm.Model
+	*base.Model
 	UID                 int64  `grom:"column:uid"`
 	Name                string `gorm:"size:100"`
 	Num                 float64
@@ -26,6 +26,18 @@ type Thing struct {
 	PurchasePlatform    string        `gorm:"size:50"`
 	RefOrderID          string        `gorm:"size:50"`
 	RubbishCategory     pq.Int64Array `gorm:"type:smallint[]"` //0:其他垃圾，1：可回收垃圾，2：厨余垃圾，3：有害垃圾
+}
+
+//NewThing ..
+func NewThing() *Thing {
+	vs := &Thing{}
+	vs.Model = base.NewModel()
+	return vs
+}
+
+//GetByID ..
+func (m *Thing) GetByID(id, uid uint, columns []string) error {
+	return m.Select(columns).IDQuery(id).IDQuery(uid, "uid").First(m)
 }
 
 //PieLineSerie ..

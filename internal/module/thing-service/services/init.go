@@ -6,6 +6,15 @@ import (
 	"github.com/9d77v/pdc/internal/module/thing-service/models"
 )
 
+func toThingsDtos(data []*models.Thing, scheme string) []*model.Thing {
+	result := make([]*model.Thing, 0, len(data))
+	for _, m := range data {
+		r := toThingDto(m, scheme)
+		result = append(result, r)
+	}
+	return result
+}
+
 func toThingDto(m *models.Thing, scheme string) *model.Thing {
 	newPics := make([]string, 0)
 	for _, v := range m.Pics {

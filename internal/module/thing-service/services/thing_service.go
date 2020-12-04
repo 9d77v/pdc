@@ -45,14 +45,14 @@ func (s ThingService) CreateThing(ctx context.Context, input model.NewThing, uid
 }
 
 //UpdateThing ..
-func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing, uid int64) (*model.Thing, error) {
-	thing := new(models.Thing)
+func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing, uid uint) (*model.Thing, error) {
+	thing := models.NewThing()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(thing, "id=? and uid=?", input.ID, uid).Error; err != nil {
+	if err := thing.GetByID(uint(input.ID), uid, fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -81,23 +81,20 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 //ListThing ..
 func (s ThingService) ListThing(ctx context.Context, keyword *string,
 	page, pageSize *int64, ids []int64, sorts []*model.Sort,
-	uid int64, scheme string) (int64, []*model.Thing, error) {
+	uid uint, scheme string) (int64, []*model.Thing, error) {
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
 	offset, limit := utils.GetPageInfo(page, pageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	builder = builder.Where("uid=?", uid)
-	if keyword != nil && ptrs.String(keyword) != "" {
-		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
-	}
+	thing := models.NewThing()
+	thing.IDQuery(uid, "uid").FuzzyQuery(keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = builder.Model(&models.Thing{}).Count(&total).Error
+			total, err = thing.Count(thing)
 			if err != nil {
 				return 0, result, err
 			}
@@ -105,30 +102,16 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string,
 	}
 	if fieldMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			sort := " DESC"
-			if v.IsAsc {
-				sort = " ASC"
-			}
-			builder = builder.Order(v.Field + sort)
-		}
-		err = builder.Find(&data).Error
+		err = thing.Select(edgeFields).
+			IDArrayQuery(thing.ToUintIDs(ids)).
+			Pagination(offset, limit).
+			Sort(sorts).
+			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toThingDto(m, scheme)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toThingsDtos(data, scheme), nil
 }
 
 //ThingSeries 获取物品数据

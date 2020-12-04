@@ -1,12 +1,13 @@
 package models
 
 import (
+	"github.com/9d77v/pdc/internal/module/base"
 	"gorm.io/gorm"
 )
 
 //Device 设备
 type Device struct {
-	gorm.Model
+	*base.Model
 	DeviceModelID uint
 	DeviceModel   DeviceModel
 	Name          string `gorm:"size:50;NOT NULL;"`
@@ -18,6 +19,18 @@ type Device struct {
 	Password      string       `gorm:"size:32;"`
 	Attributes    []*Attribute //属性，由采集程序启动时注册
 	Telemetries   []*Telemetry //遥测，由采集程序按一定频率上传
+}
+
+//NewDevice ..
+func NewDevice() *Device {
+	vs := &Device{}
+	vs.Model = base.NewModel()
+	return vs
+}
+
+//GetByID ..
+func (m *Device) GetByID(id uint, columns []string) error {
+	return m.Select(columns).IDQuery(id).First(m)
 }
 
 //Attribute 属性

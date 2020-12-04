@@ -234,19 +234,17 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	if keyword != nil && ptrs.String(keyword) != "" {
-		builder = builder.Where("title like ?", "%"+ptrs.String(keyword)+"%")
-	}
+	video := models.NewVideo()
+	video.FuzzyQuery(keyword, "title")
 	if ptrs.Bool(isCombo) {
-		builder = builder.Where("NOT EXISTS (select video_id from " + db.TablePrefix + "_video_series_item where video_id=id)")
+		video.Where("id NOT in (select video_id from " + db.TablePrefix + "_video_series_item where video_id=id)")
 	}
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = builder.Model(&models.Video{}).Count(&total).Error
+			total, err = video.Count(video)
 			if err != nil {
 				return 0, result, err
 			}
@@ -254,35 +252,21 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "episodes", "__typename"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			sort := " DESC"
-			if v.IsAsc {
-				sort = " ASC"
-			}
-			builder = builder.Order(v.Field + sort)
-		}
 		if edgeFieldMap["episodes"] {
-			builder = builder.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
+			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
 			}).Preload("Episodes.Subtitles")
 		}
-		err = builder.Find(&data).Error
+		err = video.Select(edgeFields, "episodes").
+			IDArrayQuery(video.ToUintIDs(ids)).
+			Pagination(offset, limit).
+			Sort(sorts).
+			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toVideoDto(m, scheme)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toVideoDtos(data, scheme), nil
 }
 
 //CreateVideoSeries ..
@@ -301,14 +285,14 @@ func (s VideoService) CreateVideoSeries(ctx context.Context,
 //UpdateVideoSeries ..
 func (s VideoService) UpdateVideoSeries(ctx context.Context,
 	input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
-	videoSeries := new(models.VideoSeries)
 	fields := make([]string, 0)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).
-		First(videoSeries, "id=?", input.ID).Error; err != nil {
+	videoSeries := models.NewVideoSeries()
+
+	if err := videoSeries.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -326,12 +310,12 @@ func (s VideoService) CreateVideoSeriesItem(ctx context.Context,
 		VideoID:       uint(input.VideoID),
 		Alias:         input.Alias,
 	}
-	maxItem := &models.VideoSeriesItem{}
-	err := db.GetDB().Select("max(num) num").Where("video_series_id=?", input.VideoSeriesID).Take(maxItem).Error
+	videoSeriesItem := models.NewVideoSeriesItem()
+	maxNum, err := videoSeriesItem.GetTheMaxNumOfOneVideoSeries(uint(input.VideoSeriesID))
 	if err != nil {
 		return nil, err
 	}
-	e.Num = maxItem.Num + 1
+	e.Num = maxNum + 1
 	err = db.GetDB().Create(e).Error
 	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
@@ -340,20 +324,20 @@ func (s VideoService) CreateVideoSeriesItem(ctx context.Context,
 //UpdateVideoSeriesItem ..
 func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 	input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error) {
-	item := new(models.VideoSeriesItem)
+	videoSeriesItem := models.NewVideoSeriesItem()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(item, "video_id=? and video_series_id=?",
-		input.VideoID, input.VideoSeriesID).Error; err != nil {
+	err := videoSeriesItem.GetByVideoIDVideoSeriesID(fields, uint(input.VideoID), uint(input.VideoSeriesID))
+	if err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"alias": input.Alias,
 	}
-	err := db.GetDB().Model(item).Updates(updateMap).Error
+	err = db.GetDB().Model(videoSeriesItem).Updates(updateMap).Error
 	sendMsgToUpdateES(input.VideoID)
 	return &model.VideoSeriesItem{VideoID: input.VideoID, VideoSeriesID: input.VideoSeriesID}, err
 }

@@ -2,9 +2,7 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"strings"
-	"unicode"
 
 	"github.com/99designs/gqlgen/graphql"
 )
@@ -32,42 +30,6 @@ func GetFieldData(ctx context.Context, prefix string) (map[string]bool, []string
 		fields = append(fields, k)
 	}
 	return fieldMap, fields
-}
-
-//CamelToSnack 驼峰转蛇形
-func CamelToSnack(s string) string {
-	newStr := ""
-	for i := 0; i < len(s); i++ {
-		if unicode.IsUpper(rune(s[i])) {
-			newStr += "_" + strings.ToLower(string(s[i]))
-		} else {
-			newStr += string(s[i])
-		}
-	}
-	newStr = strings.ReplaceAll(newStr, "_i_d", "_id")
-	return strings.ReplaceAll(newStr, "_u_r_l", "_url")
-}
-
-//ToDBFields ..
-func ToDBFields(fields []string, omitFields ...string) []string {
-	dbFields := make([]string, 0)
-	omitFieldMap := make(map[string]bool)
-	for _, v := range omitFields {
-		omitFieldMap[v] = true
-	}
-	for _, v := range fields {
-		if !omitFieldMap[v] {
-			value := CamelToSnack(v)
-			if strings.Contains(value, "price") {
-				dbFields = append(dbFields, fmt.Sprintf("\"%s\"::money::numeric::float8", CamelToSnack(v)))
-			} else if strings.Contains(value, ".") {
-				dbFields = append(dbFields, CamelToSnack(v))
-			} else {
-				dbFields = append(dbFields, fmt.Sprintf("\"%s\"", CamelToSnack(v)))
-			}
-		}
-	}
-	return dbFields
 }
 
 //getPreloads ..

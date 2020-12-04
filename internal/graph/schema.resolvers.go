@@ -86,7 +86,7 @@ func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing
 
 func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
 	user := middleware.ForContext(ctx)
-	return thingService.UpdateThing(ctx, input, int64(user.ID))
+	return thingService.UpdateThing(ctx, input, user.ID)
 }
 
 func (r *mutationResolver) RecordHistory(ctx context.Context, input model.NewHistoryInput) (*model.History, error) {
@@ -237,7 +237,7 @@ func (r *queryResolver) Things(ctx context.Context, keyword *string, page *int64
 	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.ThingConnection)
 	total, data, err := thingService.ListThing(ctx, keyword,
-		page, pageSize, ids, sorts, int64(user.ID), scheme)
+		page, pageSize, ids, sorts, user.ID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
