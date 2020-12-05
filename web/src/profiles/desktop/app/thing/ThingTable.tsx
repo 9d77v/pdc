@@ -1,7 +1,6 @@
 import { Table, Button, message, Tag } from 'antd'
 import React, { useState, useEffect } from 'react'
 
-import { LIST_THING, ADD_THING, UPDATE_THING } from 'src/consts/thing.gql'
 import { useQuery } from '@apollo/react-hooks'
 import { ThingCreateForm } from './ThingCreateForm'
 import { useMutation } from '@apollo/react-hooks'
@@ -11,6 +10,8 @@ import Img from 'src/components/img'
 import { RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap } from 'src/consts/consts'
 import { TablePaginationConfig } from 'antd/lib/table'
 import Search from 'antd/lib/input/Search'
+import { ADD_THING, UPDATE_THING } from 'src/gqls/thing/mutation'
+import { LIST_THING } from 'src/gqls/thing/query'
 
 
 export default function ThingTable() {
@@ -47,13 +48,15 @@ export default function ThingTable() {
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_THING,
         {
             variables: {
-                page: pagination.current,
-                pageSize: pagination.pageSize,
-                keyword: keyword,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: pagination.current,
+                    pageSize: pagination.pageSize,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             fetchPolicy: "cache-and-network"
         })
@@ -120,8 +123,15 @@ export default function ThingTable() {
     const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
-                page: pageConfig.current || 1,
-                pageSize: pageConfig.pageSize || 10
+                searchParam: {
+                    page: pageConfig.current || 1,
+                    pageSize: pageConfig.pageSize || 10,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
                 const newEdges = fetchMoreResult ? fetchMoreResult.things.edges : []

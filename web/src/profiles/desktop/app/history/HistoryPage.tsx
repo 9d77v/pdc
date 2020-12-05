@@ -1,12 +1,12 @@
 import React, { useEffect } from "react"
 import { Timeline, message } from "antd"
 import { useQuery } from "@apollo/react-hooks"
-import { LIST_HISTORY } from "src/consts/history.gpl"
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons'
 import { useHistory } from "react-router-dom"
 import Img from "src/components/img"
 import { formatRelativeTime } from "src/utils/util"
 import { AppPath } from "src/consts/path"
+import { LIST_HISTORY } from "src/gqls/history/query"
 
 export default function HistoryPage() {
 
@@ -15,8 +15,10 @@ export default function HistoryPage() {
         {
             variables: {
                 sourceType: 1,
-                page: 1,
-                pageSize: 50,
+                searchParam: {
+                    page: 1,
+                    pageSize: 50,
+                }
             }
         })
 

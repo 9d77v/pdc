@@ -1,6 +1,6 @@
 import { useMutation } from '@apollo/react-hooks'
 import React, { FC, useEffect, useState } from 'react'
-import { CAMERA_CAPTURE } from 'src/consts/device.gql'
+import { CAMERA_CAPTURE } from 'src/gqls/device/mutation'
 
 interface ICameraPictureProps {
     deviceID: number

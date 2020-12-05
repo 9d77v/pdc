@@ -1,13 +1,13 @@
 import { useQuery } from '@apollo/react-hooks'
 import { message } from 'antd'
 import React, { FC, useEffect, useMemo, useState } from 'react'
-import { VIDEO_RANDOM_TAG_SUGGEST } from 'src/consts/video.gql'
 import {
     SyncOutlined,
 } from '@ant-design/icons';
 
 import { isMobile } from 'src/utils/util'
 import { MobileVideoCard, VideoCard } from './VideoCard'
+import { VIDEO_RANDOM_TAG_SUGGEST } from 'src/gqls/video/query';
 
 interface IVideoTagSuggestProps {
     title?: string
@@ -30,7 +30,7 @@ const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
     const { error, data, refetch } = useQuery(VIDEO_RANDOM_TAG_SUGGEST,
         {
             variables: {
-                input: {
+                searchParam: {
                     pageSize: pageSize,
                     tags: [tag],
                     page: 1,

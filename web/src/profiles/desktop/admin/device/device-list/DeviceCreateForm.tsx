@@ -1,8 +1,8 @@
 import { Modal, Form, Input, Select, InputNumber } from 'antd';
 import React, { FC, useState } from 'react'
 import { useQuery } from '@apollo/react-hooks';
-import { DEVICE_MODEL_COMBO } from 'src/consts/device.gql';
 import { INewDevice } from 'src/models/device';
+import { DEVICE_MODEL_COMBO } from 'src/gqls/device/query';
 
 interface IDeviceCreateFormProps {
     visible: boolean;
@@ -27,13 +27,15 @@ export const DeviceCreateForm: FC<IDeviceCreateFormProps> = ({
     const { data } = useQuery(DEVICE_MODEL_COMBO,
         {
             variables: {
-                page: 1,
-                pageSize: 10,
-                keyword: keyword,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: 1,
+                    pageSize: 10,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             fetchPolicy: "cache-and-network"
         })

@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/react-hooks"
 import React, { useMemo } from "react"
 import { useHistory } from "react-router-dom"
 import { Card } from "src/components/Card"
-import { GET_MOBILE_HOME_DEVICES } from "src/consts/device.gql"
+import { GET_MOBILE_HOME_DEVICES } from "src/gqls/device/query"
 import CameraPicture from "src/profiles/common/device/CameraPicture"
 
 const DeviceCameraList = () => {

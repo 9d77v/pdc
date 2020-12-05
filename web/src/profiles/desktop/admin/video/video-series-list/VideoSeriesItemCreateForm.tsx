@@ -1,8 +1,7 @@
 import { Modal, Form, Input, Select } from 'antd'
 import React, { useState, useEffect, FC } from 'react'
 import { useQuery } from '@apollo/react-hooks'
-import { VIDEO_COMBO } from 'src/consts/video.gql'
-
+import { VIDEO_COMBO } from 'src/gqls/video/query'
 
 interface IVideoSeriesItemCreateFormProps {
     visible: boolean
@@ -23,13 +22,15 @@ export const VideoSeriesItemCreateForm: FC<IVideoSeriesItemCreateFormProps> = ({
     const { data } = useQuery(VIDEO_COMBO,
         {
             variables: {
-                page: 1,
-                pageSize: 10,
-                keyword: keyword,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: 1,
+                    pageSize: 10,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             fetchPolicy: "cache-and-network"
         })

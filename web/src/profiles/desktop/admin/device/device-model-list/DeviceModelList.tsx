@@ -1,13 +1,14 @@
 import { List, Button, Tag } from 'antd';
 import React, { useState } from 'react';
 import { DeviceModelCreateForm } from './DeviceModelCreateForm';
-import { ADD_DEVICE_MODEL, LIST_DEVICE_MODEL, UPDATE_DEVICE_MODEL } from 'src/consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { DeviceTypeMap } from 'src/consts/consts';
 import "src/styles/card.less"
 import { EditOutlined } from '@ant-design/icons';
 import { DeviceModelUpdateForm } from './DeviceModelUpdateForm';
 import { IDeviceModel, INewDeviceModel, IUpdateDeviceModel } from 'src/models/device';
+import { ADD_DEVICE_MODEL, UPDATE_DEVICE_MODEL } from 'src/gqls/device/mutation';
+import { LIST_DEVICE_MODEL } from 'src/gqls/device/query';
 
 interface IDeviceModelListProps {
     currentSelectID: number
@@ -30,12 +31,14 @@ export const DeviceModelList = (props: IDeviceModelListProps) => {
     const { loading, data, refetch, } = useQuery(LIST_DEVICE_MODEL,
         {
             variables: {
-                page: pagination.current,
-                pageSize: 7,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: pagination.current,
+                    pageSize: 7,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             fetchPolicy: "cache-and-network"
         });

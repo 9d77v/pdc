@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks';
 import { Modal, Form, Select } from 'antd';
 import React, { FC, useMemo } from 'react';
-import { LIST_DEVICE_SELECTOR } from 'src/consts/device.gql';
+import { LIST_DEVICE_SELECTOR } from 'src/gqls/device/query';
 import { IDeviceDashboardTelemetry, INewDeviceDashboardTelemetry } from 'src/models/device';
 
 const { Option, OptGroup } = Select;
@@ -28,10 +28,12 @@ export const DeviceDashboardTelemetryAddForm: FC<IDeviceDashboardTelemetryAddFor
     const { data } = useQuery(LIST_DEVICE_SELECTOR,
         {
             variables: {
-                sorts: [{
-                    field: 'id',
-                    isAsc: true
-                }],
+                searchParam: {
+                    sorts: [{
+                        field: 'id',
+                        isAsc: true
+                    }],
+                },
                 deviceType: 0
             },
             fetchPolicy: "cache-and-network"

@@ -1,10 +1,5 @@
 import { Table, Button, message, Tag, Modal } from 'antd'
 import React, { useState, useEffect } from 'react'
-import {
-    LIST_VIDEO, UPDATE_VIDEO,
-    ADD_EPISODE, UPDATE_EPISODE,
-    SAVE_SUBTITLES
-} from 'src/consts/video.gql'
 import { useQuery } from '@apollo/react-hooks'
 import { useMutation } from '@apollo/react-hooks'
 import { EpisodeCreateForm } from './EpisodeCreateForm'
@@ -21,6 +16,8 @@ import Search from 'antd/lib/input/Search'
 import { useHistory } from 'react-router-dom'
 import { AdminPath } from 'src/consts/path'
 import { IUpdateVideo } from 'src/models/video'
+import { ADD_EPISODE, SAVE_SUBTITLES, UPDATE_EPISODE, UPDATE_VIDEO } from 'src/gqls/video/mutation'
+import { LIST_VIDEO } from 'src/gqls/video/query'
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -149,13 +146,15 @@ export default function VideoTable() {
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_VIDEO,
         {
             variables: {
-                page: pagination.current,
-                pageSize: pagination.pageSize,
-                keyword: keyword,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: pagination.current,
+                    pageSize: pagination.pageSize,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             fetchPolicy: "cache-and-network"
         })
@@ -240,8 +239,15 @@ export default function VideoTable() {
     const onChange = (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
-                page: pageConfig.current || 1,
-                pageSize: pageConfig.pageSize || 10
+                searchParam: {
+                    page: pageConfig.current || 1,
+                    pageSize: pageConfig.pageSize || 10,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
                 const newEdges = fetchMoreResult ? fetchMoreResult.videos.edges : []

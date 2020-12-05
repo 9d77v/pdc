@@ -4,9 +4,9 @@ import React, { useState } from 'react'
 import { useMutation } from '@apollo/react-hooks';
 import dayjs from 'dayjs';
 import { TelemetryModelCreateForm } from './TelemetryModelCreateForm';
-import { UPDATE_TELEMETRY_MODEL, ADD_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL } from 'src/consts/device.gql';
 import { TelemetryModelUpdateForm } from './TelemetryModelUpdateForm';
 import { INewTelemetryModel, IUpdateTelemetryModel } from 'src/models/device';
+import { ADD_TELEMETRY_MODEL, DELETE_TELEMETRY_MODEL, UPDATE_TELEMETRY_MODEL } from 'src/gqls/device/mutation';
 
 
 interface ITelemetryModelTableProps {

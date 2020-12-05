@@ -3,12 +3,12 @@ import { useHistory } from 'react-router-dom'
 import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
-import { LIST_VIDEO_CARD } from 'src/consts/video.gql'
 import { Icon, NavBar, SearchBar } from "antd-mobile"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
 import { MobileVideoCard } from "src/profiles/common/video/VideoCard"
 import { isMobile } from "src/utils/util"
+import { LIST_VIDEO_CARD } from "src/gqls/video/query"
 
 
 export default function VideoList() {
@@ -22,7 +22,7 @@ export default function VideoList() {
     const { error, data } = useQuery(LIST_VIDEO_CARD,
         {
             variables: {
-                input: {
+                searchParam: {
                     keyword: pagination.keyword,
                     page: pagination.page,
                     pageSize: pagination.pageSize,

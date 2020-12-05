@@ -2,10 +2,10 @@ import "./index.less"
 import { useHistory } from 'react-router-dom'
 import { Form, Input, Button, message } from 'antd'
 import React, { useEffect } from 'react'
-import { LOGIN } from 'src/consts/user.gpl'
 import { useMutation } from '@apollo/react-hooks'
 import { GesturePasswordKey } from "src/consts/consts"
 import { AppPath } from "src/consts/path"
+import { LOGIN } from "src/gqls/user/mutation"
 
 const layout = {
     labelCol: { span: 8 },

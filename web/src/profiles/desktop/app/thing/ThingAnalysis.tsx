@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react"
 
 import { message, Select, Radio } from "antd"
 import { useQuery } from "@apollo/react-hooks"
-import { THING_ANALYZE } from "src/consts/thing.gql"
 import dayjs from "dayjs"
 import { ConsumerExpenditureMap, ThingStatusMap } from "src/consts/consts"
 import { RadioChangeEvent } from "antd/lib/radio"
 import { PieLine } from "src/components/PieLine"
 import DatePicker from "src/components/DatePicker"
+import { THING_ANALYZE } from "src/gqls/thing/query"
 
 
 export default function ThingAnalysis() {

@@ -1,7 +1,6 @@
 import { List, Button, Tag, Badge } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { DeviceCreateForm } from './DeviceCreateForm';
-import { ADD_DEVICE, LIST_DEVICE, UPDATE_DEVICE } from 'src/consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import "src/styles/card.less"
 import { EditOutlined } from '@ant-design/icons';
@@ -11,6 +10,8 @@ import useWebSocket from 'react-use-websocket';
 import { iotHealthSocketURL } from 'src/utils/ws_client';
 import { blobToArrayBuffer } from 'src/utils/file';
 import { IDevice, INewDevice, IUpdateDevice } from 'src/models/device';
+import { ADD_DEVICE, UPDATE_DEVICE } from 'src/gqls/device/mutation';
+import { LIST_DEVICE } from 'src/gqls/device/query';
 
 interface IDeviceListProps {
     currentSelectID: number
@@ -39,12 +40,14 @@ export const DeviceList = (props: IDeviceListProps) => {
     const { loading, data, refetch, } = useQuery(LIST_DEVICE,
         {
             variables: {
-                page: pagination.current,
-                pageSize: 7,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: pagination.current,
+                    pageSize: 7,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             }
         });
 

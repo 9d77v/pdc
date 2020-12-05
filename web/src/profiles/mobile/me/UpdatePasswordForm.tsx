@@ -2,11 +2,11 @@ import { useHistory } from 'react-router-dom'
 import { Form, Input, Button, Select } from 'antd'
 import React, { useState } from 'react'
 import { GenderMap } from "src/consts/consts"
-import { UPDATE_PASSWORD } from 'src/consts/user.gpl'
 import { useMutation } from '@apollo/react-hooks'
 import { apolloClient } from 'src/utils/apollo_client'
 import { NavBar, Icon } from 'antd-mobile'
 import { AppPath } from 'src/consts/path'
+import { UPDATE_PASSWORD } from 'src/gqls/user/mutation'
 
 export default function UpdatePasswordForm() {
     const history = useHistory()

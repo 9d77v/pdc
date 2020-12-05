@@ -1,7 +1,6 @@
 import { Table, Button, message } from 'antd';
 import React, { useState, useEffect } from 'react'
 
-import { LIST_USER, ADD_USER, UPDATE_USER } from 'src/consts/user.gpl';
 import { useQuery } from '@apollo/react-hooks';
 import { UserCreateForm } from './UserCreateForm';
 import { useMutation } from '@apollo/react-hooks';
@@ -11,6 +10,8 @@ import Img from 'src/components/img';
 import { GenderMap, FullRoleMap } from 'src/consts/consts';
 import { TablePaginationConfig } from 'antd/lib/table';
 import Search from 'antd/lib/input/Search';
+import { ADD_USER, UPDATE_USER } from 'src/gqls/user/mutation';
+import { LIST_USER } from 'src/gqls/user/query';
 
 
 export default function UserTable() {
@@ -39,13 +40,15 @@ export default function UserTable() {
     const { loading, error, data, refetch, fetchMore } = useQuery(LIST_USER,
         {
             variables: {
-                page: pagination.current,
-                pageSize: pagination.pageSize,
-                keyword: keyword,
-                sorts: [{
-                    field: 'id',
-                    isAsc: false
-                }]
+                searchParam: {
+                    page: pagination.current,
+                    pageSize: pagination.pageSize,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                },
             },
             fetchPolicy: "cache-and-network"
         });
@@ -90,8 +93,15 @@ export default function UserTable() {
     const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
             variables: {
-                page: pageConfig.current || 1,
-                pageSize: pageConfig.pageSize || 10
+                searchParam: {
+                    page: pageConfig.current || 1,
+                    pageSize: pageConfig.pageSize || 10,
+                    keyword: keyword,
+                    sorts: [{
+                        field: 'id',
+                        isAsc: false
+                    }]
+                }
             },
             updateQuery: (previousResult, { fetchMoreResult }) => {
                 const newEdges = fetchMoreResult ? fetchMoreResult.users.edges : [];

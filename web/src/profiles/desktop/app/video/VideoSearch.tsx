@@ -4,12 +4,12 @@ import { message, Pagination } from "antd"
 import "src/styles/video.less"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
-import { LIST_VIDEO_CARD } from 'src/consts/video.gql'
 import Search from "antd/lib/input/Search"
 import CheckableTag from "antd/lib/tag/CheckableTag"
 import { IVideoPagination } from "src/consts/consts"
 import { VideoCard } from "src/profiles/common/video/VideoCard"
 import { isMobile } from "src/utils/util"
+import { LIST_VIDEO_CARD } from "src/gqls/video/query"
 
 
 const VideoSearch = () => {
@@ -24,7 +24,7 @@ const VideoSearch = () => {
     const { error, data } = useQuery(LIST_VIDEO_CARD,
         {
             variables: {
-                input: {
+                searchParam: {
                     keyword: pagination.keyword,
                     page: pagination.page,
                     pageSize: pagination.pageSize,

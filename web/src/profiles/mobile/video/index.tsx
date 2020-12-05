@@ -4,19 +4,19 @@ import { Grid, Icon, NavBar } from 'antd-mobile'
 import React, { useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import { AppPath } from 'src/consts/path'
-import { GET_VIDEO_TAGS } from 'src/consts/video.gql'
 import VideoTagSuggest from 'src/profiles/common/video/VideoTagSuggest'
 import {
     HistoryOutlined, SearchOutlined
 } from '@ant-design/icons'
 import { IApp } from 'src/models/app'
 import { isMobile } from 'src/utils/util'
+import { GET_VIDEO_TAGS } from 'src/gqls/video/query'
 
 const VideoIndex = () => {
     const { error, data } = useQuery(GET_VIDEO_TAGS,
         {
             variables: {
-                input: {
+                searchParam: {
                     isMobile: isMobile()
                 }
             }

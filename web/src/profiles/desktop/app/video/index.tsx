@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import { message } from 'antd'
 import React, { useEffect, useMemo } from 'react'
-import { GET_VIDEO_TAGS } from 'src/consts/video.gql'
+import { GET_VIDEO_TAGS } from 'src/gqls/video/query'
 import VideoTagSuggest from 'src/profiles/common/video/VideoTagSuggest'
 import { isMobile } from 'src/utils/util'
 
@@ -9,7 +9,7 @@ const VideoIndex = () => {
     const { error, data } = useQuery(GET_VIDEO_TAGS,
         {
             variables: {
-                input: {
+                searchParam: {
                     isMobile: isMobile()
                 }
             }
