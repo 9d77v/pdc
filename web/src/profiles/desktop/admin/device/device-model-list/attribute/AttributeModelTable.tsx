@@ -4,9 +4,9 @@ import React, { useState } from 'react'
 import { useMutation } from '@apollo/react-hooks';
 import dayjs from 'dayjs';
 import { AttributeModelCreateForm } from './AttributeModelCreateForm';
-import { ADD_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL } from 'src/consts/device.gql';
 import { AttributeModelUpdateForm } from './AttributeModelUpdateForm';
 import { INewAttributeModel, IUpdateAttributeModel } from 'src/models/device';
+import { ADD_ATTRIBUTE_MODEL, DELETE_ATTRIBUTE_MODEL, UPDATE_ATTRIBUTE_MODEL } from 'src/gqls/device/mutation';
 
 
 interface IAttributeModelTableProps {

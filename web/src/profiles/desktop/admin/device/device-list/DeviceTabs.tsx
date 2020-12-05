@@ -2,10 +2,10 @@ import { Tabs, Layout, Tag } from 'antd';
 import React from 'react';
 import { DeviceDetailDescriptions } from './DeviceDetailDescriptions';
 import { useQuery } from '@apollo/react-hooks';
-import { GET_DEVICE } from 'src/consts/device.gql';
 import TelemetryTable from './TelemetryTable';
 import AttributeTable from './AttributeTable';
 import { DeviceTypeMap } from 'src/consts/consts';
+import { GET_DEVICE } from 'src/gqls/device/query';
 
 const { TabPane } = Tabs;
 const { Header } = Layout;
@@ -18,7 +18,9 @@ export const DeviceTabs = (props: IDeviceTabsProps) => {
     const { data } = useQuery(GET_DEVICE,
         {
             variables: {
-                ids: [id]
+                searchParam: {
+                    ids: [id]
+                }
             },
             fetchPolicy: "cache-and-network"
         })

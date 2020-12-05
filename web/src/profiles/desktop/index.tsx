@@ -10,7 +10,6 @@ import { AppHeader } from './common/AppHeader'
 import { AppSlider } from './common/AppSlider'
 import { AppNavigator } from './common/AppNavigator'
 import { useQuery } from '@apollo/react-hooks'
-import { GET_USER } from 'src/consts/user.gpl'
 import { NewUser } from 'src/models/user'
 import { AdminPath, AppPath } from 'src/consts/path'
 import UpdateProfileForm from './app/user/UpdateFrofileForm'
@@ -22,6 +21,7 @@ import VideoSearch from './app/video/VideoSearch'
 import DeviceIndex from './admin/device/device-list'
 import DeviceTelemetry from './app/device/DeviceTelemetry'
 import DeviceCamera from './app/device/DeviceCamera'
+import { GET_USER } from 'src/gqls/user/query'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))

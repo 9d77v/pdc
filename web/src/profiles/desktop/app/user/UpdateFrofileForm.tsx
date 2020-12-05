@@ -3,9 +3,9 @@ import React, { useState, useEffect, FC } from 'react'
 import { GenderMap } from "src/consts/consts"
 import { Uploader } from "src/components/Uploader"
 import dayjs from 'dayjs'
-import { UPDATE_PROFILE } from 'src/consts/user.gpl'
 import { useMutation } from '@apollo/react-hooks'
 import { NewUser } from 'src/models/user'
+import { UPDATE_PROFILE } from 'src/gqls/user/mutation'
 
 
 interface IUpdateProfileFormProps {

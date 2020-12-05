@@ -1,22 +1,8 @@
 import gql from 'graphql-tag';
 
-const ADD_THING = gql`
-mutation createThing($input:NewThing!){
-   createThing(input:$input){
-     id
-   }
-}
-`
-const UPDATE_THING = gql`
-mutation updateThing($input:NewUpdateThing!){
-   updateThing(input:$input){
-     id
-   }
-}
-`
 const LIST_THING = gql`
- query things($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   things(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
+ query things( $searchParam:SearchParam!) {
+   things(searchParam: $searchParam){
         totalCount
         edges{
             id
@@ -70,4 +56,4 @@ const THING_ANALYZE = gql`
    }
   }
 `
-export { LIST_THING, ADD_THING, UPDATE_THING, THING_SERIES, THING_ANALYZE }
+export { LIST_THING, THING_SERIES, THING_ANALYZE }

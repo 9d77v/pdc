@@ -5,7 +5,6 @@ import { UserOutlined, HomeOutlined, MessageOutlined } from '@ant-design/icons'
 import "./index.less"
 import { useHistory, Route, useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
-import { GET_USER } from 'src/consts/user.gpl'
 import { UpdateProfileForm } from './me/UpdateFrofileForm'
 import UpdatePasswordForm from './me/UpdatePasswordForm'
 import HomeNavBar from './home/HomeNavBar'
@@ -20,6 +19,7 @@ import VideoList from './video/VideoList'
 import VideoDetail from './video/VideoDetail'
 import DeviceIndex from './device'
 import DeviceCameraDetail from './device/DeviceCameraDetail'
+import { GET_USER } from 'src/gqls/user/query'
 
 
 const MeIndex = React.lazy(() => import('./me'))

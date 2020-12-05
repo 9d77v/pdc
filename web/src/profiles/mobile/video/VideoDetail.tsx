@@ -2,7 +2,6 @@ import React, { useEffect, useMemo } from "react"
 import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
-import { GET_VIDEO_DETAIL } from 'src/consts/video.gql'
 import { VideoPlayer } from "src/components/videoplayer"
 import { useHistory, useLocation } from "react-router-dom"
 import { NavBar, Icon } from "antd-mobile"
@@ -10,6 +9,7 @@ import VideoSelect from "src/profiles/common/video/VideoSelect"
 import VideoSeriesSelect from "src/profiles/common/video/VideoSeriesSelect"
 import SimilarVideoList from "src/profiles/common/video/SimilarVideoList"
 import { AppPath } from "src/consts/path"
+import { GET_VIDEO_DETAIL } from "src/gqls/video/query"
 
 export default function VideoDetail() {
     const history = useHistory()

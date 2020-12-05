@@ -2,7 +2,7 @@ import { useMutation } from '@apollo/react-hooks'
 import { Button, message, Steps } from 'antd'
 import React, { useRef, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES } from 'src/consts/video.gql'
+import { ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES } from 'src/gqls/video/mutation'
 import "./index.less"
 import VideoCreateStepOneForm from './VideoCreateStepOneForm'
 import VideoCreateStepThreeForm from './VideoCreateStepThreeForm'

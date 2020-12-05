@@ -4,7 +4,7 @@ import React, { FC, useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import Img from 'src/components/img'
 import { AppPath } from 'src/consts/path'
-import { SIMILAR_VIDEOS } from 'src/consts/video.gql'
+import { SIMILAR_VIDEOS } from 'src/gqls/video/query'
 import { VideoCardModel } from 'src/models/video'
 import { isMobile } from 'src/utils/util'
 
@@ -20,7 +20,7 @@ const SimilarVideoList: FC<ISimilarVideoListProps> = ({
     const { error, data } = useQuery(SIMILAR_VIDEOS,
         {
             variables: {
-                input: {
+                searchParam: {
                     videoID: videoID,
                     pageSize: pageSize,
                     isMobile: isMobile()

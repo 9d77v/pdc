@@ -3,8 +3,8 @@ import React from 'react';
 import { DeviceModelDetailDescriptions } from './DeviceModelDetailDescriptions';
 import AttributeModelTable from './attribute/AttributeModelTable';
 import { useQuery } from '@apollo/react-hooks';
-import { GET_DEVICE_MODEL } from 'src/consts/device.gql';
 import TelemetryModelTable from './telemetry/TelemetryModelTable';
+import { GET_DEVICE_MODEL } from 'src/gqls/device/query';
 
 const { TabPane } = Tabs;
 const { Header } = Layout;
@@ -17,7 +17,9 @@ export const DeviceModelTabs = (props: IDeviceModelTabsProps) => {
     const { data, refetch } = useQuery(GET_DEVICE_MODEL,
         {
             variables: {
-                ids: [id]
+                searchParam: {
+                    ids: [id]
+                }
             },
             fetchPolicy: "cache-and-network"
         })

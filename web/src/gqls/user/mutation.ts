@@ -14,40 +14,6 @@ mutation updateUser($input:NewUpdateUser!){
    }
 }
 `
-const LIST_USER = gql`
- query users($keyword:String, $page: Int, $pageSize: Int, $sorts: [Sort!]) {
-   users(keyword:$keyword,page: $page, pageSize: $pageSize,sorts:$sorts){
-        totalCount
-        edges{
-            id
-            name
-            avatar
-            roleID
-            gender
-            color
-            birthDate
-            ip 
-            createdAt
-            updatedAt
-       }
-   }
-  }
-`;
-
-const GET_USER = gql`
- query userInfo($uid:ID) {
-   userInfo(uid:$uid){
-      uid
-      name
-      avatar
-      roleID
-      gender
-      color
-      birthDate
-      ip 
-   }
-  }
-`;
 
 const LOGIN = gql`
 mutation login($username: String!, $password: String!) {
@@ -83,7 +49,7 @@ mutation updatePassword($oldPassword:String!,$newPassword:String!){
 `
 
 export {
-   LIST_USER, ADD_USER, UPDATE_USER, GET_USER,
-   LOGIN, REFRESH_TOKEN,
-   UPDATE_PROFILE, UPDATE_PASSWORD
+    ADD_USER, UPDATE_USER,
+    LOGIN, REFRESH_TOKEN,
+    UPDATE_PROFILE, UPDATE_PASSWORD
 }

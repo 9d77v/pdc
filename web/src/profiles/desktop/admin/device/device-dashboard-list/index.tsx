@@ -1,7 +1,6 @@
 import { List, Button, Popconfirm, Tag, Modal } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { DeviceDashboardCreateForm } from './DeviceDashboardCreateForm';
-import { ADD_DEVICE_DASHBOARD, ADD_DEVICE_DASHBOARD_CAMERA, ADD_DEVICE_DASHBOARD_TELEMETRY, DELETE_DEVICE_DASHBOARD, LIST_DEVICE_DASHBOARD, REMOVE_DEVICE_DASHBOARD_CAMERA, REMOVE_DEVICE_DASHBOARD_TELEMETRY, UPDATE_DEVICE_DASHBOARD } from 'src/consts/device.gql';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import "src/styles/card.less"
 import { DeleteOutlined, EditOutlined, FileAddOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
@@ -15,6 +14,8 @@ import { DeviceDashboardCameraAddForm } from './DeviceDashboardCameraAddForm';
 import { IDeviceDashboard, IDeviceDashboardCamera, IDeviceDashboardTelemetry, INewDeviceDashboard, INewDeviceDashboardCamera, INewDeviceDashboardTelemetry, IUpdateDeviceDashboard } from 'src/models/device';
 import CameraCard from 'src/profiles/common/device/CameraPicture';
 import { LivePlayer } from 'src/components/videoplayer/LivePlayer';
+import { ADD_DEVICE_DASHBOARD, ADD_DEVICE_DASHBOARD_CAMERA, ADD_DEVICE_DASHBOARD_TELEMETRY, DELETE_DEVICE_DASHBOARD, REMOVE_DEVICE_DASHBOARD_CAMERA, REMOVE_DEVICE_DASHBOARD_TELEMETRY, UPDATE_DEVICE_DASHBOARD } from 'src/gqls/device/mutation';
+import { LIST_DEVICE_DASHBOARD } from 'src/gqls/device/query';
 
 export default function DeviceDashboardList() {
     const [dataResource, setDataResource] = useState<any[]>([])
@@ -59,10 +60,12 @@ export default function DeviceDashboardList() {
     const { loading, data, refetch, } = useQuery(LIST_DEVICE_DASHBOARD,
         {
             variables: {
-                sorts: [{
-                    field: 'id',
-                    isAsc: true
-                }]
+                searchParam: {
+                    sorts: [{
+                        field: 'id',
+                        isAsc: true
+                    }]
+                }
             },
             fetchPolicy: "cache-and-network"
         })
