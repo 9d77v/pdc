@@ -5,24 +5,24 @@
 type Query {
   presignedUrl(bucketName:String!,objectName:String!):String!
 
-  users(keyword:String,page:Int,pageSize:Int,ids:[ID!],sorts:[Sort!]):UserConnection!
+  users(searchParam:SearchParam!):UserConnection!
   userInfo(uid:ID):User!
 
-  videos(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!],isFilterVideoSeries:Boolean):VideoConnection!
+  videos(searchParam:SearchParam!,isFilterVideoSeries:Boolean):VideoConnection!
   videoDetail(episodeID:ID!):VideoDetail!
-  videoSerieses(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):VideoSeriesConnection!
-  searchVideo(input:VideoSearchParam!):VideoIndexConnection!
-  similarVideos(input:VideoSimilarParam!):VideoIndexConnection!
+  videoSerieses(searchParam:SearchParam!):VideoSeriesConnection!
+  searchVideo(searchParam:VideoSearchParam!):VideoIndexConnection!
+  similarVideos(searchParam:VideoSimilarParam!):VideoIndexConnection!
 
-  things(keyword:String,page: Int, pageSize: Int, ids:[ID!],sorts:[Sort!]):ThingConnection!
+  things(searchParam:SearchParam!):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 
-  histories(sourceType:Int,page: Int, pageSize: Int):HistoryConnection! 
+  histories(sourceType:Int,searchParam:SearchParam!):HistoryConnection! 
   
-  deviceModels(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceModelConnection!
-  devices(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!],deviceType: Int):DeviceConnection!
-  deviceDashboards(keyword:String,page:Int,pageSize:Int, ids:[ID!],sorts:[Sort!]):DeviceDashboardConnection!
+  deviceModels(searchParam:SearchParam!):DeviceModelConnection!
+  devices(searchParam:SearchParam!,deviceType: Int):DeviceConnection!
+  deviceDashboards(searchParam:SearchParam!):DeviceDashboardConnection!
   appDeviceDashboards(deviceType: Int):DeviceDashboardConnection!
   cameraTimeLapseVideos(deviceID:Int!):CameraTimeLapseVideoConnection!
 } 

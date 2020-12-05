@@ -1,10 +1,12 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/9d77v/pdc/internal/module/base"
+)
 
 //DeviceModel 设备模型
 type DeviceModel struct {
-	gorm.Model
+	base.DefaultModel
 	Name            string `gorm:"size:50"`
 	Desc            string `gorm:"size:5000"`
 	DeviceType      uint8  //设备类型，0:默认设备,1:摄像头
@@ -13,22 +15,14 @@ type DeviceModel struct {
 	TelemetryModels []*TelemetryModel
 }
 
-//AttributeModel 属性模型
-type AttributeModel struct {
-	gorm.Model
-	DeviceModelID uint   `gorm:"unique_index:attribute_model_uix"`
-	Key           string `gorm:"unique_index:attribute_model_uix;size:50"`
-	Name          string `gorm:"size:50"`
+//NewDeviceModel ..
+func NewDeviceModel() *DeviceModel {
+	vs := &DeviceModel{}
+	vs.DefaultModel = base.NewDefaultModel()
+	return vs
 }
 
-//TelemetryModel 遥测模型
-type TelemetryModel struct {
-	gorm.Model
-	DeviceModelID uint   `gorm:"unique_index:telemetry_model_uix"`
-	Key           string `gorm:"unique_index:telemetry_model_uix;size:50"`
-	Name          string `gorm:"size:50"`
-	Factor        float64
-	Unit          string `gorm:"size:10"`
-	UnitName      string `gorm:"size:10"`
-	Scale         uint8
+//GetByID ..
+func (m *DeviceModel) GetByID(id uint, columns []string) error {
+	return m.Select(columns).IDQuery(id).First(m)
 }

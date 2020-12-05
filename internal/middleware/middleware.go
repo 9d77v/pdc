@@ -122,13 +122,19 @@ func Auth() func(http.Handler) http.Handler {
 
 //ForContext ..
 func ForContext(ctx context.Context) *models.User {
-	raw, _ := ctx.Value(userCtxKey).(*models.User)
+	raw, ok := ctx.Value(userCtxKey).(*models.User)
+	if !ok || raw == nil {
+		return models.NewUser()
+	}
 	return raw
 }
 
 //ForSchemeContext ..
 func ForSchemeContext(ctx context.Context) string {
-	raw, _ := ctx.Value(schemeCtxKey).(string)
+	raw, ok := ctx.Value(schemeCtxKey).(string)
+	if !ok || raw == "" {
+		return "http"
+	}
 	return raw
 }
 

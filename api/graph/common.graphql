@@ -19,3 +19,11 @@ type AggResult{
     key: String!
     value: Int!
 }
+
+input SearchParam{
+    keyword:String
+    page: Int
+    pageSize: Int
+    ids:[ID!]
+    sorts:[Sort!]
+}

@@ -2,12 +2,13 @@ package models
 
 import (
 	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/module/base"
 	"gorm.io/gorm"
 )
 
 //Episode 分集
 type Episode struct {
-	gorm.Model
+	*base.DefaultModel
 	VideoID   uint
 	Num       float64
 	Title     string `gorm:"size:50;NOT NULL;"`

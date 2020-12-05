@@ -6,6 +6,15 @@ import (
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 )
 
+func toDeviceModelDtos(data []*models.DeviceModel) []*model.DeviceModel {
+	result := make([]*model.DeviceModel, 0, len(data))
+	for _, m := range data {
+		r := toDeviceModelDto(m)
+		result = append(result, r)
+	}
+	return result
+}
+
 func toDeviceModelDto(m *models.DeviceModel) *model.DeviceModel {
 	as := make([]*model.AttributeModel, 0, len(m.AttributeModels))
 	for _, v := range m.AttributeModels {
@@ -43,6 +52,15 @@ func toDeviceModelDto(m *models.DeviceModel) *model.DeviceModel {
 		CreatedAt:       m.CreatedAt.Unix(),
 		UpdatedAt:       m.UpdatedAt.Unix(),
 	}
+}
+
+func toDeviceDtos(data []*models.Device) []*model.Device {
+	result := make([]*model.Device, 0, len(data))
+	for _, m := range data {
+		r := toDeviceDto(m)
+		result = append(result, r)
+	}
+	return result
 }
 
 func toDeviceDto(m *models.Device) *model.Device {
@@ -92,6 +110,14 @@ func toDeviceDto(m *models.Device) *model.Device {
 	}
 }
 
+func toDeviceDashboardDtos(data []*models.DeviceDashboard) []*model.DeviceDashboard {
+	result := make([]*model.DeviceDashboard, 0, len(data))
+	for _, m := range data {
+		r := toDeviceDashboardDto(m)
+		result = append(result, r)
+	}
+	return result
+}
 func toDeviceDashboardDto(m *models.DeviceDashboard) *model.DeviceDashboard {
 	ts := make([]*model.DeviceDashboardTelemetry, 0, len(m.Telemetries))
 	for _, v := range m.Telemetries {
@@ -132,6 +158,15 @@ func toDeviceDashboardDto(m *models.DeviceDashboard) *model.DeviceDashboard {
 		CreatedAt:   m.CreatedAt.Unix(),
 		UpdatedAt:   m.UpdatedAt.Unix(),
 	}
+}
+
+func toCameraTimeLapseVideoDtos(data []*models.CameraTimeLapseVideo, scheme string) []*model.CameraTimeLapseVideo {
+	result := make([]*model.CameraTimeLapseVideo, 0, len(data))
+	for _, m := range data {
+		r := toCameraTimeLapseVideoDto(m, scheme)
+		result = append(result, r)
+	}
+	return result
 }
 
 func toCameraTimeLapseVideoDto(m *models.CameraTimeLapseVideo, scheme string) *model.CameraTimeLapseVideo {

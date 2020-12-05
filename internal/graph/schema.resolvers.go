@@ -86,7 +86,7 @@ func (r *mutationResolver) CreateThing(ctx context.Context, input model.NewThing
 
 func (r *mutationResolver) UpdateThing(ctx context.Context, input model.NewUpdateThing) (*model.Thing, error) {
 	user := middleware.ForContext(ctx)
-	return thingService.UpdateThing(ctx, input, int64(user.ID))
+	return thingService.UpdateThing(ctx, input, user.ID)
 }
 
 func (r *mutationResolver) RecordHistory(ctx context.Context, input model.NewHistoryInput) (*model.History, error) {
@@ -172,11 +172,10 @@ func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, obj
 	return oss.GetPresignedURL(ctx, bucketName, objectName, scheme)
 }
 
-func (r *queryResolver) Users(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.UserConnection, error) {
+func (r *queryResolver) Users(ctx context.Context, searchParam model.SearchParam) (*model.UserConnection, error) {
 	con := new(model.UserConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := userService.ListUser(ctx, keyword,
-		page, pageSize, ids, sorts, scheme)
+	total, data, err := userService.ListUser(ctx, searchParam, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -190,11 +189,10 @@ func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, 
 	return user, nil
 }
 
-func (r *queryResolver) Videos(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, isFilterVideoSeries *bool) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := videoService.ListVideo(ctx, keyword,
-		page, pageSize, ids, sorts, scheme, isFilterVideoSeries)
+	total, data, err := videoService.ListVideo(ctx, searchParam, scheme, isFilterVideoSeries)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -206,38 +204,37 @@ func (r *queryResolver) VideoDetail(ctx context.Context, episodeID int64) (*mode
 	return videoService.VideoDetail(ctx, episodeID, scheme, user.ID)
 }
 
-func (r *queryResolver) VideoSerieses(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.VideoSeriesConnection, error) {
+func (r *queryResolver) VideoSerieses(ctx context.Context, searchParam model.SearchParam) (*model.VideoSeriesConnection, error) {
 	con := new(model.VideoSeriesConnection)
-	total, data, err := videoService.ListVideoSeries(ctx, keyword, page, pageSize, ids, sorts)
+	total, data, err := videoService.ListVideoSeries(ctx, searchParam)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) SearchVideo(ctx context.Context, input model.VideoSearchParam) (*model.VideoIndexConnection, error) {
+func (r *queryResolver) SearchVideo(ctx context.Context, searchParam model.VideoSearchParam) (*model.VideoIndexConnection, error) {
 	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, aggResults, err := videoSearch.ListVideoIndex(ctx, input, scheme)
+	total, data, aggResults, err := videoSearch.ListVideoIndex(ctx, searchParam, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	con.AggResults = aggResults
 	return con, err
 }
 
-func (r *queryResolver) SimilarVideos(ctx context.Context, input model.VideoSimilarParam) (*model.VideoIndexConnection, error) {
+func (r *queryResolver) SimilarVideos(ctx context.Context, searchParam model.VideoSimilarParam) (*model.VideoIndexConnection, error) {
 	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	_, data, err := videoSearch.SimilarVideoIndex(ctx, input, scheme)
+	_, data, err := videoSearch.SimilarVideoIndex(ctx, searchParam, scheme)
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) Things(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.ThingConnection, error) {
+func (r *queryResolver) Things(ctx context.Context, searchParam model.SearchParam) (*model.ThingConnection, error) {
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.ThingConnection)
-	total, data, err := thingService.ListThing(ctx, keyword,
-		page, pageSize, ids, sorts, int64(user.ID), scheme)
+	total, data, err := thingService.ListThing(ctx, searchParam, user.ID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -253,35 +250,35 @@ func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, inde
 	return thingService.ThingAnalyze(ctx, dimension, index, start, group, int64(user.ID))
 }
 
-func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, page *int64, pageSize *int64) (*model.HistoryConnection, error) {
+func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, searchParam model.SearchParam) (*model.HistoryConnection, error) {
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.HistoryConnection)
-	total, data, err := historyService.ListHistory(ctx, sourceType, page, pageSize, int64(user.ID), scheme)
+	total, data, err := historyService.ListHistory(ctx, sourceType, searchParam, user.ID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) DeviceModels(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceModelConnection, error) {
+func (r *queryResolver) DeviceModels(ctx context.Context, searchParam model.SearchParam) (*model.DeviceModelConnection, error) {
 	con := new(model.DeviceModelConnection)
-	total, data, err := deviceService.ListDeviceModel(ctx, keyword, page, pageSize, ids, sorts)
+	total, data, err := deviceService.ListDeviceModel(ctx, searchParam)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) Devices(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (*model.DeviceConnection, error) {
+func (r *queryResolver) Devices(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (*model.DeviceConnection, error) {
 	con := new(model.DeviceConnection)
-	total, data, err := deviceService.ListDevice(ctx, keyword, page, pageSize, ids, sorts, deviceType)
+	total, data, err := deviceService.ListDevice(ctx, searchParam, deviceType)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) DeviceDashboards(ctx context.Context, keyword *string, page *int64, pageSize *int64, ids []int64, sorts []*model.Sort) (*model.DeviceDashboardConnection, error) {
+func (r *queryResolver) DeviceDashboards(ctx context.Context, searchParam model.SearchParam) (*model.DeviceDashboardConnection, error) {
 	con := new(model.DeviceDashboardConnection)
-	total, data, err := deviceService.ListDeviceDashboards(ctx, keyword, page, pageSize, ids, sorts)
+	total, data, err := deviceService.ListDeviceDashboards(ctx, searchParam)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

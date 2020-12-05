@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/module/base"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 //User 用户
 type User struct {
-	gorm.Model
+	base.DefaultModel
 	Name      string `gorm:"size:50;unique;NOT NULL;"`
 	Password  string `gorm:"size:256;NOT NULL;"`
 	Avatar    string `gorm:"size:200;NOT NULL;"`
@@ -23,23 +23,30 @@ type User struct {
 	IP        string `gorm:"size:50;NOT NULL;"` //check if user is online
 }
 
+//NewUser ..
+func NewUser() *User {
+	vs := &User{}
+	vs.DefaultModel = base.NewDefaultModel()
+	return vs
+}
+
 //MarshalBinary ..
-func (u *User) MarshalBinary() ([]byte, error) {
-	return json.Marshal(u)
+func (m *User) MarshalBinary() ([]byte, error) {
+	return json.Marshal(m)
 }
 
 //UnmarshalBinary ..
-func (u *User) UnmarshalBinary(data []byte) error {
-	return json.Unmarshal(data, u)
+func (m *User) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, m)
 }
 
-//GetByID ..
-func (u *User) GetByID(uid int64) error {
-	return db.GetDB().Where("id=?", uid).First(u).Error
+//GetByID Get User by id
+func (m *User) GetByID(id uint, columns []string) error {
+	return m.Select(columns).IDQuery(id).First(m)
 }
 
 //GenerateAdminAccount ..
-func (u *User) GenerateAdminAccount(ownerName, ownerPassword string) {
+func (m *User) GenerateAdminAccount(ownerName, ownerPassword string) {
 	var total int64
 	err := db.GetDB().Model(&User{}).Count(&total).Error
 	if err != nil {

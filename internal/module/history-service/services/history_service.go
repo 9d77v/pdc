@@ -49,7 +49,9 @@ func (s HistoryService) RecordHistory(ctx context.Context,
 		tx.Rollback()
 		return &model.History{}, err
 	}
-	return &model.History{}, tx.Commit().Error
+	return &model.History{
+		SubSourceID: input.SubSourceID,
+	}, tx.Commit().Error
 }
 
 //GetHistory ..
@@ -67,36 +69,38 @@ func (s HistoryService) GetHistory(ctx context.Context,
 
 //ListHistory ..
 func (s HistoryService) ListHistory(ctx context.Context,
-	sourceType, page, pageSize *int64, uid int64, scheme string) (int64, []*model.History, error) {
+	sourceType *int64, searchParam model.SearchParam, uid uint, scheme string) (int64, []*model.History, error) {
 	result := make([]*model.History, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB().Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
+	history := models.NewHistory()
+	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(result))
 		} else {
-			err = builder.Model(&models.History{}).Count(&total).Error
+			total, err = history.Count(history)
 			if err != nil {
 				return 0, result, err
 			}
 		}
 	}
 	if fieldMap["edges"] {
+		historyTable := db.TablePrefix + "_history"
 		switch ptrs.Int64(sourceType) {
 		case 1:
-			builder = builder.Table(db.TablePrefix + "_history a").
-				Select("a.uid,a.source_type,a.source_id,a.sub_source_id,a.current_time,a.remaining_time,a.platform,cast(EXTRACT(epoch FROM CAST( a.updated_at AS TIMESTAMP)) as bigint) updated_at,  b.title,b.cover,c.num,c.title sub_title").
-				Joins("JOIN pdc_video b ON a.source_id=b.id").
-				Joins("JOIN pdc_episode c on a.sub_source_id=c.id")
+			history.
+				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time", "remaining_time", "platform",
+					"cast(EXTRACT(epoch FROM CAST( " + historyTable + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
+					"b.title", "b.cover", "c.num", "c.title sub_title"}).
+				LeftJoin("pdc_video b ON " + historyTable + ".source_id=b.id").
+				LeftJoin("pdc_episode c on " + historyTable + ".sub_source_id=c.id")
 		}
-		builder = builder.Order("updated_at desc")
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		err = builder.Find(&result).Error
+		err = history.Pagination(offset, limit).
+			Order("updated_at desc").
+			Find(&result)
 		if err != nil {
 			return 0, result, err
 		}

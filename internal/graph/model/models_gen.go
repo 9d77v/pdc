@@ -413,6 +413,14 @@ type PieLineSerieData struct {
 	Y  []float64 `json:"y"`
 }
 
+type SearchParam struct {
+	Keyword  *string `json:"keyword"`
+	Page     *int64  `json:"page"`
+	PageSize *int64  `json:"pageSize"`
+	Ids      []int64 `json:"ids"`
+	Sorts    []*Sort `json:"sorts"`
+}
+
 type SerieData struct {
 	Name  string  `json:"name"`
 	Value float64 `json:"value"`

@@ -1,10 +1,12 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/9d77v/pdc/internal/module/base"
+)
 
 //DeviceDashboard 设备仪表盘
 type DeviceDashboard struct {
-	gorm.Model
+	base.DefaultModel
 	Name        string `gorm:"size:50"`
 	IsVisible   bool
 	DeviceType  uint8 //设备类型，0:默认设备,1:摄像头
@@ -12,9 +14,21 @@ type DeviceDashboard struct {
 	Cameras     []*DeviceDashboardCamera
 }
 
+//NewDeviceDashboard ..
+func NewDeviceDashboard() *DeviceDashboard {
+	vs := &DeviceDashboard{}
+	vs.DefaultModel = base.NewDefaultModel()
+	return vs
+}
+
+//GetByID ..
+func (m *DeviceDashboard) GetByID(id uint, columns []string) error {
+	return m.Select(columns).IDQuery(id).First(m)
+}
+
 //DeviceDashboardTelemetry 仪表盘遥测
 type DeviceDashboardTelemetry struct {
-	gorm.Model
+	*base.DefaultModel
 	DeviceDashboardID uint
 	TelemetryID       uint
 	Telemetry         Telemetry
@@ -22,7 +36,7 @@ type DeviceDashboardTelemetry struct {
 
 //DeviceDashboardCamera 仪表盘摄像头
 type DeviceDashboardCamera struct {
-	gorm.Model
+	*base.DefaultModel
 	DeviceDashboardID uint
 	DeviceID          uint
 	Device            Device

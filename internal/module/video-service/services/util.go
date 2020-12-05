@@ -6,6 +6,15 @@ import (
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 )
 
+func toVideoDtos(data []*models.Video, scheme string) []*model.Video {
+	result := make([]*model.Video, 0, len(data))
+	for _, m := range data {
+		r := toVideoDto(m, scheme)
+		result = append(result, r)
+	}
+	return result
+}
+
 func toVideoDto(m *models.Video, scheme string) *model.Video {
 	es := make([]*model.Episode, 0, len(m.Episodes))
 	for _, e := range m.Episodes {
@@ -54,6 +63,15 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 		CreatedAt:      m.CreatedAt.Unix(),
 		UpdatedAt:      m.UpdatedAt.Unix(),
 	}
+}
+
+func toVideoSeriesDtos(data []*models.VideoSeries) []*model.VideoSeries {
+	result := make([]*model.VideoSeries, 0, len(data))
+	for _, m := range data {
+		r := toVideoSeriesDto(m)
+		result = append(result, r)
+	}
+	return result
 }
 
 func toVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {

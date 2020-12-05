@@ -157,21 +157,21 @@ func (s DeviceService) getDefaultHikvisionAttributeModels(id uint) []*models.Att
 //UpdateDeviceModel ..
 func (s DeviceService) UpdateDeviceModel(ctx context.Context,
 	input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
-	m := new(models.DeviceModel)
+	deviceModel := models.NewDeviceModel()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := deviceModel.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
 		"desc": ptrs.String(input.Desc),
 	}
-	err := db.GetDB().Model(m).Updates(updateMap).Error
-	return &model.DeviceModel{ID: int64(m.ID)}, err
+	err := db.GetDB().Model(deviceModel).Updates(updateMap).Error
+	return &model.DeviceModel{ID: int64(deviceModel.ID)}, err
 }
 
 //CreateAttributeModel  ..
@@ -190,20 +190,20 @@ func (s DeviceService) CreateAttributeModel(ctx context.Context, input model.New
 
 //UpdateAttributeModel ..
 func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error) {
-	m := new(models.AttributeModel)
+	attributeModel := models.NewAttributeModel()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := attributeModel.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name": input.Name,
 	}
-	err := db.GetDB().Model(m).Updates(updateMap).Error
-	return &model.AttributeModel{ID: int64(m.ID)}, err
+	err := db.GetDB().Model(attributeModel).Updates(updateMap).Error
+	return &model.AttributeModel{ID: int64(attributeModel.ID)}, err
 }
 
 //DeleteAttributeModel ..
@@ -237,13 +237,13 @@ func (s DeviceService) CreateTelemetryModel(ctx context.Context,
 //UpdateTelemetryModel ..
 func (s DeviceService) UpdateTelemetryModel(ctx context.Context,
 	input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
-	m := new(models.TelemetryModel)
+	telemetryModel := models.NewTelemetryModel()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := telemetryModel.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -253,8 +253,8 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context,
 		"unit_name": input.UnitName,
 		"scale":     input.Scale,
 	}
-	err := db.GetDB().Model(m).Updates(updateMap).Error
-	return &model.TelemetryModel{ID: int64(m.ID)}, err
+	err := db.GetDB().Model(telemetryModel).Updates(updateMap).Error
+	return &model.TelemetryModel{ID: int64(telemetryModel.ID)}, err
 }
 
 //DeleteTelemetryModel ..
@@ -267,23 +267,20 @@ func (s DeviceService) DeleteTelemetryModel(ctx context.Context,
 }
 
 //ListDeviceModel ..
-func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceModel, error) {
+func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceModel, error) {
 	result := make([]*model.DeviceModel, 0)
 	data := make([]*models.DeviceModel, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	if keyword != nil && ptrs.String(keyword) != "" {
-		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
-	}
+	deviceModel := models.NewDeviceModel()
+	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = builder.Model(&models.DeviceModel{}).Count(&total).Error
+			total, err = deviceModel.Count(deviceModel)
 			if err != nil {
 				return 0, result, err
 			}
@@ -291,40 +288,27 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields, "__typename", "attributeModels", "telemetryModels"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			sort := " DESC"
-			if v.IsAsc {
-				sort = " ASC"
-			}
-			builder = builder.Order(v.Field + sort)
-		}
 		if edgeFieldMap["attributeModels"] {
-			builder = builder.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
+			deviceModel.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.AttributeModel{})
 			})
 		}
 		if edgeFieldMap["telemetryModels"] {
-			builder = builder.Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
+			deviceModel.Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.TelemetryModel{})
 			})
 		}
-		err = builder.Find(&data).Error
+		err = deviceModel.
+			Select(edgeFields, "attributeModels", "telemetryModels").
+			IDArrayQuery(deviceModel.ToUintIDs(searchParam.Ids)).
+			Pagination(offset, limit).
+			Sort(searchParam.Sorts).
+			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toDeviceModelDto(m)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toDeviceModelDtos(data), nil
 }
 
 //CreateDevice  ..
@@ -409,21 +393,18 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 }
 
 //ListDevice ..
-func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (int64, []*model.Device, error) {
+func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (int64, []*model.Device, error) {
 	result := make([]*model.Device, 0)
 	data := make([]*models.Device, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	if keyword != nil && ptrs.String(keyword) != "" {
-		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
-	}
+	device := models.NewDevice()
+	device.FuzzyQuery(searchParam.Keyword, "name")
 	if deviceType != nil {
-		builder = builder.
+		device.
 			Where(db.TablePrefix+"_device_model.device_type = ?", ptrs.Int64(deviceType)).
-			Joins("JOIN " + db.TablePrefix + "_device_model ON " + db.TablePrefix + "_device_model.id = " +
+			LeftJoin(db.TablePrefix + "_device_model ON " + db.TablePrefix + "_device_model.id = " +
 				db.TablePrefix + "_device.device_model_id")
 	}
 	var total int64
@@ -431,7 +412,7 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = builder.Model(&models.Device{}).Count(&total).Error
+			total, err = device.Count(device)
 			if err != nil {
 				return 0, result, err
 			}
@@ -439,49 +420,31 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		fields := utils.ToDBFields(edgeFields,
-			"__typename", "attributes", "telemetries",
+		omitFields := []string{"attributes", "telemetries",
 			"deviceModelName", "deviceModelDesc",
-			"deviceModelDeviceType", "deviceModelCameraCompany")
+			"deviceModelDeviceType", "deviceModelCameraCompany"}
+		device.Select(edgeFields, omitFields...)
 		if deviceType != nil {
-			for i, v := range fields {
-				fields[i] = db.TablePrefix + "_device." + v
-			}
-		}
-		builder = builder.Select(fields)
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			sort := " DESC"
-			if v.IsAsc {
-				sort = " ASC"
-			}
-			builder = builder.Order(v.Field + sort)
+			device.SelectWithPrefix(edgeFields, db.TablePrefix+"_device.", omitFields...)
 		}
 		if edgeFieldMap["attributes"] {
-			builder = builder.Preload("Attributes").Preload("Attributes.AttributeModel")
+			device.Preload("Attributes").Preload("Attributes.AttributeModel")
 		}
 		if edgeFieldMap["telemetries"] {
-			builder = builder.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
+			device.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
 		}
 		if edgeFieldMap["deviceModelName"] || edgeFieldMap["deviceModelDesc"] ||
 			edgeFieldMap["deviceModelDeviceType"] || edgeFieldMap["deviceModelCameraCompany"] {
-			builder = builder.Preload("DeviceModel")
+			device.Preload("DeviceModel")
 		}
-		err = builder.Find(&data).Error
+		err = device.
+			IDArrayQuery(device.ToUintIDs(searchParam.Ids)).
+			Pagination(offset, limit).Sort(searchParam.Sorts).Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toDeviceDto(m)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toDeviceDtos(data), nil
 }
 
 //GetDeviceInfo ..
@@ -489,10 +452,13 @@ func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceDownMSG, error)
 	replyDeviceMsg := &pb.DeviceDownMSG{
 		DeviceId: deviceID,
 	}
-	device := new(models.Device)
-	err := db.GetDB().Preload("Attributes").Preload("Attributes.AttributeModel").
-		Preload("Telemetries").Preload("Telemetries.TelemetryModel").Preload("DeviceModel").
-		Where("id=?", replyDeviceMsg.DeviceId).First(device).Error
+	device := models.NewDevice()
+	err := device.Preload("Attributes").
+		Preload("Attributes.AttributeModel").
+		Preload("Telemetries").
+		Preload("Telemetries.TelemetryModel").
+		Preload("DeviceModel").
+		IDQuery(uint(replyDeviceMsg.DeviceId)).First(device)
 	if err != nil {
 		log.Println("get device failed,err", err)
 		return replyDeviceMsg, err
@@ -549,21 +515,21 @@ func (s DeviceService) CreateDeviceDashboard(ctx context.Context,
 
 //UpdateDeviceDashboard ..
 func (s DeviceService) UpdateDeviceDashboard(ctx context.Context, input model.NewUpdateDeviceDashboard) (*model.DeviceDashboard, error) {
-	m := new(models.DeviceDashboard)
+	deviceDashboard := models.NewDeviceDashboard()
 	varibales := graphql.GetRequestContext(ctx).Variables
 	fields := make([]string, 0)
 	for k := range varibales["input"].(map[string]interface{}) {
 		fields = append(fields, k)
 	}
-	if err := db.GetDB().Select(utils.ToDBFields(fields)).First(m, "id=?", input.ID).Error; err != nil {
+	if err := deviceDashboard.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
 		"name":       input.Name,
 		"is_visible": input.IsVisible,
 	}
-	err := db.GetDB().Model(m).Updates(updateMap).Error
-	return &model.DeviceDashboard{ID: int64(m.ID)}, err
+	err := db.GetDB().Model(deviceDashboard).Updates(updateMap).Error
+	return &model.DeviceDashboard{ID: int64(deviceDashboard.ID)}, err
 }
 
 //DeleteDeviceDashboard ..
@@ -632,23 +598,20 @@ func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context,
 }
 
 //ListDeviceDashboards ..
-func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceDashboard, error) {
+func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceDashboard, error) {
 	result := make([]*model.DeviceDashboard, 0)
 	data := make([]*models.DeviceDashboard, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	if keyword != nil && ptrs.String(keyword) != "" {
-		builder = builder.Where("name like ?", "%"+ptrs.String(keyword)+"%")
-	}
+	deviceDashboard := models.NewDeviceDashboard()
+	deviceDashboard.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
-			err = builder.Model(&models.DeviceDashboard{}).Count(&total).Error
+			total, err = deviceDashboard.Count(deviceDashboard)
 			if err != nil {
 				return 0, result, err
 			}
@@ -656,47 +619,32 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields,
-			"__typename", "telemetries", "cameras"))
-		if len(ids) > 0 {
-			builder = builder.Where("id in (?)", ids)
-		}
-		if limit > 0 {
-			builder = builder.Offset(offset).Limit(limit)
-		}
-		for _, v := range sorts {
-			sort := " DESC"
-			if v.IsAsc {
-				sort = " ASC"
-			}
-			builder = builder.Order(v.Field + sort)
-		}
 		if edgeFieldMap["telemetries"] {
-			builder = builder.Preload("Telemetries").
+			deviceDashboard.Preload("Telemetries").
 				Preload("Telemetries.Telemetry").
 				Preload("Telemetries.Telemetry.TelemetryModel")
 			telemetryFieldMap, _ := utils.GetFieldData(ctx, "edges.telemetries.")
 			if telemetryFieldMap["deviceName"] {
-				builder = builder.Preload("Telemetries.Telemetry.Device")
+				deviceDashboard.Preload("Telemetries.Telemetry.Device")
 			}
 		}
 		if edgeFieldMap["cameras"] {
-			builder = builder.Preload("Cameras")
+			deviceDashboard.Preload("Cameras")
 			cameraFieldMap, _ := utils.GetFieldData(ctx, "edges.cameras.")
 			if cameraFieldMap["deviceName"] {
-				builder = builder.Preload("Cameras.Device")
+				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
-		err = builder.Find(&data).Error
+		err = deviceDashboard.Select(edgeFields, "telemetries", "cameras").
+			IDArrayQuery(deviceDashboard.ToUintIDs(searchParam.Ids)).
+			Pagination(offset, limit).
+			Sort(searchParam.Sorts).
+			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toDeviceDashboardDto(m)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toDeviceDashboardDtos(data), nil
 }
 
 //AppDeviceDashboards ..
@@ -706,45 +654,39 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context,
 	data := make([]*models.DeviceDashboard, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
+	deviceDashboard := models.NewDeviceDashboard()
 	if deviceType != nil {
-		builder = builder.Where("device_type = ?", ptrs.Int64(deviceType))
+		deviceDashboard.Where("device_type = ?", ptrs.Int64(deviceType))
 	}
-	builder = builder.Where("is_visible = true")
+	deviceDashboard.Where("is_visible = true")
 	var total int64
 	if fieldMap["totalCount"] {
 		total = int64(len(data))
 	}
 	if fieldMap["edges"] {
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields,
-			"__typename", "telemetries", "cameras"))
 		if edgeFieldMap["telemetries"] {
-			builder = builder.Preload("Telemetries").
+			deviceDashboard.Preload("Telemetries").
 				Preload("Telemetries.Telemetry").
 				Preload("Telemetries.Telemetry.TelemetryModel")
 			telemetryFieldMap, _ := utils.GetFieldData(ctx, "edges.telemetries.")
 			if telemetryFieldMap["deviceName"] {
-				builder = builder.Preload("Telemetries.Telemetry.Device")
+				deviceDashboard.Preload("Telemetries.Telemetry.Device")
 			}
 		}
 		if edgeFieldMap["cameras"] {
-			builder = builder.Preload("Cameras")
+			deviceDashboard.Preload("Cameras")
 			cameraFieldMap, _ := utils.GetFieldData(ctx, "edges.cameras.")
 			if cameraFieldMap["deviceName"] {
-				builder = builder.Preload("Cameras.Device")
+				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
-		err = builder.Find(&data).Error
+		err = deviceDashboard.Select(edgeFields, "telemetries", "cameras").Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toDeviceDashboardDto(m)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toDeviceDashboardDtos(data), nil
 }
 
 //CameraCapture ..
@@ -795,25 +737,21 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 	data := make([]*models.CameraTimeLapseVideo, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
-	builder := db.GetDB()
-	builder = builder.Where("device_id = ?", deviceID).Where("created_at>=?", time.Now().AddDate(0, 0, -7))
+	camera := models.NewCameraTimeLapseVideo()
+	camera.IDQuery(uint(deviceID), "device_id").
+		Where("created_at>=?", time.Now().AddDate(0, 0, -7))
 	var total int64
 	if fieldMap["totalCount"] {
 		total = int64(len(data))
 	}
 	if fieldMap["edges"] {
-		builder = builder.Order("id DESC")
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		builder = builder.Select(utils.ToDBFields(edgeFields,
-			"__typename"))
-		err = builder.Find(&data).Error
+		err = camera.Select(edgeFields).
+			Order("id DESC").
+			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toCameraTimeLapseVideoDto(m, scheme)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toCameraTimeLapseVideoDtos(data, scheme), nil
 }
