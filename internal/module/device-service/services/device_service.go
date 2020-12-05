@@ -267,15 +267,14 @@ func (s DeviceService) DeleteTelemetryModel(ctx context.Context,
 }
 
 //ListDeviceModel ..
-func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceModel, error) {
+func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceModel, error) {
 	result := make([]*model.DeviceModel, 0)
 	data := make([]*models.DeviceModel, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	deviceModel := models.NewDeviceModel()
-	deviceModel.FuzzyQuery(keyword, "name")
+	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
@@ -301,9 +300,9 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, keyword *string,
 		}
 		err = deviceModel.
 			Select(edgeFields, "attributeModels", "telemetryModels").
-			IDArrayQuery(deviceModel.ToUintIDs(ids)).
+			IDArrayQuery(deviceModel.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
-			Sort(sorts).
+			Sort(searchParam.Sorts).
 			Find(&data)
 		if err != nil {
 			return 0, result, err
@@ -394,15 +393,14 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 }
 
 //ListDevice ..
-func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort, deviceType *int64) (int64, []*model.Device, error) {
+func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (int64, []*model.Device, error) {
 	result := make([]*model.Device, 0)
 	data := make([]*models.Device, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	device := models.NewDevice()
-	device.FuzzyQuery(keyword, "name")
+	device.FuzzyQuery(searchParam.Keyword, "name")
 	if deviceType != nil {
 		device.
 			Where(db.TablePrefix+"_device_model.device_type = ?", ptrs.Int64(deviceType)).
@@ -440,8 +438,8 @@ func (s DeviceService) ListDevice(ctx context.Context, keyword *string,
 			device.Preload("DeviceModel")
 		}
 		err = device.
-			IDArrayQuery(device.ToUintIDs(ids)).
-			Pagination(offset, limit).Sort(sorts).Find(&data)
+			IDArrayQuery(device.ToUintIDs(searchParam.Ids)).
+			Pagination(offset, limit).Sort(searchParam.Sorts).Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
@@ -600,15 +598,14 @@ func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context,
 }
 
 //ListDeviceDashboards ..
-func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.DeviceDashboard, error) {
+func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceDashboard, error) {
 	result := make([]*model.DeviceDashboard, 0)
 	data := make([]*models.DeviceDashboard, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	deviceDashboard := models.NewDeviceDashboard()
-	deviceDashboard.FuzzyQuery(keyword, "name")
+	deviceDashboard.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
@@ -639,9 +636,9 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, keyword *string
 			}
 		}
 		err = deviceDashboard.Select(edgeFields, "telemetries", "cameras").
-			IDArrayQuery(deviceDashboard.ToUintIDs(ids)).
+			IDArrayQuery(deviceDashboard.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
-			Sort(sorts).
+			Sort(searchParam.Sorts).
 			Find(&data)
 		if err != nil {
 			return 0, result, err

@@ -9,7 +9,7 @@ import (
 
 //Thing 物品
 type Thing struct {
-	*base.Model
+	base.DefaultModel
 	UID                 int64  `grom:"column:uid"`
 	Name                string `gorm:"size:100"`
 	Num                 float64
@@ -31,7 +31,7 @@ type Thing struct {
 //NewThing ..
 func NewThing() *Thing {
 	vs := &Thing{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 

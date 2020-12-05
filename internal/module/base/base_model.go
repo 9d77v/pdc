@@ -1,8 +1,10 @@
 package base
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/9d77v/go-lib/ptrs"
@@ -13,7 +15,6 @@ import (
 
 //Model ..
 type Model struct {
-	gorm.Model
 	db *gorm.DB
 }
 
@@ -21,6 +22,22 @@ type Model struct {
 func NewModel() *Model {
 	m := &Model{}
 	m.db = db.GetDB()
+	return m
+}
+
+//DefaultModel ..
+type DefaultModel struct {
+	*Model
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt sql.NullTime `gorm:"index"`
+}
+
+//NewDefaultModel 。。
+func NewDefaultModel() DefaultModel {
+	m := DefaultModel{}
+	m.Model = NewModel()
 	return m
 }
 
@@ -188,14 +205,13 @@ func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
 	}
 	for _, v := range fields {
 		if !omitFieldMap[v] {
-			value := m.camelToSnack(v)
-			if strings.Contains(value, "price") {
-				value = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
-			} else if strings.Contains(value, ".") || strings.Contains(value, " ") {
+			if strings.Contains(v, "price") {
+				v = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
+			} else if strings.Contains(v, ".") || strings.Contains(v, " ") {
 			} else {
-				value = fmt.Sprintf("\"%s\"", m.camelToSnack(v))
+				v = fmt.Sprintf("\"%s\"", m.camelToSnack(v))
 			}
-			dbFields = append(dbFields, value)
+			dbFields = append(dbFields, v)
 		}
 	}
 	return dbFields

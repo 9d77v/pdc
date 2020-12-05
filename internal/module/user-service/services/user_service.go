@@ -96,15 +96,14 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 }
 
 //ListUser ..
-func (s UserService) ListUser(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort, scheme string) (int64, []*model.User, error) {
+func (s UserService) ListUser(ctx context.Context, searchParam model.SearchParam, scheme string) (int64, []*model.User, error) {
 	result := make([]*model.User, 0)
 	data := make([]*models.User, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	user := models.NewUser()
-	user.FuzzyQuery(keyword, "name")
+	user.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
@@ -119,19 +118,15 @@ func (s UserService) ListUser(ctx context.Context, keyword *string,
 	if fieldMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
 		err = user.Select(edgeFields).
-			IDArrayQuery(user.ToUintIDs(ids)).
+			IDArrayQuery(user.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
-			Sort(sorts).
+			Sort(searchParam.Sorts).
 			Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
 	}
-	for _, m := range data {
-		r := toUserDto(m, scheme)
-		result = append(result, r)
-	}
-	return total, result, nil
+	return total, toUserDtos(data, scheme), nil
 }
 
 func (s UserService) checkUserName(ctx context.Context, name string) (bool, error) {

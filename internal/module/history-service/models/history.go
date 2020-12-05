@@ -9,9 +9,9 @@ import (
 //History 历史记录
 type History struct {
 	*base.Model
-	UID           uint  `gorm:"unique_index:history_uix"`
-	SourceType    uint8 `gorm:"unique_index:history_uix"` //1:video
-	SourceID      uint  `gorm:"unique_index:history_uix"`
+	UID           uint  `gorm:"primary_key;auto_increment:false"`
+	SourceType    uint8 `gorm:"primary_key;auto_increment:false"` //1:video
+	SourceID      uint  `gorm:"primary_key;auto_increment:false"`
 	SubSourceID   uint
 	Platform      string
 	CurrentTime   float64
@@ -34,9 +34,13 @@ func (m *History) GetByID(id uint, columns []string) error {
 //HistoryLog 历史记录
 type HistoryLog struct {
 	*base.Model
-	HistoryID     uint
+	ID            uint  `gorm:"primarykey"`
+	UID           uint  `gorm:"primary_key;auto_increment:false"`
+	SourceType    uint8 `gorm:"primary_key;auto_increment:false"` //1:video
+	SourceID      uint  `gorm:"primary_key;auto_increment:false"`
 	SubSourceID   uint
 	Platform      string
 	CurrentTime   float64
 	RemainingTime float64
+	CreatedAt     time.Time
 }

@@ -12,7 +12,7 @@ import (
 
 //User 用户
 type User struct {
-	*base.Model
+	base.DefaultModel
 	Name      string `gorm:"size:50;unique;NOT NULL;"`
 	Password  string `gorm:"size:256;NOT NULL;"`
 	Avatar    string `gorm:"size:200;NOT NULL;"`
@@ -26,7 +26,7 @@ type User struct {
 //NewUser ..
 func NewUser() *User {
 	vs := &User{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 

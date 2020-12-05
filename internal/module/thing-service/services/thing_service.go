@@ -79,16 +79,15 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 }
 
 //ListThing ..
-func (s ThingService) ListThing(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort,
+func (s ThingService) ListThing(ctx context.Context, searchParam model.SearchParam,
 	uid uint, scheme string) (int64, []*model.Thing, error) {
 	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	thing := models.NewThing()
-	thing.IDQuery(uid, "uid").FuzzyQuery(keyword, "name")
+	thing.IDQuery(uid, "uid").FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
@@ -103,9 +102,9 @@ func (s ThingService) ListThing(ctx context.Context, keyword *string,
 	if fieldMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
 		err = thing.Select(edgeFields).
-			IDArrayQuery(thing.ToUintIDs(ids)).
+			IDArrayQuery(thing.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
-			Sort(sorts).
+			Sort(searchParam.Sorts).
 			Find(&data)
 		if err != nil {
 			return 0, result, err

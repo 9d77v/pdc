@@ -114,7 +114,7 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 //UpdateVideo ..
 func (s VideoService) UpdateVideo(ctx context.Context,
 	input model.NewUpdateVideo) (*model.Video, error) {
-	video := new(models.Video)
+	video := models.NewVideo()
 	fields := make([]string, 0)
 	varibales := graphql.GetRequestContext(ctx).Variables
 	for k := range varibales["input"].(map[string]interface{}) {
@@ -226,16 +226,15 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort,
+func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
 	scheme string, isCombo *bool) (int64, []*model.Video, error) {
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	video := models.NewVideo()
-	video.FuzzyQuery(keyword, "title")
+	video.FuzzyQuery(searchParam.Keyword, "title")
 	if ptrs.Bool(isCombo) {
 		video.Where("id NOT in (select video_id from " + db.TablePrefix + "_video_series_item where video_id=id)")
 	}
@@ -258,9 +257,9 @@ func (s VideoService) ListVideo(ctx context.Context, keyword *string,
 			}).Preload("Episodes.Subtitles")
 		}
 		err = video.Select(edgeFields, "episodes").
-			IDArrayQuery(video.ToUintIDs(ids)).
+			IDArrayQuery(video.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
-			Sort(sorts).
+			Sort(searchParam.Sorts).
 			Find(&data)
 		if err != nil {
 			return 0, result, err
@@ -343,15 +342,14 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 }
 
 //ListVideoSeries ..
-func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string,
-	page, pageSize *int64, ids []int64, sorts []*model.Sort) (int64, []*model.VideoSeries, error) {
-	offset, limit := utils.GetPageInfo(page, pageSize)
+func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.SearchParam) (int64, []*model.VideoSeries, error) {
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	result := make([]*model.VideoSeries, 0)
 	data := make([]*models.VideoSeries, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	videoSeries := models.NewVideoSeries()
-	videoSeries.FuzzyQuery(keyword, "name")
+	videoSeries.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
 	if fieldMap["totalCount"] {
 		if limit == -1 {
@@ -367,9 +365,9 @@ func (s VideoService) ListVideoSeries(ctx context.Context, keyword *string,
 		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
 		err = videoSeries.
 			Select(edgeFields, "items").
-			IDArrayQuery(videoSeries.ToUintIDs(ids)).
+			IDArrayQuery(videoSeries.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
-			Sort(sorts).
+			Sort(searchParam.Sorts).
 			Find(&data)
 		if err != nil {
 			return 0, result, err

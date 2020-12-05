@@ -36,7 +36,9 @@ func (s HistoryService) RecordHistory(ctx context.Context,
 		return &model.History{}, err
 	}
 	hl := &models.HistoryLog{
-		HistoryID:     h.ID,
+		UID:           uid,
+		SourceType:    uint8(input.SourceType),
+		SourceID:      uint(input.SourceID),
 		SubSourceID:   uint(input.SubSourceID),
 		Platform:      input.Platform,
 		CurrentTime:   input.CurrentTime,
@@ -47,7 +49,9 @@ func (s HistoryService) RecordHistory(ctx context.Context,
 		tx.Rollback()
 		return &model.History{}, err
 	}
-	return &model.History{}, tx.Commit().Error
+	return &model.History{
+		SubSourceID: input.SubSourceID,
+	}, tx.Commit().Error
 }
 
 //GetHistory ..
@@ -65,9 +69,9 @@ func (s HistoryService) GetHistory(ctx context.Context,
 
 //ListHistory ..
 func (s HistoryService) ListHistory(ctx context.Context,
-	sourceType, page, pageSize *int64, uid int64, scheme string) (int64, []*model.History, error) {
+	sourceType *int64, searchParam model.SearchParam, uid uint, scheme string) (int64, []*model.History, error) {
 	result := make([]*model.History, 0)
-	offset, limit := utils.GetPageInfo(page, pageSize)
+	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	var err error
 	history := models.NewHistory()
@@ -84,14 +88,19 @@ func (s HistoryService) ListHistory(ctx context.Context,
 		}
 	}
 	if fieldMap["edges"] {
+		historyTable := db.TablePrefix + "_history"
 		switch ptrs.Int64(sourceType) {
 		case 1:
-			history.Table(db.TablePrefix + "_history a").
-				Select([]string{"a.uid,a.source_type,a.source_id,a.sub_source_id,a.current_time,a.remaining_time,a.platform,cast(EXTRACT(epoch FROM CAST( a.updated_at AS TIMESTAMP)) as bigint) updated_at,  b.title,b.cover,c.num,c.title sub_title"}).
-				LeftJoin("JOIN pdc_video b ON a.source_id=b.id").
-				LeftJoin("JOIN pdc_episode c on a.sub_source_id=c.id")
+			history.
+				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time", "remaining_time", "platform",
+					"cast(EXTRACT(epoch FROM CAST( " + historyTable + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
+					"b.title", "b.cover", "c.num", "c.title sub_title"}).
+				LeftJoin("pdc_video b ON " + historyTable + ".source_id=b.id").
+				LeftJoin("pdc_episode c on " + historyTable + ".sub_source_id=c.id")
 		}
-		err = history.Pagination(offset, limit).Order("updated_at desc").Find(&result)
+		err = history.Pagination(offset, limit).
+			Order("updated_at desc").
+			Find(&result)
 		if err != nil {
 			return 0, result, err
 		}

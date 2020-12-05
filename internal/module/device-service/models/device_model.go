@@ -6,7 +6,7 @@ import (
 
 //DeviceModel 设备模型
 type DeviceModel struct {
-	*base.Model
+	base.DefaultModel
 	Name            string `gorm:"size:50"`
 	Desc            string `gorm:"size:5000"`
 	DeviceType      uint8  //设备类型，0:默认设备,1:摄像头
@@ -18,7 +18,7 @@ type DeviceModel struct {
 //NewDeviceModel ..
 func NewDeviceModel() *DeviceModel {
 	vs := &DeviceModel{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 

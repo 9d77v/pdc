@@ -2,12 +2,11 @@ package models
 
 import (
 	"github.com/9d77v/pdc/internal/module/base"
-	"gorm.io/gorm"
 )
 
 //Device 设备
 type Device struct {
-	*base.Model
+	base.DefaultModel
 	DeviceModelID uint
 	DeviceModel   DeviceModel
 	Name          string `gorm:"size:50;NOT NULL;"`
@@ -24,7 +23,7 @@ type Device struct {
 //NewDevice ..
 func NewDevice() *Device {
 	vs := &Device{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 
@@ -35,18 +34,18 @@ func (m *Device) GetByID(id uint, columns []string) error {
 
 //Attribute 属性
 type Attribute struct {
-	gorm.Model
-	DeviceID         uint `gorm:"unique_index:attribute_uix"`
-	AttributeModelID uint `gorm:"unique_index:attribute_uix"`
+	base.DefaultModel
+	DeviceID         uint `gorm:"uniqueIndex:attribute_uix"`
+	AttributeModelID uint `gorm:"uniqueIndex:attribute_uix"`
 	AttributeModel   AttributeModel
 	Value            string `gorm:"size:50;NOT NULL;"`
 }
 
 //Telemetry 遥测
 type Telemetry struct {
-	gorm.Model
-	DeviceID         uint `gorm:"unique_index:telemetry_uix"`
+	*base.DefaultModel
+	DeviceID         uint `gorm:"uniqueIndex:telemetry_uix"`
 	Device           Device
-	TelemetryModelID uint `gorm:"unique_index:telemetry_uix"`
+	TelemetryModelID uint `gorm:"uniqueIndex:telemetry_uix"`
 	TelemetryModel   TelemetryModel
 }

@@ -11,7 +11,7 @@ type VideoSeriesRepository interface {
 
 //VideoSeries 视频系列
 type VideoSeries struct {
-	*base.Model
+	base.DefaultModel
 	Name  string
 	Items []*VideoSeriesItem
 }
@@ -19,7 +19,7 @@ type VideoSeries struct {
 //NewVideoSeries ..
 func NewVideoSeries() *VideoSeries {
 	vs := &VideoSeries{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 

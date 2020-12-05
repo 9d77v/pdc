@@ -6,16 +6,16 @@ import (
 
 //AttributeModel 属性模型
 type AttributeModel struct {
-	*base.Model
-	DeviceModelID uint   `gorm:"unique_index:attribute_model_uix"`
-	Key           string `gorm:"unique_index:attribute_model_uix;size:50"`
+	base.DefaultModel
+	DeviceModelID uint   `gorm:"uniqueIndex:attribute_model_uix"`
+	Key           string `gorm:"uniqueIndex:attribute_model_uix;size:50"`
 	Name          string `gorm:"size:50"`
 }
 
 //NewAttributeModel ..
 func NewAttributeModel() *AttributeModel {
 	vs := &AttributeModel{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 

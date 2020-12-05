@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -14,12 +16,14 @@ type VideoSeriesItemRepository interface {
 //VideoSeriesItem 视频系列视频列表
 type VideoSeriesItem struct {
 	*base.Model
-	VideoSeriesID uint   `gorm:"unique_index:video_series_item_uix"`
-	VideoID       uint   `gorm:"unique_index:video_series_item_uix"`
+	VideoSeriesID uint   `gorm:"primary_key;auto_increment:false"`
+	VideoID       uint   `gorm:"primary_key;auto_increment:false"`
 	EpisodeID     uint   `gorm:"<-:false"`
 	Title         string `gorm:"<-:false"`
 	Alias         string
 	Num           int
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 //NewVideoSeriesItem ..

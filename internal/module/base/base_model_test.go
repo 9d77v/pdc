@@ -9,8 +9,7 @@ import (
 
 func TestModel_camelToSnack(t *testing.T) {
 	type fields struct {
-		Model gorm.Model
-		db    *gorm.DB
+		db *gorm.DB
 	}
 	type args struct {
 		s string
@@ -26,8 +25,7 @@ func TestModel_camelToSnack(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &Model{
-				Model: tt.fields.Model,
-				db:    tt.fields.db,
+				db: tt.fields.db,
 			}
 			if got := m.camelToSnack(tt.args.s); got != tt.want {
 				t.Errorf("Model.camelToSnack() = %v, want %v", got, tt.want)
@@ -38,8 +36,7 @@ func TestModel_camelToSnack(t *testing.T) {
 
 func TestModel_ToDBFields(t *testing.T) {
 	type fields struct {
-		Model gorm.Model
-		db    *gorm.DB
+		db *gorm.DB
 	}
 	type args struct {
 		fields     []string
@@ -55,8 +52,7 @@ func TestModel_ToDBFields(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &Model{
-				Model: tt.fields.Model,
-				db:    tt.fields.db,
+				db: tt.fields.db,
 			}
 			if got := m.toDBFields(tt.args.fields, tt.args.omitFields...); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Model.ToDBFields() = %v, want %v", got, tt.want)

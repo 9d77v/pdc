@@ -6,9 +6,9 @@ import (
 
 //TelemetryModel 遥测模型
 type TelemetryModel struct {
-	*base.Model
-	DeviceModelID uint   `gorm:"unique_index:telemetry_model_uix"`
-	Key           string `gorm:"unique_index:telemetry_model_uix;size:50"`
+	base.DefaultModel
+	DeviceModelID uint   `gorm:"uniqueIndex:telemetry_model_uix"`
+	Key           string `gorm:"uniqueIndex:telemetry_model_uix;size:50"`
 	Name          string `gorm:"size:50"`
 	Factor        float64
 	Unit          string `gorm:"size:10"`
@@ -19,7 +19,7 @@ type TelemetryModel struct {
 //NewTelemetryModel ..
 func NewTelemetryModel() *TelemetryModel {
 	vs := &TelemetryModel{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 

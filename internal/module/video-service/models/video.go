@@ -14,7 +14,7 @@ type VideoRepository interface {
 
 //Video 视频
 type Video struct {
-	*base.Model
+	base.DefaultModel
 	Title          string `gorm:"size:50;NOT NULL;"`
 	Desc           string `gorm:"size:5000;NOT NULL;"`
 	PubDate        time.Time
@@ -29,7 +29,7 @@ type Video struct {
 //NewVideo ..
 func NewVideo() *Video {
 	vs := &Video{}
-	vs.Model = base.NewModel()
+	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
 
