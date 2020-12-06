@@ -7,12 +7,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/redis"
 	"github.com/9d77v/pdc/internal/graph/model"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/user-service/models"
 	"github.com/9d77v/pdc/internal/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +20,7 @@ import (
 
 //UserService ..
 type UserService struct {
+	base.Service
 }
 
 const (
@@ -60,11 +61,7 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 //UpdateUser ..
 func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error) {
 	user := models.NewUser()
-	varibales := graphql.GetRequestContext(ctx).Variables
-	fields := make([]string, 0)
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
+	fields := s.GetInputFields(ctx)
 	if err := user.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
@@ -97,36 +94,11 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 
 //ListUser ..
 func (s UserService) ListUser(ctx context.Context, searchParam model.SearchParam, scheme string) (int64, []*model.User, error) {
-	result := make([]*model.User, 0)
 	data := make([]*models.User, 0)
-	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
 	user := models.NewUser()
 	user.FuzzyQuery(searchParam.Keyword, "name")
-	var total int64
-	if fieldMap["totalCount"] {
-		if limit == -1 {
-			total = int64(len(data))
-		} else {
-			total, err = user.Count(user)
-			if err != nil {
-				return 0, result, err
-			}
-		}
-	}
-	if fieldMap["edges"] {
-		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		err = user.Select(edgeFields).
-			IDArrayQuery(user.ToUintIDs(searchParam.Ids)).
-			Pagination(offset, limit).
-			Sort(searchParam.Sorts).
-			Find(&data)
-		if err != nil {
-			return 0, result, err
-		}
-	}
-	return total, toUserDtos(data, scheme), nil
+	total, err := s.GetConnection(ctx, user, searchParam, &data, nil)
+	return total, toUserDtos(data, scheme), err
 }
 
 func (s UserService) checkUserName(ctx context.Context, name string) (bool, error) {
@@ -187,11 +159,7 @@ func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, erro
 //UpdateProfile ..
 func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdateProfile, uid uint) (*model.User, error) {
 	user := models.NewUser()
-	varibales := graphql.GetRequestContext(ctx).Variables
-	fields := make([]string, 0)
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
+	fields := s.GetInputFields(ctx)
 	fields = append(fields, "id")
 	if err := user.GetByID(uid, fields); err != nil {
 		return nil, err

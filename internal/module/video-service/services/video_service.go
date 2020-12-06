@@ -8,13 +8,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"gorm.io/gorm"
 
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph/model"
+	"github.com/9d77v/pdc/internal/module/base"
 	hitory_service "github.com/9d77v/pdc/internal/module/history-service/services"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 
@@ -23,6 +23,7 @@ import (
 
 //VideoService ..
 type VideoService struct {
+	base.Service
 }
 
 //CreateVideo ..
@@ -115,11 +116,7 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 func (s VideoService) UpdateVideo(ctx context.Context,
 	input model.NewUpdateVideo) (*model.Video, error) {
 	video := models.NewVideo()
-	fields := make([]string, 0)
-	varibales := graphql.GetRequestContext(ctx).Variables
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
+	fields := s.GetInputFields(ctx)
 	if err := video.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
@@ -228,44 +225,21 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
 	scheme string, isCombo *bool) (int64, []*model.Video, error) {
-	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
-	result := make([]*model.Video, 0)
 	data := make([]*models.Video, 0)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
 	video := models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
 	if ptrs.Bool(isCombo) {
 		video.Where("id NOT in (select video_id from " + db.TablePrefix + "_video_series_item where video_id=id)")
 	}
-	var total int64
-	if fieldMap["totalCount"] {
-		if limit == -1 {
-			total = int64(len(data))
-		} else {
-			total, err = video.Count(video)
-			if err != nil {
-				return 0, result, err
-			}
-		}
-	}
-	if fieldMap["edges"] {
-		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
 		if edgeFieldMap["episodes"] {
 			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
 			}).Preload("Episodes.Subtitles")
 		}
-		err = video.Select(edgeFields, "episodes").
-			IDArrayQuery(video.ToUintIDs(searchParam.Ids)).
-			Pagination(offset, limit).
-			Sort(searchParam.Sorts).
-			Find(&data)
-		if err != nil {
-			return 0, result, err
-		}
 	}
-	return total, toVideoDtos(data, scheme), nil
+	total, err := s.GetConnection(ctx, video, searchParam, &data, replaceFunc, "episodes")
+	return total, toVideoDtos(data, scheme), err
 }
 
 //CreateVideoSeries ..
@@ -284,13 +258,8 @@ func (s VideoService) CreateVideoSeries(ctx context.Context,
 //UpdateVideoSeries ..
 func (s VideoService) UpdateVideoSeries(ctx context.Context,
 	input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
-	fields := make([]string, 0)
-	varibales := graphql.GetRequestContext(ctx).Variables
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
+	fields := s.GetInputFields(ctx)
 	videoSeries := models.NewVideoSeries()
-
 	if err := videoSeries.GetByID(uint(input.ID), fields); err != nil {
 		return nil, err
 	}
@@ -324,11 +293,7 @@ func (s VideoService) CreateVideoSeriesItem(ctx context.Context,
 func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 	input model.NewUpdateVideoSeriesItem) (*model.VideoSeriesItem, error) {
 	videoSeriesItem := models.NewVideoSeriesItem()
-	varibales := graphql.GetRequestContext(ctx).Variables
-	fields := make([]string, 0)
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
+	fields := s.GetInputFields(ctx)
 	err := videoSeriesItem.GetByVideoIDVideoSeriesID(fields, uint(input.VideoID), uint(input.VideoSeriesID))
 	if err != nil {
 		return nil, err
@@ -343,7 +308,6 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 
 //ListVideoSeries ..
 func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.SearchParam) (int64, []*model.VideoSeries, error) {
-	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	result := make([]*model.VideoSeries, 0)
 	data := make([]*models.VideoSeries, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
@@ -351,6 +315,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 	videoSeries := models.NewVideoSeries()
 	videoSeries.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
+	offset, limit := s.GetPageInfo(searchParam.Page, searchParam.PageSize)
 	if fieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
