@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -24,6 +25,11 @@ func NewHistory() *History {
 	vs := &History{}
 	vs.Model = base.NewModel()
 	return vs
+}
+
+//TableName ..
+func (m *History) TableName() string {
+	return db.TablePrefix() + "history"
 }
 
 //GetByID ..

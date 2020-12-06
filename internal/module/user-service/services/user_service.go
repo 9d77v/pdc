@@ -94,9 +94,9 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 
 //ListUser ..
 func (s UserService) ListUser(ctx context.Context, searchParam model.SearchParam, scheme string) (int64, []*model.User, error) {
-	data := make([]*models.User, 0)
 	user := models.NewUser()
 	user.FuzzyQuery(searchParam.Keyword, "name")
+	data := make([]*models.User, 0)
 	total, err := s.GetConnection(ctx, user, searchParam, &data, nil)
 	return total, toUserDtos(data, scheme), err
 }

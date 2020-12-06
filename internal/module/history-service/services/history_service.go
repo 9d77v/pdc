@@ -73,30 +73,30 @@ func (s HistoryService) GetHistory(ctx context.Context,
 //ListHistory ..
 func (s HistoryService) ListHistory(ctx context.Context,
 	sourceType *int64, searchParam model.SearchParam, uid uint, scheme string) (int64, []*model.History, error) {
-	data := make([]*model.History, 0)
 	history := models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
 	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
-		historyTable := db.TablePrefix + "_history"
+		tableHistory := history.TableName()
 		switch ptrs.Int64(sourceType) {
 		case 1:
 			history.
 				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time",
 					"remaining_time", "platform",
 					"cast(EXTRACT(epoch FROM CAST( " +
-						historyTable + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
+						tableHistory + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
 					"b.title", "b.cover", "c.num", "c.title sub_title"}).
-				LeftJoin("pdc_video b ON " + historyTable + ".source_id=b.id").
-				LeftJoin("pdc_episode c on " + historyTable + ".sub_source_id=c.id")
+				LeftJoin("pdc_video b ON " + tableHistory + ".source_id=b.id").
+				LeftJoin("pdc_episode c on " + tableHistory + ".sub_source_id=c.id")
 		default:
 			return errors.New("sourceType not exist")
 		}
 		history.Order("updated_at desc")
 		return nil
 	}
+	data := make([]*model.History, 0)
 	total, err := s.GetConnection(ctx, history, searchParam, &data, replaceFunc)
 	for _, v := range data {
-		v.Cover = oss.GetOSSPrefix(scheme) + v.Cover
+		v.Cover = oss.GetOSSPrefixByScheme(scheme) + v.Cover
 	}
 	return total, data, err
 }

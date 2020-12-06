@@ -40,7 +40,7 @@ func HandleCard() func(w http.ResponseWriter, r *http.Request) {
 		}
 		user.UID = consts.GetEncodeUID(u.ID)
 		scheme := req.Header.Get("X-Forwarded-Proto")
-		user.Avatar = oss.GetOSSPrefix(scheme) + u.Avatar
+		user.Avatar = oss.GetOSSPrefixByScheme(scheme) + u.Avatar
 		user.Name = u.Name
 		user.Gender = u.Gender
 		ret, err := json.Marshal(user)

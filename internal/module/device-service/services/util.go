@@ -174,7 +174,7 @@ func toCameraTimeLapseVideoDto(m *models.CameraTimeLapseVideo, scheme string) *m
 		ID:       int64(m.ID),
 		DeviceID: int64(m.DeviceID),
 		Date:     m.Date,
-		VideoURL: oss.GetOSSPrefix(scheme) + m.VideoURL,
+		VideoURL: oss.GetOSSPrefixByScheme(scheme) + m.VideoURL,
 	}
 }
 

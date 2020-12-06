@@ -18,7 +18,7 @@ func toThingsDtos(data []*models.Thing, scheme string) []*model.Thing {
 func toThingDto(m *models.Thing, scheme string) *model.Thing {
 	newPics := make([]string, 0)
 	for _, v := range m.Pics {
-		newPics = append(newPics, oss.GetOSSPrefix(scheme)+v)
+		newPics = append(newPics, oss.GetOSSPrefixByScheme(scheme)+v)
 	}
 	return &model.Thing{
 		ID:                  int64(m.ID),

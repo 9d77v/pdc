@@ -27,8 +27,8 @@ func (m *setPresignedURLSignedMsg) sendData(deviceMsg *pb.DeviceUpMsg) {
 	presignedURLReplyMsg := &pb.DeviceDownMSG_PresignedUrlReplyMsg{
 		PresignedUrlReplyMsg: &pb.PresignedUrlReplyMsg{
 			PictureUrl:      requestURL,
-			OssPrefix:       oss.OssPrefix,
-			SecureOssPrefix: oss.SecureOssPrerix,
+			OssPrefix:       oss.OSSPrefix(),
+			SecureOssPrefix: oss.SecureOSSPrefix(),
 		},
 	}
 	request.DeviceId = deviceMsg.DeviceId

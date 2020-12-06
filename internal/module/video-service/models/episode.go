@@ -26,7 +26,12 @@ type Subtitle struct {
 	URL       string `gorm:"size:500;NOT NULL;"`
 }
 
+//TableName ..
+func (m *Episode) TableName() string {
+	return db.TablePrefix() + "episode"
+}
+
 //GetByID get episode id and video_id
-func (e *Episode) GetByID(id uint, columns []string) error {
-	return db.GetDB().Select("id,video_id").First(e, "id=?", id).Error
+func (m *Episode) GetByID(id uint, columns []string) error {
+	return db.GetDB().Select("id,video_id").First(m, "id=?", id).Error
 }

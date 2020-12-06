@@ -30,6 +30,11 @@ func NewUser() *User {
 	return vs
 }
 
+//TableName ..
+func (m *User) TableName() string {
+	return db.TablePrefix() + "user"
+}
+
 //MarshalBinary ..
 func (m *User) MarshalBinary() ([]byte, error) {
 	return json.Marshal(m)

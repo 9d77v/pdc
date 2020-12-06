@@ -22,16 +22,16 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 		for _, v := range e.Subtitles {
 			sArr = append(sArr, &model.Subtitle{
 				Name: v.Name,
-				URL:  oss.GetOSSPrefix(scheme) + v.URL,
+				URL:  oss.GetOSSPrefixByScheme(scheme) + v.URL,
 			})
 		}
 		cover := ""
 		if e.Cover != "" {
-			cover = oss.GetOSSPrefix(scheme) + e.Cover
+			cover = oss.GetOSSPrefixByScheme(scheme) + e.Cover
 		}
 		url := ""
 		if e.URL != "" {
-			url = oss.GetOSSPrefix(scheme) + e.URL
+			url = oss.GetOSSPrefixByScheme(scheme) + e.URL
 		}
 		es = append(es, &model.Episode{
 			ID:        int64(e.ID),
@@ -47,7 +47,7 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 	}
 	cover := ""
 	if m.Cover != "" {
-		cover = oss.GetOSSPrefix(scheme) + m.Cover
+		cover = oss.GetOSSPrefixByScheme(scheme) + m.Cover
 	}
 	return &model.Video{
 		ID:             int64(m.ID),
