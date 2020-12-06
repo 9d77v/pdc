@@ -67,7 +67,7 @@ func (s HistoryService) GetHistory(ctx context.Context,
 		log.Println("get history error", err)
 		return nil, nil
 	}
-	return toHistoryDto(history), nil
+	return s.getHistory(history), nil
 }
 
 //ListHistory ..

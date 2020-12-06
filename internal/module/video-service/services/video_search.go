@@ -25,7 +25,7 @@ type VideoSearch struct {
 }
 
 //BulkSaveES 批量保存到es
-func (v VideoSearch) BulkSaveES(ctx context.Context,
+func (s VideoSearch) BulkSaveES(ctx context.Context,
 	vis []*models.VideoIndex, indexName string, bulkNum, workerNum int) {
 	bds := make([]*es.BulkDoc, 0, len(vis))
 	for _, v := range vis {
@@ -42,7 +42,7 @@ func (v VideoSearch) BulkSaveES(ctx context.Context,
 }
 
 //GetByIDFromElastic ...
-func (v VideoSearch) GetByIDFromElastic(ctx context.Context,
+func (s VideoSearch) GetByIDFromElastic(ctx context.Context,
 	videoID string) (*models.VideoIndex, error) {
 	result, err := elasticsearch.GetClient().Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
 	if err != nil {
@@ -63,7 +63,7 @@ func (v VideoSearch) GetByIDFromElastic(ctx context.Context,
 }
 
 //ListVideoIndex ..
-func (v VideoSearch) ListVideoIndex(ctx context.Context,
+func (s VideoSearch) ListVideoIndex(ctx context.Context,
 	input model.VideoSearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
 	boolQuery := elastic.NewBoolQuery()
 	keywordStr := strings.ReplaceAll(ptrs.String(input.Keyword), " ", "")
@@ -150,7 +150,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 				log.Println("elastic search result json unmarshal error:", err)
 			}
 			vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
-			vis = append(vis, toVideoIndexDto(vi))
+			vis = append(vis, s.getVideoIndex(vi))
 		}
 	}
 	if field.FieldMap["aggResults"] {
@@ -170,7 +170,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 }
 
 //SimilarVideoIndex ..
-func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
+func (s VideoSearch) SimilarVideoIndex(ctx context.Context,
 	input model.VideoSimilarParam, scheme string) (int64, []*model.VideoIndex, error) {
 	id := strconv.FormatInt(input.VideoID, 10)
 	vis := make([]*model.VideoIndex, 0)
@@ -232,7 +232,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
 			log.Println("elastic search result json unmarshal error:", err)
 		}
 		vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
-		vis = append(vis, toVideoIndexDto(vi))
+		vis = append(vis, s.getVideoIndex(vi))
 	}
 	return result.TotalHits(), vis, nil
 }

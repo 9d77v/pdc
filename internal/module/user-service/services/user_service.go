@@ -98,7 +98,7 @@ func (s UserService) ListUser(ctx context.Context, searchParam model.SearchParam
 	user.FuzzyQuery(searchParam.Keyword, "name")
 	data := make([]*models.User, 0)
 	total, err := s.GetConnection(ctx, user, searchParam, &data, nil)
-	return total, toUserDtos(data, scheme), err
+	return total, s.getUsers(data, scheme), err
 }
 
 func (s UserService) checkUserName(ctx context.Context, name string) (bool, error) {
@@ -217,5 +217,5 @@ func (s UserService) UpdatePassword(ctx context.Context,
 
 //GetUserInfo ..
 func (s UserService) GetUserInfo(user *models.User, scheme string) *model.User {
-	return toUserDto(user, scheme)
+	return s.getUser(user, scheme)
 }

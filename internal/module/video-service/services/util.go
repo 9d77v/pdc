@@ -6,16 +6,16 @@ import (
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 )
 
-func toVideoDtos(data []*models.Video, scheme string) []*model.Video {
+func (s VideoService) getVideos(data []*models.Video, scheme string) []*model.Video {
 	result := make([]*model.Video, 0, len(data))
 	for _, m := range data {
-		r := toVideoDto(m, scheme)
+		r := s.getVideoData(m, scheme)
 		result = append(result, r)
 	}
 	return result
 }
 
-func toVideoDto(m *models.Video, scheme string) *model.Video {
+func (s VideoService) getVideoData(m *models.Video, scheme string) *model.Video {
 	es := make([]*model.Episode, 0, len(m.Episodes))
 	for _, e := range m.Episodes {
 		sArr := make([]*model.Subtitle, 0, len(e.Subtitles))
@@ -65,16 +65,16 @@ func toVideoDto(m *models.Video, scheme string) *model.Video {
 	}
 }
 
-func toVideoSeriesDtos(data []*models.VideoSeries) []*model.VideoSeries {
+func (s VideoService) getVideoSerieses(data []*models.VideoSeries) []*model.VideoSeries {
 	result := make([]*model.VideoSeries, 0, len(data))
 	for _, m := range data {
-		r := toVideoSeriesDto(m)
+		r := s.getVideoSeriesData(m)
 		result = append(result, r)
 	}
 	return result
 }
 
-func toVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {
+func (s VideoService) getVideoSeriesData(m *models.VideoSeries) *model.VideoSeries {
 	items := make([]*model.VideoSeriesItem, 0, len(m.Items))
 	for _, item := range m.Items {
 		items = append(items, &model.VideoSeriesItem{
@@ -95,7 +95,7 @@ func toVideoSeriesDto(m *models.VideoSeries) *model.VideoSeries {
 	}
 }
 
-func toVideoIndexDto(vi *models.VideoIndex) *model.VideoIndex {
+func (s VideoSearch) getVideoIndex(vi *models.VideoIndex) *model.VideoIndex {
 	return &model.VideoIndex{
 		ID:        int64(vi.ID),
 		Title:     vi.Title,

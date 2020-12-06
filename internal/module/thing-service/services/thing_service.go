@@ -81,7 +81,7 @@ func (s ThingService) ListThing(ctx context.Context, searchParam model.SearchPar
 	thing.IDQuery(uid, "uid").FuzzyQuery(searchParam.Keyword, "name")
 	data := make([]*models.Thing, 0)
 	total, err := s.GetConnection(ctx, thing, searchParam, &data, nil)
-	return total, toThingsDtos(data, scheme), err
+	return total, s.getThings(data, scheme), err
 }
 
 //ThingSeries 获取物品数据
@@ -145,5 +145,5 @@ func (s ThingService) ThingAnalyze(ctx context.Context, dimension, index string,
 	builder = builder.Group("x1," + dimension).Order("x1," + dimension)
 	data := make([]*models.PieLineSerie, 0)
 	err := builder.Scan(&data).Error
-	return toPieLineSerieData(data), err
+	return s.getPieLineSerieData(data), err
 }

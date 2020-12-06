@@ -240,7 +240,7 @@ func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchPar
 	}
 	data := make([]*models.Video, 0)
 	total, err := s.GetConnection(ctx, video, searchParam, &data, replaceFunc, "episodes")
-	return total, toVideoDtos(data, scheme), err
+	return total, s.getVideos(data, scheme), err
 }
 
 //CreateVideoSeries ..
@@ -362,7 +362,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 			videoSeries.AddItemsToList(data, items)
 		}
 	}
-	return total, toVideoSeriesDtos(data), nil
+	return total, s.getVideoSerieses(data), nil
 }
 
 //VideoDetail ..
@@ -413,7 +413,7 @@ func (s VideoService) getVideo(ctx context.Context, videoID int64, scheme string
 	if err != nil {
 		return &model.Video{}
 	}
-	return toVideoDto(video, scheme)
+	return s.getVideoData(video, scheme)
 }
 
 func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model.VideoSeries {
@@ -464,7 +464,7 @@ func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model
 		}
 		videoSeries.AddItemsToList(data, items)
 	}
-	return toVideoSeriesDtos(data)
+	return s.getVideoSerieses(data)
 }
 
 func sendMsgToUpdateES(videoID int64) {
