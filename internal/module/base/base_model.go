@@ -13,6 +13,28 @@ import (
 	"gorm.io/gorm"
 )
 
+//Repository 。。
+type Repository interface {
+	GetDB() *gorm.DB
+	Table(name string, args ...interface{}) Repository
+	SelectWithPrefix(fields []string, prefix string, omitFields ...string) Repository
+	Select(fields []string, omitFields ...string) Repository
+	LeftJoin(query string, args ...interface{}) Repository
+	FuzzyQuery(keyword *string, field string) Repository
+	IDQuery(id uint, idFieldName ...string) Repository
+	IDArrayQuery(ids []uint, idFieldName ...string) Repository
+	Where(query interface{}, args ...interface{}) Repository
+	ToUintIDs(ids []int64) []uint
+	Pagination(offset, limit int) Repository
+	Sort(sorts []*model.Sort) Repository
+	Order(value interface{}) Repository
+	Preload(query string, args ...interface{}) Repository
+	First(dest interface{}) error
+	Take(dest interface{}) error
+	Find(dest interface{}) error
+	Count(model interface{}) (total int64, err error)
+}
+
 //Model ..
 type Model struct {
 	db *gorm.DB
@@ -47,32 +69,32 @@ func (m *Model) GetDB() *gorm.DB {
 }
 
 //Table ..
-func (m *Model) Table(name string, args ...interface{}) *Model {
+func (m *Model) Table(name string, args ...interface{}) Repository {
 	m.db = m.db.Table(name, args)
 	return m
 }
 
 //SelectWithPrefix 选择字段带上特定前缀
-func (m *Model) SelectWithPrefix(fields []string, prefix string, omitFields ...string) *Model {
+func (m *Model) SelectWithPrefix(fields []string, prefix string, omitFields ...string) Repository {
 	m.db = m.db.Select(m.toDBFieldsWithPrefix(fields, prefix,
 		append([]string{"__typename"}, omitFields...)...))
 	return m
 }
 
 //Select 选择字段
-func (m *Model) Select(fields []string, omitFields ...string) *Model {
+func (m *Model) Select(fields []string, omitFields ...string) Repository {
 	m.db = m.db.Select(m.toDBFields(fields, append([]string{"__typename"}, omitFields...)...))
 	return m
 }
 
 //LeftJoin 左连接
-func (m *Model) LeftJoin(query string, args ...interface{}) *Model {
+func (m *Model) LeftJoin(query string, args ...interface{}) Repository {
 	m.db = m.db.Joins("left join "+query, args...)
 	return m
 }
 
 //FuzzyQuery 增加模糊查询
-func (m *Model) FuzzyQuery(keyword *string, field string) *Model {
+func (m *Model) FuzzyQuery(keyword *string, field string) Repository {
 	if keyword != nil && ptrs.String(keyword) != "" {
 		m.db = m.db.Where(field+" like ?", "%"+ptrs.String(keyword)+"%")
 	}
@@ -80,13 +102,13 @@ func (m *Model) FuzzyQuery(keyword *string, field string) *Model {
 }
 
 //IDQuery id查询
-func (m *Model) IDQuery(id uint, idFieldName ...string) *Model {
+func (m *Model) IDQuery(id uint, idFieldName ...string) Repository {
 	m.db = m.db.Where(m.getFieldName(idFieldName...)+" = ?", id)
 	return m
 }
 
 //IDArrayQuery ids查询
-func (m *Model) IDArrayQuery(ids []uint, idFieldName ...string) *Model {
+func (m *Model) IDArrayQuery(ids []uint, idFieldName ...string) Repository {
 	if len(ids) > 0 {
 		m.db = m.db.Where(m.getFieldName(idFieldName...)+" in (?)", ids)
 	}
@@ -94,7 +116,7 @@ func (m *Model) IDArrayQuery(ids []uint, idFieldName ...string) *Model {
 }
 
 //Where where查询
-func (m *Model) Where(query interface{}, args ...interface{}) *Model {
+func (m *Model) Where(query interface{}, args ...interface{}) Repository {
 	m.db = m.db.Where(query, args...)
 	return m
 }
@@ -117,7 +139,7 @@ func (m *Model) ToUintIDs(ids []int64) []uint {
 }
 
 //Pagination 分页
-func (m *Model) Pagination(offset, limit int) *Model {
+func (m *Model) Pagination(offset, limit int) Repository {
 	if limit > 0 {
 		m.db = m.db.Offset(offset).Limit(limit)
 	}
@@ -125,7 +147,7 @@ func (m *Model) Pagination(offset, limit int) *Model {
 }
 
 //Sort 排序
-func (m *Model) Sort(sorts []*model.Sort) *Model {
+func (m *Model) Sort(sorts []*model.Sort) Repository {
 	for _, v := range sorts {
 		sort := " DESC"
 		if v.IsAsc {
@@ -137,13 +159,13 @@ func (m *Model) Sort(sorts []*model.Sort) *Model {
 }
 
 //Order 排序
-func (m *Model) Order(value interface{}) *Model {
+func (m *Model) Order(value interface{}) Repository {
 	m.db = m.db.Order(value)
 	return m
 }
 
 //Preload 预加载
-func (m *Model) Preload(query string, args ...interface{}) *Model {
+func (m *Model) Preload(query string, args ...interface{}) Repository {
 	m.db = m.db.Preload(query, args...)
 	return m
 }
@@ -205,7 +227,7 @@ func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
 	}
 	for _, v := range fields {
 		if !omitFieldMap[v] {
-			if strings.Contains(v, "price") {
+			if strings.Contains(strings.ToLower(v), "price") {
 				v = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
 			} else if strings.Contains(v, ".") || strings.Contains(v, " ") {
 			} else {

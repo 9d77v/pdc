@@ -16,6 +16,7 @@ import (
 )
 
 var cc = client.New(middleware.Auth()(apiHandler))
+
 var apiHandler = handler.NewDefaultServer(
 	generated.NewExecutableSchema(
 		generated.Config{
@@ -26,19 +27,40 @@ var loginResponse struct {
 	Login model.LoginResponse
 }
 
+func post(query string, response interface{}, operation string, etcOptions ...client.Option) {
+	options := []client.Option{
+		client.Path("/api"),
+		client.Operation(operation),
+		client.AddHeader("Authorization", loginResponse.Login.AccessToken),
+	}
+	cc.MustPost(query, &response, append(options, etcOptions...)...)
+}
+
+func postInput(query string, response interface{}, operation string, input interface{}) {
+	post(query, response, operation, client.Var("input", input))
+}
+
+func postSearch(query string, response interface{}, operation string, searchParam interface{},
+	etcOptions ...client.Option) {
+	post(query, response, operation, client.Var("searchParam", searchParam))
+}
+
 func TestMain(m *testing.M) {
 	login()
 	m.Run()
 }
 
 func login() {
-	cc.MustPost(`mutation login($username: String!, $password: String!) {
+	query := `
+	mutation login($username: String!, $password: String!) {
 		login(username: $username, password: $password) {
 		  accessToken
 		  refreshToken
 		}
-	  }`,
-		&loginResponse,
+	  }
+	  `
+	cc.MustPost(query,
+		loginResponse,
 		client.Var("username", "admin"),
 		client.Var("password", "1234567890"),
 	)
@@ -53,6 +75,7 @@ func Test_mutationResolver_RecordHistory(t *testing.T) {
 		Resolver *Resolver
 	}
 	type args struct {
+		query string
 		input model.NewHistoryInput
 	}
 	tests := []struct {
@@ -60,7 +83,13 @@ func Test_mutationResolver_RecordHistory(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"test RecordHistory", args{
+		{"test RecordHistory", args{`
+			mutation recordHistory($input: NewHistoryInput!) {
+				recordHistory(input: $input) {
+				  subSourceID
+				}
+			  }
+			`,
 			model.NewHistoryInput{
 				SourceType:    1,
 				SourceID:      1,
@@ -72,17 +101,7 @@ func Test_mutationResolver_RecordHistory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cc.MustPost(`
-			mutation recordHistory($input: NewHistoryInput!) {
-				recordHistory(input: $input) {
-				  subSourceID
-				}
-			  }
-			`, &resp,
-				client.Path("/api"),
-				client.Operation("recordHistory"),
-				client.AddHeader("Authorization", loginResponse.Login.AccessToken),
-				client.Var("input", tt.args.input))
+			postInput(tt.args.query, &resp, "recordHistory", tt.args.input)
 			require.NotZero(t, resp.RecordHistory.SubSourceID)
 		})
 	}
@@ -92,9 +111,8 @@ func Test_queryResolver_Histories(t *testing.T) {
 	var resp struct {
 		Histories model.HistoryConnection
 	}
-	var sourceType int64 = 1
-	var page int64 = 1
 	type args struct {
+		query       string
 		sourceType  *int64
 		searchParam model.SearchParam
 	}
@@ -103,11 +121,7 @@ func Test_queryResolver_Histories(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"test histories", args{&sourceType, model.SearchParam{Page: &page}}, false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cc.MustPost(`
+		{"test histories", args{`
 			query histories($sourceType: Int, $searchParam: SearchParam!) {
 				histories(sourceType: $sourceType, searchParam: $searchParam) {
 				  totalCount
@@ -126,11 +140,11 @@ func Test_queryResolver_Histories(t *testing.T) {
 				  }
 				}
 			  }
-			`, &resp,
-				client.Path("/api"),
-				client.Operation("histories"),
-				client.AddHeader("Authorization", loginResponse.Login.AccessToken),
-				client.Var("searchParam", tt.args.searchParam),
+			`, ptrs.Int64Ptr(1), model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "histories", tt.args.searchParam,
 				client.Var("sourceType", tt.args.sourceType))
 			require.NotZero(t, resp.Histories.TotalCount)
 		})
@@ -142,6 +156,7 @@ func Test_mutationResolver_CreateVideo(t *testing.T) {
 		CreateVideo model.Video
 	}
 	type args struct {
+		query string
 		input model.NewVideo
 	}
 	tests := []struct {
@@ -149,7 +164,13 @@ func Test_mutationResolver_CreateVideo(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"test CreateVideo", args{model.NewVideo{
+		{"test CreateVideo", args{`
+			mutation createVideo($input:NewVideo!){
+				createVideo(input:$input){
+				  id
+				}
+			 }
+			`, model.NewVideo{
 			IsHideOnMobile: false,
 			Title:          "title",
 			Desc:           ptrs.StringPtr("desc"),
@@ -161,17 +182,7 @@ func Test_mutationResolver_CreateVideo(t *testing.T) {
 		}}, false}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cc.MustPost(`
-			mutation createVideo($input:NewVideo!){
-				createVideo(input:$input){
-				  id
-				}
-			 }
-			`, &resp,
-				client.Path("/api"),
-				client.Operation("createVideo"),
-				client.AddHeader("Authorization", loginResponse.Login.AccessToken),
-				client.Var("input", tt.args.input))
+			postInput(tt.args.query, &resp, "createVideo", tt.args.input)
 			require.NotZero(t, resp.CreateVideo.ID)
 			removeVideo(t, uint(resp.CreateVideo.ID))
 		})
@@ -192,6 +203,7 @@ func Test_mutationResolver_UpdateVideo(t *testing.T) {
 		UpdateVideo model.Video
 	}
 	type args struct {
+		query string
 		input model.NewUpdateVideo
 	}
 	tests := []struct {
@@ -199,7 +211,13 @@ func Test_mutationResolver_UpdateVideo(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"test UpdateVideo", args{model.NewUpdateVideo{
+		{"test UpdateVideo", args{`
+			mutation updateVideo($input:NewUpdateVideo!){
+			updateVideo(input:$input){
+			  id
+			}
+		 }
+		`, model.NewUpdateVideo{
 			ID:             1,
 			IsHideOnMobile: ptrs.BoolPtr(false),
 			Title:          ptrs.StringPtr("title"),
@@ -213,18 +231,400 @@ func Test_mutationResolver_UpdateVideo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cc.MustPost(`
-			mutation updateVideo($input:NewUpdateVideo!){
-				updateVideo(input:$input){
-				  id
-				}
-			 }
-			`, &resp,
-				client.Path("/api"),
-				client.Operation("updateVideo"),
-				client.AddHeader("Authorization", loginResponse.Login.AccessToken),
-				client.Var("input", tt.args.input))
+			postInput(tt.args.query, &resp, "updateVideo", tt.args.input)
 			require.NotZero(t, resp.UpdateVideo.ID)
+		})
+	}
+}
+
+func Test_queryResolver_DeviceModels(t *testing.T) {
+	var resp struct {
+		DeviceModels model.DeviceModelConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test DeviceModels", args{`
+		query deviceModels($searchParam:SearchParam!) {
+			deviceModels(searchParam: $searchParam) {
+			  edges {
+				id
+				name
+				desc
+				deviceType
+				cameraCompany
+				attributeModels{
+				  id
+				  key
+				  name
+				  createdAt
+				  updatedAt
+				}
+				telemetryModels{
+				  id
+				  key
+				  name
+				  factor
+				  unit
+				  unitName
+				  scale
+				  createdAt
+				  updatedAt
+				}
+				createdAt
+				updatedAt
+			  }
+			}
+		  }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "deviceModels", tt.args.searchParam)
+			require.Zero(t, resp.DeviceModels.TotalCount)
+			require.NotZero(t, len(resp.DeviceModels.Edges))
+		})
+	}
+}
+
+func Test_queryResolver_Devices(t *testing.T) {
+	var resp struct {
+		Devices model.DeviceConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+		deviceType  *int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test Devices without deviceType", args{`
+		query devices( $searchParam:SearchParam!) {
+			devices(searchParam: $searchParam) {
+			  edges {
+				id
+				name
+				ip
+				port
+				accessKey
+				secretKey
+				username
+				password
+				deviceModelID
+				deviceModelName
+				deviceModelDesc
+				deviceModelDeviceType
+				deviceModelCameraCompany
+				attributes{
+				  id
+				  key
+				  name
+				  value
+				  createdAt
+				  updatedAt
+				}
+				telemetries{
+				  id
+				  key
+				  name
+				  value
+				  unit
+				  unitName
+				  factor
+				  scale
+				  createdAt
+				  updatedAt
+				}
+				createdAt
+				updatedAt
+			  }
+			}
+		  }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}, nil}, false},
+		{"test Devices  with deviceType", args{`
+		query devices($deviceType:Int!, $searchParam:SearchParam!) {
+			devices(deviceType:$deviceType,searchParam: $searchParam) {
+			  edges {
+				id
+				name
+				telemetries{
+				  id
+				  key
+				  name
+				}
+			  }
+			}
+		  }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}, ptrs.Int64Ptr(1)}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			options := []client.Option{}
+			if tt.args.deviceType != nil {
+				options = append(options, client.Var("deviceType", tt.args.deviceType))
+			}
+			postSearch(tt.args.query, &resp, "devices", tt.args.searchParam, options...)
+			require.Zero(t, resp.Devices.TotalCount)
+			require.NotZero(t, len(resp.Devices.Edges))
+		})
+	}
+}
+
+func Test_queryResolver_DeviceDashboards(t *testing.T) {
+	var resp struct {
+		DeviceDashboards model.DeviceDashboardConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test DeviceDashboards", args{`
+		query deviceDashboards($searchParam:SearchParam!) {
+			deviceDashboards(searchParam: $searchParam) {
+			  totalCount
+			  edges {
+				id
+				name
+				isVisible
+				deviceType
+				telemetries{
+				  id
+				  deviceID
+				  deviceName
+				  telemetryID
+				  name
+				  value
+				  factor
+				  scale
+				  unit
+				}
+				cameras{
+				  id
+				  deviceID
+				  deviceName
+				}
+			  }
+			}
+		  }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "deviceDashboards", tt.args.searchParam)
+			require.NotZero(t, resp.DeviceDashboards.TotalCount)
+		})
+	}
+}
+
+func Test_queryResolver_Things(t *testing.T) {
+	var resp struct {
+		Things model.ThingConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test DeviceDashboards", args{`
+		query things( $searchParam:SearchParam!) {
+			things(searchParam: $searchParam){
+				 totalCount
+				 edges{
+					 id
+					 uid
+					 name
+					 num
+					 brandName
+					 pics
+					 unitPrice
+					 unit
+					 specifications
+					 category
+					 consumerExpenditure
+					 location
+					 status
+					 purchaseDate
+					 purchasePlatform
+					 refOrderID
+					 rubbishCategory
+					 createdAt
+					 updatedAt
+				}
+			}
+		   }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "things", tt.args.searchParam)
+			require.NotZero(t, resp.Things.TotalCount)
+		})
+	}
+}
+
+func Test_queryResolver_Users(t *testing.T) {
+	var resp struct {
+		Users model.UserConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test Users", args{`
+		query users($searchParam:SearchParam!) {
+			users(searchParam: $searchParam){
+				 totalCount
+				 edges{
+					 id
+					 name
+					 avatar
+					 roleID
+					 gender
+					 color
+					 birthDate
+					 ip
+					 createdAt
+					 updatedAt
+				}
+			}
+		   }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "users", tt.args.searchParam)
+			require.NotZero(t, resp.Users.TotalCount)
+		})
+	}
+}
+
+func Test_queryResolver_Videos(t *testing.T) {
+	var resp struct {
+		Videos model.VideoConnection
+	}
+	type args struct {
+		query               string
+		searchParam         model.SearchParam
+		isFilterVideoSeries *bool
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test Videos not filter", args{`
+		query videos($searchParam:SearchParam!) {
+			videos(searchParam: $searchParam){
+				totalCount
+				edges{
+					  id
+					 title
+					 desc
+					 cover
+					 pubDate
+					 episodes{
+					   id
+					   num
+					   title
+					   desc
+					   cover
+					   url
+					   subtitles{
+						   name
+						   url
+					   }
+					 createdAt
+					 updatedAt
+					 }
+					 isShow
+					 isHideOnMobile
+					 theme
+					 tags
+					 createdAt
+					 updatedAt
+				}
+			}
+		   }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}, ptrs.BoolPtr(false)}, false},
+		{"test Videos filter", args{`
+		query videos($searchParam:SearchParam!,$isFilterVideoSeries:Boolean=true) {
+			videos(searchParam:$searchParam,isFilterVideoSeries:$isFilterVideoSeries){
+				edges{
+				   id 
+				   title 
+				}
+			}
+		   }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}, ptrs.BoolPtr(true)}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "videos", tt.args.searchParam)
+			require.NotZero(t, resp.Videos.TotalCount)
+		})
+	}
+}
+
+func Test_queryResolver_VideoSerieses(t *testing.T) {
+	var resp struct {
+		VideoSerieses model.VideoSeriesConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test VideoSerieses", args{`
+		query videoSerieses($searchParam:SearchParam!) {
+			videoSerieses(searchParam:$searchParam){
+				 totalCount
+				 edges{
+					  id
+					  name
+					  items{
+						videoSeriesID
+						videoID
+						title
+						alias
+						num
+					  }
+					  createdAt
+					  updatedAt
+				 }
+			 }
+			}
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run(tt.name, func(t *testing.T) {
+				postSearch(tt.args.query, &resp, "videoSerieses", tt.args.searchParam)
+				require.NotZero(t, resp.VideoSerieses.TotalCount)
+			})
 		})
 	}
 }

@@ -9,12 +9,14 @@ import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/history-service/models"
-	"github.com/9d77v/pdc/internal/utils"
 )
 
 //HistoryService ..
-type HistoryService struct{}
+type HistoryService struct {
+	base.Service
+}
 
 //RecordHistory ..
 func (s HistoryService) RecordHistory(ctx context.Context,
@@ -70,43 +72,27 @@ func (s HistoryService) GetHistory(ctx context.Context,
 //ListHistory ..
 func (s HistoryService) ListHistory(ctx context.Context,
 	sourceType *int64, searchParam model.SearchParam, uid uint, scheme string) (int64, []*model.History, error) {
-	result := make([]*model.History, 0)
-	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
+	data := make([]*model.History, 0)
 	history := models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
-	var total int64
-	if fieldMap["totalCount"] {
-		if limit == -1 {
-			total = int64(len(result))
-		} else {
-			total, err = history.Count(history)
-			if err != nil {
-				return 0, result, err
-			}
-		}
-	}
-	if fieldMap["edges"] {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
 		historyTable := db.TablePrefix + "_history"
 		switch ptrs.Int64(sourceType) {
 		case 1:
 			history.
-				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time", "remaining_time", "platform",
-					"cast(EXTRACT(epoch FROM CAST( " + historyTable + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
+				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time",
+					"remaining_time", "platform",
+					"cast(EXTRACT(epoch FROM CAST( " +
+						historyTable + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
 					"b.title", "b.cover", "c.num", "c.title sub_title"}).
 				LeftJoin("pdc_video b ON " + historyTable + ".source_id=b.id").
 				LeftJoin("pdc_episode c on " + historyTable + ".sub_source_id=c.id")
 		}
-		err = history.Pagination(offset, limit).
-			Order("updated_at desc").
-			Find(&result)
-		if err != nil {
-			return 0, result, err
-		}
+		history.Order("updated_at desc")
 	}
-	for _, v := range result {
+	total, err := s.GetConnection(ctx, history, searchParam, &data, replaceFunc)
+	for _, v := range data {
 		v.Cover = oss.GetOSSPrefix(scheme) + v.Cover
 	}
-	return total, result, nil
+	return total, data, err
 }

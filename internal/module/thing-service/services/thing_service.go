@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/graph/model"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/thing-service/models"
-	"github.com/9d77v/pdc/internal/utils"
 )
 
 //ThingService ..
 type ThingService struct {
+	base.Service
 }
 
 //CreateThing ..
@@ -47,11 +47,7 @@ func (s ThingService) CreateThing(ctx context.Context, input model.NewThing, uid
 //UpdateThing ..
 func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing, uid uint) (*model.Thing, error) {
 	thing := models.NewThing()
-	varibales := graphql.GetRequestContext(ctx).Variables
-	fields := make([]string, 0)
-	for k := range varibales["input"].(map[string]interface{}) {
-		fields = append(fields, k)
-	}
+	fields := s.GetInputFields(ctx)
 	if err := thing.GetByID(uint(input.ID), uid, fields); err != nil {
 		return nil, err
 	}
@@ -81,36 +77,11 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 //ListThing ..
 func (s ThingService) ListThing(ctx context.Context, searchParam model.SearchParam,
 	uid uint, scheme string) (int64, []*model.Thing, error) {
-	result := make([]*model.Thing, 0)
 	data := make([]*models.Thing, 0)
-	offset, limit := utils.GetPageInfo(searchParam.Page, searchParam.PageSize)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
 	thing := models.NewThing()
 	thing.IDQuery(uid, "uid").FuzzyQuery(searchParam.Keyword, "name")
-	var total int64
-	if fieldMap["totalCount"] {
-		if limit == -1 {
-			total = int64(len(data))
-		} else {
-			total, err = thing.Count(thing)
-			if err != nil {
-				return 0, result, err
-			}
-		}
-	}
-	if fieldMap["edges"] {
-		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		err = thing.Select(edgeFields).
-			IDArrayQuery(thing.ToUintIDs(searchParam.Ids)).
-			Pagination(offset, limit).
-			Sort(searchParam.Sorts).
-			Find(&data)
-		if err != nil {
-			return 0, result, err
-		}
-	}
-	return total, toThingsDtos(data, scheme), nil
+	total, err := s.GetConnection(ctx, thing, searchParam, &data, nil)
+	return total, toThingsDtos(data, scheme), err
 }
 
 //ThingSeries 获取物品数据

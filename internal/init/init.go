@@ -66,13 +66,6 @@ func autoMergeTables() {
 	if err != nil {
 		log.Println("auto migrate error:", err)
 	}
-	tx := db.GetDB()
-	tx.Migrator().CreateIndex(&device.AttributeModel{}, "attribute_model_uix")
-	tx.Migrator().CreateIndex(&device.Attribute{}, "attribute_uix")
-	tx.Migrator().CreateIndex(&device.Telemetry{}, "telemetry_uix")
-	tx.Migrator().CreateIndex(&device.TelemetryModel{}, "telemetry_model_uix")
-	tx.Migrator().CreateIndex(&video.VideoSeriesItem{}, "video_series_item_uix")
-
 }
 
 func initSubscribe() {
