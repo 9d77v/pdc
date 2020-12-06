@@ -231,12 +231,13 @@ func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchPar
 	if ptrs.Bool(isCombo) {
 		video.Where("id NOT in (select video_id from " + db.TablePrefix + "_video_series_item where video_id=id)")
 	}
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if edgeFieldMap["episodes"] {
 			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
 			}).Preload("Episodes.Subtitles")
 		}
+		return nil
 	}
 	total, err := s.GetConnection(ctx, video, searchParam, &data, replaceFunc, "episodes")
 	return total, toVideoDtos(data, scheme), err

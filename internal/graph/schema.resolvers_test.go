@@ -42,7 +42,8 @@ func postInput(query string, response interface{}, operation string, input inter
 
 func postSearch(query string, response interface{}, operation string, searchParam interface{},
 	etcOptions ...client.Option) {
-	post(query, response, operation, client.Var("searchParam", searchParam))
+	options := []client.Option{client.Var("searchParam", searchParam)}
+	post(query, response, operation, append(options, etcOptions...)...)
 }
 
 func TestMain(m *testing.M) {
@@ -60,7 +61,7 @@ func login() {
 	  }
 	  `
 	cc.MustPost(query,
-		loginResponse,
+		&loginResponse,
 		client.Var("username", "admin"),
 		client.Var("password", "1234567890"),
 	)

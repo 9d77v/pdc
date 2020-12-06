@@ -155,7 +155,7 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.Se
 	data := make([]*models.DeviceModel, 0)
 	deviceModel := models.NewDeviceModel()
 	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if edgeFieldMap["attributeModels"] {
 			deviceModel.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.AttributeModel{})
@@ -166,6 +166,7 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.Se
 				return db.Model(&models.TelemetryModel{})
 			})
 		}
+		return nil
 	}
 	total, err := s.GetConnection(ctx, deviceModel, searchParam, &data, replaceFunc,
 		"attributeModels", "telemetryModels")
@@ -267,7 +268,7 @@ func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchP
 	omitFields := []string{"attributes", "telemetries",
 		"deviceModelName", "deviceModelDesc",
 		"deviceModelDeviceType", "deviceModelCameraCompany"}
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if deviceType != nil {
 			device.SelectWithPrefix(edgeFields, db.TablePrefix+"_device.", omitFields...)
 		}
@@ -281,6 +282,7 @@ func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchP
 			edgeFieldMap["deviceModelDeviceType"] || edgeFieldMap["deviceModelCameraCompany"] {
 			device.Preload("DeviceModel")
 		}
+		return nil
 	}
 	total, err := s.GetConnection(ctx, device, searchParam, &data, replaceFunc, omitFields...)
 	return total, toDeviceDtos(data), err
@@ -437,7 +439,7 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam mod
 	data := make([]*models.DeviceDashboard, 0)
 	deviceDashboard := models.NewDeviceDashboard()
 	deviceDashboard.FuzzyQuery(searchParam.Keyword, "name")
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error{
 		if edgeFieldMap["telemetries"] {
 			deviceDashboard.Preload("Telemetries").
 				Preload("Telemetries.Telemetry").
@@ -454,6 +456,7 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam mod
 				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
+		return nil
 	}
 	total, err := s.GetConnection(ctx, deviceDashboard, searchParam, &data, replaceFunc,
 		"telemetries", "cameras")

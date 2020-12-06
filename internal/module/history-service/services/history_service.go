@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -75,7 +76,7 @@ func (s HistoryService) ListHistory(ctx context.Context,
 	data := make([]*model.History, 0)
 	history := models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		historyTable := db.TablePrefix + "_history"
 		switch ptrs.Int64(sourceType) {
 		case 1:
@@ -87,8 +88,11 @@ func (s HistoryService) ListHistory(ctx context.Context,
 					"b.title", "b.cover", "c.num", "c.title sub_title"}).
 				LeftJoin("pdc_video b ON " + historyTable + ".source_id=b.id").
 				LeftJoin("pdc_episode c on " + historyTable + ".sub_source_id=c.id")
+		default:
+			return errors.New("sourceType not exist")
 		}
 		history.Order("updated_at desc")
+		return nil
 	}
 	total, err := s.GetConnection(ctx, history, searchParam, &data, replaceFunc)
 	for _, v := range data {
