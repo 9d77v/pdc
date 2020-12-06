@@ -6,7 +6,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/graph/model"
-	"github.com/9d77v/pdc/internal/utils"
 )
 
 //Service base service
@@ -25,24 +24,23 @@ func (s Service) GetInputFields(ctx context.Context) []string {
 
 //GetConnection get list data and total count
 func (s Service) GetConnection(ctx context.Context, r Repository, searchParam model.SearchParam,
-	data interface{}, replaceFunc func(edgeFieldMap map[string]bool, edgeFields []string) error,
-	omitFields ...string) (total int64, err error) {
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	if fieldMap["totalCount"] {
+	data interface{}, replaceFunc func(field GraphQLField) error, omitFields ...string) (total int64, err error) {
+	graphqlField := NewGraphQLField(ctx, "")
+	if graphqlField.FieldMap["totalCount"] {
 		total, err = r.Count(r)
 		if err != nil {
 			return
 		}
 	}
-	offset, limit := s.GetPageInfo(searchParam.Page, searchParam.PageSize)
-	if fieldMap["edges"] {
-		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		r.Select(edgeFields, omitFields...).
+	offset, limit := s.GetPageInfo(searchParam)
+	if graphqlField.FieldMap["edges"] {
+		edgeGraphqlField := NewGraphQLField(ctx, "edges.")
+		r.Select(edgeGraphqlField.Fields, omitFields...).
 			IDArrayQuery(r.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
 			Sort(searchParam.Sorts)
 		if replaceFunc != nil {
-			err = replaceFunc(edgeFieldMap, edgeFields)
+			err = replaceFunc(edgeGraphqlField)
 			if err != nil {
 				return
 			}
@@ -53,9 +51,9 @@ func (s Service) GetConnection(ctx context.Context, r Repository, searchParam mo
 }
 
 //GetPageInfo ...
-func (s Service) GetPageInfo(page, pageSize *int64) (int, int) {
-	offset := ptrs.Int64(page)
-	limit := ptrs.Int64(pageSize)
+func (s Service) GetPageInfo(searchParam model.SearchParam) (int, int) {
+	offset := ptrs.Int64(searchParam.Page)
+	limit := ptrs.Int64(searchParam.PageSize)
 	if offset < 1 {
 		offset = 1
 	}

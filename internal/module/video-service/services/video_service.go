@@ -230,8 +230,8 @@ func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchPar
 	if ptrs.Bool(isCombo) {
 		video.Where("id NOT in (select video_id from " + new(models.VideoSeriesItem).TableName() + " where video_id=id)")
 	}
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
-		if edgeFieldMap["episodes"] {
+	replaceFunc := func(edgeField base.GraphQLField) error {
+		if edgeField.FieldMap["episodes"] {
 			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
 			}).Preload("Episodes.Subtitles")
@@ -311,13 +311,13 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.SearchParam) (int64, []*model.VideoSeries, error) {
 	result := make([]*model.VideoSeries, 0)
 	data := make([]*models.VideoSeries, 0)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
+	field := base.NewGraphQLField(ctx, "")
 	var err error
 	videoSeries := models.NewVideoSeries()
 	videoSeries.FuzzyQuery(searchParam.Keyword, "name")
 	var total int64
-	offset, limit := s.GetPageInfo(searchParam.Page, searchParam.PageSize)
-	if fieldMap["totalCount"] {
+	offset, limit := s.GetPageInfo(searchParam)
+	if field.FieldMap["totalCount"] {
 		if limit == -1 {
 			total = int64(len(data))
 		} else {
@@ -327,10 +327,10 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 			}
 		}
 	}
-	if fieldMap["edges"] {
-		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
+	if field.FieldMap["edges"] {
+		edgeField := base.NewGraphQLField(ctx, "edges.")
 		err = videoSeries.
-			Select(edgeFields, "items").
+			Select(edgeField.Fields, "items").
 			IDArrayQuery(videoSeries.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
 			Sort(searchParam.Sorts).
@@ -338,21 +338,21 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 		if err != nil {
 			return 0, result, err
 		}
-		if edgeFieldMap["items"] && len(data) > 0 {
-			itemFieldMap, itemFields := utils.GetFieldData(ctx, "edges.items.")
+		if edgeField.FieldMap["items"] && len(data) > 0 {
+			itemField := base.NewGraphQLField(ctx, "edges.items.")
 			ids := make([]uint, 0)
 			for _, v := range data {
 				ids = append(ids, v.ID)
 			}
 			items := make([]*models.VideoSeriesItem, 0)
 			tableVideo := new(models.Video).TableName()
-			if itemFieldMap["title"] {
-				itemFields = append(itemFields, tableVideo+".\"title\"")
+			if itemField.FieldMap["title"] {
+				itemField.Fields = append(itemField.Fields, tableVideo+".\"title\"")
 				videoSeries.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
 					tableVideo, tableVideo, new(models.VideoSeriesItem).TableName()))
 			}
 			subErr := videoSeries.
-				Select(itemFields, "title").
+				Select(itemField.Fields, "title").
 				IDArrayQuery(ids, "video_series_id").
 				Order("video_series_id asc,num asc").
 				Find(&items)
@@ -399,15 +399,15 @@ func (s VideoService) VideoDetail(ctx context.Context, episodeID int64, scheme s
 }
 
 func (s VideoService) getVideo(ctx context.Context, videoID int64, scheme string) *model.Video {
-	fieldMap, fields := utils.GetFieldData(ctx, "video.")
+	field := base.NewGraphQLField(ctx, "video.")
 	video := models.NewVideo()
-	if fieldMap["episodes"] {
+	if field.FieldMap["episodes"] {
 		video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 			return db.Model(&models.Episode{}).Order("num ASC,id ASC")
 		}).Preload("Episodes.Subtitles")
 	}
 	err := video.
-		Select(fields, "episodes").
+		Select(field.Fields, "episodes").
 		IDQuery(uint(videoID)).
 		First(video)
 	if err != nil {
@@ -418,7 +418,7 @@ func (s VideoService) getVideo(ctx context.Context, videoID int64, scheme string
 
 func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model.VideoSeries {
 	result := make([]*model.VideoSeries, 0)
-	edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "videoSerieses.")
+	edgeField := base.NewGraphQLField(ctx, "videoSerieses.")
 	data := make([]*models.VideoSeries, 0)
 	videoSeriesItem := models.NewVideoSeriesItem()
 	if err := videoSeriesItem.GetByVideoID(videoID); err != nil {
@@ -427,14 +427,14 @@ func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model
 	ids := []uint{videoSeriesItem.VideoSeriesID}
 	videoSeries := models.NewVideoSeries()
 	err := videoSeries.
-		Select(edgeFields, "items").
+		Select(edgeField.Fields, "items").
 		IDArrayQuery(ids).
 		Find(&data)
 	if err != nil {
 		return result
 	}
-	if edgeFieldMap["items"] && len(data) > 0 {
-		itemFieldMap, itemFields := utils.GetFieldData(ctx, "videoSerieses.items.")
+	if edgeField.FieldMap["items"] && len(data) > 0 {
+		itemField := base.NewGraphQLField(ctx, "videoSerieses.items.")
 		ids := make([]uint, 0)
 		for _, v := range data {
 			ids = append(ids, v.ID)
@@ -443,19 +443,19 @@ func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model
 		tableVideo := new(models.Video).TableName()
 		tableEpisode := new(models.Episode).TableName()
 		tableVideoSeriesItem := new(models.VideoSeriesItem).TableName()
-		if itemFieldMap["title"] {
-			itemFields = append(itemFields, tableVideo+".\"title\"")
+		if itemField.FieldMap["title"] {
+			itemField.Fields = append(itemField.Fields, tableVideo+".\"title\"")
 			videoSeriesItem.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
 				tableVideo, tableVideo, tableVideoSeriesItem))
-		} else if itemFieldMap["episodeID"] {
-			itemFields = append(itemFields,
+		} else if itemField.FieldMap["episodeID"] {
+			itemField.Fields = append(itemField.Fields,
 				tableEpisode+".\"episode_id\"",
 				tableVideoSeriesItem+".\"video_id\"")
 			videoSeriesItem.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + tableEpisode + " group by (video_id)) p left join " + tableEpisode + "  q on p.video_id=q.video_id and p.num=q.num) " + tableEpisode +
 				" on " + tableEpisode + ".video_id=" + tableVideoSeriesItem + ".video_id")
 		}
 		subErr := videoSeriesItem.
-			Select(itemFields, "title", "videoID", "episodeID").
+			Select(itemField.Fields, "title", "videoID", "episodeID").
 			IDArrayQuery(ids, "video_series_id").
 			Order("video_series_id asc,num asc").
 			Find(&items)

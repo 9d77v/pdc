@@ -18,7 +18,6 @@ import (
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
-	"github.com/9d77v/pdc/internal/utils"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 )
 
@@ -154,13 +153,13 @@ func (s DeviceService) DeleteTelemetryModel(ctx context.Context,
 func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceModel, error) {
 	deviceModel := models.NewDeviceModel()
 	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
-		if edgeFieldMap["attributeModels"] {
+	replaceFunc := func(field base.GraphQLField) error {
+		if field.FieldMap["attributeModels"] {
 			deviceModel.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.AttributeModel{})
 			})
 		}
-		if edgeFieldMap["telemetryModels"] {
+		if field.FieldMap["telemetryModels"] {
 			deviceModel.Preload("TelemetryModels", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.TelemetryModel{})
 			})
@@ -268,18 +267,18 @@ func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchP
 	omitFields := []string{"attributes", "telemetries",
 		"deviceModelName", "deviceModelDesc",
 		"deviceModelDeviceType", "deviceModelCameraCompany"}
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
+	replaceFunc := func(field base.GraphQLField) error {
 		if deviceType != nil {
-			device.SelectWithPrefix(edgeFields, device.TableName()+".", omitFields...)
+			device.SelectWithPrefix(field.Fields, device.TableName()+".", omitFields...)
 		}
-		if edgeFieldMap["attributes"] {
+		if field.FieldMap["attributes"] {
 			device.Preload("Attributes").Preload("Attributes.AttributeModel")
 		}
-		if edgeFieldMap["telemetries"] {
+		if field.FieldMap["telemetries"] {
 			device.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
 		}
-		if edgeFieldMap["deviceModelName"] || edgeFieldMap["deviceModelDesc"] ||
-			edgeFieldMap["deviceModelDeviceType"] || edgeFieldMap["deviceModelCameraCompany"] {
+		if field.FieldMap["deviceModelName"] || field.FieldMap["deviceModelDesc"] ||
+			field.FieldMap["deviceModelDeviceType"] || field.FieldMap["deviceModelCameraCompany"] {
 			device.Preload("DeviceModel")
 		}
 		return nil
@@ -439,20 +438,20 @@ func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context,
 func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceDashboard, error) {
 	deviceDashboard := models.NewDeviceDashboard()
 	deviceDashboard.FuzzyQuery(searchParam.Keyword, "name")
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
-		if edgeFieldMap["telemetries"] {
+	replaceFunc := func(edgeField base.GraphQLField) error {
+		if edgeField.FieldMap["telemetries"] {
 			deviceDashboard.Preload("Telemetries").
 				Preload("Telemetries.Telemetry").
 				Preload("Telemetries.Telemetry.TelemetryModel")
-			telemetryFieldMap, _ := utils.GetFieldData(ctx, "edges.telemetries.")
-			if telemetryFieldMap["deviceName"] {
+			telemetryField := base.NewGraphQLField(ctx, "edges.telemetries.")
+			if telemetryField.FieldMap["deviceName"] {
 				deviceDashboard.Preload("Telemetries.Telemetry.Device")
 			}
 		}
-		if edgeFieldMap["cameras"] {
+		if edgeField.FieldMap["cameras"] {
 			deviceDashboard.Preload("Cameras")
-			cameraFieldMap, _ := utils.GetFieldData(ctx, "edges.cameras.")
-			if cameraFieldMap["deviceName"] {
+			cameraField := base.NewGraphQLField(ctx, "edges.cameras.")
+			if cameraField.FieldMap["deviceName"] {
 				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
@@ -469,36 +468,35 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context,
 	deviceType *int64) (int64, []*model.DeviceDashboard, error) {
 	result := make([]*model.DeviceDashboard, 0)
 	data := make([]*models.DeviceDashboard, 0)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
+	field := base.NewGraphQLField(ctx, "")
 	deviceDashboard := models.NewDeviceDashboard()
 	if deviceType != nil {
 		deviceDashboard.Where("device_type = ?", ptrs.Int64(deviceType))
 	}
 	deviceDashboard.Where("is_visible = true")
 	var total int64
-	if fieldMap["totalCount"] {
+	if field.FieldMap["totalCount"] {
 		total = int64(len(data))
 	}
-	if fieldMap["edges"] {
-		edgeFieldMap, edgeFields := utils.GetFieldData(ctx, "edges.")
-		if edgeFieldMap["telemetries"] {
+	if field.FieldMap["edges"] {
+		edgeField := base.NewGraphQLField(ctx, "edges.")
+		if edgeField.FieldMap["telemetries"] {
 			deviceDashboard.Preload("Telemetries").
 				Preload("Telemetries.Telemetry").
 				Preload("Telemetries.Telemetry.TelemetryModel")
-			telemetryFieldMap, _ := utils.GetFieldData(ctx, "edges.telemetries.")
-			if telemetryFieldMap["deviceName"] {
+			telemetryField := base.NewGraphQLField(ctx, "edges.telemetries.")
+			if telemetryField.FieldMap["deviceName"] {
 				deviceDashboard.Preload("Telemetries.Telemetry.Device")
 			}
 		}
-		if edgeFieldMap["cameras"] {
+		if edgeField.FieldMap["cameras"] {
 			deviceDashboard.Preload("Cameras")
-			cameraFieldMap, _ := utils.GetFieldData(ctx, "edges.cameras.")
-			if cameraFieldMap["deviceName"] {
+			cameraField := base.NewGraphQLField(ctx, "edges.cameras.")
+			if cameraField.FieldMap["deviceName"] {
 				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
-		err = deviceDashboard.Select(edgeFields, "telemetries", "cameras").Find(&data)
+		err := deviceDashboard.Select(edgeField.Fields, "telemetries", "cameras").Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
@@ -552,18 +550,17 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 	deviceID int64, scheme string) (int64, []*model.CameraTimeLapseVideo, error) {
 	result := make([]*model.CameraTimeLapseVideo, 0)
 	data := make([]*models.CameraTimeLapseVideo, 0)
-	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
+	field := base.NewGraphQLField(ctx, "")
 	camera := models.NewCameraTimeLapseVideo()
 	camera.IDQuery(uint(deviceID), "device_id").
 		Where("created_at>=?", time.Now().AddDate(0, 0, -7))
 	var total int64
-	if fieldMap["totalCount"] {
+	if field.FieldMap["totalCount"] {
 		total = int64(len(data))
 	}
-	if fieldMap["edges"] {
-		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		err = camera.Select(edgeFields).
+	if field.FieldMap["edges"] {
+		edgeField := base.NewGraphQLField(ctx, "edges.")
+		err := camera.Select(edgeField.Fields).
 			Order("id DESC").
 			Find(&data)
 		if err != nil {

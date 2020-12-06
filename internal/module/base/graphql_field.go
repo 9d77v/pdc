@@ -1,4 +1,4 @@
-package utils
+package base
 
 import (
 	"context"
@@ -7,8 +7,14 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-//GetFieldData 获取字段map和数组
-func GetFieldData(ctx context.Context, prefix string) (map[string]bool, []string) {
+//GraphQLField ..
+type GraphQLField struct {
+	FieldMap map[string]bool
+	Fields   []string
+}
+
+//NewGraphQLField get graphql field from context
+func NewGraphQLField(ctx context.Context, prefix string) GraphQLField {
 	fieldMap := make(map[string]bool)
 	if prefix == "" {
 		fields := graphql.CollectAllFields(ctx)
@@ -29,7 +35,10 @@ func GetFieldData(ctx context.Context, prefix string) (map[string]bool, []string
 	for k := range fieldMap {
 		fields = append(fields, k)
 	}
-	return fieldMap, fields
+	return GraphQLField{
+		FieldMap: fieldMap,
+		Fields:   fields,
+	}
 }
 
 //getPreloads ..
