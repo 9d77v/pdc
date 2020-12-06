@@ -96,10 +96,12 @@ func synthesizeJPGsIntoMP4(ids []uint, yesterdayStr string) {
 func getCameraIDs() []uint {
 	ids := make([]uint, 0, 0)
 	devices := make([]*models.Device, 0, 0)
-	err := db.GetDB().Select(db.TablePrefix + "_device.id").
-		Where(db.TablePrefix + "_device_model.device_type = 1").
-		Joins("JOIN " + db.TablePrefix + "_device_model ON " + db.TablePrefix + "_device_model.id = " +
-			db.TablePrefix + "_device.device_model_id").Find(&devices).Error
+	tableDeviceModel := new(models.DeviceModel).TableName()
+	tableDevice := new(models.Device).TableName()
+	err := db.GetDB().Select(tableDevice + ".id").
+		Where(tableDeviceModel + ".device_type = 1").
+		Joins("JOIN " + tableDeviceModel + " ON " + tableDeviceModel + ".id = " +
+			tableDevice + ".device_model_id").Find(&devices).Error
 	if err != nil {
 		return ids
 	}

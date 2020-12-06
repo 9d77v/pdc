@@ -18,18 +18,22 @@ import (
 
 //环境变量
 var (
-	dbHost      = utils.GetEnvStr("DB_HOST", "domain.local")
-	dbPort      = utils.GetEnvInt("DB_PORT", 5432)
-	dbUser      = utils.GetEnvStr("DB_USER", "postgres")
-	dbPassword  = utils.GetEnvStr("DB_PASSWORD", "123456")
-	dbName      = utils.GetEnvStr("DB_NAME", "pdc")
-	TablePrefix = utils.GetEnvStr("DB_PREFIX", "pdc")
+	dbHost     = utils.GetEnvStr("DB_HOST", "domain.local")
+	dbPort     = utils.GetEnvInt("DB_PORT", 5432)
+	dbUser     = utils.GetEnvStr("DB_USER", "postgres")
+	dbPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
+	dbName     = utils.GetEnvStr("DB_NAME", "pdc")
 )
 
 var (
 	client *gorm.DB
 	once   sync.Once
 )
+
+//TablePrefix 获取表前缀
+func TablePrefix() string {
+	return dbName + "_"
+}
 
 //GetDB get db connection
 func GetDB() *gorm.DB {
@@ -89,7 +93,7 @@ func newClient(config *config.DBConfig) (*gorm.DB, error) {
 	gormConfig := &gorm.Config{
 		SkipDefaultTransaction: true,
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   TablePrefix + "_", // table name prefix, table for `User` would be `t_users`
+			TablePrefix:   TablePrefix(), // table name prefix, table for `User` would be `t_users`
 			SingularTable: true,
 		},
 	}

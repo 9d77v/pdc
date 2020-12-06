@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -21,6 +22,11 @@ func NewVideoSeries() *VideoSeries {
 	vs := &VideoSeries{}
 	vs.DefaultModel = base.NewDefaultModel()
 	return vs
+}
+
+//TableName ..
+func (m *VideoSeries) TableName() string {
+	return db.TablePrefix() + "video_series"
 }
 
 //GetByID Get video by id

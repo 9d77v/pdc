@@ -18,8 +18,8 @@ var (
 	secureMinioAddress   = utils.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
 	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
 	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
-	OssPrefix            = fmt.Sprintf("http://%s", minioAddress)
-	SecureOssPrerix      = fmt.Sprintf("https://%s", secureMinioAddress)
+	ossPrefix            = fmt.Sprintf("http://%s", minioAddress)
+	secureOssPrerix      = fmt.Sprintf("https://%s", secureMinioAddress)
 )
 
 var (
@@ -111,9 +111,19 @@ func GetPresignedURL(ctx context.Context, bucketName, objectName, scheme string)
 }
 
 //GetOSSPrefix ..
-func GetOSSPrefix(sheme string) string {
+func OSSPrefix() string {
+	return ossPrefix
+}
+
+//GetSecureOSSPrefix ..
+func SecureOSSPrefix() string {
+	return secureOssPrerix
+}
+
+//GetOSSPrefix ..
+func GetOSSPrefixByScheme(sheme string) string {
 	if sheme == "https" {
-		return SecureOssPrerix
+		return secureOssPrerix
 	}
-	return OssPrefix
+	return ossPrefix
 }

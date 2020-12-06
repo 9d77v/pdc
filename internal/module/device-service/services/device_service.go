@@ -152,10 +152,9 @@ func (s DeviceService) DeleteTelemetryModel(ctx context.Context,
 
 //ListDeviceModel ..
 func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceModel, error) {
-	data := make([]*models.DeviceModel, 0)
 	deviceModel := models.NewDeviceModel()
 	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if edgeFieldMap["attributeModels"] {
 			deviceModel.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.AttributeModel{})
@@ -166,7 +165,9 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.Se
 				return db.Model(&models.TelemetryModel{})
 			})
 		}
+		return nil
 	}
+	data := make([]*models.DeviceModel, 0)
 	total, err := s.GetConnection(ctx, deviceModel, searchParam, &data, replaceFunc,
 		"attributeModels", "telemetryModels")
 	return total, toDeviceModelDtos(data), err
@@ -255,21 +256,21 @@ func (s DeviceService) UpdateDevice(ctx context.Context, input model.NewUpdateDe
 
 //ListDevice ..
 func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (int64, []*model.Device, error) {
-	data := make([]*models.Device, 0)
 	device := models.NewDevice()
 	device.FuzzyQuery(searchParam.Keyword, "name")
 	if deviceType != nil {
+		tableDeviceModel := new(models.DeviceModel).TableName()
 		device.
-			Where(db.TablePrefix+"_device_model.device_type = ?", ptrs.Int64(deviceType)).
-			LeftJoin(db.TablePrefix + "_device_model ON " + db.TablePrefix + "_device_model.id = " +
-				db.TablePrefix + "_device.device_model_id")
+			Where(tableDeviceModel+".device_type = ?", ptrs.Int64(deviceType)).
+			LeftJoin(tableDeviceModel + " ON " + tableDeviceModel + ".id = " +
+				device.TableName() + ".device_model_id")
 	}
 	omitFields := []string{"attributes", "telemetries",
 		"deviceModelName", "deviceModelDesc",
 		"deviceModelDeviceType", "deviceModelCameraCompany"}
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if deviceType != nil {
-			device.SelectWithPrefix(edgeFields, db.TablePrefix+"_device.", omitFields...)
+			device.SelectWithPrefix(edgeFields, device.TableName()+".", omitFields...)
 		}
 		if edgeFieldMap["attributes"] {
 			device.Preload("Attributes").Preload("Attributes.AttributeModel")
@@ -281,7 +282,9 @@ func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchP
 			edgeFieldMap["deviceModelDeviceType"] || edgeFieldMap["deviceModelCameraCompany"] {
 			device.Preload("DeviceModel")
 		}
+		return nil
 	}
+	data := make([]*models.Device, 0)
 	total, err := s.GetConnection(ctx, device, searchParam, &data, replaceFunc, omitFields...)
 	return total, toDeviceDtos(data), err
 }
@@ -434,10 +437,9 @@ func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context,
 
 //ListDeviceDashboards ..
 func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceDashboard, error) {
-	data := make([]*models.DeviceDashboard, 0)
 	deviceDashboard := models.NewDeviceDashboard()
 	deviceDashboard.FuzzyQuery(searchParam.Keyword, "name")
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if edgeFieldMap["telemetries"] {
 			deviceDashboard.Preload("Telemetries").
 				Preload("Telemetries.Telemetry").
@@ -454,7 +456,9 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam mod
 				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
+		return nil
 	}
+	data := make([]*models.DeviceDashboard, 0)
 	total, err := s.GetConnection(ctx, deviceDashboard, searchParam, &data, replaceFunc,
 		"telemetries", "cameras")
 	return total, toDeviceDashboardDtos(data), err
@@ -519,8 +523,8 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	request.Payload = &pb.DeviceDownMSG_CameraCaptureMsg{
 		CameraCaptureMsg: &pb.CameraCaptureMsg{
 			PictureUrl:      u.String(),
-			OssPrefix:       oss.OssPrefix,
-			SecureOssPrefix: oss.SecureOssPrerix,
+			OssPrefix:       oss.OSSPrefix(),
+			SecureOssPrefix: oss.SecureOSSPrefix(),
 		},
 	}
 	requestMsg, err := proto.Marshal(request)
@@ -533,14 +537,14 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	msg, err := mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
 	if err != nil {
 		log.Println("send data error:", err)
-		return oss.GetOSSPrefix(scheme) + u.Path, nil
+		return oss.GetOSSPrefixByScheme(scheme) + u.Path, nil
 	}
 	deviceMsg := new(pb.DeviceUpMsg)
 	err = proto.Unmarshal(msg.Data, deviceMsg)
 	if err != nil {
 		log.Println("unmarshal data error")
 	}
-	return oss.GetOSSPrefix(scheme) + u.Path, nil
+	return oss.GetOSSPrefixByScheme(scheme) + u.Path, nil
 }
 
 //CameraTimeLapseVideos ..

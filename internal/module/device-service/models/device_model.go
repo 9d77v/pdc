@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -20,6 +21,11 @@ func NewDeviceModel() *DeviceModel {
 	vs := &DeviceModel{}
 	vs.DefaultModel = base.NewDefaultModel()
 	return vs
+}
+
+//TableName ..
+func (m *DeviceModel) TableName() string {
+	return db.TablePrefix() + "device_model"
 }
 
 //GetByID ..

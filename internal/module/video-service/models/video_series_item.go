@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -31,6 +32,11 @@ func NewVideoSeriesItem() *VideoSeriesItem {
 	vs := &VideoSeriesItem{}
 	vs.Model = base.NewModel()
 	return vs
+}
+
+//TableName ..
+func (m *VideoSeriesItem) TableName() string {
+	return db.TablePrefix() + "video_series_item"
 }
 
 //GetByVideoID ..

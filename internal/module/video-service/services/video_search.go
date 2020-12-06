@@ -148,7 +148,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 			if err != nil {
 				log.Println("elastic search result json unmarshal error:", err)
 			}
-			vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
+			vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
 			vis = append(vis, toVideoIndexDto(vi))
 		}
 	}
@@ -230,7 +230,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
 		if err != nil {
 			log.Println("elastic search result json unmarshal error:", err)
 		}
-		vi.Cover = oss.GetOSSPrefix(scheme) + vi.Cover
+		vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
 		vis = append(vis, toVideoIndexDto(vi))
 	}
 	return result.TotalHits(), vis, nil

@@ -18,7 +18,7 @@ func toUserDtos(data []*models.User, scheme string) []*model.User {
 func toUserDto(m *models.User, scheme string) *model.User {
 	avatar := ""
 	if m.Avatar != "" {
-		avatar = oss.GetOSSPrefix(scheme) + m.Avatar
+		avatar = oss.GetOSSPrefixByScheme(scheme) + m.Avatar
 	}
 	return &model.User{
 		ID:        int64(m.ID),

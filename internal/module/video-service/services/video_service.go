@@ -225,19 +225,20 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
 	scheme string, isCombo *bool) (int64, []*model.Video, error) {
-	data := make([]*models.Video, 0)
 	video := models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
 	if ptrs.Bool(isCombo) {
-		video.Where("id NOT in (select video_id from " + db.TablePrefix + "_video_series_item where video_id=id)")
+		video.Where("id NOT in (select video_id from " + new(models.VideoSeriesItem).TableName() + " where video_id=id)")
 	}
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) {
+	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
 		if edgeFieldMap["episodes"] {
 			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
 				return db.Model(&models.Episode{}).Order("num ASC").Order("id ASC")
 			}).Preload("Episodes.Subtitles")
 		}
+		return nil
 	}
+	data := make([]*models.Video, 0)
 	total, err := s.GetConnection(ctx, video, searchParam, &data, replaceFunc, "episodes")
 	return total, toVideoDtos(data, scheme), err
 }
@@ -344,12 +345,11 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 				ids = append(ids, v.ID)
 			}
 			items := make([]*models.VideoSeriesItem, 0)
-			videoTableName := db.TablePrefix + "_video"
-			videoSeriesItemTableName := db.TablePrefix + "_video_series_item"
+			tableVideo := new(models.Video).TableName()
 			if itemFieldMap["title"] {
-				itemFields = append(itemFields, videoTableName+".\"title\"")
+				itemFields = append(itemFields, tableVideo+".\"title\"")
 				videoSeries.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
-					videoTableName, videoTableName, videoSeriesItemTableName))
+					tableVideo, tableVideo, new(models.VideoSeriesItem).TableName()))
 			}
 			subErr := videoSeries.
 				Select(itemFields, "title").
@@ -440,19 +440,19 @@ func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model
 			ids = append(ids, v.ID)
 		}
 		items := make([]*models.VideoSeriesItem, 0)
-		videoTableName := db.TablePrefix + "_video"
-		episodeTableName := db.TablePrefix + "_episode"
-		videoSeriesItemTableName := db.TablePrefix + "_video_series_item"
+		tableVideo := new(models.Video).TableName()
+		tableEpisode := new(models.Episode).TableName()
+		tableVideoSeriesItem := new(models.VideoSeriesItem).TableName()
 		if itemFieldMap["title"] {
-			itemFields = append(itemFields, videoTableName+".\"title\"")
+			itemFields = append(itemFields, tableVideo+".\"title\"")
 			videoSeriesItem.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
-				videoTableName, videoTableName, videoSeriesItemTableName))
+				tableVideo, tableVideo, tableVideoSeriesItem))
 		} else if itemFieldMap["episodeID"] {
 			itemFields = append(itemFields,
-				episodeTableName+".\"episode_id\"",
-				videoSeriesItemTableName+".\"video_id\"")
-			videoSeriesItem.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + episodeTableName + " group by (video_id)) p left join " + episodeTableName + "  q on p.video_id=q.video_id and p.num=q.num) " + episodeTableName +
-				" on " + episodeTableName + ".video_id=" + videoSeriesItemTableName + ".video_id")
+				tableEpisode+".\"episode_id\"",
+				tableVideoSeriesItem+".\"video_id\"")
+			videoSeriesItem.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + tableEpisode + " group by (video_id)) p left join " + tableEpisode + "  q on p.video_id=q.video_id and p.num=q.num) " + tableEpisode +
+				" on " + tableEpisode + ".video_id=" + tableVideoSeriesItem + ".video_id")
 		}
 		subErr := videoSeriesItem.
 			Select(itemFields, "title", "videoID", "episodeID").

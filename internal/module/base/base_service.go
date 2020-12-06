@@ -25,7 +25,7 @@ func (s Service) GetInputFields(ctx context.Context) []string {
 
 //GetConnection get list data and total count
 func (s Service) GetConnection(ctx context.Context, r Repository, searchParam model.SearchParam,
-	data interface{}, replaceFunc func(edgeFieldMap map[string]bool, edgeFields []string),
+	data interface{}, replaceFunc func(edgeFieldMap map[string]bool, edgeFields []string) error,
 	omitFields ...string) (total int64, err error) {
 	fieldMap, _ := utils.GetFieldData(ctx, "")
 	if fieldMap["totalCount"] {
@@ -42,7 +42,10 @@ func (s Service) GetConnection(ctx context.Context, r Repository, searchParam mo
 			Pagination(offset, limit).
 			Sort(searchParam.Sorts)
 		if replaceFunc != nil {
-			replaceFunc(edgeFieldMap, edgeFields)
+			err = replaceFunc(edgeFieldMap, edgeFields)
+			if err != nil {
+				return
+			}
 		}
 		err = r.Find(data)
 	}
