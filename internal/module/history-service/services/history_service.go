@@ -75,7 +75,7 @@ func (s HistoryService) ListHistory(ctx context.Context,
 	sourceType *int64, searchParam model.SearchParam, uid uint, scheme string) (int64, []*model.History, error) {
 	history := models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
-	replaceFunc := func(edgeFieldMap map[string]bool, edgeFields []string) error {
+	replaceFunc := func(edgeField base.GraphQLField) error {
 		tableHistory := history.TableName()
 		switch ptrs.Int64(sourceType) {
 		case 1:

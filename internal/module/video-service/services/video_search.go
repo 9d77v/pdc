@@ -15,6 +15,7 @@ import (
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 	"github.com/9d77v/pdc/internal/utils"
 )
@@ -64,7 +65,6 @@ func (v VideoSearch) GetByIDFromElastic(ctx context.Context,
 //ListVideoIndex ..
 func (v VideoSearch) ListVideoIndex(ctx context.Context,
 	input model.VideoSearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
-	fieldMap, _ := utils.GetFieldData(ctx, "")
 	boolQuery := elastic.NewBoolQuery()
 	keywordStr := strings.ReplaceAll(ptrs.String(input.Keyword), " ", "")
 	if keywordStr != "" {
@@ -117,10 +117,11 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 	aggsParams := []*es.AggsParam{
 		{Field: "tags", Size: 50},
 	}
-	if fieldMap["aggResults"] {
+	field := base.NewGraphQLField(ctx, "")
+	if field.FieldMap["aggResults"] {
 		searchService = es.Aggs(searchService, aggsParams...)
 	}
-	if fieldMap["edges"] {
+	if field.FieldMap["edges"] {
 		if ptrs.Bool(input.IsRandom) {
 			searchService.SortBy(elastic.NewScriptSort(elastic.NewScript("Math.random()"), "number").Order(true))
 		} else {
@@ -137,7 +138,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 		log.Println("err:", err)
 		return 0, vis, aggResults, nil
 	}
-	if fieldMap["edges"] {
+	if field.FieldMap["edges"] {
 		for _, v := range result.Hits.Hits {
 			vi := new(models.VideoIndex)
 			data, err := v.Source.MarshalJSON()
@@ -152,7 +153,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 			vis = append(vis, toVideoIndexDto(vi))
 		}
 	}
-	if fieldMap["aggResults"] {
+	if field.FieldMap["aggResults"] {
 		for _, v := range aggsParams {
 			aggResult, found := result.Aggregations.Terms("group_by_" + v.Field)
 			if found {
