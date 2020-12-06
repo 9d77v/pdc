@@ -2,9 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
 import "video.js/dist/video-js.min.css"
 import "./index.less"
-
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
-import { useLocation } from 'react-router-dom'
 
 const lang: any = video_zhCN
 lang["Picture-in-Picture"] = "画中画"
@@ -31,9 +29,6 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
     autoplay,
     autoDestroy,
 }) => {
-    const location = useLocation();
-    const isApp = location.pathname.indexOf("/app") >= 0
-
     const videoKey = "custom-video-" + id
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()

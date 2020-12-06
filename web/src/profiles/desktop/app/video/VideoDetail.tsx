@@ -18,12 +18,11 @@ export default function VideoDetail() {
     const query = new URLSearchParams(location.search)
     const episodeID = query.get("episode_id")
     const next = query.get("next")
-
     const { error, data } = useQuery(GET_VIDEO_DETAIL,
         {
             variables: {
                 episodeID: episodeID
-            },
+            }
         })
     useEffect(() => {
         if (error) {
@@ -31,28 +30,30 @@ export default function VideoDetail() {
         }
     }, [error])
 
-    let videoItem = {
-        id: 0,
-        cover: "",
-        title: "",
-        desc: "",
-        episodes: [],
-        theme: ""
-    }
-    let video: any = null
-    if (data) {
-        video = data.videoDetail.video
+    const video = useMemo(() => {
+        return data?.videoDetail.video
+    }, [data])
+
+    const videoItem = useMemo(() => {
         if (video) {
-            videoItem = ({
+            return {
                 id: video.id,
                 cover: video.cover,
                 title: video.title,
                 desc: video.desc,
                 episodes: video.episodes,
                 theme: video.theme
-            })
+            }
         }
-    }
+        return {
+            id: 0,
+            cover: "",
+            title: "",
+            desc: "",
+            episodes: [],
+            theme: ""
+        }
+    }, [video])
 
     const historyInfo = useMemo(() => {
         return data?.videoDetail?.historyInfo
@@ -67,7 +68,7 @@ export default function VideoDetail() {
         if (historyInfo && next !== "true" && Number(historyInfo.subSourceID !== Number(episodeID))) {
             history.replace(AppPath.VIDEO_DETAIL + "?episode_id=" + historyInfo.subSourceID)
         }
-    }, [historyInfo, next, episodeID])
+    }, [historyInfo, history, next, episodeID])
 
     const num = useMemo(() => {
         if (video && video.episodes) {
