@@ -55,7 +55,6 @@ func initClient() *gorm.DB {
 		MaxOpenConns: 100,
 		EnableLog:    consts.DEBUG,
 	}
-	var err error
 	db, err := newClient(dbConfig)
 	if err != nil {
 		log.Printf("Could not initialize gorm: %s", err.Error())

@@ -470,7 +470,6 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context,
 	result := make([]*model.DeviceDashboard, 0)
 	data := make([]*models.DeviceDashboard, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
 	deviceDashboard := models.NewDeviceDashboard()
 	if deviceType != nil {
 		deviceDashboard.Where("device_type = ?", ptrs.Int64(deviceType))
@@ -498,7 +497,7 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context,
 				deviceDashboard.Preload("Cameras.Device")
 			}
 		}
-		err = deviceDashboard.Select(edgeFields, "telemetries", "cameras").Find(&data)
+		err := deviceDashboard.Select(edgeFields, "telemetries", "cameras").Find(&data)
 		if err != nil {
 			return 0, result, err
 		}
@@ -553,7 +552,6 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 	result := make([]*model.CameraTimeLapseVideo, 0)
 	data := make([]*models.CameraTimeLapseVideo, 0)
 	fieldMap, _ := utils.GetFieldData(ctx, "")
-	var err error
 	camera := models.NewCameraTimeLapseVideo()
 	camera.IDQuery(uint(deviceID), "device_id").
 		Where("created_at>=?", time.Now().AddDate(0, 0, -7))
@@ -563,7 +561,7 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 	}
 	if fieldMap["edges"] {
 		_, edgeFields := utils.GetFieldData(ctx, "edges.")
-		err = camera.Select(edgeFields).
+		err := camera.Select(edgeFields).
 			Order("id DESC").
 			Find(&data)
 		if err != nil {
