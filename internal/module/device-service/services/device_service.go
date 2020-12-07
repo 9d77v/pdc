@@ -40,7 +40,7 @@ func (s DeviceService) CreateDeviceModel(ctx context.Context,
 		return &model.DeviceModel{}, err
 	}
 	if input.DeviceType == 1 && input.CameraCompany == 0 {
-		attributes := getDefaultHikvisionAttributeModels(m.ID)
+		attributes := s.getDefaultHikvisionAttributeModels(m.ID)
 		err = db.GetDB().Create(&attributes).Error
 		if err != nil {
 			return &model.DeviceModel{ID: int64(m.ID)}, err
@@ -54,7 +54,7 @@ func (s DeviceService) UpdateDeviceModel(ctx context.Context,
 	input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
 	deviceModel := models.NewDeviceModel()
 	fields := s.GetInputFields(ctx)
-	if err := deviceModel.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(deviceModel, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -83,7 +83,7 @@ func (s DeviceService) CreateAttributeModel(ctx context.Context, input model.New
 func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error) {
 	attributeModel := models.NewAttributeModel()
 	fields := s.GetInputFields(ctx)
-	if err := attributeModel.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(attributeModel, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -126,7 +126,7 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context,
 	input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
 	telemetryModel := models.NewTelemetryModel()
 	fields := s.GetInputFields(ctx)
-	if err := telemetryModel.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(telemetryModel, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -169,7 +169,7 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.Se
 	data := make([]*models.DeviceModel, 0)
 	total, err := s.GetConnection(ctx, deviceModel, searchParam, &data, replaceFunc,
 		"attributeModels", "telemetryModels")
-	return total, toDeviceModelDtos(data), err
+	return total, s.getDeviceModels(data), err
 }
 
 //CreateDevice  ..
@@ -285,7 +285,7 @@ func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchP
 	}
 	data := make([]*models.Device, 0)
 	total, err := s.GetConnection(ctx, device, searchParam, &data, replaceFunc, omitFields...)
-	return total, toDeviceDtos(data), err
+	return total, s.getDevices(data), err
 }
 
 //GetDeviceInfo ..
@@ -358,7 +358,7 @@ func (s DeviceService) CreateDeviceDashboard(ctx context.Context,
 func (s DeviceService) UpdateDeviceDashboard(ctx context.Context, input model.NewUpdateDeviceDashboard) (*model.DeviceDashboard, error) {
 	deviceDashboard := models.NewDeviceDashboard()
 	fields := s.GetInputFields(ctx)
-	if err := deviceDashboard.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(deviceDashboard, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -460,7 +460,7 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam mod
 	data := make([]*models.DeviceDashboard, 0)
 	total, err := s.GetConnection(ctx, deviceDashboard, searchParam, &data, replaceFunc,
 		"telemetries", "cameras")
-	return total, toDeviceDashboardDtos(data), err
+	return total, s.getDeviceDashboards(data), err
 }
 
 //AppDeviceDashboards ..
@@ -501,7 +501,7 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context,
 			return 0, result, err
 		}
 	}
-	return total, toDeviceDashboardDtos(data), nil
+	return total, s.getDeviceDashboards(data), nil
 }
 
 //CameraCapture ..
@@ -567,5 +567,5 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 			return 0, result, err
 		}
 	}
-	return total, toCameraTimeLapseVideoDtos(data, scheme), nil
+	return total, s.getCameraTimeLapseVideos(data, scheme), nil
 }

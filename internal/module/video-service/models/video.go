@@ -8,11 +8,6 @@ import (
 	"github.com/lib/pq"
 )
 
-//VideoRepository ..
-type VideoRepository interface {
-	GetByID(id uint, columns []string) error
-}
-
 //Video 视频
 type Video struct {
 	base.DefaultModel
@@ -37,9 +32,4 @@ func NewVideo() *Video {
 //TableName ..
 func (m *Video) TableName() string {
 	return db.TablePrefix() + "video"
-}
-
-//GetByID Get video by id
-func (m *Video) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
 }

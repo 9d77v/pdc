@@ -39,11 +39,15 @@ func (m *VideoSeriesItem) TableName() string {
 	return db.TablePrefix() + "video_series_item"
 }
 
-//GetByVideoID ..
-func (m *VideoSeriesItem) GetByVideoID(videoID uint) error {
-	return m.Select([]string{"video_series_id"}).
+//GetVideoSeriesIDByVideoID ..
+func (m *VideoSeriesItem) GetVideoSeriesIDByVideoID(videoID uint) uint {
+	err := m.Select([]string{"video_series_id"}).
 		IDQuery(videoID, "video_id").
 		Take(m)
+	if err != nil {
+		return 0
+	}
+	return m.VideoSeriesID
 }
 
 //GetByVideoIDVideoSeriesID ..

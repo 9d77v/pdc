@@ -25,7 +25,7 @@ type VideoSearch struct {
 }
 
 //BulkSaveES 批量保存到es
-func (v VideoSearch) BulkSaveES(ctx context.Context,
+func (s VideoSearch) BulkSaveES(ctx context.Context,
 	vis []*models.VideoIndex, indexName string, bulkNum, workerNum int) {
 	bds := make([]*es.BulkDoc, 0, len(vis))
 	for _, v := range vis {
@@ -42,7 +42,7 @@ func (v VideoSearch) BulkSaveES(ctx context.Context,
 }
 
 //GetByIDFromElastic ...
-func (v VideoSearch) GetByIDFromElastic(ctx context.Context,
+func (s VideoSearch) GetByIDFromElastic(ctx context.Context,
 	videoID string) (*models.VideoIndex, error) {
 	result, err := elasticsearch.GetClient().Get().Index(elasticsearch.AliasVideo).Id(videoID).Do(ctx)
 	if err != nil {
@@ -63,8 +63,8 @@ func (v VideoSearch) GetByIDFromElastic(ctx context.Context,
 }
 
 //ListVideoIndex ..
-func (v VideoSearch) ListVideoIndex(ctx context.Context,
-	input model.VideoSearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
+func (s VideoSearch) ListVideoIndex(ctx context.Context,
+	input model.SearchParam, scheme string) (int64, []*model.VideoIndex, []*model.AggResult, error) {
 	boolQuery := elastic.NewBoolQuery()
 	keywordStr := strings.ReplaceAll(ptrs.String(input.Keyword), " ", "")
 	if keywordStr != "" {
@@ -150,7 +150,7 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 				log.Println("elastic search result json unmarshal error:", err)
 			}
 			vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
-			vis = append(vis, toVideoIndexDto(vi))
+			vis = append(vis, s.getVideoIndex(vi))
 		}
 	}
 	if field.FieldMap["aggResults"] {
@@ -170,9 +170,10 @@ func (v VideoSearch) ListVideoIndex(ctx context.Context,
 }
 
 //SimilarVideoIndex ..
-func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
-	input model.VideoSimilarParam, scheme string) (int64, []*model.VideoIndex, error) {
-	id := strconv.FormatInt(input.VideoID, 10)
+func (s VideoSearch) SimilarVideoIndex(ctx context.Context,
+	searchParam model.SearchParam, episodeID int64, scheme string) (int64, []*model.VideoIndex, error) {
+	videoID := models.NewEpisode().GetVideoIDByID(uint(episodeID))
+	id := strconv.FormatUint(uint64(videoID), 10)
 	vis := make([]*model.VideoIndex, 0)
 
 	boolQuery := elastic.NewBoolQuery()
@@ -203,7 +204,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
 	ignoreQueries := make([]elastic.Query, 0)
 	seriesID := strconv.FormatUint(uint64(videoDoc.SeriesID), 10)
 	ignoreQueries = append(ignoreQueries, elastic.NewTermQuery("series_id", seriesID))
-	if ptrs.Bool(input.IsMobile) {
+	if ptrs.Bool(searchParam.IsMobile) {
 		ignoreQueries = append(ignoreQueries, elastic.NewTermQuery("is_hide_on_mobile", true))
 	}
 	filterQuery := elastic.NewBoolQuery().
@@ -213,7 +214,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
 	searchService := elasticsearch.GetClient().Search().
 		Index(elasticsearch.AliasVideo).
 		Query(boolQuery).
-		Size(int(input.PageSize)).
+		Size(int(ptrs.Int64(searchParam.PageSize))).
 		Sort("_score", false).
 		Sort("title.keyword", true)
 	result, err := searchService.Do(ctx)
@@ -232,7 +233,7 @@ func (v VideoSearch) SimilarVideoIndex(ctx context.Context,
 			log.Println("elastic search result json unmarshal error:", err)
 		}
 		vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
-		vis = append(vis, toVideoIndexDto(vi))
+		vis = append(vis, s.getVideoIndex(vi))
 	}
 	return result.TotalHits(), vis, nil
 }

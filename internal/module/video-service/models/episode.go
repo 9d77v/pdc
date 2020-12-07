@@ -8,7 +8,7 @@ import (
 
 //Episode 分集
 type Episode struct {
-	*base.DefaultModel
+	base.DefaultModel
 	VideoID   uint
 	Num       float64
 	Title     string `gorm:"size:50;NOT NULL;"`
@@ -26,12 +26,23 @@ type Subtitle struct {
 	URL       string `gorm:"size:500;NOT NULL;"`
 }
 
+//NewEpisode ..
+func NewEpisode() *Episode {
+	vs := &Episode{}
+	vs.DefaultModel = base.NewDefaultModel()
+	return vs
+}
+
 //TableName ..
 func (m *Episode) TableName() string {
 	return db.TablePrefix() + "episode"
 }
 
-//GetByID get episode id and video_id
-func (m *Episode) GetByID(id uint, columns []string) error {
-	return db.GetDB().Select("id,video_id").First(m, "id=?", id).Error
+//GetVideoIDByID ..
+func (m *Episode) GetVideoIDByID(id uint) uint {
+	err := m.Select([]string{"video_id"}).IDQuery(id).First(m)
+	if err != nil {
+		return 0
+	}
+	return m.VideoID
 }

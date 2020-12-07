@@ -15,7 +15,6 @@ import (
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
-	hitory_service "github.com/9d77v/pdc/internal/module/history-service/services"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 
 	"github.com/9d77v/pdc/internal/utils"
@@ -117,7 +116,7 @@ func (s VideoService) UpdateVideo(ctx context.Context,
 	input model.NewUpdateVideo) (*model.Video, error) {
 	video := models.NewVideo()
 	fields := s.GetInputFields(ctx)
-	if err := video.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(video, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -178,7 +177,8 @@ func (s VideoService) CreateEpisode(ctx context.Context,
 func (s VideoService) UpdateEpisode(ctx context.Context,
 	input model.NewUpdateEpisode) (*model.Episode, error) {
 	episode := new(models.Episode)
-	if err := episode.GetByID(uint(input.ID), []string{"id"}); err != nil {
+	fields := s.GetInputFields(ctx)
+	if err := s.GetByID(episode, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -224,12 +224,21 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
-	scheme string, isCombo *bool) (int64, []*model.Video, error) {
+	scheme string, isCombo *bool, episodeID *int64) (int64, []*model.Video, error) {
 	video := models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
+	fmt.Println(searchParam)
 	if ptrs.Bool(isCombo) {
 		video.Where("id NOT in (select video_id from " + new(models.VideoSeriesItem).TableName() + " where video_id=id)")
 	}
+	if ptrs.Int64(episodeID) > 0 {
+		videoID := models.NewEpisode().GetVideoIDByID(uint(ptrs.Int64(episodeID)))
+		if videoID == 0 {
+			return 0, []*model.Video{}, nil
+		}
+		searchParam.Ids = []int64{int64(videoID)}
+	}
+	fmt.Println(searchParam)
 	replaceFunc := func(edgeField base.GraphQLField) error {
 		if edgeField.FieldMap["episodes"] {
 			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
@@ -240,7 +249,7 @@ func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchPar
 	}
 	data := make([]*models.Video, 0)
 	total, err := s.GetConnection(ctx, video, searchParam, &data, replaceFunc, "episodes")
-	return total, toVideoDtos(data, scheme), err
+	return total, s.getVideos(data, scheme), err
 }
 
 //CreateVideoSeries ..
@@ -261,7 +270,7 @@ func (s VideoService) UpdateVideoSeries(ctx context.Context,
 	input model.NewUpdateVideoSeries) (*model.VideoSeries, error) {
 	fields := s.GetInputFields(ctx)
 	videoSeries := models.NewVideoSeries()
-	if err := videoSeries.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(videoSeries, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -308,13 +317,27 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 }
 
 //ListVideoSeries ..
-func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.SearchParam) (int64, []*model.VideoSeries, error) {
+func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.SearchParam, episodeID *int64) (int64, []*model.VideoSeries, error) {
 	result := make([]*model.VideoSeries, 0)
 	data := make([]*models.VideoSeries, 0)
 	field := base.NewGraphQLField(ctx, "")
 	var err error
 	videoSeries := models.NewVideoSeries()
 	videoSeries.FuzzyQuery(searchParam.Keyword, "name")
+	omitFields := []string{"title"}
+	videoSeriesItem := models.NewVideoSeriesItem()
+	if episodeID != nil && ptrs.Int64(episodeID) > 0 {
+		videoID := models.NewEpisode().GetVideoIDByID(uint(ptrs.Int64(episodeID)))
+		if videoID == 0 {
+			return 0, result, errors.New("episode not found")
+		}
+		videoSeriesID := videoSeriesItem.GetVideoSeriesIDByVideoID(videoID)
+		if videoSeriesID == 0 {
+			return 0, result, nil
+		}
+		searchParam.Ids = []int64{int64(videoSeriesItem.VideoSeriesID)}
+		omitFields = append(omitFields, "videoID", "episodeID")
+	}
 	var total int64
 	offset, limit := s.GetPageInfo(searchParam)
 	if field.FieldMap["totalCount"] {
@@ -346,13 +369,22 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 			}
 			items := make([]*models.VideoSeriesItem, 0)
 			tableVideo := new(models.Video).TableName()
+			tableEpisode := new(models.Episode).TableName()
+			tableVideoSeriesItem := new(models.VideoSeriesItem).TableName()
 			if itemField.FieldMap["title"] {
 				itemField.Fields = append(itemField.Fields, tableVideo+".\"title\"")
-				videoSeries.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
-					tableVideo, tableVideo, new(models.VideoSeriesItem).TableName()))
+				videoSeriesItem.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
+					tableVideo, tableVideo, tableVideoSeriesItem))
 			}
-			subErr := videoSeries.
-				Select(itemField.Fields, "title").
+			if itemField.FieldMap["episodeID"] {
+				itemField.Fields = append(itemField.Fields,
+					tableEpisode+".\"episode_id\"",
+					tableVideoSeriesItem+".\"video_id\"")
+				videoSeriesItem.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + tableEpisode + " group by (video_id)) p left join " + tableEpisode + "  q on p.video_id=q.video_id and p.num=q.num) " + tableEpisode +
+					" on " + tableEpisode + ".video_id=" + tableVideoSeriesItem + ".video_id")
+			}
+			subErr := videoSeriesItem.
+				Select(itemField.Fields, omitFields...).
 				IDArrayQuery(ids, "video_series_id").
 				Order("video_series_id asc,num asc").
 				Find(&items)
@@ -362,109 +394,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 			videoSeries.AddItemsToList(data, items)
 		}
 	}
-	return total, toVideoSeriesDtos(data), nil
-}
-
-//VideoDetail ..
-func (s VideoService) VideoDetail(ctx context.Context, episodeID int64, scheme string, uid uint) (*model.VideoDetail, error) {
-	result := new(model.VideoDetail)
-	episode := new(models.Episode)
-	if err := episode.GetByID(uint(episodeID), []string{"id", "video_id"}); err != nil {
-		return nil, err
-	}
-
-	vch := make(chan *model.Video, 1)
-	go func(ctx context.Context, videoID uint, scheme string) {
-		vch <- s.getVideo(ctx, int64(videoID), scheme)
-	}(ctx, episode.VideoID, scheme)
-
-	vsch := make(chan []*model.VideoSeries, 1)
-	go func(ctx context.Context, videoID uint) {
-		vsch <- s.getVideoSeries(ctx, videoID)
-	}(ctx, episode.VideoID)
-
-	h := make(chan *model.History, 1)
-	go func(ctx context.Context, videoID uint, uid uint) {
-		const historyTypeVideo = 1
-		history, err := hitory_service.HistoryService{}.GetHistory(ctx, historyTypeVideo, int64(videoID), uid)
-		if err != nil {
-			log.Println("get record failed")
-		}
-		h <- history
-	}(ctx, episode.VideoID, uid)
-	result.Video = <-vch
-	result.VideoSerieses = <-vsch
-	result.HistoryInfo = <-h
-	return result, nil
-}
-
-func (s VideoService) getVideo(ctx context.Context, videoID int64, scheme string) *model.Video {
-	field := base.NewGraphQLField(ctx, "video.")
-	video := models.NewVideo()
-	if field.FieldMap["episodes"] {
-		video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {
-			return db.Model(&models.Episode{}).Order("num ASC,id ASC")
-		}).Preload("Episodes.Subtitles")
-	}
-	err := video.
-		Select(field.Fields, "episodes").
-		IDQuery(uint(videoID)).
-		First(video)
-	if err != nil {
-		return &model.Video{}
-	}
-	return toVideoDto(video, scheme)
-}
-
-func (s VideoService) getVideoSeries(ctx context.Context, videoID uint) []*model.VideoSeries {
-	result := make([]*model.VideoSeries, 0)
-	edgeField := base.NewGraphQLField(ctx, "videoSerieses.")
-	data := make([]*models.VideoSeries, 0)
-	videoSeriesItem := models.NewVideoSeriesItem()
-	if err := videoSeriesItem.GetByVideoID(videoID); err != nil {
-		return result
-	}
-	ids := []uint{videoSeriesItem.VideoSeriesID}
-	videoSeries := models.NewVideoSeries()
-	err := videoSeries.
-		Select(edgeField.Fields, "items").
-		IDArrayQuery(ids).
-		Find(&data)
-	if err != nil {
-		return result
-	}
-	if edgeField.FieldMap["items"] && len(data) > 0 {
-		itemField := base.NewGraphQLField(ctx, "videoSerieses.items.")
-		ids := make([]uint, 0)
-		for _, v := range data {
-			ids = append(ids, v.ID)
-		}
-		items := make([]*models.VideoSeriesItem, 0)
-		tableVideo := new(models.Video).TableName()
-		tableEpisode := new(models.Episode).TableName()
-		tableVideoSeriesItem := new(models.VideoSeriesItem).TableName()
-		if itemField.FieldMap["title"] {
-			itemField.Fields = append(itemField.Fields, tableVideo+".\"title\"")
-			videoSeriesItem.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
-				tableVideo, tableVideo, tableVideoSeriesItem))
-		} else if itemField.FieldMap["episodeID"] {
-			itemField.Fields = append(itemField.Fields,
-				tableEpisode+".\"episode_id\"",
-				tableVideoSeriesItem+".\"video_id\"")
-			videoSeriesItem.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + tableEpisode + " group by (video_id)) p left join " + tableEpisode + "  q on p.video_id=q.video_id and p.num=q.num) " + tableEpisode +
-				" on " + tableEpisode + ".video_id=" + tableVideoSeriesItem + ".video_id")
-		}
-		subErr := videoSeriesItem.
-			Select(itemField.Fields, "title", "videoID", "episodeID").
-			IDArrayQuery(ids, "video_series_id").
-			Order("video_series_id asc,num asc").
-			Find(&items)
-		if subErr != nil {
-			return result
-		}
-		videoSeries.AddItemsToList(data, items)
-	}
-	return toVideoSeriesDtos(data)
+	return total, s.getVideoSerieses(data), nil
 }
 
 func sendMsgToUpdateES(videoID int64) {

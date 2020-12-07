@@ -81,6 +81,48 @@ func (m *Model) SelectWithPrefix(fields []string, prefix string, omitFields ...s
 	return m
 }
 
+func (m *Model) toDBFieldsWithPrefix(fields []string, prefix string, omitFields ...string) []string {
+	newFields := make([]string, 0, len(fields))
+	for _, v := range m.toDBFields(fields, append([]string{"__typename"}, omitFields...)...) {
+		newFields = append(newFields, prefix+v)
+	}
+	return newFields
+}
+
+//ToDBFields calculate slect fields by input fields
+func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
+	dbFields := make([]string, 0)
+	omitFieldMap := make(map[string]bool)
+	for _, v := range omitFields {
+		omitFieldMap[v] = true
+	}
+	for _, v := range fields {
+		if !omitFieldMap[v] {
+			if strings.Contains(strings.ToLower(v), "price") {
+				v = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
+			} else if strings.Contains(v, ".") || strings.Contains(v, " ") {
+			} else {
+				v = fmt.Sprintf("\"%s\"", m.camelToSnack(v))
+			}
+			dbFields = append(dbFields, v)
+		}
+	}
+	return dbFields
+}
+
+func (m *Model) camelToSnack(s string) string {
+	newStr := ""
+	for i := 0; i < len(s); i++ {
+		if unicode.IsUpper(rune(s[i])) {
+			newStr += "_" + strings.ToLower(string(s[i]))
+		} else {
+			newStr += string(s[i])
+		}
+	}
+	newStr = strings.ReplaceAll(newStr, "_i_d", "_id")
+	return strings.ReplaceAll(newStr, "_u_r_l", "_url")
+}
+
 //Select 选择字段
 func (m *Model) Select(fields []string, omitFields ...string) Repository {
 	m.db = m.db.Select(m.toDBFields(fields, append([]string{"__typename"}, omitFields...)...))
@@ -195,46 +237,4 @@ func (m *Model) Find(dest interface{}) error {
 func (m *Model) Count(model interface{}) (total int64, err error) {
 	err = m.db.Model(model).Count(&total).Error
 	return
-}
-
-func (m *Model) camelToSnack(s string) string {
-	newStr := ""
-	for i := 0; i < len(s); i++ {
-		if unicode.IsUpper(rune(s[i])) {
-			newStr += "_" + strings.ToLower(string(s[i]))
-		} else {
-			newStr += string(s[i])
-		}
-	}
-	newStr = strings.ReplaceAll(newStr, "_i_d", "_id")
-	return strings.ReplaceAll(newStr, "_u_r_l", "_url")
-}
-
-func (m *Model) toDBFieldsWithPrefix(fields []string, prefix string, omitFields ...string) []string {
-	newFields := make([]string, 0, len(fields))
-	for _, v := range m.toDBFields(fields, append([]string{"__typename"}, omitFields...)...) {
-		newFields = append(newFields, prefix+v)
-	}
-	return newFields
-}
-
-//ToDBFields calculate slect fields by input fields
-func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
-	dbFields := make([]string, 0)
-	omitFieldMap := make(map[string]bool)
-	for _, v := range omitFields {
-		omitFieldMap[v] = true
-	}
-	for _, v := range fields {
-		if !omitFieldMap[v] {
-			if strings.Contains(strings.ToLower(v), "price") {
-				v = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
-			} else if strings.Contains(v, ".") || strings.Contains(v, " ") {
-			} else {
-				v = fmt.Sprintf("\"%s\"", m.camelToSnack(v))
-			}
-			dbFields = append(dbFields, v)
-		}
-	}
-	return dbFields
 }

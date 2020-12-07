@@ -33,11 +33,6 @@ func (m *Device) TableName() string {
 	return db.TablePrefix() + "device"
 }
 
-//GetByID ..
-func (m *Device) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}
-
 //Attribute 属性
 type Attribute struct {
 	base.DefaultModel

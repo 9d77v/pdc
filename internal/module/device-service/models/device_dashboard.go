@@ -21,11 +21,6 @@ func NewDeviceDashboard() *DeviceDashboard {
 	return vs
 }
 
-//GetByID ..
-func (m *DeviceDashboard) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}
-
 //DeviceDashboardTelemetry 仪表盘遥测
 type DeviceDashboardTelemetry struct {
 	*base.DefaultModel

@@ -27,8 +27,3 @@ func NewDeviceModel() *DeviceModel {
 func (m *DeviceModel) TableName() string {
 	return db.TablePrefix() + "device_model"
 }
-
-//GetByID ..
-func (m *DeviceModel) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}

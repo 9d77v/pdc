@@ -32,11 +32,6 @@ func (m *History) TableName() string {
 	return db.TablePrefix() + "history"
 }
 
-//GetByID ..
-func (m *History) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}
-
 //HistoryLog 历史记录
 type HistoryLog struct {
 	*base.Model

@@ -168,21 +168,6 @@ type VideoIndexConnection {
   aggResults:[AggResult!]
 }
 
-input VideoSearchParam{
-  keyword: String
-  tags:[String!]
-  page: Int
-  pageSize: Int
-  isRandom: Boolean
-  isMobile: Boolean
-}
-
-input VideoSimilarParam{
-  videoID:ID!
-  pageSize:Int!
-  isMobile: Boolean
-}
-
 type VideoDetail{
   video: Video!
   videoSerieses:[VideoSeries!]

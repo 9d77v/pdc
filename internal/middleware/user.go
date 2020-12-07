@@ -34,7 +34,7 @@ func HandleCard() func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		id := consts.GetDecodeUID(arr[2])
-		u, err := userService.GetByID(context.Background(), int64(id))
+		u, err := userService.GetUserByID(context.Background(), int64(id))
 		if err != nil {
 			log.Println("get user error:", err)
 		}

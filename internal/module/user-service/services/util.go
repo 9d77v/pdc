@@ -6,16 +6,16 @@ import (
 	"github.com/9d77v/pdc/internal/module/user-service/models"
 )
 
-func toUserDtos(data []*models.User, scheme string) []*model.User {
+func (s UserService) getUsers(data []*models.User, scheme string) []*model.User {
 	result := make([]*model.User, 0, len(data))
 	for _, m := range data {
-		r := toUserDto(m, scheme)
+		r := s.getUser(m, scheme)
 		result = append(result, r)
 	}
 	return result
 }
 
-func toUserDto(m *models.User, scheme string) *model.User {
+func (s UserService) getUser(m *models.User, scheme string) *model.User {
 	avatar := ""
 	if m.Avatar != "" {
 		avatar = oss.GetOSSPrefixByScheme(scheme) + m.Avatar

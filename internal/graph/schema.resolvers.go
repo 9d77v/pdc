@@ -189,30 +189,24 @@ func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, 
 	return user, nil
 }
 
-func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool, episodeID *int64) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := videoService.ListVideo(ctx, searchParam, scheme, isFilterVideoSeries)
+	total, data, err := videoService.ListVideo(ctx, searchParam, scheme, isFilterVideoSeries, episodeID)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) VideoDetail(ctx context.Context, episodeID int64) (*model.VideoDetail, error) {
-	scheme := middleware.ForSchemeContext(ctx)
-	user := middleware.ForContext(ctx)
-	return videoService.VideoDetail(ctx, episodeID, scheme, user.ID)
-}
-
-func (r *queryResolver) VideoSerieses(ctx context.Context, searchParam model.SearchParam) (*model.VideoSeriesConnection, error) {
+func (r *queryResolver) VideoSerieses(ctx context.Context, searchParam model.SearchParam, episodeID *int64) (*model.VideoSeriesConnection, error) {
 	con := new(model.VideoSeriesConnection)
-	total, data, err := videoService.ListVideoSeries(ctx, searchParam)
+	total, data, err := videoService.ListVideoSeries(ctx, searchParam, episodeID)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
-func (r *queryResolver) SearchVideo(ctx context.Context, searchParam model.VideoSearchParam) (*model.VideoIndexConnection, error) {
+func (r *queryResolver) SearchVideo(ctx context.Context, searchParam model.SearchParam) (*model.VideoIndexConnection, error) {
 	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
 	total, data, aggResults, err := videoSearch.ListVideoIndex(ctx, searchParam, scheme)
@@ -222,10 +216,10 @@ func (r *queryResolver) SearchVideo(ctx context.Context, searchParam model.Video
 	return con, err
 }
 
-func (r *queryResolver) SimilarVideos(ctx context.Context, searchParam model.VideoSimilarParam) (*model.VideoIndexConnection, error) {
+func (r *queryResolver) SimilarVideos(ctx context.Context, searchParam model.SearchParam, episodeID int64) (*model.VideoIndexConnection, error) {
 	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	_, data, err := videoSearch.SimilarVideoIndex(ctx, searchParam, scheme)
+	_, data, err := videoSearch.SimilarVideoIndex(ctx, searchParam, episodeID, scheme)
 	con.Edges = data
 	return con, err
 }
@@ -250,11 +244,11 @@ func (r *queryResolver) ThingAnalyze(ctx context.Context, dimension string, inde
 	return thingService.ThingAnalyze(ctx, dimension, index, start, group, int64(user.ID))
 }
 
-func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, searchParam model.SearchParam) (*model.HistoryConnection, error) {
+func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, searchParam model.SearchParam, subSourceID *int64) (*model.HistoryConnection, error) {
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.HistoryConnection)
-	total, data, err := historyService.ListHistory(ctx, sourceType, searchParam, user.ID, scheme)
+	total, data, err := historyService.ListHistory(ctx, sourceType, searchParam, subSourceID, user.ID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err

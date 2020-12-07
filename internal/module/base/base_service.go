@@ -22,6 +22,11 @@ func (s Service) GetInputFields(ctx context.Context) []string {
 	return fields
 }
 
+//GetByID Get model by id
+func (s Service) GetByID(r Repository, id uint, columns []string) error {
+	return r.Select(columns).IDQuery(id).First(r)
+}
+
 //GetConnection get list data and total count
 func (s Service) GetConnection(ctx context.Context, r Repository, searchParam model.SearchParam,
 	data interface{}, replaceFunc func(field GraphQLField) error, omitFields ...string) (total int64, err error) {

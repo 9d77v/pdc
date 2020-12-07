@@ -5,7 +5,7 @@ import (
 	"github.com/9d77v/pdc/internal/module/history-service/models"
 )
 
-func toHistoryDto(m *models.History) *model.History {
+func (s HistoryService) getHistory(m *models.History) *model.History {
 	if m == nil {
 		return &model.History{}
 	}

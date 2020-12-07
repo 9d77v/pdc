@@ -48,7 +48,7 @@ func (s ThingService) CreateThing(ctx context.Context, input model.NewThing, uid
 func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing, uid uint) (*model.Thing, error) {
 	thing := models.NewThing()
 	fields := s.GetInputFields(ctx)
-	if err := thing.GetByID(uint(input.ID), uid, fields); err != nil {
+	if err := thing.Select(fields).IDQuery(uint(input.ID)).IDQuery(uid, "uid").First(thing); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -81,7 +81,7 @@ func (s ThingService) ListThing(ctx context.Context, searchParam model.SearchPar
 	thing.IDQuery(uid, "uid").FuzzyQuery(searchParam.Keyword, "name")
 	data := make([]*models.Thing, 0)
 	total, err := s.GetConnection(ctx, thing, searchParam, &data, nil)
-	return total, toThingsDtos(data, scheme), err
+	return total, s.getThings(data, scheme), err
 }
 
 //ThingSeries 获取物品数据
@@ -145,5 +145,5 @@ func (s ThingService) ThingAnalyze(ctx context.Context, dimension, index string,
 	builder = builder.Group("x1," + dimension).Order("x1," + dimension)
 	data := make([]*models.PieLineSerie, 0)
 	err := builder.Scan(&data).Error
-	return toPieLineSerieData(data), err
+	return s.getPieLineSerieData(data), err
 }
