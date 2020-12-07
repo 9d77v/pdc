@@ -1,0 +1,114 @@
+import React, { FC, useEffect, useMemo } from "react"
+import { message } from "antd"
+import "src/styles/button.less"
+import { useQuery } from "@apollo/react-hooks"
+import Img from "src/components/img"
+import { VideoPlayer } from "src/components/videoplayer"
+import { useHistory, useLocation } from "react-router-dom"
+import TextArea from "antd/lib/input/TextArea"
+import VideoSelect from "src/profiles/common/video/VideoSelect"
+import VideoSeriesSelect from "src/profiles/common/video/VideoSeriesSelect"
+import SimilarVideoList from "src/profiles/common/video/SimilarVideoList"
+import { AppPath } from "src/consts/path"
+import { GET_VIDEO_DETAIL } from "src/gqls/video/query"
+import { getVideoDetail } from "src/models/video"
+import { isMobile } from "src/utils/util"
+
+export const EpisodePage: FC = () => {
+    const history = useHistory()
+    const location = useLocation()
+    const query = new URLSearchParams(location.search)
+    const episodeID = query.get("episode_id")
+    const autoJump = query.get("autoJump")
+
+    const { error, data } = useQuery(GET_VIDEO_DETAIL,
+        {
+            variables: {
+                episodeID: episodeID,
+                similiarVideoParam: {
+                    isMobile: isMobile(),
+                    pageSize: 10,
+                },
+                searchParam: {
+                    page: 1
+                }
+            }
+        })
+
+    useEffect(() => {
+        if (error) {
+            message.error("接口请求失败！")
+        }
+    }, [error])
+
+    const historyInfo = data?.histories.edges.length > 0 ? data?.histories.edges[0] : null
+
+    useEffect(() => {
+        if (historyInfo && autoJump === "true" && Number(historyInfo.subSourceID !== Number(episodeID))) {
+            history.replace(AppPath.VIDEO_DETAIL + "?episode_id=" + historyInfo.subSourceID)
+        }
+    }, [historyInfo, history, autoJump, episodeID])
+
+    const videoDetail = useMemo(() => {
+        return getVideoDetail(data, episodeID)
+    }, [data, episodeID])
+
+    const videoSeries = useMemo(() => {
+        if (Number(videoDetail.videoItem.id)) {
+            return <VideoSeriesSelect data={videoDetail.videoSerieses} videoID={Number(videoDetail.videoItem.id)} />
+        }
+        return null
+    }, [videoDetail])
+
+    const similarVideoList = useMemo(() => {
+        if (Number(videoDetail.videoItem.id)) {
+            return <SimilarVideoList data={videoDetail.similarVideos} />
+        }
+        return null
+    }, [videoDetail])
+    return (
+        <div style={{
+            display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
+        }}>
+            <div style={{
+                display: 'flex', flexDirection: 'column', padding: 10,
+                width: 1080, height: 891,
+            }}>
+                <VideoPlayer
+                    theme={videoDetail.videoItem.theme}
+                    videoID={videoDetail.videoItem.id}
+                    episodeID={videoDetail.episodeItem.id}
+                    url={videoDetail.episodeItem.url}
+                    subtitles={videoDetail.episodeItem.subtitles}
+                    height={"100%"}
+                    width={"100%"}
+                    autoplay={false}
+                    autoDestroy={false}
+                    currentTime={(Number(historyInfo?.subSourceID) !== 0 && Number(historyInfo?.subSourceID) === Number(videoDetail.episodeItem.id)) ? historyInfo?.currentTime : 0}
+                />
+                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
+                    <Img src={videoDetail.videoItem.cover} />
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingInline: 10 }} >
+                        <div style={{ textAlign: "left", fontSize: 18, padding: 10 }}> {videoDetail.videoItem.title}</div>
+                        <div style={{ textAlign: "left", paddingLeft: 10, paddingRight: 10 }}> 全{videoDetail.videoItem.episodes.length}话</div>
+                        <div style={{ textAlign: 'left', paddingLeft: 10, paddingRight: 10 }}>
+                            <TextArea
+                                value={videoDetail.videoItem.desc}
+                                rows={9}
+                                contentEditable={false}
+                                style={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0)',
+                                    border: 0,
+                                }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style={{ margin: 20, display: "flex", flexDirection: 'column', width: 350 }}>
+                <VideoSelect data={videoDetail.video?.episodes} num={videoDetail.num} />
+                <br />
+                {videoSeries}
+                {similarVideoList}
+            </div>
+        </div>)
+}

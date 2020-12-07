@@ -1,45 +1,21 @@
-import { useQuery } from '@apollo/react-hooks'
-import { message } from 'antd'
-import React, { FC, useEffect, useMemo } from 'react'
+import React, { FC, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import Img from 'src/components/img'
 import { AppPath } from 'src/consts/path'
-import { SIMILAR_VIDEOS } from 'src/gqls/video/query'
 import { VideoCardModel } from 'src/models/video'
-import { isMobile } from 'src/utils/util'
 
 interface ISimilarVideoListProps {
-    videoID: number
-    pageSize: number
+    data: any
 }
 
 const SimilarVideoList: FC<ISimilarVideoListProps> = ({
-    videoID,
-    pageSize
+    data
 }) => {
-    const { error, data } = useQuery(SIMILAR_VIDEOS,
-        {
-            variables: {
-                searchParam: {
-                    videoID: videoID,
-                    pageSize: pageSize,
-                    isMobile: isMobile()
-                }
-            }
-        }
-    )
-
-    useEffect(() => {
-        if (error) {
-            message.error("接口请求失败！")
-        }
-    }, [error])
-
     const history = useHistory()
     const videos: JSX.Element[] = useMemo(() => {
         if (data) {
-            return data.similarVideos.edges.map((video: VideoCardModel, index: number) => {
-                const link = AppPath.VIDEO_DETAIL + "?episode_id=" + video.episodeID
+            return data.map((video: VideoCardModel, index: number) => {
+                const link = AppPath.VIDEO_DETAIL + "?episode_id=" + video.episodeID + "&autoJump=true"
                 return (<div key={index}
                     onClick={() => history.push(link)}
                     style={{ display: "flex", cursor: "pointer", paddingBottom: 10 }}>

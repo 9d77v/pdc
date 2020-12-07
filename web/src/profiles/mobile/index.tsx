@@ -16,7 +16,7 @@ import { AppPath } from 'src/consts/path'
 import CalculatorMobile from './home/calculator'
 import VideoIndex from './video'
 import VideoList from './video/VideoList'
-import VideoDetail from './video/VideoDetail'
+import { EpisodePage } from './video/EpisodePage'
 import DeviceIndex from './device'
 import DeviceCameraDetail from './device/DeviceCameraDetail'
 import { GET_USER } from 'src/gqls/user/query'
@@ -62,7 +62,7 @@ const MobileIndex = () => {
                 <VideoList />
             </Route>
             <Route exact path={AppPath.VIDEO_DETAIL}  >
-                <VideoDetail />
+                <EpisodePage />
             </Route>
             <Route exact path={AppPath.HISTORY} >
                 <HistoryPage />

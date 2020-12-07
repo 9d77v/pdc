@@ -29,6 +29,7 @@ const DeviceCamera = () => {
                             url={`/hls/stream${t.deviceID}.m3u8`}
                             height={200}
                             width={280}
+                            autoplay={true}
                         />
                     </div>)
                 })

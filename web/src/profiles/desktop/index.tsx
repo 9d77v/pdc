@@ -16,12 +16,12 @@ import UpdateProfileForm from './app/user/UpdateFrofileForm'
 import UpdatePasswordForm from './app/user/UpdatePasswordForm'
 import Calculator from 'src/components/calculator'
 import VideoIndex from './app/video'
-import VideoDetail from './app/video/VideoDetail'
 import VideoSearch from './app/video/VideoSearch'
 import DeviceIndex from './admin/device/device-list'
 import DeviceTelemetry from './app/device/DeviceTelemetry'
 import DeviceCamera from './app/device/DeviceCamera'
 import { GET_USER } from 'src/gqls/user/query'
+import { EpisodePage } from './app/video/EpisodePage'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -66,7 +66,7 @@ const DesktopIndex = () => {
                                 <DeviceCamera />
                             </Route>
                             <Route exact path={AppPath.VIDEO_DETAIL}  >
-                                <VideoDetail />
+                                <EpisodePage />
                             </Route>
                             <Route exact path={AppPath.VIDEO_SUGGEST}>
                                 <VideoIndex />
