@@ -414,11 +414,14 @@ type PieLineSerieData struct {
 }
 
 type SearchParam struct {
-	Keyword  *string `json:"keyword"`
-	Page     *int64  `json:"page"`
-	PageSize *int64  `json:"pageSize"`
-	Ids      []int64 `json:"ids"`
-	Sorts    []*Sort `json:"sorts"`
+	Keyword  *string  `json:"keyword"`
+	Page     *int64   `json:"page"`
+	PageSize *int64   `json:"pageSize"`
+	Ids      []int64  `json:"ids"`
+	Tags     []string `json:"tags"`
+	Sorts    []*Sort  `json:"sorts"`
+	IsRandom *bool    `json:"isRandom"`
+	IsMobile *bool    `json:"isMobile"`
 }
 
 type SerieData struct {
@@ -555,15 +558,6 @@ type VideoIndexConnection struct {
 	AggResults []*AggResult  `json:"aggResults"`
 }
 
-type VideoSearchParam struct {
-	Keyword  *string  `json:"keyword"`
-	Tags     []string `json:"tags"`
-	Page     *int64   `json:"page"`
-	PageSize *int64   `json:"pageSize"`
-	IsRandom *bool    `json:"isRandom"`
-	IsMobile *bool    `json:"isMobile"`
-}
-
 type VideoSeries struct {
 	ID        int64              `json:"id"`
 	Name      string             `json:"name"`
@@ -584,10 +578,4 @@ type VideoSeriesItem struct {
 	Title         string `json:"title"`
 	Alias         string `json:"alias"`
 	Num           int64  `json:"num"`
-}
-
-type VideoSimilarParam struct {
-	VideoID  int64 `json:"videoID"`
-	PageSize int64 `json:"pageSize"`
-	IsMobile *bool `json:"isMobile"`
 }

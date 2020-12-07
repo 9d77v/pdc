@@ -25,5 +25,8 @@ input SearchParam{
     page: Int
     pageSize: Int
     ids:[ID!]
+    tags:[String!]
     sorts:[Sort!]
+    isRandom: Boolean
+    isMobile: Boolean
 }

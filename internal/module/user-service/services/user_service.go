@@ -62,7 +62,7 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) (*model.User, error) {
 	user := models.NewUser()
 	fields := s.GetInputFields(ctx)
-	if err := user.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(user, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -139,8 +139,8 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 	return res, nil
 }
 
-//GetByID ..
-func (s UserService) GetByID(ctx context.Context, uid int64) (*models.User, error) {
+//GetUserByID ..
+func (s UserService) GetUserByID(ctx context.Context, uid int64) (*models.User, error) {
 	user := models.NewUser()
 	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
 	err := redis.GetClient().Get(ctx, key).Scan(user)
@@ -161,7 +161,7 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 	user := models.NewUser()
 	fields := s.GetInputFields(ctx)
 	fields = append(fields, "id")
-	if err := user.GetByID(uid, fields); err != nil {
+	if err := s.GetByID(user, uid, fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{

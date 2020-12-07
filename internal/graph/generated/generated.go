@@ -258,18 +258,17 @@ type ComplexityRoot struct {
 		DeviceDashboards      func(childComplexity int, searchParam model.SearchParam) int
 		DeviceModels          func(childComplexity int, searchParam model.SearchParam) int
 		Devices               func(childComplexity int, searchParam model.SearchParam, deviceType *int64) int
-		Histories             func(childComplexity int, sourceType *int64, searchParam model.SearchParam) int
+		Histories             func(childComplexity int, sourceType *int64, searchParam model.SearchParam, subSourceID *int64) int
 		PresignedURL          func(childComplexity int, bucketName string, objectName string) int
-		SearchVideo           func(childComplexity int, searchParam model.VideoSearchParam) int
-		SimilarVideos         func(childComplexity int, searchParam model.VideoSimilarParam) int
+		SearchVideo           func(childComplexity int, searchParam model.SearchParam) int
+		SimilarVideos         func(childComplexity int, searchParam model.SearchParam, episodeID int64) int
 		ThingAnalyze          func(childComplexity int, dimension string, index string, start *int64, group string) int
 		ThingSeries           func(childComplexity int, dimension string, index string, start *int64, end *int64, status []int64) int
 		Things                func(childComplexity int, searchParam model.SearchParam) int
 		UserInfo              func(childComplexity int, uid *int64) int
 		Users                 func(childComplexity int, searchParam model.SearchParam) int
-		VideoDetail           func(childComplexity int, episodeID int64) int
-		VideoSerieses         func(childComplexity int, searchParam model.SearchParam) int
-		Videos                func(childComplexity int, searchParam model.SearchParam, isFilterVideoSeries *bool) int
+		VideoSerieses         func(childComplexity int, searchParam model.SearchParam, episodeID *int64) int
+		Videos                func(childComplexity int, searchParam model.SearchParam, isFilterVideoSeries *bool, episodeID *int64) int
 	}
 
 	SerieData struct {
@@ -467,15 +466,14 @@ type QueryResolver interface {
 	PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error)
 	Users(ctx context.Context, searchParam model.SearchParam) (*model.UserConnection, error)
 	UserInfo(ctx context.Context, uid *int64) (*model.User, error)
-	Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool) (*model.VideoConnection, error)
-	VideoDetail(ctx context.Context, episodeID int64) (*model.VideoDetail, error)
-	VideoSerieses(ctx context.Context, searchParam model.SearchParam) (*model.VideoSeriesConnection, error)
-	SearchVideo(ctx context.Context, searchParam model.VideoSearchParam) (*model.VideoIndexConnection, error)
-	SimilarVideos(ctx context.Context, searchParam model.VideoSimilarParam) (*model.VideoIndexConnection, error)
+	Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool, episodeID *int64) (*model.VideoConnection, error)
+	VideoSerieses(ctx context.Context, searchParam model.SearchParam, episodeID *int64) (*model.VideoSeriesConnection, error)
+	SearchVideo(ctx context.Context, searchParam model.SearchParam) (*model.VideoIndexConnection, error)
+	SimilarVideos(ctx context.Context, searchParam model.SearchParam, episodeID int64) (*model.VideoIndexConnection, error)
 	Things(ctx context.Context, searchParam model.SearchParam) (*model.ThingConnection, error)
 	ThingSeries(ctx context.Context, dimension string, index string, start *int64, end *int64, status []int64) ([]*model.SerieData, error)
 	ThingAnalyze(ctx context.Context, dimension string, index string, start *int64, group string) (*model.PieLineSerieData, error)
-	Histories(ctx context.Context, sourceType *int64, searchParam model.SearchParam) (*model.HistoryConnection, error)
+	Histories(ctx context.Context, sourceType *int64, searchParam model.SearchParam, subSourceID *int64) (*model.HistoryConnection, error)
 	DeviceModels(ctx context.Context, searchParam model.SearchParam) (*model.DeviceModelConnection, error)
 	Devices(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (*model.DeviceConnection, error)
 	DeviceDashboards(ctx context.Context, searchParam model.SearchParam) (*model.DeviceDashboardConnection, error)
@@ -1796,7 +1794,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Histories(childComplexity, args["sourceType"].(*int64), args["searchParam"].(model.SearchParam)), true
+		return e.complexity.Query.Histories(childComplexity, args["sourceType"].(*int64), args["searchParam"].(model.SearchParam), args["subSourceID"].(*int64)), true
 
 	case "Query.presignedUrl":
 		if e.complexity.Query.PresignedURL == nil {
@@ -1820,7 +1818,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.SearchVideo(childComplexity, args["searchParam"].(model.VideoSearchParam)), true
+		return e.complexity.Query.SearchVideo(childComplexity, args["searchParam"].(model.SearchParam)), true
 
 	case "Query.similarVideos":
 		if e.complexity.Query.SimilarVideos == nil {
@@ -1832,7 +1830,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.SimilarVideos(childComplexity, args["searchParam"].(model.VideoSimilarParam)), true
+		return e.complexity.Query.SimilarVideos(childComplexity, args["searchParam"].(model.SearchParam), args["episodeID"].(int64)), true
 
 	case "Query.thingAnalyze":
 		if e.complexity.Query.ThingAnalyze == nil {
@@ -1894,18 +1892,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Users(childComplexity, args["searchParam"].(model.SearchParam)), true
 
-	case "Query.videoDetail":
-		if e.complexity.Query.VideoDetail == nil {
-			break
-		}
-
-		args, err := ec.field_Query_videoDetail_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.VideoDetail(childComplexity, args["episodeID"].(int64)), true
-
 	case "Query.videoSerieses":
 		if e.complexity.Query.VideoSerieses == nil {
 			break
@@ -1916,7 +1902,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.VideoSerieses(childComplexity, args["searchParam"].(model.SearchParam)), true
+		return e.complexity.Query.VideoSerieses(childComplexity, args["searchParam"].(model.SearchParam), args["episodeID"].(*int64)), true
 
 	case "Query.videos":
 		if e.complexity.Query.Videos == nil {
@@ -1928,7 +1914,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Videos(childComplexity, args["searchParam"].(model.SearchParam), args["isFilterVideoSeries"].(*bool)), true
+		return e.complexity.Query.Videos(childComplexity, args["searchParam"].(model.SearchParam), args["isFilterVideoSeries"].(*bool), args["episodeID"].(*int64)), true
 
 	case "SerieData.name":
 		if e.complexity.SerieData.Name == nil {
@@ -2721,7 +2707,10 @@ input SearchParam{
     page: Int
     pageSize: Int
     ids:[ID!]
+    tags:[String!]
     sorts:[Sort!]
+    isRandom: Boolean
+    isMobile: Boolean
 }`, BuiltIn: false},
 	&ast.Source{Name: "api/graph/device.graphql", Input: `type DeviceModel {
   id: ID!
@@ -2987,17 +2976,16 @@ type Query {
   users(searchParam:SearchParam!):UserConnection!
   userInfo(uid:ID):User!
 
-  videos(searchParam:SearchParam!,isFilterVideoSeries:Boolean):VideoConnection!
-  videoDetail(episodeID:ID!):VideoDetail!
-  videoSerieses(searchParam:SearchParam!):VideoSeriesConnection!
-  searchVideo(searchParam:VideoSearchParam!):VideoIndexConnection!
-  similarVideos(searchParam:VideoSimilarParam!):VideoIndexConnection!
+  videos(searchParam:SearchParam!,isFilterVideoSeries:Boolean,episodeID:ID):VideoConnection!
+  videoSerieses(searchParam:SearchParam!,episodeID:ID):VideoSeriesConnection!
+  searchVideo(searchParam:SearchParam!):VideoIndexConnection!
+  similarVideos(searchParam:SearchParam!,episodeID:ID!):VideoIndexConnection!
 
   things(searchParam:SearchParam!):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 
-  histories(sourceType:Int,searchParam:SearchParam!):HistoryConnection! 
+  histories(sourceType:Int,searchParam:SearchParam!,subSourceID:ID):HistoryConnection! 
   
   deviceModels(searchParam:SearchParam!):DeviceModelConnection!
   devices(searchParam:SearchParam!,deviceType: Int):DeviceConnection!
@@ -3336,21 +3324,6 @@ type VideoIndexConnection {
   totalCount: Int!
   edges:[VideoIndex!]!
   aggResults:[AggResult!]
-}
-
-input VideoSearchParam{
-  keyword: String
-  tags:[String!]
-  page: Int
-  pageSize: Int
-  isRandom: Boolean
-  isMobile: Boolean
-}
-
-input VideoSimilarParam{
-  videoID:ID!
-  pageSize:Int!
-  isMobile: Boolean
 }
 
 type VideoDetail{
@@ -4011,6 +3984,14 @@ func (ec *executionContext) field_Query_histories_args(ctx context.Context, rawA
 		}
 	}
 	args["searchParam"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["subSourceID"]; ok {
+		arg2, err = ec.unmarshalOID2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["subSourceID"] = arg2
 	return args, nil
 }
 
@@ -4039,9 +4020,9 @@ func (ec *executionContext) field_Query_presignedUrl_args(ctx context.Context, r
 func (ec *executionContext) field_Query_searchVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.VideoSearchParam
+	var arg0 model.SearchParam
 	if tmp, ok := rawArgs["searchParam"]; ok {
-		arg0, err = ec.unmarshalNVideoSearchParam2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSearchParam(ctx, tmp)
+		arg0, err = ec.unmarshalNSearchParam2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐSearchParam(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4053,14 +4034,22 @@ func (ec *executionContext) field_Query_searchVideo_args(ctx context.Context, ra
 func (ec *executionContext) field_Query_similarVideos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.VideoSimilarParam
+	var arg0 model.SearchParam
 	if tmp, ok := rawArgs["searchParam"]; ok {
-		arg0, err = ec.unmarshalNVideoSimilarParam2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSimilarParam(ctx, tmp)
+		arg0, err = ec.unmarshalNSearchParam2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐSearchParam(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["searchParam"] = arg0
+	var arg1 int64
+	if tmp, ok := rawArgs["episodeID"]; ok {
+		arg1, err = ec.unmarshalNID2int64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["episodeID"] = arg1
 	return args, nil
 }
 
@@ -4190,20 +4179,6 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_videoDetail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 int64
-	if tmp, ok := rawArgs["episodeID"]; ok {
-		arg0, err = ec.unmarshalNID2int64(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["episodeID"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_videoSerieses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -4215,6 +4190,14 @@ func (ec *executionContext) field_Query_videoSerieses_args(ctx context.Context, 
 		}
 	}
 	args["searchParam"] = arg0
+	var arg1 *int64
+	if tmp, ok := rawArgs["episodeID"]; ok {
+		arg1, err = ec.unmarshalOID2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["episodeID"] = arg1
 	return args, nil
 }
 
@@ -4237,6 +4220,14 @@ func (ec *executionContext) field_Query_videos_args(ctx context.Context, rawArgs
 		}
 	}
 	args["isFilterVideoSeries"] = arg1
+	var arg2 *int64
+	if tmp, ok := rawArgs["episodeID"]; ok {
+		arg2, err = ec.unmarshalOID2ᚖint64(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["episodeID"] = arg2
 	return args, nil
 }
 
@@ -9727,7 +9718,7 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Videos(rctx, args["searchParam"].(model.SearchParam), args["isFilterVideoSeries"].(*bool))
+		return ec.resolvers.Query().Videos(rctx, args["searchParam"].(model.SearchParam), args["isFilterVideoSeries"].(*bool), args["episodeID"].(*int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9742,47 +9733,6 @@ func (ec *executionContext) _Query_videos(ctx context.Context, field graphql.Col
 	res := resTmp.(*model.VideoConnection)
 	fc.Result = res
 	return ec.marshalNVideoConnection2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoConnection(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Query_videoDetail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:   "Query",
-		Field:    field,
-		Args:     nil,
-		IsMethod: true,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_videoDetail_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().VideoDetail(rctx, args["episodeID"].(int64))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.VideoDetail)
-	fc.Result = res
-	return ec.marshalNVideoDetail2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoDetail(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_videoSerieses(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -9809,7 +9759,7 @@ func (ec *executionContext) _Query_videoSerieses(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().VideoSerieses(rctx, args["searchParam"].(model.SearchParam))
+		return ec.resolvers.Query().VideoSerieses(rctx, args["searchParam"].(model.SearchParam), args["episodeID"].(*int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9850,7 +9800,7 @@ func (ec *executionContext) _Query_searchVideo(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SearchVideo(rctx, args["searchParam"].(model.VideoSearchParam))
+		return ec.resolvers.Query().SearchVideo(rctx, args["searchParam"].(model.SearchParam))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9891,7 +9841,7 @@ func (ec *executionContext) _Query_similarVideos(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().SimilarVideos(rctx, args["searchParam"].(model.VideoSimilarParam))
+		return ec.resolvers.Query().SimilarVideos(rctx, args["searchParam"].(model.SearchParam), args["episodeID"].(int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10055,7 +10005,7 @@ func (ec *executionContext) _Query_histories(ctx context.Context, field graphql.
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Histories(rctx, args["sourceType"].(*int64), args["searchParam"].(model.SearchParam))
+		return ec.resolvers.Query().Histories(rctx, args["sourceType"].(*int64), args["searchParam"].(model.SearchParam), args["subSourceID"].(*int64))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16061,9 +16011,27 @@ func (ec *executionContext) unmarshalInputSearchParam(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
+		case "tags":
+			var err error
+			it.Tags, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "sorts":
 			var err error
 			it.Sorts, err = ec.unmarshalOSort2ᚕᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐSortᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isRandom":
+			var err error
+			it.IsRandom, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "isMobile":
+			var err error
+			it.IsMobile, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16088,84 +16056,6 @@ func (ec *executionContext) unmarshalInputSort(ctx context.Context, obj interfac
 		case "isAsc":
 			var err error
 			it.IsAsc, err = ec.unmarshalNBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputVideoSearchParam(ctx context.Context, obj interface{}) (model.VideoSearchParam, error) {
-	var it model.VideoSearchParam
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "keyword":
-			var err error
-			it.Keyword, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "tags":
-			var err error
-			it.Tags, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "page":
-			var err error
-			it.Page, err = ec.unmarshalOInt2ᚖint64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pageSize":
-			var err error
-			it.PageSize, err = ec.unmarshalOInt2ᚖint64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isRandom":
-			var err error
-			it.IsRandom, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isMobile":
-			var err error
-			it.IsMobile, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputVideoSimilarParam(ctx context.Context, obj interface{}) (model.VideoSimilarParam, error) {
-	var it model.VideoSimilarParam
-	var asMap = obj.(map[string]interface{})
-
-	for k, v := range asMap {
-		switch k {
-		case "videoID":
-			var err error
-			it.VideoID, err = ec.unmarshalNID2int64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "pageSize":
-			var err error
-			it.PageSize, err = ec.unmarshalNInt2int64(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "isMobile":
-			var err error
-			it.IsMobile, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17417,20 +17307,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_videos(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			})
-		case "videoDetail":
-			field := field
-			out.Concurrently(i, func() (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_videoDetail(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -19821,20 +19697,6 @@ func (ec *executionContext) marshalNVideoConnection2ᚖgithubᚗcomᚋ9d77vᚋpd
 	return ec._VideoConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNVideoDetail2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoDetail(ctx context.Context, sel ast.SelectionSet, v model.VideoDetail) graphql.Marshaler {
-	return ec._VideoDetail(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNVideoDetail2ᚖgithubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoDetail(ctx context.Context, sel ast.SelectionSet, v *model.VideoDetail) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	return ec._VideoDetail(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNVideoIndex2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoIndex(ctx context.Context, sel ast.SelectionSet, v model.VideoIndex) graphql.Marshaler {
 	return ec._VideoIndex(ctx, sel, &v)
 }
@@ -19898,10 +19760,6 @@ func (ec *executionContext) marshalNVideoIndexConnection2ᚖgithubᚗcomᚋ9d77v
 		return graphql.Null
 	}
 	return ec._VideoIndexConnection(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNVideoSearchParam2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSearchParam(ctx context.Context, v interface{}) (model.VideoSearchParam, error) {
-	return ec.unmarshalInputVideoSearchParam(ctx, v)
 }
 
 func (ec *executionContext) marshalNVideoSeries2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSeries(ctx context.Context, sel ast.SelectionSet, v model.VideoSeries) graphql.Marshaler {
@@ -20018,10 +19876,6 @@ func (ec *executionContext) marshalNVideoSeriesItem2ᚖgithubᚗcomᚋ9d77vᚋpd
 		return graphql.Null
 	}
 	return ec._VideoSeriesItem(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNVideoSimilarParam2githubᚗcomᚋ9d77vᚋpdcᚋinternalᚋgraphᚋmodelᚐVideoSimilarParam(ctx context.Context, v interface{}) (model.VideoSimilarParam, error) {
-	return ec.unmarshalInputVideoSimilarParam(ctx, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

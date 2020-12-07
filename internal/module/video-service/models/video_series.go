@@ -29,11 +29,6 @@ func (m *VideoSeries) TableName() string {
 	return db.TablePrefix() + "video_series"
 }
 
-//GetByID Get video by id
-func (m *VideoSeries) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}
-
 //AddItemsToList ..
 func (m *VideoSeries) AddItemsToList(data []*VideoSeries, items []*VideoSeriesItem) {
 	itemMap := make(map[uint][]*VideoSeriesItem)

@@ -18,8 +18,3 @@ func NewAttributeModel() *AttributeModel {
 	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
-
-//GetByID ..
-func (m *AttributeModel) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}

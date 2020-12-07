@@ -12,6 +12,7 @@ import (
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/history-service/models"
+	video "github.com/9d77v/pdc/internal/module/video-service/models"
 )
 
 //HistoryService ..
@@ -72,13 +73,24 @@ func (s HistoryService) GetHistory(ctx context.Context,
 
 //ListHistory ..
 func (s HistoryService) ListHistory(ctx context.Context,
-	sourceType *int64, searchParam model.SearchParam, uid uint, scheme string) (int64, []*model.History, error) {
+	sourceType *int64, searchParam model.SearchParam, subSourceID *int64, uid uint, scheme string) (int64, []*model.History, error) {
 	history := models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
+
+	var sourceID uint
+	if ptrs.Int64(subSourceID) > 0 {
+		sourceID = video.NewEpisode().GetVideoIDByID(uint(ptrs.Int64(subSourceID)))
+		if sourceID == 0 {
+			return 0, []*model.History{}, nil
+		}
+	}
 	replaceFunc := func(edgeField base.GraphQLField) error {
 		tableHistory := history.TableName()
 		switch ptrs.Int64(sourceType) {
 		case 1:
+			if sourceID > 0 {
+				history.Where("source_id=?", sourceID)
+			}
 			history.
 				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time",
 					"remaining_time", "platform",

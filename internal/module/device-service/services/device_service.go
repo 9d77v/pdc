@@ -54,7 +54,7 @@ func (s DeviceService) UpdateDeviceModel(ctx context.Context,
 	input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
 	deviceModel := models.NewDeviceModel()
 	fields := s.GetInputFields(ctx)
-	if err := deviceModel.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(deviceModel, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -83,7 +83,7 @@ func (s DeviceService) CreateAttributeModel(ctx context.Context, input model.New
 func (s DeviceService) UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error) {
 	attributeModel := models.NewAttributeModel()
 	fields := s.GetInputFields(ctx)
-	if err := attributeModel.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(attributeModel, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -126,7 +126,7 @@ func (s DeviceService) UpdateTelemetryModel(ctx context.Context,
 	input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
 	telemetryModel := models.NewTelemetryModel()
 	fields := s.GetInputFields(ctx)
-	if err := telemetryModel.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(telemetryModel, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{
@@ -358,7 +358,7 @@ func (s DeviceService) CreateDeviceDashboard(ctx context.Context,
 func (s DeviceService) UpdateDeviceDashboard(ctx context.Context, input model.NewUpdateDeviceDashboard) (*model.DeviceDashboard, error) {
 	deviceDashboard := models.NewDeviceDashboard()
 	fields := s.GetInputFields(ctx)
-	if err := deviceDashboard.GetByID(uint(input.ID), fields); err != nil {
+	if err := s.GetByID(deviceDashboard, uint(input.ID), fields); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{

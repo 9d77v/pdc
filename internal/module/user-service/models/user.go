@@ -45,11 +45,6 @@ func (m *User) UnmarshalBinary(data []byte) error {
 	return json.Unmarshal(data, m)
 }
 
-//GetByID Get User by id
-func (m *User) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}
-
 //GenerateAdminAccount ..
 func (m *User) GenerateAdminAccount(ownerName, ownerPassword string) {
 	var total int64

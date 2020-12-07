@@ -48,7 +48,7 @@ func (s ThingService) CreateThing(ctx context.Context, input model.NewThing, uid
 func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThing, uid uint) (*model.Thing, error) {
 	thing := models.NewThing()
 	fields := s.GetInputFields(ctx)
-	if err := thing.GetByID(uint(input.ID), uid, fields); err != nil {
+	if err := thing.Select(fields).IDQuery(uint(input.ID)).IDQuery(uid, "uid").First(thing); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{

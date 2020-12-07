@@ -22,8 +22,3 @@ func NewTelemetryModel() *TelemetryModel {
 	vs.DefaultModel = base.NewDefaultModel()
 	return vs
 }
-
-//GetByID ..
-func (m *TelemetryModel) GetByID(id uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).First(m)
-}

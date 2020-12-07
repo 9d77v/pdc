@@ -35,11 +35,6 @@ func NewThing() *Thing {
 	return vs
 }
 
-//GetByID ..
-func (m *Thing) GetByID(id, uid uint, columns []string) error {
-	return m.Select(columns).IDQuery(id).IDQuery(uid, "uid").First(m)
-}
-
 //PieLineSerie ..
 type PieLineSerie struct {
 	X1 string  `json:"x1"`

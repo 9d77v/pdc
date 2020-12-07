@@ -8,17 +8,16 @@ type Query {
   users(searchParam:SearchParam!):UserConnection!
   userInfo(uid:ID):User!
 
-  videos(searchParam:SearchParam!,isFilterVideoSeries:Boolean):VideoConnection!
-  videoDetail(episodeID:ID!):VideoDetail!
-  videoSerieses(searchParam:SearchParam!):VideoSeriesConnection!
-  searchVideo(searchParam:VideoSearchParam!):VideoIndexConnection!
-  similarVideos(searchParam:VideoSimilarParam!):VideoIndexConnection!
+  videos(searchParam:SearchParam!,isFilterVideoSeries:Boolean,episodeID:ID):VideoConnection!
+  videoSerieses(searchParam:SearchParam!,episodeID:ID):VideoSeriesConnection!
+  searchVideo(searchParam:SearchParam!):VideoIndexConnection!
+  similarVideos(searchParam:SearchParam!,episodeID:ID!):VideoIndexConnection!
 
   things(searchParam:SearchParam!):ThingConnection!
   thingSeries(dimension:String!,index:String!,start:Int,end:Int, status:[Int!]):[SerieData!]!
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 
-  histories(sourceType:Int,searchParam:SearchParam!):HistoryConnection! 
+  histories(sourceType:Int,searchParam:SearchParam!,subSourceID:ID):HistoryConnection! 
   
   deviceModels(searchParam:SearchParam!):DeviceModelConnection!
   devices(searchParam:SearchParam!,deviceType: Int):DeviceConnection!
