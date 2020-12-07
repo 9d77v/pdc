@@ -33,3 +33,8 @@ func NewVideo() *Video {
 func (m *Video) TableName() string {
 	return db.TablePrefix() + "video"
 }
+
+//FilterVideoSeries filter video which in video_series_item table
+func (m *Video) FilterVideoSeries() {
+	m.Where("id NOT in (select video_id from " + new(VideoSeriesItem).TableName() + " where video_id=id)")
+}

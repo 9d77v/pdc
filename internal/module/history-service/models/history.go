@@ -7,6 +7,12 @@ import (
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
+//history category
+const (
+	HistoryNull = iota
+	HistoryVideo
+)
+
 //History 历史记录
 type History struct {
 	*base.Model

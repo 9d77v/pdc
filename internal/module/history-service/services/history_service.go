@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"log"
 	"time"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/history-service/models"
-	video "github.com/9d77v/pdc/internal/module/video-service/models"
 )
 
 //HistoryService ..
@@ -76,34 +74,18 @@ func (s HistoryService) ListHistory(ctx context.Context,
 	sourceType *int64, searchParam model.SearchParam, subSourceID *int64, uid uint, scheme string) (int64, []*model.History, error) {
 	history := models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
-
 	var sourceID uint
+	historyer := models.CreateHistory(sourceType)
 	if ptrs.Int64(subSourceID) > 0 {
-		sourceID = video.NewEpisode().GetVideoIDByID(uint(ptrs.Int64(subSourceID)))
+		sourceID = historyer.GetSourceID(subSourceID)
 		if sourceID == 0 {
 			return 0, []*model.History{}, nil
 		}
 	}
 	replaceFunc := func(edgeField base.GraphQLField) error {
 		tableHistory := history.TableName()
-		switch ptrs.Int64(sourceType) {
-		case 1:
-			if sourceID > 0 {
-				history.Where("source_id=?", sourceID)
-			}
-			history.
-				Select([]string{"uid", "source_type", "source_id", "sub_source_id", "current_time",
-					"remaining_time", "platform",
-					"cast(EXTRACT(epoch FROM CAST( " +
-						tableHistory + ".updated_at AS TIMESTAMP)) as bigint) updated_at",
-					"b.title", "b.cover", "c.num", "c.title sub_title"}).
-				LeftJoin("pdc_video b ON " + tableHistory + ".source_id=b.id").
-				LeftJoin("pdc_episode c on " + tableHistory + ".sub_source_id=c.id")
-		default:
-			return errors.New("sourceType not exist")
-		}
 		history.Order("updated_at desc")
-		return nil
+		return historyer.JoinSource(history, tableHistory, sourceID)
 	}
 	data := make([]*model.History, 0)
 	total, err := s.GetConnection(ctx, history, searchParam, &data, replaceFunc)

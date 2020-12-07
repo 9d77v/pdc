@@ -31,7 +31,7 @@ func updateDeviceAttributes(iotSDK *sdk.IotSDK) {
 	device := iotSDK.DeviceInfo
 	cameraDeviceMap := make(map[string]string, 0)
 
-	c := newCameraer(device)
+	c := createCameraer(device)
 	cameraDeviceMap = c.GetDeviceInfo()
 	attributeMap := make(map[uint32]string, 0)
 	for k, v := range cameraDeviceMap {
@@ -63,7 +63,7 @@ func cameraMsgHandler(iotSDK *sdk.IotSDK, msg []byte) {
 
 func handleCameraCaptureMsg(iotSDK *sdk.IotSDK, msg *pb.CameraCaptureMsg) {
 	device := iotSDK.DeviceInfo
-	c := newCameraer(device)
+	c := createCameraer(device)
 	picture := c.Capture()
 	captureOk := false
 	err := iotSDK.SavePicture(sdk.PictureRequest{
@@ -82,7 +82,7 @@ func handleCameraCaptureMsg(iotSDK *sdk.IotSDK, msg *pb.CameraCaptureMsg) {
 
 func handlePresignedURLReplyMsg(iotSDK *sdk.IotSDK, msg *pb.PresignedUrlReplyMsg) {
 	device := iotSDK.DeviceInfo
-	c := newCameraer(device)
+	c := createCameraer(device)
 	picture := c.Capture()
 	err := iotSDK.SavePicture(sdk.PictureRequest{
 		RequestURL:      msg.GetPictureUrl(),
@@ -95,7 +95,7 @@ func handlePresignedURLReplyMsg(iotSDK *sdk.IotSDK, msg *pb.PresignedUrlReplyMsg
 	}
 }
 
-func newCameraer(device *pb.LoginReplyMsg) camera.Cameraer {
+func createCameraer(device *pb.LoginReplyMsg) camera.Cameraer {
 	var c camera.Cameraer
 	switch device.CameraCompany {
 	case camera.CameraCompanyHikvision:

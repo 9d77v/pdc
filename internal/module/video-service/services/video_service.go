@@ -224,12 +224,11 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
-	scheme string, isCombo *bool, episodeID *int64) (int64, []*model.Video, error) {
+	scheme string, isFilterVideoSeries *bool, episodeID *int64) (int64, []*model.Video, error) {
 	video := models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
-	fmt.Println(searchParam)
-	if ptrs.Bool(isCombo) {
-		video.Where("id NOT in (select video_id from " + new(models.VideoSeriesItem).TableName() + " where video_id=id)")
+	if ptrs.Bool(isFilterVideoSeries) {
+		video.FilterVideoSeries()
 	}
 	if ptrs.Int64(episodeID) > 0 {
 		videoID := models.NewEpisode().GetVideoIDByID(uint(ptrs.Int64(episodeID)))
@@ -238,7 +237,6 @@ func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchPar
 		}
 		searchParam.Ids = []int64{int64(videoID)}
 	}
-	fmt.Println(searchParam)
 	replaceFunc := func(edgeField base.GraphQLField) error {
 		if edgeField.FieldMap["episodes"] {
 			video.Preload("Episodes", func(db *gorm.DB) *gorm.DB {

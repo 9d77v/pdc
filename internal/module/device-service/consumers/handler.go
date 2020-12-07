@@ -23,7 +23,7 @@ type msgHandler interface {
 	handleMsg(deviceMsg *pb.DeviceUpMsg)
 }
 
-func newMsgHandler(deviceMsg *pb.DeviceUpMsg) (msgHandler, error) {
+func createMsgHandler(deviceMsg *pb.DeviceUpMsg) (msgHandler, error) {
 	switch deviceMsg.Payload.(type) {
 	case *pb.DeviceUpMsg_CameraCaptureReplyMsg:
 		return &cameraCaptureReplyMsg{}, nil
@@ -42,7 +42,7 @@ type dataHandler interface {
 	sendData(deviceMsg *pb.DeviceUpMsg)
 }
 
-func newDataHandler(deviceMsg *pb.DeviceUpMsg) (dataHandler, error) {
+func createDataHandler(deviceMsg *pb.DeviceUpMsg) (dataHandler, error) {
 	switch deviceMsg.Payload.(type) {
 	case *pb.DeviceUpMsg_SetTelemetriesMsg:
 		return &setTelemetriesMsg{}, nil
@@ -66,7 +66,7 @@ func HandleDeviceMsg(m *stan.Msg) {
 	if deviceMsg.Payload == nil {
 		return
 	}
-	handler, err := newMsgHandler(deviceMsg)
+	handler, err := createMsgHandler(deviceMsg)
 	if err != nil {
 		log.Println("handle device msg failed:", err)
 		return
@@ -82,7 +82,7 @@ func PublishDeviceData(m *stan.Msg) {
 		log.Println("unmarshal data error")
 		return
 	}
-	handler, err := newDataHandler(deviceMsg)
+	handler, err := createDataHandler(deviceMsg)
 	if err != nil {
 		log.Println("publish data failed:", err)
 		return
