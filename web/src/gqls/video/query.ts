@@ -36,7 +36,7 @@ const LIST_VIDEO = gql`
 `;
 
 const LIST_VIDEO_CARD = gql`
- query searchVideo($searchParam:VideoSearchParam!) {
+ query searchVideo($searchParam:SearchParam!) {
    searchVideo(searchParam:$searchParam){
        edges{
             id
@@ -56,7 +56,7 @@ const LIST_VIDEO_CARD = gql`
 `;
 
 const GET_VIDEO_TAGS = gql`
- query searchVideo($searchParam:VideoSearchParam!) {
+ query searchVideo($searchParam:SearchParam!) {
    searchVideo(searchParam:$searchParam){
     aggResults{
          key
@@ -67,23 +67,8 @@ const GET_VIDEO_TAGS = gql`
 `;
 
 const VIDEO_RANDOM_TAG_SUGGEST = gql`
-    query searchVideo($searchParam:VideoSearchParam!) {
+    query searchVideo($searchParam:SearchParam!) {
    searchVideo(searchParam:$searchParam){
-       edges{
-            id
-            title
-            desc
-            cover
-            totalNum
-            episodeID
-       }
-   }
-  }
-`;
-
-const SIMILAR_VIDEOS = gql`
- query similarVideos($searchParam:VideoSimilarParam!) {
-   similarVideos(searchParam:$searchParam){
        edges{
             id
             title
@@ -108,9 +93,21 @@ const VIDEO_COMBO = gql`
 `;
 
 const GET_VIDEO_DETAIL = gql`
-query videoDetail($episodeID: ID!) {
-  videoDetail(episodeID: $episodeID) {
-    video {
+query videoDetail(
+  $similiarVideoParam: SearchParam!
+  $searchParam: SearchParam!
+  $episodeID: ID!
+) {
+  histories(sourceType: 1, searchParam: $searchParam, subSourceID: $episodeID) {
+    edges {
+      subSourceID
+      currentTime
+      remainingTime
+      updatedAt
+    }
+  }
+  videos(searchParam: $searchParam, episodeID: $episodeID) {
+    edges {
       id
       title
       desc
@@ -131,7 +128,9 @@ query videoDetail($episodeID: ID!) {
       tags
       theme
     }
-    videoSerieses {
+  }
+  videoSerieses(searchParam: $searchParam, episodeID: $episodeID) {
+    edges {
       id
       name
       items {
@@ -141,14 +140,19 @@ query videoDetail($episodeID: ID!) {
         episodeID
       }
     }
-    historyInfo {
-      subSourceID
-      currentTime
-      remainingTime
-      updatedAt
+  }
+  similarVideos(searchParam: $similiarVideoParam, episodeID: $episodeID) {
+    edges {
+      id
+      title
+      desc
+      cover
+      totalNum
+      episodeID
     }
   }
 }
+
 `;
 
 const LIST_VIDEO_SERIES = gql`
@@ -174,6 +178,6 @@ const LIST_VIDEO_SERIES = gql`
 
 export {
   LIST_VIDEO, VIDEO_COMBO, LIST_VIDEO_CARD, GET_VIDEO_DETAIL,
-  GET_VIDEO_TAGS, VIDEO_RANDOM_TAG_SUGGEST, SIMILAR_VIDEOS,
+  GET_VIDEO_TAGS, VIDEO_RANDOM_TAG_SUGGEST,
   LIST_VIDEO_SERIES
 }

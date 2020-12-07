@@ -15,7 +15,6 @@ import { SubtitleUpdateForm } from './SubtitleUpdateForm'
 import Search from 'antd/lib/input/Search'
 import { useHistory } from 'react-router-dom'
 import { AdminPath } from 'src/consts/path'
-import { IUpdateVideo } from 'src/models/video'
 import { ADD_EPISODE, SAVE_SUBTITLES, UPDATE_EPISODE, UPDATE_VIDEO } from 'src/gqls/video/mutation'
 import { LIST_VIDEO } from 'src/gqls/video/query'
 
