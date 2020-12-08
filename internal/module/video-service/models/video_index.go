@@ -24,7 +24,7 @@ type VideoIndex struct {
 }
 
 //GetByID ..
-func (v *VideoIndex) GetByID(id string) error {
+func (v *VideoIndex) GetByID(id uint) error {
 	tableEpisode := new(Episode).TableName()
 	return buildSQL().
 		LeftJoin("(select video_id,count(video_id) total_num from "+tableEpisode+" where video_id=? group by video_id) b on a.id=b.video_id", id).

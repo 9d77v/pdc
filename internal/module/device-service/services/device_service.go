@@ -547,8 +547,8 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 
 //CameraTimeLapseVideos ..
 func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
-	deviceID int64, scheme string) (int64, []*model.CameraTimeLapseVideo, error) {
-	result := make([]*model.CameraTimeLapseVideo, 0)
+	deviceID int64, scheme string) (*model.CameraTimeLapseVideoConnection, error) {
+	result := new(model.CameraTimeLapseVideoConnection)
 	data := make([]*models.CameraTimeLapseVideo, 0)
 	field := base.NewGraphQLField(ctx, "")
 	camera := models.NewCameraTimeLapseVideo()
@@ -564,8 +564,10 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 			Order("id DESC").
 			Find(&data)
 		if err != nil {
-			return 0, result, err
+			return result, err
 		}
 	}
-	return total, s.getCameraTimeLapseVideos(data, scheme), nil
+	result.Edges = s.getCameraTimeLapseVideos(data, scheme)
+	result.TotalCount = total
+	return result, nil
 }

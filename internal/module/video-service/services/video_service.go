@@ -4,20 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
-	"strconv"
 	"time"
 
 	"github.com/9d77v/go-lib/ptrs"
 	"gorm.io/gorm"
 
 	"github.com/9d77v/pdc/internal/db/db"
-	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
-
-	"github.com/9d77v/pdc/internal/utils"
 )
 
 //VideoService ..
@@ -395,10 +390,13 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 	return total, s.getVideoSerieses(data), nil
 }
 
-func sendMsgToUpdateES(videoID int64) {
-	guid, err := mq.GetClient().PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
-		utils.AckHandler)
-	if err != nil {
-		log.Println("mq publish failed,guid:", guid, " error:", err)
-	}
+//SearchVideo ..
+func (s VideoService) SearchVideo(ctx context.Context,
+	searchParam model.SearchParam, scheme string) (*model.VideoIndexConnection, error) {
+	return newVideoSearch(ctx, searchParam, scheme).execute()
+}
+
+//SimilarVideos ..
+func (s VideoService) SimilarVideos(ctx context.Context, searchParam model.SearchParam, episodeID int64, scheme string) (*model.VideoIndexConnection, error) {
+	return newVideoSuggest(ctx, searchParam, episodeID, scheme).execute()
 }

@@ -207,21 +207,13 @@ func (r *queryResolver) VideoSerieses(ctx context.Context, searchParam model.Sea
 }
 
 func (r *queryResolver) SearchVideo(ctx context.Context, searchParam model.SearchParam) (*model.VideoIndexConnection, error) {
-	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, aggResults, err := videoSearch.ListVideoIndex(ctx, searchParam, scheme)
-	con.TotalCount = total
-	con.Edges = data
-	con.AggResults = aggResults
-	return con, err
+	return videoService.SearchVideo(ctx, searchParam, scheme)
 }
 
 func (r *queryResolver) SimilarVideos(ctx context.Context, searchParam model.SearchParam, episodeID int64) (*model.VideoIndexConnection, error) {
-	con := new(model.VideoIndexConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	_, data, err := videoSearch.SimilarVideoIndex(ctx, searchParam, episodeID, scheme)
-	con.Edges = data
-	return con, err
+	return videoService.SimilarVideos(ctx, searchParam, episodeID, scheme)
 }
 
 func (r *queryResolver) Things(ctx context.Context, searchParam model.SearchParam) (*model.ThingConnection, error) {
@@ -287,12 +279,8 @@ func (r *queryResolver) AppDeviceDashboards(ctx context.Context, deviceType *int
 }
 
 func (r *queryResolver) CameraTimeLapseVideos(ctx context.Context, deviceID int64) (*model.CameraTimeLapseVideoConnection, error) {
-	con := new(model.CameraTimeLapseVideoConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := deviceService.CameraTimeLapseVideos(ctx, deviceID, scheme)
-	con.TotalCount = total
-	con.Edges = data
-	return con, err
+	return deviceService.CameraTimeLapseVideos(ctx, deviceID, scheme)
 }
 
 // Mutation returns generated.MutationResolver implementation.

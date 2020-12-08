@@ -18,7 +18,6 @@ type Resolver struct{}
 
 var (
 	videoService   = video.VideoService{}
-	videoSearch    = video.VideoSearch{}
 	thingService   = thing.ThingService{}
 	userService    = user.UserService{}
 	historyService = history.HistoryService{}

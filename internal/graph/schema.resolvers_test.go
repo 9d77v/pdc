@@ -629,3 +629,86 @@ func Test_queryResolver_VideoSerieses(t *testing.T) {
 		})
 	}
 }
+
+func Test_queryResolver_SearchVideo(t *testing.T) {
+	var resp struct {
+		SearchVideo model.VideoIndexConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test SearchVideo", args{`
+		query searchVideo($searchParam:SearchParam!) {
+			searchVideo(searchParam:$searchParam){
+				edges{
+					 id
+					 title
+					 desc
+					 cover
+					 totalNum
+					 episodeID
+				}
+				totalCount
+				aggResults{
+				  key
+				  value
+				}
+			}
+		   }
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "searchVideo", tt.args.searchParam)
+			require.NotZero(t, resp.SearchVideo.TotalCount)
+			require.NotZero(t, len(resp.SearchVideo.AggResults))
+			require.NotZero(t, len(resp.SearchVideo.Edges))
+		})
+	}
+}
+
+func Test_queryResolver_SimilarVideos(t *testing.T) {
+	var resp struct {
+		SimilarVideos model.VideoIndexConnection
+	}
+	type args struct {
+		query       string
+		searchParam model.SearchParam
+		episodeID   int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test SimilarVideos", args{`
+		query similarVideos($searchParam:SearchParam!,$episodeID:ID!) {
+		similarVideos(searchParam: $searchParam, episodeID: $episodeID) {
+			edges {
+			  id
+			  title
+			  desc
+			  cover
+			  totalNum
+			  episodeID
+			}
+		  }
+		}
+		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}, 1}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			postSearch(tt.args.query, &resp, "similarVideos", tt.args.searchParam,
+				client.Var("episodeID", tt.args.episodeID))
+			require.Zero(t, resp.SimilarVideos.TotalCount)
+			require.Zero(t, len(resp.SimilarVideos.AggResults))
+			require.Zero(t, len(resp.SimilarVideos.Edges))
+		})
+	}
+}
