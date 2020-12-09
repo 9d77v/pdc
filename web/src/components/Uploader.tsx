@@ -6,6 +6,7 @@ import axios from 'axios'
 import crypto from 'crypto'
 import { getVttFromFile, getType } from 'src/utils/subtitle';
 import { getTextFromFile, replaceURL } from 'src/utils/file';
+import { supportedSubtitleTypes } from 'src/consts/consts';
 
 interface UploaderProps {
     fileLimit: number
@@ -42,6 +43,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
     const sortFile = (a: UploadFile, b: UploadFile) => {
         return parseInt(a.uid.split("-").pop() || '') - parseInt(b.uid.split("-").pop() || '')
     }
+
     useEffect(() => {
         let all_done = true
         for (let file of fileList) {
@@ -69,6 +71,18 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
             }
         }
     }, [fileList, succeedFile, setURL, fileLimit]);
+
+    const isSubtitleType = (fileType: string): Boolean => {
+        if (fileType === "vtt") {
+            return false
+        }
+        for (let t of supportedSubtitleTypes) {
+            if (fileType === t) {
+                return true
+            }
+        }
+        return false
+    }
     const props = {
         name: 'file',
         multiple: isMulti,
@@ -87,7 +101,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
                 let fileType = getType(file)
                 let fileName = file.name
                 let fileString = ""
-                if (fileType === "ass" || fileType === "srt") {
+                if (isSubtitleType(fileType)) {
                     fileString = await getVttFromFile(file)
                 } else if (validFileTypes[0].indexOf("image") !== -1) {
                     fileString = await getTextFromFile(file)
@@ -95,7 +109,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
                 if (fileString !== "") {
                     const hash = crypto.createHash('sha256');
                     hash.update(fileString);
-                    if (fileType === "ass" || fileType === "srt") {
+                    if (isSubtitleType(fileType)) {
                         fileType = "vtt"
                     }
                     fileName = `${hash.digest('hex')}.${fileType}`
@@ -109,7 +123,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
         transformFile(file: File) {
             return new Promise<File>(async (resolve) => {
                 const fileType = getType(file)
-                if (fileType === "ass" || fileType === "srt") {
+                if (isSubtitleType(fileType)) {
                     const vttText = await getVttFromFile(file);
                     const blob = new Blob([vttText], {
                         type: 'text/vtt',
@@ -189,7 +203,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
     };
     return (
         <Upload.Dragger {...props}>
-            <p className="ant-upload-hint">点击或拖拽上传{validFileTypes.join(",")}文件</p>
+            <p className="ant-upload-hint">点击或拖拽上传文件</p>
         </Upload.Dragger>
     )
 }

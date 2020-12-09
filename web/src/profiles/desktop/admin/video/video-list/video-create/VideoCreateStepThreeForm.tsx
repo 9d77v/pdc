@@ -1,6 +1,7 @@
 import { Form, Radio } from 'antd'
 import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
+import { supportedSubtitleTypes } from 'src/consts/consts'
 
 const VideoCreateStepThreeForm = (props: any, ref: Ref<any>) => {
     const [form] = Form.useForm()
@@ -43,7 +44,7 @@ const VideoCreateStepThreeForm = (props: any, ref: Ref<any>) => {
                 <Uploader
                     fileLimit={0}
                     bucketName="vtt"
-                    validFileTypes={["text/vtt", "text/ass", 'text/srt']}
+                    validFileTypes={supportedSubtitleTypes}
                     setURL={setSubtitles}
                 />
             </Form.Item>
