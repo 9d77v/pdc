@@ -70,40 +70,38 @@ func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubt
 		return nil, err
 	}
 	if len(input.Subtitles.Urls) == 0 {
-		ids := make([]uint, 0, len(data))
-		for _, v := range data {
-			ids = append(ids, v.ID)
-		}
-		err := db.GetDB().Where("episode_id in(?) and name=?", ids, input.Subtitles.Name).
-			Delete(&models.Subtitle{}).Error
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		if len(input.Subtitles.Urls) != len(data) {
-			return nil, errors.New("视频与字幕数量不一致")
-		}
-		subtitles := make([]*models.Subtitle, 0, 0)
-		for i, d := range data {
-			if len(d.Subtitles) == 0 {
-				subtitles = append(subtitles, &models.Subtitle{
-					EpisodeID: d.ID,
-					Name:      input.Subtitles.Name,
-					URL:       input.Subtitles.Urls[i],
-				})
-			} else {
-				if d.Subtitles[0].URL != input.Subtitles.Urls[i] {
-					d.Subtitles[0].URL = input.Subtitles.Urls[i]
-					subtitles = append(subtitles, d.Subtitles[0])
-				}
-			}
-		}
-		err := db.GetDB().Save(&subtitles).Error
-		if err != nil {
-			return nil, err
-		}
+		err := s.deleteSubtitlesByName(data, input.Subtitles.Name)
+		return &model.Video{ID: int64(input.ID)}, err
+	}
+	if len(input.Subtitles.Urls) != len(data) {
+		return nil, errors.New("视频与字幕数量不一致")
+	}
+	err := s.deleteSubtitlesByName(data, input.Subtitles.Name)
+	if err != nil {
+		return nil, err
+	}
+	subtitles := make([]*models.Subtitle, 0, 0)
+	for i, d := range data {
+		subtitles = append(subtitles, &models.Subtitle{
+			EpisodeID: d.ID,
+			Name:      input.Subtitles.Name,
+			URL:       input.Subtitles.Urls[i],
+		})
+	}
+	err = db.GetDB().Save(&subtitles).Error
+	if err != nil {
+		return nil, err
 	}
 	return &model.Video{ID: int64(input.ID)}, nil
+}
+
+func (s VideoService) deleteSubtitlesByName(data []*models.Episode, name string) error {
+	ids := make([]uint, 0, len(data))
+	for _, v := range data {
+		ids = append(ids, v.ID)
+	}
+	return db.GetDB().Unscoped().Where("episode_id in(?) and name=?", ids, name).
+		Delete(&models.Subtitle{}).Error
 }
 
 //UpdateVideo ..
