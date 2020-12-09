@@ -1,9 +1,10 @@
 package models
 
 import (
+	"time"
+
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
-	"gorm.io/gorm"
 )
 
 //Episode 分集
@@ -20,9 +21,11 @@ type Episode struct {
 
 //Subtitle 字幕
 type Subtitle struct {
-	gorm.Model
-	EpisodeID uint
-	Name      string `gorm:"size:50;NOT NULL;"`
+	base.Model
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	EpisodeID uint   `gorm:"index:subtitle_ep_name"`
+	Name      string `gorm:"index:subtitle_ep_name;size:50;NOT NULL;"`
 	URL       string `gorm:"size:500;NOT NULL;"`
 }
 

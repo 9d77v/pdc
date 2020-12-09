@@ -2,17 +2,16 @@ package consumers
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strconv"
 
-	v7 "github.com/9d77v/go-lib/clients/elastic/v7"
+	es "github.com/9d77v/go-lib/clients/elastic/v7"
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
-	"github.com/9d77v/pdc/internal/module/video-service/services"
 
 	"github.com/nats-io/stan.go"
 )
-
-var videoSearch = new(services.VideoSearch)
 
 //HandleVideoMSG ...
 func HandleVideoMSG(m *stan.Msg) {
@@ -36,7 +35,7 @@ func HandleVideoMSG(m *stan.Msg) {
 	}
 }
 
-func syncAllVideos(ctx context.Context, vi *models.VideoIndex, client *v7.Client) error {
+func syncAllVideos(ctx context.Context, vi *models.VideoIndex, client *es.Client) error {
 	indexName := client.GetNewIndexName(elasticsearch.AliasVideo, elasticsearch.ESLayout)
 	err := client.CreateIndex(ctx, indexName, elasticsearch.VideoMapping)
 	if err != nil {
@@ -46,7 +45,7 @@ func syncAllVideos(ctx context.Context, vi *models.VideoIndex, client *v7.Client
 	if err != nil {
 		return err
 	}
-	videoSearch.BulkSaveES(ctx, data, indexName, 1000, 3)
+	bulkSaveES(ctx, data, indexName, 1000, 3)
 	err = client.SetNewAlias(ctx, elasticsearch.AliasVideo, indexName)
 	if err != nil {
 		return err
@@ -55,9 +54,26 @@ func syncAllVideos(ctx context.Context, vi *models.VideoIndex, client *v7.Client
 	return client.KeepIndex(ctx, indexNames, 3)
 }
 
+func bulkSaveES(ctx context.Context,
+	vis []*models.VideoIndex, indexName string, bulkNum, workerNum int) {
+	bds := make([]*es.BulkDoc, 0, len(vis))
+	for _, v := range vis {
+		bd := &es.BulkDoc{
+			ID:  strconv.Itoa(int(v.ID)),
+			Doc: v,
+		}
+		bds = append(bds, bd)
+	}
+	errs := elasticsearch.GetClient().BulkInsert(ctx, bds, indexName, bulkNum, workerNum)
+	for _, v := range errs {
+		fmt.Println(v)
+	}
+}
+
 func syncOneVideoRecord(ctx context.Context, id string, vi *models.VideoIndex,
-	client *v7.Client) error {
-	err := vi.GetByID(id)
+	client *es.Client) error {
+	videoID, _ := strconv.ParseUint(id, 10, 64)
+	err := vi.GetByID(uint(videoID))
 	if err != nil {
 		return err
 	}

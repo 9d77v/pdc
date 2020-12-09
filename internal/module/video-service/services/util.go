@@ -1,10 +1,23 @@
 package services
 
 import (
+	"log"
+	"strconv"
+
+	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
+	"github.com/9d77v/pdc/internal/utils"
 )
+
+func sendMsgToUpdateES(videoID int64) {
+	guid, err := mq.GetClient().PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
+		utils.AckHandler)
+	if err != nil {
+		log.Println("mq publish failed,guid:", guid, " error:", err)
+	}
+}
 
 func (s VideoService) getVideos(data []*models.Video, scheme string) []*model.Video {
 	result := make([]*model.Video, 0, len(data))
@@ -92,16 +105,5 @@ func (s VideoService) getVideoSeriesData(m *models.VideoSeries) *model.VideoSeri
 		Items:     items,
 		CreatedAt: m.CreatedAt.Unix(),
 		UpdatedAt: m.UpdatedAt.Unix(),
-	}
-}
-
-func (s VideoSearch) getVideoIndex(vi *models.VideoIndex) *model.VideoIndex {
-	return &model.VideoIndex{
-		ID:        int64(vi.ID),
-		Title:     vi.Title,
-		Desc:      vi.Desc,
-		Cover:     vi.Cover,
-		TotalNum:  int64(vi.TotalNum),
-		EpisodeID: int64(vi.EpisodeID),
 	}
 }

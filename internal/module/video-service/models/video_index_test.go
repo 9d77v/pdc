@@ -24,7 +24,7 @@ func TestVideoIndex_GetByID(t *testing.T) {
 		SeriesNum      uint
 	}
 	type args struct {
-		id string
+		id uint
 	}
 	tests := []struct {
 		name    string
@@ -32,7 +32,7 @@ func TestVideoIndex_GetByID(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"test get by id", fields{}, args{"1"}, false},
+		{"test get by id", fields{}, args{1}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

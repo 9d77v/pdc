@@ -1,10 +1,8 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 	"log"
-	"strings"
 	"sync"
 
 	"github.com/9d77v/go-lib/clients/config"
@@ -18,11 +16,12 @@ import (
 
 //环境变量
 var (
-	dbHost     = utils.GetEnvStr("DB_HOST", "domain.local")
-	dbPort     = utils.GetEnvInt("DB_PORT", 5432)
-	dbUser     = utils.GetEnvStr("DB_USER", "postgres")
-	dbPassword = utils.GetEnvStr("DB_PASSWORD", "123456")
-	dbName     = utils.GetEnvStr("DB_NAME", "pdc")
+	dbHost        = utils.GetEnvStr("DB_HOST", "domain.local")
+	dbPort        = utils.GetEnvInt("DB_PORT", 5432)
+	dbUser        = utils.GetEnvStr("DB_USER", "postgres")
+	dbPassword    = utils.GetEnvStr("DB_PASSWORD", "123456")
+	dbName        = utils.GetEnvStr("DB_NAME", "pdc")
+	dbTablePrefix = utils.GetEnvStr("DB_TABLE_PREFIX", "pdc")
 )
 
 var (
@@ -32,7 +31,7 @@ var (
 
 //TablePrefix 获取表前缀
 func TablePrefix() string {
-	return dbName + "_"
+	return dbTablePrefix + "_"
 }
 
 //GetDB get db connection
@@ -44,7 +43,17 @@ func GetDB() *gorm.DB {
 }
 
 func initClient() *gorm.DB {
-	dbConfig := &config.DBConfig{
+	dbConfig := newDBConfig()
+	createDatabaseIfNotExist(dbConfig)
+	db, err := newClient(dbConfig)
+	if err != nil {
+		log.Printf("Could not initialize gorm: %s", err.Error())
+	}
+	return db
+}
+
+func newDBConfig() *config.DBConfig {
+	return &config.DBConfig{
 		Driver:       "postgres",
 		Host:         dbHost,
 		Port:         uint(dbPort),
@@ -55,44 +64,15 @@ func initClient() *gorm.DB {
 		MaxOpenConns: 100,
 		EnableLog:    consts.DEBUG,
 	}
-	db, err := newClient(dbConfig)
-	if err != nil {
-		log.Printf("Could not initialize gorm: %s", err.Error())
-	}
-	return db
 }
 
 func newClient(config *config.DBConfig) (*gorm.DB, error) {
-	if config == nil {
-		return nil, errors.New("db config is not exist")
-	}
-	//support postgres
-	if config.Driver != "postgres" {
-		return nil, errors.New("unsupport driver,now only support postgres")
-	}
-	//auto create database
-	dsnInit := fmt.Sprintf("host=%s port=%d user=%s sslmode=disable password=%s",
-		config.Host, config.Port, config.User, config.Password)
-	dbInit, err := gorm.Open(postgres.Open(dsnInit), &gorm.Config{})
-	if err != nil {
-		return nil, err
-	}
-	initSQL := fmt.Sprintf("CREATE DATABASE \"%s\" WITH  OWNER =%s ENCODING = 'UTF8' CONNECTION LIMIT=-1;",
-		config.Name, config.User)
-	err = dbInit.Exec(initSQL).Error
-	if err != nil && !strings.Contains(err.Error(), "already exists") {
-		return nil, err
-	}
-	sqlDBInit, err := dbInit.DB()
-	defer sqlDBInit.Close()
-
 	dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
 		config.Host, config.Port, config.User, config.Name, config.Password)
-	//global database connection
 	gormConfig := &gorm.Config{
 		SkipDefaultTransaction: true,
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   TablePrefix(), // table name prefix, table for `User` would be `t_users`
+			TablePrefix:   TablePrefix(),
 			SingularTable: true,
 		},
 	}
@@ -109,4 +89,38 @@ func newClient(config *config.DBConfig) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(int(config.MaxIdleConns))
 	sqlDB.SetMaxOpenConns(int(config.MaxOpenConns))
 	return db, err
+}
+
+func createDatabaseIfNotExist(config *config.DBConfig) {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s sslmode=disable password=%s",
+		config.Host, config.Port, config.User, config.Password)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Panicln("connect to postgres failed:", err)
+	}
+	if databaseNotExist(db, config.Name) {
+		createDatabase(db, config.Name, config.User)
+	}
+	sqlDBInit, err := db.DB()
+	sqlDBInit.Close()
+}
+
+func databaseNotExist(db *gorm.DB, dbName string) bool {
+	var total int64
+	err := db.Raw("SELECT 1 FROM pg_database WHERE datname = ?", dbName).Scan(&total).Error
+	if err != nil {
+		log.Println("check db failed", err)
+	}
+	return total == 0
+}
+
+func createDatabase(db *gorm.DB, dbName, dbUser string) {
+	initSQL := fmt.Sprintf("CREATE DATABASE \"%s\" WITH  OWNER =%s ENCODING = 'UTF8' CONNECTION LIMIT=-1;",
+		dbName, dbUser)
+	err := db.Exec(initSQL).Error
+	if err != nil {
+		log.Println("create db failed:", err)
+	} else {
+		log.Printf("create db '%s' succeed\n", dbName)
+	}
 }

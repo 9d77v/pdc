@@ -57,17 +57,17 @@ func (s Service) GetConnection(ctx context.Context, r Repository, searchParam mo
 
 //GetPageInfo ...
 func (s Service) GetPageInfo(searchParam model.SearchParam) (int, int) {
-	offset := ptrs.Int64(searchParam.Page)
-	limit := ptrs.Int64(searchParam.PageSize)
-	if offset < 1 {
-		offset = 1
+	page := ptrs.Int64(searchParam.Page)
+	pageSize := ptrs.Int64(searchParam.PageSize)
+	if page < 1 {
+		page = 1
 	}
-	if limit <= 0 {
-		limit = 10
+	if pageSize <= 0 {
+		pageSize = 10
 	}
-	if limit > 100 {
-		limit = 100
+	if pageSize > 100 {
+		pageSize = 100
 	}
-	offset = (offset - 1) * limit
-	return int(offset), int(limit)
+	offset := (page - 1) * pageSize
+	return int(offset), int(pageSize)
 }
