@@ -113,8 +113,10 @@ const CameraCompanyMap = new Map<number, string>([
 
 const GesturePasswordKey = "gesture-password"
 
+const supportedSubtitleTypes = ["text/vtt", "text/ass", "text/ssa", 'text/srt', "text/sub", "text/sbv", "text/smi", "text/lrc", "text/json"]
 
 export {
     RubbishCategoryMap, ConsumerExpenditureMap, ThingStatusMap, ThingStatusArr,
-    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap, GesturePasswordKey, CameraCompanyMap
+    GenderMap, RoleMap, FullRoleMap, DeviceTypeMap, GesturePasswordKey, CameraCompanyMap,
+    supportedSubtitleTypes
 }

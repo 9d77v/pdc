@@ -1,6 +1,7 @@
 import { Modal, Form, Input, Radio } from 'antd'
 import React, { FC, useState } from 'react'
 import { Uploader } from 'src/components/Uploader'
+import { supportedSubtitleTypes } from 'src/consts/consts'
 
 interface ISubtitleUpdateFormProps {
     visible: boolean
@@ -85,7 +86,7 @@ export const SubtitleUpdateForm: FC<ISubtitleUpdateFormProps> = ({
                     <Uploader
                         fileLimit={0}
                         bucketName="vtt"
-                        validFileTypes={["text/vtt", "text/ass", 'text/srt']}
+                        validFileTypes={supportedSubtitleTypes}
                         setURL={setSubtitles}
                     />
                 </Form.Item>

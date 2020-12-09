@@ -30,6 +30,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-use-websocket": "^2.1.1",
+    "subsrt": "^1.1.1",
     "video.js": "^7.8.2"
   },
   "devDependencies": {
