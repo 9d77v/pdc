@@ -6,7 +6,7 @@ import axios from 'axios'
 import crypto from 'crypto'
 import { getVttFromFile, getType } from 'src/utils/subtitle';
 import { getTextFromFile, replaceURL } from 'src/utils/file';
-import { supportedSubtitleTypes } from 'src/consts/consts';
+import { supportedSubtitleSuffix } from 'src/consts/consts';
 
 interface UploaderProps {
     fileLimit: number
@@ -76,7 +76,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
         if (fileType === "vtt") {
             return false
         }
-        for (let t of supportedSubtitleTypes) {
+        for (let t of supportedSubtitleSuffix) {
             if (fileType === t) {
                 return true
             }
