@@ -10,8 +10,8 @@ import (
 var (
 	//WSURL websocket服务地址
 	WSURL     = GetEnvStr("WS_URL", "ws://localhost:8080/ws/iot/device")
-	accessKey = GetEnvStr("PDC_DEVICE_ACCESSKEY", "Vz23KaqK0lZD")
-	secretKey = GetEnvStr("PDC_DEVICE_SECRETKEY", "TAHXZZYQRITZIBAMUXAEQRAAVARJRMTH")
+	accessKey = GetEnvStr("PDC_DEVICE_ACCESSKEY", "")
+	secretKey = GetEnvStr("PDC_DEVICE_SECRETKEY", "")
 )
 
 var (

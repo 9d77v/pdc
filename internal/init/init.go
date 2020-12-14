@@ -11,8 +11,10 @@ import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
+	ch_device "github.com/9d77v/pdc/internal/module/device-service/chmodels"
 	device_consumers "github.com/9d77v/pdc/internal/module/device-service/consumers"
 	device "github.com/9d77v/pdc/internal/module/device-service/models"
+
 	history "github.com/9d77v/pdc/internal/module/history-service/models"
 	thing "github.com/9d77v/pdc/internal/module/thing-service/models"
 	user "github.com/9d77v/pdc/internal/module/user-service/models"
@@ -27,16 +29,16 @@ var (
 )
 
 func init() {
-	autoMergeTables()
+	autoMergePostgresTables()
+	autoMergeClickhouseTables()
 	new(user.User).GenerateAdminAccount(ownerName, ownerPassword)
-	clickhouse.CreateTables()
 	oss.InitMinioBuckets()
 	initSubscribe()
 	initConsumers()
 	initElasticSearchIndexes()
 }
 
-func autoMergeTables() {
+func autoMergePostgresTables() {
 	err := db.GetDB().AutoMigrate(
 		//device
 		&device.DeviceModel{},
@@ -63,6 +65,21 @@ func autoMergeTables() {
 		&video.VideoSeries{},
 		&video.VideoSeriesItem{},
 	)
+	if err != nil {
+		log.Println("auto migrate error:", err)
+	}
+}
+
+func autoMergeClickhouseTables() {
+	err := clickhouse.GetDB().Set("gorm:table_options",
+		"engine=MergeTree() ORDER BY (device_id,telemetry_id,action_time) PARTITION BY (device_id)").
+		AutoMigrate(&ch_device.DeviceTelemetry{})
+	if err != nil {
+		log.Println("auto migrate error:", err)
+	}
+	err = clickhouse.GetDB().Set("gorm:table_options",
+		"engine=MergeTree() ORDER BY (device_id,action_time) PARTITION BY (device_id)").
+		AutoMigrate(&ch_device.DeviceHealth{})
 	if err != nil {
 		log.Println("auto migrate error:", err)
 	}
@@ -107,6 +124,7 @@ func unSubscribeMQQueues(qsubs []stan.Subscription) {
 }
 
 func initConsumers() {
+
 	go device_consumers.SaveDeviceTelemetry()
 	go device_consumers.SaveDeviceHealth()
 }
