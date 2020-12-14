@@ -35,15 +35,18 @@ func TablePrefix() string {
 }
 
 //GetDB get db connection
-func GetDB() *gorm.DB {
+func GetDB(config ...*config.DBConfig) *gorm.DB {
 	once.Do(func() {
-		client = initClient()
+		dbConfig := defualtConfig()
+		if config != nil && len(config) == 1 {
+			dbConfig = config[0]
+		}
+		client = initClient(dbConfig)
 	})
 	return client
 }
 
-func initClient() *gorm.DB {
-	dbConfig := newDBConfig()
+func initClient(dbConfig *config.DBConfig) *gorm.DB {
 	createDatabaseIfNotExist(dbConfig)
 	db, err := newClient(dbConfig)
 	if err != nil {
@@ -52,7 +55,7 @@ func initClient() *gorm.DB {
 	return db
 }
 
-func newDBConfig() *config.DBConfig {
+func defualtConfig() *config.DBConfig {
 	return &config.DBConfig{
 		Driver:       "postgres",
 		Host:         dbHost,
@@ -98,29 +101,29 @@ func createDatabaseIfNotExist(config *config.DBConfig) {
 	if err != nil {
 		log.Panicln("connect to postgres failed:", err)
 	}
-	if databaseNotExist(db, config.Name) {
-		createDatabase(db, config.Name, config.User)
+	if databaseNotExist(db, config) {
+		createDatabase(db, config)
 	}
 	sqlDBInit, err := db.DB()
 	sqlDBInit.Close()
 }
 
-func databaseNotExist(db *gorm.DB, dbName string) bool {
+func databaseNotExist(db *gorm.DB, config *config.DBConfig) bool {
 	var total int64
-	err := db.Raw("SELECT 1 FROM pg_database WHERE datname = ?", dbName).Scan(&total).Error
+	err := db.Raw("SELECT 1 FROM pg_database WHERE datname = ?", config.Name).Scan(&total).Error
 	if err != nil {
 		log.Println("check db failed", err)
 	}
 	return total == 0
 }
 
-func createDatabase(db *gorm.DB, dbName, dbUser string) {
+func createDatabase(db *gorm.DB, config *config.DBConfig) {
 	initSQL := fmt.Sprintf("CREATE DATABASE \"%s\" WITH  OWNER =%s ENCODING = 'UTF8' CONNECTION LIMIT=-1;",
-		dbName, dbUser)
+		config.Name, config.User)
 	err := db.Exec(initSQL).Error
 	if err != nil {
 		log.Println("create db failed:", err)
 	} else {
-		log.Printf("create db '%s' succeed\n", dbName)
+		log.Printf("create db '%s' succeed\n", config.Name)
 	}
 }
