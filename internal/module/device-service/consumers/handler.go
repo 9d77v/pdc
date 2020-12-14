@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/9d77v/pdc/internal/db/clickhouse"
+	"github.com/9d77v/pdc/internal/module/device-service/chmodels"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/nats-io/stan.go"
@@ -84,43 +85,29 @@ func SaveDeviceTelemetry() {
 }
 
 func batchSaveTelemetry(telemetries []*pb.Telemetry) {
-	tx, err := clickhouse.GetDB().Begin()
-	if err != nil {
-		log.Println("clickhouse tx begin error:", err)
+	if telemetries == nil || len(telemetries) == 0 {
 		return
 	}
-	stmt, err := tx.Prepare("INSERT INTO device_telemetry (device_id,telemetry_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
-	if err != nil {
-		log.Println("clickhouse tx Prepare error:", err)
-		return
-	}
-	defer stmt.Close()
+	deviceTelemetries := make([]chmodels.DeviceTelemetry, 0, len(telemetries))
 	now := time.Now()
 	for _, v := range telemetries {
 		actionTime, err := ptypes.Timestamp(v.ActionTime)
 		if err != nil {
 			log.Println("conver actiontime to timestamp error:", err)
 		}
-		if _, err := stmt.Exec(
-			v.DeviceID,
-			v.ID,
-			actionTime,
-			actionTime.Nanosecond(),
-			v.Value,
-			now,
-			now.Nanosecond(),
-		); err != nil {
-			log.Println(err)
-			err = tx.Rollback()
-			if err != nil {
-				log.Println("clickhouse tx rollback error:", err)
-			}
-			return
-		}
+		deviceTelemetries = append(deviceTelemetries,
+			chmodels.DeviceTelemetry{
+				ActionTime:      actionTime,
+				ActionTimeNanos: uint32(actionTime.Nanosecond()),
+				DeviceID:        v.DeviceID,
+				TelemetryID:     v.ID,
+				Value:           v.Value,
+				CreatedAt:       now,
+				CreatedAtNanos:  uint32(now.Nanosecond()),
+			})
 	}
-	if err := tx.Commit(); err != nil {
-		log.Println("commit failed:", err)
-	}
+	err := clickhouse.GetDB().Create(&deviceTelemetries).Error
+	log.Println("save data failed:", err)
 }
 
 //SaveDeviceHealth 。。
@@ -154,40 +141,26 @@ func SaveDeviceHealth() {
 }
 
 func batchSaveHealth(healths []*pb.Health) {
-	tx, err := clickhouse.GetDB().Begin()
-	if err != nil {
-		log.Println("clickhouse tx begin error:", err)
+	if healths == nil || len(healths) == 0 {
 		return
 	}
-	stmt, err := tx.Prepare("INSERT INTO device_health (device_id,action_time,action_time_nanos, value, created_at,created_at_nanos) VALUES (?,?, ?, ?, ?,?,?)")
-	if err != nil {
-		log.Println("clickhouse tx Prepare error:", err)
-		return
-	}
-	defer stmt.Close()
+	deviceHealths := make([]chmodels.DeviceHealth, 0, len(healths))
 	now := time.Now()
 	for _, v := range healths {
 		actionTime, err := ptypes.Timestamp(v.ActionTime)
 		if err != nil {
 			log.Println("conver actiontime to timestamp error:", err)
 		}
-		if _, err := stmt.Exec(
-			v.DeviceID,
-			actionTime,
-			actionTime.Nanosecond(),
-			v.Value,
-			now,
-			now.Nanosecond(),
-		); err != nil {
-			log.Println(err)
-			err = tx.Rollback()
-			if err != nil {
-				log.Println("clickhouse tx rollback error:", err)
-			}
-			return
-		}
+		deviceHealths = append(deviceHealths,
+			chmodels.DeviceHealth{
+				ActionTime:      actionTime,
+				ActionTimeNanos: uint32(actionTime.Nanosecond()),
+				DeviceID:        v.DeviceID,
+				Value:           float64(v.Value),
+				CreatedAt:       now,
+				CreatedAtNanos:  uint32(now.Nanosecond()),
+			})
 	}
-	if err := tx.Commit(); err != nil {
-		log.Println("commit failed:", err)
-	}
+	err := clickhouse.GetDB().Create(&deviceHealths).Error
+	log.Println("save data failed:", err)
 }

@@ -41,18 +41,14 @@ func GetDB(config ...*config.DBConfig) *gorm.DB {
 		if config != nil && len(config) == 1 {
 			dbConfig = config[0]
 		}
-		client = initClient(dbConfig)
+		createDatabaseIfNotExist(dbConfig)
+		var err error
+		client, err = newClient(dbConfig)
+		if err != nil {
+			log.Panicf("Could not initialize gorm: %s\n", err.Error())
+		}
 	})
 	return client
-}
-
-func initClient(dbConfig *config.DBConfig) *gorm.DB {
-	createDatabaseIfNotExist(dbConfig)
-	db, err := newClient(dbConfig)
-	if err != nil {
-		log.Printf("Could not initialize gorm: %s", err.Error())
-	}
-	return db
 }
 
 func defualtConfig() *config.DBConfig {
@@ -67,31 +63,6 @@ func defualtConfig() *config.DBConfig {
 		MaxOpenConns: 100,
 		EnableLog:    consts.DEBUG,
 	}
-}
-
-func newClient(config *config.DBConfig) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
-		config.Host, config.Port, config.User, config.Name, config.Password)
-	gormConfig := &gorm.Config{
-		SkipDefaultTransaction: true,
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix:   TablePrefix(),
-			SingularTable: true,
-		},
-	}
-	if consts.DEBUG {
-		gormConfig.Logger = logger.Default.LogMode(logger.Info)
-	} else {
-		gormConfig.DisableForeignKeyConstraintWhenMigrating = true
-	}
-	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
-	if err != nil {
-		return nil, err
-	}
-	sqlDB, err := db.DB()
-	sqlDB.SetMaxIdleConns(int(config.MaxIdleConns))
-	sqlDB.SetMaxOpenConns(int(config.MaxOpenConns))
-	return db, err
 }
 
 func createDatabaseIfNotExist(config *config.DBConfig) {
@@ -126,4 +97,29 @@ func createDatabase(db *gorm.DB, config *config.DBConfig) {
 	} else {
 		log.Printf("create db '%s' succeed\n", config.Name)
 	}
+}
+
+func newClient(config *config.DBConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable password=%s",
+		config.Host, config.Port, config.User, config.Name, config.Password)
+	gormConfig := &gorm.Config{
+		SkipDefaultTransaction: true,
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   TablePrefix(),
+			SingularTable: true,
+		},
+	}
+	if consts.DEBUG {
+		gormConfig.Logger = logger.Default.LogMode(logger.Info)
+	} else {
+		gormConfig.DisableForeignKeyConstraintWhenMigrating = true
+	}
+	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
+	if err != nil {
+		return nil, err
+	}
+	sqlDB, err := db.DB()
+	sqlDB.SetMaxIdleConns(int(config.MaxIdleConns))
+	sqlDB.SetMaxOpenConns(int(config.MaxOpenConns))
+	return db, err
 }
