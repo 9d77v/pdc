@@ -71,7 +71,7 @@ services:
         - ./redis/data:/data
     container_name: redis
   pdc:
-    image: 9d77v/pdc:2020-12-07_2c52feb
+    image: 9d77v/pdc:2020-12-14_9ad545b
     restart: always
     ports: 
       - 8080:8080
@@ -79,13 +79,13 @@ services:
       - ./configs/pdc.env
     container_name: pdc
   # pdc-iot-esp8266-sht3x:
-  #   image: 9d77v/pdc-iot-esp8266-sht3x:2020-11-24_a1ba7d0
+  #   image: 9d77v/pdc-iot-esp8266-sht3x:2020-12-14_9ad545b
   #   restart: always
   #   env_file:
   #     - esp8266-sht3x.env
   #   container_name: pdc-iot-esp8266-sht3x
   # pdc-iot-raspi:
-  #   image: 9d77v/pdc-iot-raspi:2020-11-24_a1ba7d0
+  #   image: 9d77v/pdc-iot-raspi:2020-12-14_9ad545b
   #   restart: always
   #   env_file:
   #     - raspi.env
@@ -94,13 +94,13 @@ services:
   #     - /dev/i2c-1  
   #   container_name: pdc-iot-raspi
   # pdc-iot-camera:
-  #   image: 9d77v/pdc-iot-camera:2020-11-30_3513c42
+  #   image: 9d77v/pdc-iot-camera:2020-12-14_9ad545b
   #   restart: always
   #   env_file:
   #     - camera.env
   #   container_name: pdc-iot-camera
   # pdc-cron-camera:
-  #   image: 9d77v/pdc-cron-camera:2020-11-27_19fc62a
+  #   image: 9d77v/pdc-cron-camera:2020-12-14_9ad545b
   #   restart: always
   #   env_file:
   #     - pdc.env
