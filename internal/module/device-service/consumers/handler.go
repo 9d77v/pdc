@@ -107,7 +107,9 @@ func batchSaveTelemetry(telemetries []*pb.Telemetry) {
 			})
 	}
 	err := clickhouse.GetDB().Create(&deviceTelemetries).Error
-	log.Println("save data failed:", err)
+	if err != nil {
+		log.Println("batchSaveTelemetry failed:", err)
+	}
 }
 
 //SaveDeviceHealth 。。
@@ -162,5 +164,7 @@ func batchSaveHealth(healths []*pb.Health) {
 			})
 	}
 	err := clickhouse.GetDB().Create(&deviceHealths).Error
-	log.Println("save data failed:", err)
+	if err != nil {
+		log.Println("batchSaveHealth failed:", err)
+	}
 }

@@ -52,7 +52,7 @@ func (s *videoSuggest) execute() (*model.VideoIndexConnection, error) {
 		return result, err
 	}
 	result.TotalCount = searchResult.TotalHits()
-	result.Edges = s.GetEdges(searchResult, s.Scheme)
+	result.Edges = getEdges(searchResult, s.Scheme)
 	return result, nil
 }
 
