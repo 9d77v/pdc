@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"log"
 	"strconv"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 	"github.com/9d77v/pdc/internal/utils"
+	elastic "github.com/olivere/elastic/v7"
 )
 
 func sendMsgToUpdateES(videoID int64) {
@@ -105,5 +107,34 @@ func (s VideoService) getVideoSeriesData(m *models.VideoSeries) *model.VideoSeri
 		Items:     items,
 		CreatedAt: m.CreatedAt.Unix(),
 		UpdatedAt: m.UpdatedAt.Unix(),
+	}
+}
+
+//GetEdges ..
+func getEdges(result *elastic.SearchResult, scheme string) []*model.VideoIndex {
+	vis := make([]*model.VideoIndex, 0)
+	for _, v := range result.Hits.Hits {
+		vi := new(models.VideoIndex)
+		data, err := v.Source.MarshalJSON()
+		if err != nil {
+			log.Println("elastic search result json marshal error:", err)
+		}
+		err = json.Unmarshal(data, &vi)
+		if err != nil {
+			log.Println("elastic search result json unmarshal error:", err)
+		}
+		vis = append(vis, getVideoIndex(vi, scheme))
+	}
+	return vis
+}
+
+func getVideoIndex(m *models.VideoIndex, scheme string) *model.VideoIndex {
+	return &model.VideoIndex{
+		ID:        int64(m.ID),
+		Title:     m.Title,
+		Desc:      m.Desc,
+		Cover:     oss.GetOSSPrefixByScheme(scheme) + m.Cover,
+		TotalNum:  int64(m.TotalNum),
+		EpisodeID: int64(m.EpisodeID),
 	}
 }

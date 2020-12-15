@@ -57,7 +57,7 @@ func (s *videoSearch) execute() (*model.VideoIndexConnection, error) {
 	}
 	result.TotalCount = searchResult.TotalHits()
 	if field.FieldMap["edges"] {
-		result.Edges = s.GetEdges(searchResult, s.Scheme)
+		result.Edges = getEdges(searchResult, s.Scheme)
 	}
 	if field.FieldMap["aggResults"] {
 		result.AggResults = s.GetAggResults(aggsParams, searchResult)

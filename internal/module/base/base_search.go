@@ -2,12 +2,9 @@ package base
 
 import (
 	"context"
-	"encoding/json"
-	"log"
 
 	es "github.com/9d77v/go-lib/clients/elastic/v7"
 	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	elastic "github.com/olivere/elastic/v7"
 )
@@ -101,23 +98,4 @@ func (s *Search) getAggResults(aggResult *elastic.AggregationBucketKeyItems) []*
 		})
 	}
 	return aggResults
-}
-
-//GetEdges ..
-func (s *Search) GetEdges(result *elastic.SearchResult, scheme string) []*model.VideoIndex {
-	vis := make([]*model.VideoIndex, 0)
-	for _, v := range result.Hits.Hits {
-		vi := new(model.VideoIndex)
-		data, err := v.Source.MarshalJSON()
-		if err != nil {
-			log.Println("elastic search result json marshal error:", err)
-		}
-		err = json.Unmarshal(data, &vi)
-		if err != nil {
-			log.Println("elastic search result json unmarshal error:", err)
-		}
-		vi.Cover = oss.GetOSSPrefixByScheme(scheme) + vi.Cover
-		vis = append(vis, vi)
-	}
-	return vis
 }
