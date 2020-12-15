@@ -114,19 +114,19 @@ const VideoSearch = () => {
                     />
                 </div>
             </div>
-            <div style={{ marginLeft: 10, marginTop: 38, display: "flex" }}>
-                <div className={"pdc-button-selected"}
-                    style={{ cursor: "pointer", width: 66 }}
-                    onClick={() => {
-                        setPagination({
-                            keyword: pagination.keyword,
-                            page: pagination.page,
-                            pageSize: pagination.pageSize,
-                            selectedTags: []
-                        })
-                    }}>全部</div>
+            <div style={{ marginLeft: 10, marginTop: 38, display: "flex", flex: 1 }}>
                 <div style={{ flex: 1 }}>
-                    <div style={{ maxWidth: 304 }}>
+                    <div className={"pdc-button-selected"}
+                        style={{ cursor: "pointer", width: 66 }}
+                        onClick={() => {
+                            setPagination({
+                                keyword: pagination.keyword,
+                                page: pagination.page,
+                                pageSize: pagination.pageSize,
+                                selectedTags: []
+                            })
+                        }}>全部</div>
+                    <div style={{ maxWidth: 304, minWidth: 233 }}>
                         {data?.searchVideo.aggResults.map((tag: any) => (
                             <CheckableTag
                                 className={pagination.selectedTags.indexOf(tag.key) > -1 ? "pdc-button-selected" : "pdc-button"}

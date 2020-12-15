@@ -41,7 +41,6 @@ const LIST_VIDEO_CARD = gql`
        edges{
             id
             title
-            desc
             cover
             totalNum
             episodeID
@@ -72,7 +71,6 @@ const VIDEO_RANDOM_TAG_SUGGEST = gql`
        edges{
             id
             title
-            desc
             cover
             totalNum
             episodeID

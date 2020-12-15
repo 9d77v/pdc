@@ -46,6 +46,8 @@ export const getVideoDetail = (data: any, episodeID: string | null) => {
         cover: "",
         title: "",
         desc: "",
+        tags: [],
+        pubDate: 0,
         episodes: [],
         theme: ""
     }
@@ -56,7 +58,9 @@ export const getVideoDetail = (data: any, episodeID: string | null) => {
             title: video.title,
             desc: video.desc,
             episodes: video.episodes,
-            theme: video.theme
+            theme: video.theme,
+            tags: video.tags,
+            pubDate: video.pubDate,
         }
     }
     let num = 0

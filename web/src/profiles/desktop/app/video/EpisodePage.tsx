@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useMemo } from "react"
-import { message } from "antd"
+import { message, Tag } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import Img from "src/components/img"
@@ -13,6 +13,7 @@ import { AppPath } from "src/consts/path"
 import { GET_VIDEO_DETAIL } from "src/gqls/video/query"
 import { getVideoDetail } from "src/models/video"
 import { isMobile } from "src/utils/util"
+import dayjs from "dayjs"
 
 export const EpisodePage: FC = () => {
     const history = useHistory()
@@ -66,6 +67,18 @@ export const EpisodePage: FC = () => {
         }
         return null
     }, [videoDetail])
+
+    const tagNodes = useMemo(() => {
+        const tags = videoDetail.videoItem.tags.map((value: string, index: number) => {
+            return (
+                <Tag color={'cyan'} key={"tag_" + index}>
+                    {value}
+                </Tag>
+            )
+        })
+        return <div style={{ marginLeft: 10 }}>{tags}</div>
+    }, [videoDetail])
+
     return (
         <div style={{
             display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
@@ -88,10 +101,11 @@ export const EpisodePage: FC = () => {
                 />
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
                     <Img src={videoDetail.videoItem.cover} />
-                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, paddingInline: 10 }} >
-                        <div style={{ textAlign: "left", fontSize: 18, padding: 10 }}> {videoDetail.videoItem.title}</div>
-                        <div style={{ textAlign: "left", paddingLeft: 10, paddingRight: 10 }}> 全{videoDetail.videoItem.episodes.length}话</div>
-                        <div style={{ textAlign: 'left', paddingLeft: 10, paddingRight: 10 }}>
+                    <div style={{ display: 'flex', textAlign: "left", paddingLeft: 10, flexDirection: 'column', flex: 1, paddingInline: 10 }} >
+                        <div style={{ fontSize: 18, display: "flex" }}> {videoDetail.videoItem.title}{tagNodes}</div>
+                        <div style={{ paddingRight: 10 }}> 全{videoDetail.videoItem.episodes.length}话</div>
+                        <span style={{ marginTop: 15, marginBottom: 10 }}>{dayjs(videoDetail.videoItem.pubDate * 1000).format("YYYY年MM月DD日") + "开播"}</span>
+                        <div style={{ paddingRight: 10 }}>
                             <TextArea
                                 value={videoDetail.videoItem.desc}
                                 rows={9}
