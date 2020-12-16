@@ -151,7 +151,7 @@ func (s DeviceService) DeleteTelemetryModel(ctx context.Context,
 
 //ListDeviceModel ..
 func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceModel, error) {
-	deviceModel := models.NewDeviceModel()
+	var deviceModel base.Repository = models.NewDeviceModel()
 	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
 	replaceFunc := func(field base.GraphQLField) error {
 		if field.FieldMap["attributeModels"] {
@@ -436,7 +436,7 @@ func (s DeviceService) RemoveDeviceDashboardCamera(ctx context.Context,
 
 //ListDeviceDashboards ..
 func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceDashboard, error) {
-	deviceDashboard := models.NewDeviceDashboard()
+	var deviceDashboard base.Repository = models.NewDeviceDashboard()
 	deviceDashboard.FuzzyQuery(searchParam.Keyword, "name")
 	replaceFunc := func(edgeField base.GraphQLField) error {
 		if edgeField.FieldMap["telemetries"] {

@@ -24,7 +24,8 @@ type Device struct {
 //NewDevice ..
 func NewDevice() *Device {
 	vs := &Device{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

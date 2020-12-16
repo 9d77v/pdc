@@ -7,6 +7,7 @@ import (
 
 //VideoSeriesRepository ..
 type VideoSeriesRepository interface {
+	base.Repository
 	AddItemsToList(data []*VideoSeries, items []*VideoSeriesItem)
 }
 
@@ -20,7 +21,8 @@ type VideoSeries struct {
 //NewVideoSeries ..
 func NewVideoSeries() *VideoSeries {
 	vs := &VideoSeries{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

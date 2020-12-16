@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -19,6 +20,7 @@ type TelemetryModel struct {
 //NewTelemetryModel ..
 func NewTelemetryModel() *TelemetryModel {
 	vs := &TelemetryModel{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }

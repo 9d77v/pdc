@@ -8,14 +8,13 @@ import (
 	"unicode"
 
 	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"gorm.io/gorm"
 )
 
 //Repository 。。
 type Repository interface {
-	GetDB() *gorm.DB
+	SetDB(db *gorm.DB)
 	Table(name string, args ...interface{}) Repository
 	SelectWithPrefix(fields []string, prefix string, omitFields ...string) Repository
 	Select(fields []string, omitFields ...string) Repository
@@ -33,18 +32,13 @@ type Repository interface {
 	Take(dest interface{}) error
 	Find(dest interface{}) error
 	Count(model interface{}) (total int64, err error)
+	Create(value interface{}) error
+	Updates(value interface{}) error
 }
 
 //Model ..
 type Model struct {
 	db *gorm.DB
-}
-
-//NewModel 。。
-func NewModel() *Model {
-	m := &Model{}
-	m.db = db.GetDB()
-	return m
 }
 
 //DefaultModel ..
@@ -56,16 +50,9 @@ type DefaultModel struct {
 	DeletedAt sql.NullTime `gorm:"index"`
 }
 
-//NewDefaultModel 。。
-func NewDefaultModel() DefaultModel {
-	m := DefaultModel{}
-	m.Model = NewModel()
-	return m
-}
-
-//GetDB ..
-func (m *Model) GetDB() *gorm.DB {
-	return m.db
+//SetDB ..
+func (m *Model) SetDB(db *gorm.DB) {
+	m.db = db
 }
 
 //Table ..
@@ -212,24 +199,21 @@ func (m *Model) Preload(query string, args ...interface{}) Repository {
 	return m
 }
 
-//First 查找单挑数据并重置查询
+//First 查找按主键排序第一条数据
 func (m *Model) First(dest interface{}) error {
 	err := m.db.First(dest).Error
-	m.db = db.GetDB()
 	return err
 }
 
-//Take 查找单挑数据并重置查询
+//Take 查找单条数据
 func (m *Model) Take(dest interface{}) error {
 	err := m.db.Take(dest).Error
-	m.db = db.GetDB()
 	return err
 }
 
-//Find 查找数据并重置查询
+//Find 查找数据
 func (m *Model) Find(dest interface{}) error {
 	err := m.db.Find(dest).Error
-	m.db = db.GetDB()
 	return err
 }
 
@@ -237,4 +221,14 @@ func (m *Model) Find(dest interface{}) error {
 func (m *Model) Count(model interface{}) (total int64, err error) {
 	err = m.db.Model(model).Count(&total).Error
 	return
+}
+
+//Create 新建数据
+func (m *Model) Create(value interface{}) error {
+	return m.db.Create(value).Error
+}
+
+//Updates 更新数据
+func (m *Model) Updates(value interface{}) error {
+	return m.db.Updates(value).Error
 }

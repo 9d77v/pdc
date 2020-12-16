@@ -26,7 +26,8 @@ type User struct {
 //NewUser ..
 func NewUser() *User {
 	vs := &User{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

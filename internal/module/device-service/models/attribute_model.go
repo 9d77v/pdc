@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -15,6 +16,7 @@ type AttributeModel struct {
 //NewAttributeModel ..
 func NewAttributeModel() *AttributeModel {
 	vs := &AttributeModel{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }

@@ -1,6 +1,9 @@
 package models
 
-import "github.com/9d77v/pdc/internal/module/base"
+import (
+	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/module/base"
+)
 
 //CameraTimeLapseVideo 摄像头延时视频，定时每1分钟抓拍图片，第二天1点合成视频
 type CameraTimeLapseVideo struct {
@@ -13,6 +16,7 @@ type CameraTimeLapseVideo struct {
 //NewCameraTimeLapseVideo ..
 func NewCameraTimeLapseVideo() *CameraTimeLapseVideo {
 	vs := &CameraTimeLapseVideo{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }

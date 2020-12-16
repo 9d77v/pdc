@@ -7,13 +7,6 @@ import (
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
-//VideoSeriesItemRepository ..
-type VideoSeriesItemRepository interface {
-	GetByVideoID(videoID uint) error
-	GetByVideoIDVideoSeriesID(fields []string, videoID uint, videoSeriesID uint) error
-	GetTheMaxNumOfOneVideoSeries(videoSeriesID uint) (int, error)
-}
-
 //VideoSeriesItem 视频系列视频列表
 type VideoSeriesItem struct {
 	*base.Model
@@ -30,7 +23,8 @@ type VideoSeriesItem struct {
 //NewVideoSeriesItem ..
 func NewVideoSeriesItem() *VideoSeriesItem {
 	vs := &VideoSeriesItem{}
-	vs.Model = base.NewModel()
+	vs.Model = &base.Model{}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

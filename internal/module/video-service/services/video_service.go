@@ -218,7 +218,7 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
 	scheme string, isFilterVideoSeries *bool, episodeID *int64) (int64, []*model.Video, error) {
-	video := models.NewVideo()
+	var video models.VideoRepository = models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
 	if ptrs.Bool(isFilterVideoSeries) {
 		video.FilterVideoSeries()
@@ -313,7 +313,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 	data := make([]*models.VideoSeries, 0)
 	field := base.NewGraphQLField(ctx, "")
 	var err error
-	videoSeries := models.NewVideoSeries()
+	var videoSeries models.VideoSeriesRepository = models.NewVideoSeries()
 	videoSeries.FuzzyQuery(searchParam.Keyword, "name")
 	omitFields := []string{"title"}
 	videoSeriesItem := models.NewVideoSeriesItem()
@@ -359,22 +359,23 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 				ids = append(ids, v.ID)
 			}
 			items := make([]*models.VideoSeriesItem, 0)
+			var repository base.Repository = models.NewVideoSeriesItem()
 			tableVideo := new(models.Video).TableName()
 			tableEpisode := new(models.Episode).TableName()
 			tableVideoSeriesItem := new(models.VideoSeriesItem).TableName()
 			if itemField.FieldMap["title"] {
 				itemField.Fields = append(itemField.Fields, tableVideo+".\"title\"")
-				videoSeriesItem.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
+				repository.LeftJoin(fmt.Sprintf("%s on %s.id=%s.video_id",
 					tableVideo, tableVideo, tableVideoSeriesItem))
 			}
 			if itemField.FieldMap["episodeID"] {
 				itemField.Fields = append(itemField.Fields,
 					tableEpisode+".\"episode_id\"",
 					tableVideoSeriesItem+".\"video_id\"")
-				videoSeriesItem.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + tableEpisode + " group by (video_id)) p left join " + tableEpisode + "  q on p.video_id=q.video_id and p.num=q.num) " + tableEpisode +
+				repository.LeftJoin("(select p.video_id,q.id episode_id from (SELECT video_id, min(num) num from " + tableEpisode + " group by (video_id)) p left join " + tableEpisode + "  q on p.video_id=q.video_id and p.num=q.num) " + tableEpisode +
 					" on " + tableEpisode + ".video_id=" + tableVideoSeriesItem + ".video_id")
 			}
-			subErr := videoSeriesItem.
+			subErr := repository.
 				Select(itemField.Fields, omitFields...).
 				IDArrayQuery(ids, "video_series_id").
 				Order("video_series_id asc,num asc").
