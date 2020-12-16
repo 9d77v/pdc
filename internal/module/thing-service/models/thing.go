@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/lib/pq"
 )
@@ -31,7 +32,8 @@ type Thing struct {
 //NewThing ..
 func NewThing() *Thing {
 	vs := &Thing{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

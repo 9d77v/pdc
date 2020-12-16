@@ -72,7 +72,7 @@ func (s HistoryService) GetHistory(ctx context.Context,
 //ListHistory ..
 func (s HistoryService) ListHistory(ctx context.Context,
 	sourceType *int64, searchParam model.SearchParam, subSourceID *int64, uid uint, scheme string) (int64, []*model.History, error) {
-	history := models.NewHistory()
+	var history base.Repository = models.NewHistory()
 	history.Where("uid=? and source_type=?", uid, ptrs.Int64(sourceType))
 	var sourceID uint
 	historyer := models.CreateHistory(sourceType)
@@ -83,9 +83,8 @@ func (s HistoryService) ListHistory(ctx context.Context,
 		}
 	}
 	replaceFunc := func(edgeField base.GraphQLField) error {
-		tableHistory := history.TableName()
 		history.Order("updated_at desc")
-		return historyer.JoinSource(history, tableHistory, sourceID)
+		return historyer.JoinSource(history, models.NewHistory().TableName(), sourceID)
 	}
 	data := make([]*model.History, 0)
 	total, err := s.GetConnection(ctx, history, searchParam, &data, replaceFunc)

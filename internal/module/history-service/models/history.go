@@ -29,7 +29,8 @@ type History struct {
 //NewHistory ..
 func NewHistory() *History {
 	vs := &History{}
-	vs.Model = base.NewModel()
+	vs.Model = &base.Model{}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

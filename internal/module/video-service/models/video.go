@@ -8,6 +8,12 @@ import (
 	"github.com/lib/pq"
 )
 
+//VideoRepository ..
+type VideoRepository interface {
+	base.Repository
+	FilterVideoSeries()
+}
+
 //Video 视频
 type Video struct {
 	base.DefaultModel
@@ -25,7 +31,8 @@ type Video struct {
 //NewVideo ..
 func NewVideo() *Video {
 	vs := &Video{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 

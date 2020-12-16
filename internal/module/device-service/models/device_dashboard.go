@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 )
 
@@ -17,7 +18,8 @@ type DeviceDashboard struct {
 //NewDeviceDashboard ..
 func NewDeviceDashboard() *DeviceDashboard {
 	vs := &DeviceDashboard{}
-	vs.DefaultModel = base.NewDefaultModel()
+	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
+	vs.SetDB(db.GetDB())
 	return vs
 }
 
