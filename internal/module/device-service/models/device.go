@@ -24,7 +24,6 @@ type Device struct {
 //NewDevice ..
 func NewDevice() *Device {
 	vs := &Device{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }
@@ -32,22 +31,4 @@ func NewDevice() *Device {
 //TableName ..
 func (m *Device) TableName() string {
 	return db.TablePrefix() + "device"
-}
-
-//Attribute 属性
-type Attribute struct {
-	base.DefaultModel
-	DeviceID         uint `gorm:"uniqueIndex:attribute_uix"`
-	AttributeModelID uint `gorm:"uniqueIndex:attribute_uix"`
-	AttributeModel   AttributeModel
-	Value            string `gorm:"size:50;NOT NULL;"`
-}
-
-//Telemetry 遥测
-type Telemetry struct {
-	*base.DefaultModel
-	DeviceID         uint `gorm:"uniqueIndex:telemetry_uix"`
-	Device           Device
-	TelemetryModelID uint `gorm:"uniqueIndex:telemetry_uix"`
-	TelemetryModel   TelemetryModel
 }

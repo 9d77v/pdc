@@ -40,7 +40,7 @@ func (s DeviceService) CreateDeviceModel(ctx context.Context,
 		return &model.DeviceModel{}, err
 	}
 	if input.DeviceType == 1 && input.CameraCompany == 0 {
-		attributes := s.getDefaultHikvisionAttributeModels(m.ID)
+		attributes := getDefaultHikvisionAttributeModels(m.ID)
 		err = db.GetDB().Create(&attributes).Error
 		if err != nil {
 			return &model.DeviceModel{ID: int64(m.ID)}, err
@@ -169,7 +169,7 @@ func (s DeviceService) ListDeviceModel(ctx context.Context, searchParam model.Se
 	data := make([]*models.DeviceModel, 0)
 	total, err := s.GetConnection(ctx, deviceModel, searchParam, &data, replaceFunc,
 		"attributeModels", "telemetryModels")
-	return total, s.getDeviceModels(data), err
+	return total, getDeviceModels(data), err
 }
 
 //CreateDevice  ..
@@ -285,7 +285,7 @@ func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchP
 	}
 	data := make([]*models.Device, 0)
 	total, err := s.GetConnection(ctx, device, searchParam, &data, replaceFunc, omitFields...)
-	return total, s.getDevices(data), err
+	return total, getDevices(data), err
 }
 
 //GetDeviceInfo ..
@@ -460,7 +460,7 @@ func (s DeviceService) ListDeviceDashboards(ctx context.Context, searchParam mod
 	data := make([]*models.DeviceDashboard, 0)
 	total, err := s.GetConnection(ctx, deviceDashboard, searchParam, &data, replaceFunc,
 		"telemetries", "cameras")
-	return total, s.getDeviceDashboards(data), err
+	return total, getDeviceDashboards(data), err
 }
 
 //AppDeviceDashboards ..
@@ -501,7 +501,7 @@ func (s DeviceService) AppDeviceDashboards(ctx context.Context,
 			return 0, result, err
 		}
 	}
-	return total, s.getDeviceDashboards(data), nil
+	return total, getDeviceDashboards(data), nil
 }
 
 //CameraCapture ..
@@ -567,7 +567,7 @@ func (s DeviceService) CameraTimeLapseVideos(ctx context.Context,
 			return result, err
 		}
 	}
-	result.Edges = s.getCameraTimeLapseVideos(data, scheme)
+	result.Edges = getCameraTimeLapseVideos(data, scheme)
 	result.TotalCount = total
 	return result, nil
 }

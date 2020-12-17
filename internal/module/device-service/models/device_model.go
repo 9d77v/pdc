@@ -19,7 +19,6 @@ type DeviceModel struct {
 //NewDeviceModel ..
 func NewDeviceModel() *DeviceModel {
 	vs := &DeviceModel{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }

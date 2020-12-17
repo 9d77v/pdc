@@ -20,7 +20,6 @@ type TelemetryModel struct {
 //NewTelemetryModel ..
 func NewTelemetryModel() *TelemetryModel {
 	vs := &TelemetryModel{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }

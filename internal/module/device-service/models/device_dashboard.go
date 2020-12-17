@@ -18,7 +18,6 @@ type DeviceDashboard struct {
 //NewDeviceDashboard ..
 func NewDeviceDashboard() *DeviceDashboard {
 	vs := &DeviceDashboard{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }

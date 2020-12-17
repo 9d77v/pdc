@@ -43,7 +43,7 @@ type Model struct {
 
 //DefaultModel ..
 type DefaultModel struct {
-	*Model
+	Model
 	ID        uint `gorm:"primarykey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

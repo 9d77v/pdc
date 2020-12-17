@@ -16,7 +16,6 @@ type AttributeModel struct {
 //NewAttributeModel ..
 func NewAttributeModel() *AttributeModel {
 	vs := &AttributeModel{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }
