@@ -1,5 +1,5 @@
 APP=pdc
-BASE_VERSION=0.0.13
+BASE_VERSION=0.0.14
 BASE_DEPLOY_VERSION=0.0.2
 BASE_DEPLOY_FFMPEG_VERSION=0.0.1
 DOCKER_DIR=build/package
@@ -22,6 +22,9 @@ protoc-iot: api/proto/iot/*.proto
 protoc-device: api/proto/server/device-service/*.proto
 	protoc -I./api/proto/server/device-service --go_out=plugins=grpc:internal/module/device-service/pb api/proto/server/device-service/*.proto
 
+gen: api protoc-iot protoc-device
+	echo "generated all code"
+	
 #docker
 docker-deploy: test cmd/server.go
 	docker build -t 9d77v/$(APP):$(IMAGE_TAG) -f $(DOCKER_DIR)/Dockerfile .
@@ -54,3 +57,4 @@ docker-iot-camera: $(DOCKER_DIR)/iot/Dockerfile.camera
 backup:
 	datename=$(date +%Y%m%d)
 	PGPASSWORD="123456" pg_dump -h domain.local -p 5432 -U postgres  -d pdc -f ./pdc_db_backup.$datename.tar.gz -Ft 
+
