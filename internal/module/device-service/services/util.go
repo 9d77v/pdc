@@ -6,16 +6,16 @@ import (
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 )
 
-func (s DeviceService) getDeviceModels(data []*models.DeviceModel) []*model.DeviceModel {
+func getDeviceModels(data []*models.DeviceModel) []*model.DeviceModel {
 	result := make([]*model.DeviceModel, 0, len(data))
 	for _, m := range data {
-		r := s.getDeviceModel(m)
+		r := getDeviceModel(m)
 		result = append(result, r)
 	}
 	return result
 }
 
-func (s DeviceService) getDeviceModel(m *models.DeviceModel) *model.DeviceModel {
+func getDeviceModel(m *models.DeviceModel) *model.DeviceModel {
 	as := make([]*model.AttributeModel, 0, len(m.AttributeModels))
 	for _, v := range m.AttributeModels {
 		as = append(as, &model.AttributeModel{
@@ -54,16 +54,16 @@ func (s DeviceService) getDeviceModel(m *models.DeviceModel) *model.DeviceModel 
 	}
 }
 
-func (s DeviceService) getDevices(data []*models.Device) []*model.Device {
+func getDevices(data []*models.Device) []*model.Device {
 	result := make([]*model.Device, 0, len(data))
 	for _, m := range data {
-		r := s.getDevice(m)
+		r := getDevice(m)
 		result = append(result, r)
 	}
 	return result
 }
 
-func (s DeviceService) getDevice(m *models.Device) *model.Device {
+func getDevice(m *models.Device) *model.Device {
 	as := make([]*model.Attribute, 0, len(m.Attributes))
 	for _, v := range m.Attributes {
 		as = append(as, &model.Attribute{
@@ -110,15 +110,15 @@ func (s DeviceService) getDevice(m *models.Device) *model.Device {
 	}
 }
 
-func (s DeviceService) getDeviceDashboards(data []*models.DeviceDashboard) []*model.DeviceDashboard {
+func getDeviceDashboards(data []*models.DeviceDashboard) []*model.DeviceDashboard {
 	result := make([]*model.DeviceDashboard, 0, len(data))
 	for _, m := range data {
-		r := s.getDeviceDashboard(m)
+		r := getDeviceDashboard(m)
 		result = append(result, r)
 	}
 	return result
 }
-func (s DeviceService) getDeviceDashboard(m *models.DeviceDashboard) *model.DeviceDashboard {
+func getDeviceDashboard(m *models.DeviceDashboard) *model.DeviceDashboard {
 	ts := make([]*model.DeviceDashboardTelemetry, 0, len(m.Telemetries))
 	for _, v := range m.Telemetries {
 		ts = append(ts, &model.DeviceDashboardTelemetry{
@@ -160,16 +160,16 @@ func (s DeviceService) getDeviceDashboard(m *models.DeviceDashboard) *model.Devi
 	}
 }
 
-func (s DeviceService) getCameraTimeLapseVideos(data []*models.CameraTimeLapseVideo, scheme string) []*model.CameraTimeLapseVideo {
+func getCameraTimeLapseVideos(data []*models.CameraTimeLapseVideo, scheme string) []*model.CameraTimeLapseVideo {
 	result := make([]*model.CameraTimeLapseVideo, 0, len(data))
 	for _, m := range data {
-		r := s.getCameraTimeLapseVideo(m, scheme)
+		r := getCameraTimeLapseVideo(m, scheme)
 		result = append(result, r)
 	}
 	return result
 }
 
-func (s DeviceService) getCameraTimeLapseVideo(m *models.CameraTimeLapseVideo,
+func getCameraTimeLapseVideo(m *models.CameraTimeLapseVideo,
 	scheme string) *model.CameraTimeLapseVideo {
 	return &model.CameraTimeLapseVideo{
 		ID:       int64(m.ID),
@@ -179,7 +179,7 @@ func (s DeviceService) getCameraTimeLapseVideo(m *models.CameraTimeLapseVideo,
 	}
 }
 
-func (s DeviceService) getDefaultHikvisionAttributeModels(id uint) []*models.AttributeModel {
+func getDefaultHikvisionAttributeModels(id uint) []*models.AttributeModel {
 	return []*models.AttributeModel{
 		{
 			DeviceModelID: id,

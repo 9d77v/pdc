@@ -37,7 +37,7 @@ func TablePrefix() string {
 //GetDB get db connection
 func GetDB(config ...*config.DBConfig) *gorm.DB {
 	once.Do(func() {
-		dbConfig := defualtConfig()
+		dbConfig := defaultConfig()
 		if config != nil && len(config) == 1 {
 			dbConfig = config[0]
 		}
@@ -51,7 +51,7 @@ func GetDB(config ...*config.DBConfig) *gorm.DB {
 	return client
 }
 
-func defualtConfig() *config.DBConfig {
+func defaultConfig() *config.DBConfig {
 	return &config.DBConfig{
 		Driver:       "postgres",
 		Host:         dbHost,

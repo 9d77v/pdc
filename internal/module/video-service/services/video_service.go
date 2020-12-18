@@ -345,7 +345,7 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 		edgeField := base.NewGraphQLField(ctx, "edges.")
 		err = videoSeries.
 			Select(edgeField.Fields, "items").
-			IDArrayQuery(videoSeries.ToUintIDs(searchParam.Ids)).
+			IDArrayQuery(s.ToUintIDs(searchParam.Ids)).
 			Pagination(offset, limit).
 			Sort(searchParam.Sorts).
 			Find(&data)

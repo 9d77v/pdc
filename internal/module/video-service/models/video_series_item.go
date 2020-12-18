@@ -9,7 +9,7 @@ import (
 
 //VideoSeriesItem 视频系列视频列表
 type VideoSeriesItem struct {
-	*base.Model
+	base.Model
 	VideoSeriesID uint   `gorm:"primary_key;auto_increment:false"`
 	VideoID       uint   `gorm:"primary_key;auto_increment:false"`
 	EpisodeID     uint   `gorm:"<-:false"`
@@ -23,7 +23,6 @@ type VideoSeriesItem struct {
 //NewVideoSeriesItem ..
 func NewVideoSeriesItem() *VideoSeriesItem {
 	vs := &VideoSeriesItem{}
-	vs.Model = &base.Model{}
 	vs.SetDB(db.GetDB())
 	return vs
 }

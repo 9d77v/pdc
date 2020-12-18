@@ -23,6 +23,7 @@ require (
 	gobot.io/x/gobot v1.14.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
+	google.golang.org/grpc v1.34.0
 	google.golang.org/protobuf v1.25.0
 	gorm.io/driver/clickhouse v0.1.0
 	gorm.io/driver/postgres v1.0.0

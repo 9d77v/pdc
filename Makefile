@@ -19,8 +19,8 @@ gosec:
 #protoc gen
 protoc-iot: api/proto/iot/*.proto
 	protoc --go_out=pkg/iot/sdk/pb api/proto/iot/*.proto
-protoc-server: api/proto/server/*.proto
-	protoc --go_out=internal/pb api/proto/server/*.proto
+protoc-device: api/proto/server/device-service/*.proto
+	protoc -I./api/proto/server/device-service --go_out=plugins=grpc:internal/module/device-service/pb api/proto/server/device-service/*.proto
 
 #docker
 docker-deploy: test cmd/server.go
@@ -36,7 +36,7 @@ docker-base-deploy: $(DOCKER_DIR)/base/Dockerfile.deploy
 docker-base-deploy-ffmpeg: $(DOCKER_DIR)/base/Dockerfile.deploy.ffmpeg
 	docker build -t 9d77v/$(APP)-base-deploy-ffmpeg:$(BASE_DEPLOY_FFMPEG_VERSION) -f $(DOCKER_DIR)/base/Dockerfile.deploy.ffmpeg .
 	docker push 9d77v/$(APP)-base-deploy-ffmpeg:$(BASE_DEPLOY_FFMPEG_VERSION)
-#cron
+#cron                                                                                     
 docker-cron-camera: $(DOCKER_DIR)/cron/Dockerfile.camera
 	docker build -t 9d77v/$(APP)-cron-camera:$(IMAGE_TAG) -f $(DOCKER_DIR)/cron/Dockerfile.camera .
 	docker push 9d77v/$(APP)-cron-camera:$(IMAGE_TAG)

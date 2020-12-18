@@ -32,7 +32,6 @@ type Thing struct {
 //NewThing ..
 func NewThing() *Thing {
 	vs := &Thing{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }

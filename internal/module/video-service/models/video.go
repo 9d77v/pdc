@@ -31,7 +31,6 @@ type Video struct {
 //NewVideo ..
 func NewVideo() *Video {
 	vs := &Video{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }

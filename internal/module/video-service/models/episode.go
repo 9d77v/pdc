@@ -32,7 +32,6 @@ type Subtitle struct {
 //NewEpisode ..
 func NewEpisode() *Episode {
 	vs := &Episode{}
-	vs.DefaultModel = base.DefaultModel{Model: &base.Model{}}
 	vs.SetDB(db.GetDB())
 	return vs
 }
