@@ -39,6 +39,7 @@ docs https://domain.local/docs
 # Develop 
 ## run server
 ```
+make gen
 make dev
 ```
 ## run web
