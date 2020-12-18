@@ -11,6 +11,7 @@ import (
 	"github.com/9d77v/pdc/internal/graph/generated"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/middleware"
+	"github.com/9d77v/pdc/internal/module/device-service/pb"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -95,71 +96,88 @@ func (r *mutationResolver) RecordHistory(ctx context.Context, input model.NewHis
 }
 
 func (r *mutationResolver) CreateDeviceModel(ctx context.Context, input model.NewDeviceModel) (*model.DeviceModel, error) {
-	return deviceService.CreateDeviceModel(ctx, input)
+	resp, err := deviceModelService.CreateDeviceModel(ctx, getCreateDeviceModelRequest(input))
+	return &model.DeviceModel{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) UpdateDeviceModel(ctx context.Context, input model.NewUpdateDeviceModel) (*model.DeviceModel, error) {
-	return deviceService.UpdateDeviceModel(ctx, input)
+	resp, err := deviceModelService.UpdateDeviceModel(ctx, getUpdateDeviceModelRequest(input))
+	return &model.DeviceModel{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) CreateAttributeModel(ctx context.Context, input model.NewAttributeModel) (*model.AttributeModel, error) {
-	return deviceService.CreateAttributeModel(ctx, input)
+	resp, err := deviceModelService.CreateAttributeModel(ctx, getCreateAttributeModelRequest(input))
+	return &model.AttributeModel{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) UpdateAttributeModel(ctx context.Context, input model.NewUpdateAttributeModel) (*model.AttributeModel, error) {
-	return deviceService.UpdateAttributeModel(ctx, input)
+	resp, err := deviceModelService.UpdateAttributeModel(ctx, getUpdateAttributeModelRequest(input))
+	return &model.AttributeModel{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) DeleteAttributeModel(ctx context.Context, id int64) (*model.AttributeModel, error) {
-	return deviceService.DeleteAttributeModel(ctx, id)
+	resp, err := deviceModelService.DeleteAttributeModel(ctx, &pb.DeleteAttributeModelRequest{Ids: []int64{id}})
+	return &model.AttributeModel{ID: resp.Ids[0]}, err
 }
 
 func (r *mutationResolver) CreateTelemetryModel(ctx context.Context, input model.NewTelemetryModel) (*model.TelemetryModel, error) {
-	return deviceService.CreateTelemetryModel(ctx, input)
+	resp, err := deviceModelService.CreateTelemetryModel(ctx, getCreateTelemetryModelRequest(input))
+	return &model.TelemetryModel{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) UpdateTelemetryModel(ctx context.Context, input model.NewUpdateTelemetryModel) (*model.TelemetryModel, error) {
-	return deviceService.UpdateTelemetryModel(ctx, input)
+	resp, err := deviceModelService.UpdateTelemetryModel(ctx, getUpdateTelemetryModelRequest(input))
+	return &model.TelemetryModel{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) DeleteTelemetryModel(ctx context.Context, id int64) (*model.TelemetryModel, error) {
-	return deviceService.DeleteTelemetryModel(ctx, id)
+	resp, err := deviceModelService.DeleteTelemetryModel(ctx, &pb.DeleteTelemetryModelRequest{Ids: []int64{id}})
+	return &model.TelemetryModel{ID: resp.Ids[0]}, err
 }
 
 func (r *mutationResolver) CreateDevice(ctx context.Context, input model.NewDevice) (*model.Device, error) {
-	return deviceService.CreateDevice(ctx, input)
+	resp, err := deviceService.CreateDevice(ctx, getCreateDeviceRequest(input))
+	return &model.Device{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) UpdateDevice(ctx context.Context, input model.NewUpdateDevice) (*model.Device, error) {
-	return deviceService.UpdateDevice(ctx, input)
+	resp, err := deviceService.UpdateDevice(ctx, getUpdateDeviceRequest(input))
+	return &model.Device{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) CreateDeviceDashboard(ctx context.Context, input model.NewDeviceDashboard) (*model.DeviceDashboard, error) {
-	return deviceService.CreateDeviceDashboard(ctx, input)
+	resp, err := deviceDashboardService.CreateDeviceDashboard(ctx, getCreateDeviceDashboardRequest(input))
+	return &model.DeviceDashboard{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) UpdateDeviceDashboard(ctx context.Context, input model.NewUpdateDeviceDashboard) (*model.DeviceDashboard, error) {
-	return deviceService.UpdateDeviceDashboard(ctx, input)
+	resp, err := deviceDashboardService.UpdateDeviceDashboard(ctx, getUpdateDeviceDashboardRequest(input))
+	return &model.DeviceDashboard{ID: resp.Id}, err
 }
 
 func (r *mutationResolver) DeleteDeviceDashboard(ctx context.Context, id int64) (*model.DeviceDashboard, error) {
-	return deviceService.DeleteDeviceDashboard(ctx, id)
+	_, err := deviceDashboardService.DeleteDeviceDashboard(ctx, &pb.DeleteDeviceDashboardRequest{Ids: []int64{id}})
+	return &model.DeviceDashboard{ID: 0}, err
 }
 
 func (r *mutationResolver) AddDeviceDashboardTelemetry(ctx context.Context, input model.NewDeviceDashboardTelemetry) (*model.DeviceDashboard, error) {
-	return deviceService.AddDeviceDashboardTelemetry(ctx, input)
+	_, err := deviceDashboardService.AddTelemetries(ctx, getAddTelemetriesRequest(input))
+	return &model.DeviceDashboard{ID: 0}, err
 }
 
 func (r *mutationResolver) RemoveDeviceDashboardTelemetry(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
-	return deviceService.RemoveDeviceDashboardTelemetry(ctx, ids)
+	_, err := deviceDashboardService.RemoveTelemetries(ctx, &pb.RemoveTelemetriesRequest{Ids: ids})
+	return &model.DeviceDashboard{ID: 0}, err
 }
 
 func (r *mutationResolver) AddDeviceDashboardCamera(ctx context.Context, input model.NewDeviceDashboardCamera) (*model.DeviceDashboard, error) {
-	return deviceService.AddDeviceDashboardCamera(ctx, input)
+	_, err := deviceDashboardService.AddCameras(ctx, getAddCamerasRequest(input))
+	return &model.DeviceDashboard{ID: 0}, err
 }
 
 func (r *mutationResolver) RemoveDeviceDashboardCamera(ctx context.Context, ids []int64) (*model.DeviceDashboard, error) {
-	return deviceService.RemoveDeviceDashboardCamera(ctx, ids)
+	_, err := deviceDashboardService.RemoveCameras(ctx, &pb.RemoveCamerasRequest{Ids: ids})
+	return &model.DeviceDashboard{ID: 0}, err
 }
 
 func (r *mutationResolver) CameraCapture(ctx context.Context, deviceID int64) (string, error) {
@@ -248,7 +266,7 @@ func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, search
 
 func (r *queryResolver) DeviceModels(ctx context.Context, searchParam model.SearchParam) (*model.DeviceModelConnection, error) {
 	con := new(model.DeviceModelConnection)
-	total, data, err := deviceService.ListDeviceModel(ctx, searchParam)
+	total, data, err := deviceModelService.ListDeviceModel(ctx, searchParam)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -264,7 +282,7 @@ func (r *queryResolver) Devices(ctx context.Context, searchParam model.SearchPar
 
 func (r *queryResolver) DeviceDashboards(ctx context.Context, searchParam model.SearchParam) (*model.DeviceDashboardConnection, error) {
 	con := new(model.DeviceDashboardConnection)
-	total, data, err := deviceService.ListDeviceDashboards(ctx, searchParam)
+	total, data, err := deviceDashboardService.ListDeviceDashboards(ctx, searchParam)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -272,7 +290,7 @@ func (r *queryResolver) DeviceDashboards(ctx context.Context, searchParam model.
 
 func (r *queryResolver) AppDeviceDashboards(ctx context.Context, deviceType *int64) (*model.DeviceDashboardConnection, error) {
 	con := new(model.DeviceDashboardConnection)
-	total, data, err := deviceService.AppDeviceDashboards(ctx, deviceType)
+	total, data, err := deviceDashboardService.AppDeviceDashboards(ctx, deviceType)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -280,7 +298,7 @@ func (r *queryResolver) AppDeviceDashboards(ctx context.Context, deviceType *int
 
 func (r *queryResolver) CameraTimeLapseVideos(ctx context.Context, deviceID int64) (*model.CameraTimeLapseVideoConnection, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return deviceService.CameraTimeLapseVideos(ctx, deviceID, scheme)
+	return deviceDashboardService.CameraTimeLapseVideos(ctx, deviceID, scheme)
 }
 
 // Mutation returns generated.MutationResolver implementation.

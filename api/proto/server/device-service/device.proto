@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package pb;
+option go_package = ".;pb";
+
+service DeviceService {
+  rpc CreateDevice(CreateDeviceRequest) returns(CreateDeviceResponse) {}
+  rpc UpdateDevice(UpdateDeviceRequest) returns(UpdateDeviceResponse) {}
+}
+
+message CreateDeviceRequest {
+  int64 device_model_id = 1;
+  string name = 2;
+  string ip = 3;
+  uint64 port = 4;
+  string username = 5;
+  string password = 6;
+}
+
+message CreateDeviceResponse { int64 id = 1; }
+
+message UpdateDeviceRequest {
+  int64 id = 1;
+  string name = 2;
+  string ip = 3;
+  uint64 port = 4;
+  string username = 5;
+  string password = 6;
+}
+
+message UpdateDeviceResponse { int64 id = 1; }

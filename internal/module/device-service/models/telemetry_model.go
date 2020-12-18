@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
+	"github.com/9d77v/pdc/internal/module/device-service/pb"
 )
 
 //TelemetryModel 遥测模型
@@ -19,7 +20,22 @@ type TelemetryModel struct {
 
 //NewTelemetryModel ..
 func NewTelemetryModel() *TelemetryModel {
-	vs := &TelemetryModel{}
-	vs.SetDB(db.GetDB())
-	return vs
+	m := &TelemetryModel{}
+	m.SetDB(db.GetDB())
+	return m
+}
+
+//NewTelemetryModelFromPB ..
+func NewTelemetryModelFromPB(in *pb.CreateTelemetryModelRequest) *TelemetryModel {
+	m := &TelemetryModel{
+		DeviceModelID: uint(in.DeviceModelId),
+		Key:           in.Key,
+		Name:          in.Name,
+		Factor:        in.Factor,
+		Unit:          in.Unit,
+		UnitName:      in.UnitName,
+		Scale:         uint8(in.Scale),
+	}
+	m.SetDB(db.GetDB())
+	return m
 }

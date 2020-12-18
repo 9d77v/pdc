@@ -3,6 +3,8 @@ package models
 import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
+	"github.com/9d77v/pdc/internal/module/device-service/pb"
+	"gorm.io/gorm"
 )
 
 //DeviceDashboard 设备仪表盘
@@ -17,23 +19,57 @@ type DeviceDashboard struct {
 
 //NewDeviceDashboard ..
 func NewDeviceDashboard() *DeviceDashboard {
-	vs := &DeviceDashboard{}
-	vs.SetDB(db.GetDB())
-	return vs
+	m := &DeviceDashboard{}
+	m.SetDB(db.GetDB())
+	return m
+}
+
+//NewDeviceDashboardFromPB ..
+func NewDeviceDashboardFromPB(in *pb.CreateDeviceDashboardRequest) *DeviceDashboard {
+	m := &DeviceDashboard{
+		Name:       in.Name,
+		IsVisible:  in.IsVisible,
+		DeviceType: uint8(in.DeviceType),
+	}
+	m.SetDB(db.GetDB())
+	return m
+}
+
+//GetByID ..
+func (m *DeviceDashboard) GetByID(id uint) error {
+	return m.IDQuery(id).Preload("Cameras", func(db *gorm.DB) *gorm.DB {
+		return db.Model(&DeviceDashboardCamera{})
+	}).Preload("Telemetries", func(db *gorm.DB) *gorm.DB {
+		return db.Model(&DeviceDashboardTelemetry{})
+	}).First(m)
 }
 
 //DeviceDashboardTelemetry 仪表盘遥测
 type DeviceDashboardTelemetry struct {
-	*base.DefaultModel
+	base.DefaultModel
 	DeviceDashboardID uint
 	TelemetryID       uint
 	Telemetry         Telemetry
 }
 
+//NewDeviceDashboardTelemetry ..
+func NewDeviceDashboardTelemetry() *DeviceDashboardTelemetry {
+	m := &DeviceDashboardTelemetry{}
+	m.SetDB(db.GetDB())
+	return m
+}
+
 //DeviceDashboardCamera 仪表盘摄像头
 type DeviceDashboardCamera struct {
-	*base.DefaultModel
+	base.DefaultModel
 	DeviceDashboardID uint
 	DeviceID          uint
 	Device            Device
+}
+
+//NewDeviceDashboardCamera ..
+func NewDeviceDashboardCamera() *DeviceDashboardCamera {
+	m := &DeviceDashboardCamera{}
+	m.SetDB(db.GetDB())
+	return m
 }

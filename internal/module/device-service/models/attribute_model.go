@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
+	"github.com/9d77v/pdc/internal/module/device-service/pb"
 )
 
 //AttributeModel 属性模型
@@ -15,7 +16,18 @@ type AttributeModel struct {
 
 //NewAttributeModel ..
 func NewAttributeModel() *AttributeModel {
-	vs := &AttributeModel{}
-	vs.SetDB(db.GetDB())
-	return vs
+	m := &AttributeModel{}
+	m.SetDB(db.GetDB())
+	return m
+}
+
+//NewAttributeModelFromPB ..
+func NewAttributeModelFromPB(in *pb.CreateAttributeModelRequest) *AttributeModel {
+	m := &AttributeModel{
+		DeviceModelID: uint(in.DeviceModelId),
+		Key:           in.Key,
+		Name:          in.Name,
+	}
+	m.SetDB(db.GetDB())
+	return m
 }

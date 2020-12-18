@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package pb;
+option go_package = ".;pb";
+import "device_model.proto";
+
+service DeviceDashboardService {
+  rpc CreateDeviceDashboard(CreateDeviceDashboardRequest)
+      returns(CreateDeviceDashboardResponse) {}
+  rpc UpdateDeviceDashboard(UpdateDeviceDashboardRequest)
+      returns(UpdateDeviceDashboardResponse) {}
+  rpc DeleteDeviceDashboard(DeleteDeviceDashboardRequest)
+      returns(DeleteDeviceDashboardResponse) {}
+  rpc AddTelemetries(AddTelemetriesRequest) returns(AddTelemetriesResponse) {}
+  rpc RemoveTelemetries(RemoveTelemetriesRequest)
+      returns(RemoveTelemetriesResponse) {}
+  rpc AddCameras(AddCamerasRequest) returns(AddCamerasResponse) {}
+  rpc RemoveCameras(RemoveCamerasRequest) returns(RemoveCamerasResponse) {}
+}
+
+message CreateDeviceDashboardRequest {
+  string name = 1;
+  bool is_visible = 2;
+  DeviceType device_type = 3;
+}
+
+message CreateDeviceDashboardResponse { int64 id = 1; }
+
+message UpdateDeviceDashboardRequest {
+  int64 id = 1;
+  string name = 2;
+  bool is_visible = 3;
+}
+
+message UpdateDeviceDashboardResponse { int64 id = 1; }
+
+message DeleteDeviceDashboardRequest { repeated int64 ids = 1; }
+
+message DeleteDeviceDashboardResponse { repeated int64 ids = 1; }
+
+message AddTelemetriesRequest {
+  int64 device_dashboard_id = 1;
+  repeated int64 telemetry_ids = 2;
+}
+
+message AddTelemetriesResponse { repeated int64 ids = 1; }
+
+message RemoveTelemetriesRequest { repeated int64 ids = 1; }
+
+message RemoveTelemetriesResponse { repeated int64 ids = 1; }
+
+message AddCamerasRequest {
+  int64 device_dashboard_id = 1;
+  repeated int64 device_ids = 2;
+}
+
+message AddCamerasResponse { repeated int64 ids = 1; }
+
+message RemoveCamerasRequest { repeated int64 ids = 1; }
+
+message RemoveCamerasResponse { repeated int64 ids = 1; }

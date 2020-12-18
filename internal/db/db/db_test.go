@@ -29,12 +29,13 @@ func Test_createDatabaseIfNotExist(t *testing.T) {
 			MaxIdleConns: 10,
 			MaxOpenConns: 100,
 			EnableLog:    true,
-		}, "pdc_test"}},
+		}, "pdc_dbtest"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db := GetDB(tt.args.config)
 			tt.args.config.Name = tt.args.dbName
+			deleteDB(db, tt.args.dbName)
 			assert.True(t, databaseNotExist(db, tt.args.config))
 			createDatabaseIfNotExist(tt.args.config)
 			assert.False(t, databaseNotExist(db, tt.args.config))

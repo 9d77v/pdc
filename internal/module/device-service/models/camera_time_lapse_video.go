@@ -15,7 +15,7 @@ type CameraTimeLapseVideo struct {
 
 //NewCameraTimeLapseVideo ..
 func NewCameraTimeLapseVideo() *CameraTimeLapseVideo {
-	vs := &CameraTimeLapseVideo{}
-	vs.SetDB(db.GetDB())
-	return vs
+	m := &CameraTimeLapseVideo{}
+	m.SetDB(db.GetDB())
+	return m
 }

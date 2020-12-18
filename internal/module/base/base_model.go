@@ -23,7 +23,6 @@ type Repository interface {
 	IDQuery(id uint, idFieldName ...string) Repository
 	IDArrayQuery(ids []uint, idFieldName ...string) Repository
 	Where(query interface{}, args ...interface{}) Repository
-	ToUintIDs(ids []int64) []uint
 	Pagination(offset, limit int) Repository
 	Sort(sorts []*model.Sort) Repository
 	Order(value interface{}) Repository
@@ -34,6 +33,7 @@ type Repository interface {
 	Count(model interface{}) (total int64, err error)
 	Create(value interface{}) error
 	Updates(value interface{}) error
+	Delete(value interface{}, ids []int64) error
 }
 
 //Model ..
@@ -158,15 +158,6 @@ func (m *Model) getFieldName(idFieldName ...string) string {
 	return fieldName
 }
 
-//ToUintIDs change id type from int64 to uint
-func (m *Model) ToUintIDs(ids []int64) []uint {
-	result := make([]uint, 0, len(ids))
-	for _, id := range ids {
-		result = append(result, uint(id))
-	}
-	return result
-}
-
 //Pagination 分页
 func (m *Model) Pagination(offset, limit int) Repository {
 	if limit > 0 {
@@ -231,4 +222,32 @@ func (m *Model) Create(value interface{}) error {
 //Updates 更新数据
 func (m *Model) Updates(value interface{}) error {
 	return m.db.Updates(value).Error
+}
+
+//Save 保存数据
+func (m *Model) Save(value interface{}) error {
+	return m.db.Save(value).Error
+}
+
+//Delete 删除数据
+func (m *Model) Delete(value interface{}, ids []int64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	return m.db.Delete(value, ids).Error
+}
+
+//Begin 开启事务
+func (m *Model) Begin() {
+	m.db = m.db.Begin()
+}
+
+//Rollback 撤回事务
+func (m *Model) Rollback() {
+	m.db.Rollback()
+}
+
+//Commit 提交事务
+func (m *Model) Commit() error {
+	return m.db.Commit().Error
 }

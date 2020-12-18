@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package pb;
+option go_package = ".;pb";
+
+service DeviceModelService {
+  rpc CreateDeviceModel(CreateDeviceModelRequest)
+      returns(CreateDeviceModelResponse) {}
+  rpc UpdateDeviceModel(UpdateDeviceModelRequest)
+      returns(UpdateDeviceModelResponse) {}
+  rpc CreateAttributeModel(CreateAttributeModelRequest)
+      returns(CreateAttributeModelResponse) {}
+  rpc UpdateAttributeModel(UpdateAttributeModelRequest)
+      returns(UpdateAttributeModelResponse) {}
+  rpc DeleteAttributeModel(DeleteAttributeModelRequest)
+      returns(DeleteAttributeModelResponse) {}
+  rpc CreateTelemetryModel(CreateTelemetryModelRequest)
+      returns(CreateTelemetryModelResponse) {}
+  rpc UpdateTelemetryModel(UpdateTelemetryModelRequest)
+      returns(UpdateTelemetryModelResponse) {}
+  rpc DeleteTelemetryModel(DeleteTelemetryModelRequest)
+      returns(DeleteTelemetryModelResponse) {}
+}
+
+enum DeviceType { Default = 0; Camera = 1; }
+enum CameraCompany { Hikvision = 0; DaHua = 1; }
+
+message CreateDeviceModelRequest {
+  string name = 1;
+  string desc = 2;
+  DeviceType device_type = 3;
+  CameraCompany camera_company = 4;
+}
+
+message CreateDeviceModelResponse { int64 id = 1; }
+
+message UpdateDeviceModelRequest {
+  int64 id = 1;
+  string name = 2;
+  string desc = 3;
+}
+
+message UpdateDeviceModelResponse { int64 id = 1; }
+
+message CreateAttributeModelRequest {
+  int64 device_model_id = 1;
+  string key = 2;
+  string name = 3;
+}
+
+message CreateAttributeModelResponse { int64 id = 1; }
+
+message UpdateAttributeModelRequest {
+  int64 id = 1;
+  string name = 2;
+}
+
+message UpdateAttributeModelResponse { int64 id = 1; }
+
+message DeleteAttributeModelRequest { repeated int64 ids = 1; }
+
+message DeleteAttributeModelResponse { repeated int64 ids = 1; }
+
+message CreateTelemetryModelRequest {
+  int64 device_model_id = 1;
+  string key = 2;
+  string name = 3;
+  double factor = 4;
+  string unit = 5;
+  string unit_name = 6;
+  int64 scale = 7;
+}
+
+message CreateTelemetryModelResponse { int64 id = 1; }
+
+message UpdateTelemetryModelRequest {
+  int64 id = 1;
+  string name = 2;
+  double factor = 3;
+  string unit = 4;
+  string unit_name = 5;
+  int64 scale = 6;
+}
+
+message UpdateTelemetryModelResponse { int64 id = 1; }
+
+message DeleteTelemetryModelRequest { repeated int64 ids = 1; }
+
+message DeleteTelemetryModelResponse { repeated int64 ids = 1; }
