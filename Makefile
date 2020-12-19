@@ -19,10 +19,17 @@ gosec:
 #protoc gen
 protoc-iot: api/proto/iot/*.proto
 	protoc --go_out=pkg/iot/sdk/pb api/proto/iot/*.proto
+protoc-base: api/proto/server/base/*.proto
+	protoc --go_out=internal/module/base api/proto/server/base/*.proto
+	mv internal/module/base/github.com/9d77v/pdc/internal/module/base/*.go internal/module/base/
+	rm -rf internal/module/base/github.com
 protoc-device: api/proto/server/device-service/*.proto
-	protoc -I./api/proto/server/device-service --go_out=plugins=grpc:internal/module/device-service/pb api/proto/server/device-service/*.proto
+	protoc -I./api/proto/server \
+	--go_out=plugins=grpc:. \
+	--experimental_allow_proto3_optional \
+	api/proto/server/device-service/*.proto
 
-gen: api protoc-iot protoc-device
+gen:  protoc-iot protoc-device api
 	echo "generated all code"
 	
 #docker

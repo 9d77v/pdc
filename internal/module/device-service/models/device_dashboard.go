@@ -44,32 +44,53 @@ func (m *DeviceDashboard) GetByID(id uint) error {
 	}).First(m)
 }
 
-//DeviceDashboardTelemetry 仪表盘遥测
-type DeviceDashboardTelemetry struct {
-	base.DefaultModel
-	DeviceDashboardID uint
-	TelemetryID       uint
-	Telemetry         Telemetry
+//ToDeviceDashboardPBs ..
+func (m *DeviceDashboard) ToDeviceDashboardPBs(data []*DeviceDashboard) []*pb.DeviceDashboard {
+	result := make([]*pb.DeviceDashboard, 0, len(data))
+	for _, v := range data {
+		r := m.toDeviceDashboardPB(v)
+		result = append(result, r)
+	}
+	return result
 }
-
-//NewDeviceDashboardTelemetry ..
-func NewDeviceDashboardTelemetry() *DeviceDashboardTelemetry {
-	m := &DeviceDashboardTelemetry{}
-	m.SetDB(db.GetDB())
-	return m
-}
-
-//DeviceDashboardCamera 仪表盘摄像头
-type DeviceDashboardCamera struct {
-	base.DefaultModel
-	DeviceDashboardID uint
-	DeviceID          uint
-	Device            Device
-}
-
-//NewDeviceDashboardCamera ..
-func NewDeviceDashboardCamera() *DeviceDashboardCamera {
-	m := &DeviceDashboardCamera{}
-	m.SetDB(db.GetDB())
-	return m
+func (m *DeviceDashboard) toDeviceDashboardPB(deviceDashboard *DeviceDashboard) *pb.DeviceDashboard {
+	ts := make([]*pb.DeviceDashboardTelemetry, 0, len(deviceDashboard.Telemetries))
+	for _, v := range deviceDashboard.Telemetries {
+		ts = append(ts, &pb.DeviceDashboardTelemetry{
+			Id:                int64(v.ID),
+			DeviceDashboardId: int64(v.DeviceDashboardID),
+			DeviceId:          int64(v.Telemetry.DeviceID),
+			DeviceName:        v.Telemetry.Device.Name,
+			TelemetryId:       int64(v.TelemetryID),
+			Key:               v.Telemetry.TelemetryModel.Key,
+			Name:              v.Telemetry.TelemetryModel.Name,
+			Unit:              v.Telemetry.TelemetryModel.Unit,
+			UnitName:          v.Telemetry.TelemetryModel.UnitName,
+			Factor:            v.Telemetry.TelemetryModel.Factor,
+			Scale:             int64(v.Telemetry.TelemetryModel.Scale),
+			CreatedAt:         v.CreatedAt.Unix(),
+			UpdatedAt:         v.UpdatedAt.Unix(),
+		})
+	}
+	cs := make([]*pb.DeviceDashboardCamera, 0, len(deviceDashboard.Cameras))
+	for _, v := range deviceDashboard.Cameras {
+		cs = append(cs, &pb.DeviceDashboardCamera{
+			Id:                int64(v.ID),
+			DeviceDashboardId: int64(v.DeviceDashboardID),
+			DeviceId:          int64(v.DeviceID),
+			DeviceName:        v.Device.Name,
+			CreatedAt:         v.CreatedAt.Unix(),
+			UpdatedAt:         v.UpdatedAt.Unix(),
+		})
+	}
+	return &pb.DeviceDashboard{
+		Id:          int64(deviceDashboard.ID),
+		Name:        deviceDashboard.Name,
+		IsVisible:   deviceDashboard.IsVisible,
+		Telemetries: ts,
+		Cameras:     cs,
+		DeviceType:  pb.DeviceType(deviceDashboard.DeviceType),
+		CreatedAt:   deviceDashboard.CreatedAt.Unix(),
+		UpdatedAt:   deviceDashboard.UpdatedAt.Unix(),
+	}
 }

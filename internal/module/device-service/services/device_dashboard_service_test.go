@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
 	"github.com/stretchr/testify/assert"
@@ -14,7 +16,7 @@ var (
 	testDeviceDashboard    = &pb.CreateDeviceDashboardRequest{
 		Name:       "测试面板1",
 		IsVisible:  true,
-		DeviceType: pb.DeviceType_Default,
+		DeviceType: pb.DeviceType_Camera,
 	}
 )
 
@@ -143,18 +145,6 @@ func TestDeviceDashboardService_AddTelemetries(t *testing.T) {
 
 func TestDeviceDashboardService_RemoveTelemetries(t *testing.T) {
 	deviceDashboard, _ := deviceDashboardService.CreateDeviceDashboard(ctx, testDeviceDashboard)
-	deviceResp := createDevice()
-	device := models.NewDevice()
-	device.GetByID(uint(deviceResp.Id))
-	ids := make([]int64, 0, len(device.Telemetries))
-	for _, v := range device.Telemetries {
-		ids = append(ids, int64(v.ID))
-	}
-	rightTelemetryRequest := &pb.AddTelemetriesRequest{
-		DeviceDashboardId: deviceDashboard.Id,
-		TelemetryIds:      ids,
-	}
-	deviceDashboardService.AddTelemetries(ctx, rightTelemetryRequest)
 	dashboard := models.NewDeviceDashboard()
 	dashboard.GetByID(uint(deviceDashboard.Id))
 	removeIds := make([]int64, 0)
@@ -261,6 +251,172 @@ func TestDeviceDashboardService_RemoveCameras(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := deviceDashboardService.RemoveCameras(tt.args.ctx, tt.args.in)
 			assert.Equal(t, tt.wantErr, err != nil)
+		})
+	}
+}
+
+func TestDeviceDashboardService_ListDeviceDashboards(t *testing.T) {
+	deviceDashboard := createDeviceDashboard()
+	type args struct {
+		ctx context.Context
+		in  *pb.ListDeviceDashboardRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test ListDeviceDashboards", args{context.Background(), &pb.ListDeviceDashboardRequest{
+			SearchParam: &base.SearchParam{
+				Ids: []int64{deviceDashboard.Id},
+				QueryFields: []string{
+					"edges",
+					"edges.id",
+					"edges.name",
+					"edges.isVisible",
+					"edges.deviceType",
+					"edges.telemetries",
+					"edges.telemetries.id",
+					"edges.telemetries.deviceID",
+					"edges.telemetries.deviceName",
+					"edges.telemetries.telemetryID",
+					"edges.telemetries.name",
+					"edges.telemetries.value",
+					"edges.telemetries.factor",
+					"edges.telemetries.scale",
+					"edges.telemetries.unit",
+					"edges.cameras",
+					"edges.cameras.id",
+					"edges.cameras.deviceID",
+					"edges.cameras.deviceName",
+					"totalCount",
+				},
+			},
+		}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := deviceDashboardService.ListDeviceDashboards(tt.args.ctx, tt.args.in)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeviceDashboardService.ListDeviceDashboard() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, 1, len(got.Edges))
+			assert.LessOrEqual(t, int64(1), got.TotalCount)
+		})
+	}
+}
+
+func createDeviceDashboard() *pb.CreateDeviceDashboardResponse {
+	deviceDashboard, _ := deviceDashboardService.CreateDeviceDashboard(ctx, testDeviceDashboard)
+	deviceResp := createDevice()
+	device := models.NewDevice()
+	device.GetByID(uint(deviceResp.Id))
+	ids := make([]int64, 0, len(device.Telemetries))
+	for _, v := range device.Telemetries {
+		ids = append(ids, int64(v.ID))
+	}
+	rightTelemetryRequest := &pb.AddTelemetriesRequest{
+		DeviceDashboardId: deviceDashboard.Id,
+		TelemetryIds:      ids,
+	}
+	deviceDashboardService.AddTelemetries(ctx, rightTelemetryRequest)
+	rightCameraRequest := &pb.AddCamerasRequest{
+		DeviceDashboardId: deviceDashboard.Id,
+		DeviceIds:         []int64{deviceResp.Id},
+	}
+	deviceDashboardService.AddCameras(ctx, rightCameraRequest)
+	return deviceDashboard
+}
+
+func TestDeviceDashboardService_ListAppDeviceDashboards(t *testing.T) {
+	createDeviceDashboard()
+	type args struct {
+		ctx context.Context
+		in  *pb.ListAppDeviceDashboardRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test ListAppDeviceDashboards", args{context.Background(), &pb.ListAppDeviceDashboardRequest{
+			QueryFields: []string{
+				"edges",
+				"edges.id",
+				"edges.name",
+				"edges.isVisible",
+				"edges.deviceType",
+				"edges.telemetries",
+				"edges.telemetries.id",
+				"edges.telemetries.deviceID",
+				"edges.telemetries.deviceName",
+				"edges.telemetries.telemetryID",
+				"edges.telemetries.name",
+				"edges.telemetries.value",
+				"edges.telemetries.factor",
+				"edges.telemetries.scale",
+				"edges.telemetries.unit",
+				"edges.cameras",
+				"edges.cameras.id",
+				"edges.cameras.deviceID",
+				"edges.cameras.deviceName",
+				"totalCount",
+			},
+			DeviceType: ptrs.Int64Ptr(int64(pb.DeviceType_Camera)),
+		}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := deviceDashboardService.ListAppDeviceDashboards(tt.args.ctx, tt.args.in)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeviceDashboardService.ListDeviceDashboard() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.LessOrEqual(t, int64(1), got.TotalCount)
+		})
+	}
+}
+
+func TestDeviceDashboardService_ListCameraTimeLapseVideos(t *testing.T) {
+	m := models.NewCameraTimeLapseVideo()
+	deviceResp := createDevice()
+	m.Save(&models.CameraTimeLapseVideo{
+		DeviceID: uint(deviceResp.Id),
+		Date:     "2020-12-19",
+		VideoURL: "http://oss.domain.local/1.jpg",
+	})
+	type args struct {
+		ctx context.Context
+		in  *pb.ListCameraTimeLapseVideoRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test ListCameraTimeLapseVideos", args{context.Background(), &pb.ListCameraTimeLapseVideoRequest{
+			QueryFields: []string{
+				"edges",
+				"edges.id",
+				"edges.deviceID",
+				"edges.date",
+				"edges.videoURL",
+				"totalCount",
+			},
+			DeviceID: deviceResp.Id,
+		}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := deviceDashboardService.ListCameraTimeLapseVideos(tt.args.ctx, tt.args.in)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeviceDashboardService.ListCameraTimeLapseVideos() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.Equal(t, 1, len(got.Edges))
+			assert.Equal(t, int64(1), got.TotalCount)
+
 		})
 	}
 }

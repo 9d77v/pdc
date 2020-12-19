@@ -4,7 +4,6 @@ import (
 	"context"
 
 	es "github.com/9d77v/go-lib/clients/elastic/v7"
-	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/graph/model"
 	elastic "github.com/olivere/elastic/v7"
 )
@@ -12,7 +11,7 @@ import (
 //Search ..
 type Search struct {
 	Ctx           context.Context
-	SearchParam   model.SearchParam
+	SearchParam   *SearchParam
 	Scheme        string
 	SearchService *elastic.SearchService
 	BoolQuery     *elastic.BoolQuery
@@ -21,7 +20,7 @@ type Search struct {
 }
 
 //NewSearch ..
-func NewSearch(ctx context.Context, searchParam model.SearchParam, scheme string) *Search {
+func NewSearch(ctx context.Context, searchParam *SearchParam, scheme string) *Search {
 	return &Search{
 		Ctx:           ctx,
 		SearchParam:   searchParam,
@@ -32,7 +31,7 @@ func NewSearch(ctx context.Context, searchParam model.SearchParam, scheme string
 	}
 }
 
-func newFilterQueries(searchParam model.SearchParam) []elastic.Query {
+func newFilterQueries(searchParam *SearchParam) []elastic.Query {
 	mustQueries := make([]elastic.Query, 0)
 	mustQueries = append(mustQueries, elastic.NewTermQuery("is_show", true))
 	if len(searchParam.Tags) > 0 {
@@ -45,9 +44,9 @@ func newFilterQueries(searchParam model.SearchParam) []elastic.Query {
 	return mustQueries
 }
 
-func newIgnoreQueries(searchParam model.SearchParam) []elastic.Query {
+func newIgnoreQueries(searchParam *SearchParam) []elastic.Query {
 	mustNotQueries := make([]elastic.Query, 0)
-	if ptrs.Bool(searchParam.IsMobile) {
+	if searchParam.IsMobile {
 		mustNotQueries = append(mustNotQueries, elastic.NewTermQuery("is_hide_on_mobile", true))
 	}
 	return mustNotQueries
@@ -62,8 +61,8 @@ func (s *Search) Filter() {
 
 //GetPageInfo ..
 func (s *Search) GetPageInfo() (int, int) {
-	page := ptrs.Int64(s.SearchParam.Page)
-	pageSize := ptrs.Int64(s.SearchParam.PageSize)
+	page := s.SearchParam.Page
+	pageSize := s.SearchParam.PageSize
 	if page < 1 {
 		page = 1
 	}

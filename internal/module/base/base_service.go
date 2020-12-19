@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/graph/model"
 )
 
 //Service base service
@@ -48,8 +46,40 @@ func (s Service) GetValidIDs(r Repository, tableName string, ids []uint) []uint 
 	return validIDs
 }
 
+//GetNewConnection get list data and total count
+func (s Service) GetNewConnection(r Repository, searchParam *SearchParam,
+	data interface{}, replaceFunc func(field GraphQLField) error, omitFields ...string) (total int64, err error) {
+	graphqlField := ForGraphQLField(searchParam.QueryFields, "")
+	if graphqlField.FieldMap["totalCount"] {
+		total, err = r.Count(r)
+		if err != nil {
+			return
+		}
+	}
+	offset, limit := s.GetPageInfo(searchParam)
+	if graphqlField.FieldMap["edges"] {
+		edgeGraphqlField := ForGraphQLField(searchParam.QueryFields, "edges.")
+		r.Select(edgeGraphqlField.Fields, omitFields...)
+		if searchParam.TableName != "" {
+			r.IDArrayQuery(s.ToUintIDs(searchParam.Ids), searchParam.TableName+".id")
+		} else {
+			r.IDArrayQuery(s.ToUintIDs(searchParam.Ids))
+		}
+		r.Pagination(offset, limit).
+			Sort(searchParam.Sorts)
+		if replaceFunc != nil {
+			err = replaceFunc(edgeGraphqlField)
+			if err != nil {
+				return
+			}
+		}
+		err = r.Find(data)
+	}
+	return
+}
+
 //GetConnection get list data and total count
-func (s Service) GetConnection(ctx context.Context, r Repository, searchParam model.SearchParam,
+func (s Service) GetConnection(ctx context.Context, r Repository, searchParam *SearchParam,
 	data interface{}, replaceFunc func(field GraphQLField) error, omitFields ...string) (total int64, err error) {
 	graphqlField := NewGraphQLField(ctx, "")
 	if graphqlField.FieldMap["totalCount"] {
@@ -77,9 +107,9 @@ func (s Service) GetConnection(ctx context.Context, r Repository, searchParam mo
 }
 
 //GetPageInfo ...
-func (s Service) GetPageInfo(searchParam model.SearchParam) (int, int) {
-	page := ptrs.Int64(searchParam.Page)
-	pageSize := ptrs.Int64(searchParam.PageSize)
+func (s Service) GetPageInfo(searchParam *SearchParam) (int, int) {
+	page := searchParam.Page
+	pageSize := searchParam.PageSize
 	if page < 1 {
 		page = 1
 	}

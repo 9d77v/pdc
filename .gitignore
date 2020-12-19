@@ -16,3 +16,4 @@
 logs
 tmp
 pb
+*.pb.go

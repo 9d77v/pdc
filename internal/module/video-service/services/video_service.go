@@ -216,7 +216,7 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 }
 
 //ListVideo ..
-func (s VideoService) ListVideo(ctx context.Context, searchParam model.SearchParam,
+func (s VideoService) ListVideo(ctx context.Context, searchParam *base.SearchParam,
 	scheme string, isFilterVideoSeries *bool, episodeID *int64) (int64, []*model.Video, error) {
 	var video models.VideoRepository = models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
@@ -308,7 +308,7 @@ func (s VideoService) UpdateVideoSeriesItem(ctx context.Context,
 }
 
 //ListVideoSeries ..
-func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.SearchParam, episodeID *int64) (int64, []*model.VideoSeries, error) {
+func (s VideoService) ListVideoSeries(ctx context.Context, searchParam *base.SearchParam, episodeID *int64) (int64, []*model.VideoSeries, error) {
 	result := make([]*model.VideoSeries, 0)
 	data := make([]*models.VideoSeries, 0)
 	field := base.NewGraphQLField(ctx, "")
@@ -391,11 +391,11 @@ func (s VideoService) ListVideoSeries(ctx context.Context, searchParam model.Sea
 
 //SearchVideo ..
 func (s VideoService) SearchVideo(ctx context.Context,
-	searchParam model.SearchParam, scheme string) (*model.VideoIndexConnection, error) {
+	searchParam *base.SearchParam, scheme string) (*model.VideoIndexConnection, error) {
 	return newVideoSearch(ctx, searchParam, scheme).execute()
 }
 
 //SimilarVideos ..
-func (s VideoService) SimilarVideos(ctx context.Context, searchParam model.SearchParam, episodeID int64, scheme string) (*model.VideoIndexConnection, error) {
+func (s VideoService) SimilarVideos(ctx context.Context, searchParam *base.SearchParam, episodeID int64, scheme string) (*model.VideoIndexConnection, error) {
 	return newVideoSuggest(ctx, searchParam, episodeID, scheme).execute()
 }

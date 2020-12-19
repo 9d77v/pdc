@@ -8,7 +8,6 @@ import (
 	elastic "github.com/olivere/elastic/v7"
 
 	es "github.com/9d77v/go-lib/clients/elastic/v7"
-	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
@@ -18,7 +17,7 @@ type videoSearch struct {
 	*base.Search
 }
 
-func newVideoSearch(ctx context.Context, searchParam model.SearchParam,
+func newVideoSearch(ctx context.Context, searchParam *base.SearchParam,
 	scheme string) *videoSearch {
 	return &videoSearch{
 		Search: base.NewSearch(ctx, searchParam, scheme),
@@ -27,7 +26,7 @@ func newVideoSearch(ctx context.Context, searchParam model.SearchParam,
 
 func (s *videoSearch) execute() (*model.VideoIndexConnection, error) {
 	result := new(model.VideoIndexConnection)
-	keyword := strings.ReplaceAll(ptrs.String(s.SearchParam.Keyword), " ", "")
+	keyword := strings.ReplaceAll(s.SearchParam.Keyword, " ", "")
 	if keyword != "" {
 		s.BoolQuery.Must(newKeywordQuery(keyword))
 	}
@@ -87,7 +86,7 @@ func newKeywordQuery(keyword string) *elastic.MultiMatchQuery {
 }
 
 func (s *videoSearch) sort(searchService *elastic.SearchService) {
-	if ptrs.Bool(s.SearchParam.IsRandom) {
+	if s.SearchParam.IsRandom {
 		searchService.SortBy(elastic.NewScriptSort(elastic.NewScript("Math.random()"), "number").Order(true))
 	} else {
 		searchService.Sort("_score", false).

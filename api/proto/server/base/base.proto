@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package base;
+option go_package = "github.com/9d77v/pdc/internal/module/base";
+
+message SearchParam {
+  repeated string query_fields = 1;
+  string tableName = 2;
+  string keyword = 3;
+  int64 page = 4;
+  int64 pageSize = 5;
+  repeated int64 ids = 6;
+  repeated string tags = 7;
+  repeated Sort sorts = 8;
+  bool is_random = 9;
+  bool is_mobile = 10;
+}
+
+message Sort {
+  string field = 1;
+  bool is_asc = 2;
+}

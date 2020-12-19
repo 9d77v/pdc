@@ -88,10 +88,7 @@ type Device {
   port: Int!
   accessKey: String!
   secretKey: String!
-  deviceModelName:String!
-  deviceModelDesc:String!
-  deviceModelDeviceType: Int!
-  deviceModelCameraCompany: Int!
+  deviceModel:DeviceModel
   attributes: [Attribute!]
   telemetries: [Telemetry!]
   username: String!

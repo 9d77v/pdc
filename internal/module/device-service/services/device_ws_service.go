@@ -9,8 +9,11 @@ import (
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
+	devicePB "github.com/9d77v/pdc/internal/module/device-service/pb"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -24,20 +27,19 @@ func (s DeviceService) DeviceLogin(accessKey, secretKey string) (uint, error) {
 
 //GetDeviceInfo ..
 func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceDownMSG, error) {
-	replyDeviceMsg := &pb.DeviceDownMSG{
-		DeviceId: deviceID,
-	}
+	replyDeviceMsg := new(pb.DeviceDownMSG)
 	device := models.NewDevice()
 	err := device.Preload("Attributes").
 		Preload("Attributes.AttributeModel").
 		Preload("Telemetries").
 		Preload("Telemetries.TelemetryModel").
 		Preload("DeviceModel").
-		IDQuery(uint(replyDeviceMsg.DeviceId)).First(device)
+		IDQuery(uint(deviceID)).First(device)
 	if err != nil {
 		log.Println("get device failed,err", err)
 		return replyDeviceMsg, err
 	}
+	replyDeviceMsg.DeviceId = uint32(device.ID)
 	attributeConfig := make(map[string]uint32, 0)
 	for _, v := range device.Attributes {
 		attributeConfig[v.AttributeModel.Key] = uint32(v.ID)
@@ -62,18 +64,24 @@ func (s DeviceService) GetDeviceInfo(deviceID uint32) (*pb.DeviceDownMSG, error)
 }
 
 //CameraCapture ..
-func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme string) (string, error) {
+func (s DeviceService) CameraCapture(ctx context.Context,
+	in *devicePB.CameraCaptureRequest) (*devicePB.CameraCaptureResponse, error) {
+	resp := new(devicePB.CameraCaptureResponse)
+	m := models.NewDevice()
+	if s.RecordNotExist(m, uint(in.DeviceId)) {
+		return resp, status.Error(codes.NotFound, "数据不存在")
+	}
 	bucketName := "camera"
 	now := time.Now()
-	objectName := "picture/" + strconv.FormatInt(deviceID, 10) + "/" + now.Format("2006-01-02") + "/" +
+	objectName := "picture/" + strconv.FormatUint(uint64(in.DeviceId), 10) + "/" + now.Format("2006-01-02") + "/" +
 		strconv.FormatInt(now.Unix(), 10) + ".jpg"
 	minioClient := oss.GetMinioClient()
 	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 10*time.Minute)
 	if err != nil {
-		return "", err
+		return resp, err
 	}
 	request := new(pb.DeviceDownMSG)
-	request.DeviceId = uint32(deviceID)
+	request.DeviceId = in.DeviceId
 	request.ActionTime = ptypes.TimestampNow()
 	request.Payload = &pb.DeviceDownMSG_CameraCaptureMsg{
 		CameraCaptureMsg: &pb.CameraCaptureMsg{
@@ -84,20 +92,15 @@ func (s DeviceService) CameraCapture(ctx context.Context, deviceID int64, scheme
 	}
 	requestMsg, err := proto.Marshal(request)
 	if err != nil {
-		log.Println("proto marshal error:", err)
-		return "", nil
+		return resp, err
 	}
-	subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(deviceID), 10)
-	log.Println("发送数据到主题", subject)
+	subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(in.DeviceId), 10)
 	msg, err := mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
 	if err != nil {
-		log.Println("send data error:", err)
-		return oss.GetOSSPrefixByScheme(scheme) + u.Path, nil
+		return resp, err
 	}
 	deviceMsg := new(pb.DeviceUpMsg)
 	err = proto.Unmarshal(msg.Data, deviceMsg)
-	if err != nil {
-		log.Println("unmarshal data error")
-	}
-	return oss.GetOSSPrefixByScheme(scheme) + u.Path, nil
+	resp.ImageUrl = oss.GetOSSPrefixByScheme(in.Scheme) + u.Path
+	return resp, err
 }

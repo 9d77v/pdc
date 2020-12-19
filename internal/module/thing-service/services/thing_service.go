@@ -75,7 +75,7 @@ func (s ThingService) UpdateThing(ctx context.Context, input model.NewUpdateThin
 }
 
 //ListThing ..
-func (s ThingService) ListThing(ctx context.Context, searchParam model.SearchParam,
+func (s ThingService) ListThing(ctx context.Context, searchParam *base.SearchParam,
 	uid uint, scheme string) (int64, []*model.Thing, error) {
 	var thing base.Repository = models.NewThing()
 	thing.IDQuery(uid, "uid").FuzzyQuery(searchParam.Keyword, "name")

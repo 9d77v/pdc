@@ -28,5 +28,4 @@ require (
 	gorm.io/driver/clickhouse v0.1.0
 	gorm.io/driver/postgres v1.0.0
 	gorm.io/gorm v1.20.8
-
 )

@@ -7,8 +7,6 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/graph/model"
 	"gorm.io/gorm"
 )
 
@@ -19,12 +17,12 @@ type Repository interface {
 	SelectWithPrefix(fields []string, prefix string, omitFields ...string) Repository
 	Select(fields []string, omitFields ...string) Repository
 	LeftJoin(query string, args ...interface{}) Repository
-	FuzzyQuery(keyword *string, field string) Repository
+	FuzzyQuery(keyword string, field string) Repository
 	IDQuery(id uint, idFieldName ...string) Repository
 	IDArrayQuery(ids []uint, idFieldName ...string) Repository
 	Where(query interface{}, args ...interface{}) Repository
 	Pagination(offset, limit int) Repository
-	Sort(sorts []*model.Sort) Repository
+	Sort(sorts []*Sort) Repository
 	Order(value interface{}) Repository
 	Preload(query string, args ...interface{}) Repository
 	First(dest interface{}) error
@@ -123,9 +121,9 @@ func (m *Model) LeftJoin(query string, args ...interface{}) Repository {
 }
 
 //FuzzyQuery 增加模糊查询
-func (m *Model) FuzzyQuery(keyword *string, field string) Repository {
-	if keyword != nil && ptrs.String(keyword) != "" {
-		m.db = m.db.Where(field+" like ?", "%"+ptrs.String(keyword)+"%")
+func (m *Model) FuzzyQuery(keyword string, field string) Repository {
+	if keyword != "" {
+		m.db = m.db.Where(field+" like ?", "%"+keyword+"%")
 	}
 	return m
 }
@@ -152,7 +150,7 @@ func (m *Model) Where(query interface{}, args ...interface{}) Repository {
 
 func (m *Model) getFieldName(idFieldName ...string) string {
 	fieldName := "id"
-	if len(idFieldName) > 0 {
+	if len(idFieldName) > 0 && idFieldName[0] != "" {
 		fieldName = idFieldName[0]
 	}
 	return fieldName
@@ -167,7 +165,7 @@ func (m *Model) Pagination(offset, limit int) Repository {
 }
 
 //Sort 排序
-func (m *Model) Sort(sorts []*model.Sort) Repository {
+func (m *Model) Sort(sorts []*Sort) Repository {
 	for _, v := range sorts {
 		sort := " DESC"
 		if v.IsAsc {

@@ -322,11 +322,13 @@ func Test_queryResolver_Devices(t *testing.T) {
 				secretKey
 				username
 				password
-				deviceModelID
-				deviceModelName
-				deviceModelDesc
-				deviceModelDeviceType
-				deviceModelCameraCompany
+				deviceModel{
+					id
+					name
+					desc
+					deviceType
+					cameraCompany
+				}
 				attributes{
 				  id
 				  key
@@ -1283,6 +1285,43 @@ func Test_mutationResolver_RemoveDeviceDashboardCamera(t *testing.T) {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("mutationResolver.RemoveDeviceDashboardCamera() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func Test_queryResolver_CameraTimeLapseVideos(t *testing.T) {
+	var resp struct {
+		CameraTimeLapseVideos model.CameraTimeLapseVideoConnection
+	}
+	type args struct {
+		query    string
+		deviceID int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test CameraTimeLapseVideos", args{`
+		query cameraTimeLapseVideos($deviceID: Int!) {
+			cameraTimeLapseVideos(deviceID: $deviceID) {
+			  totalCount
+			  edges {
+				id
+				deviceID
+				date
+				videoURL
+			  }
+			}
+		  }
+		`, 4}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			post(tt.args.query, &resp, "cameraTimeLapseVideos",
+				client.Var("deviceID", tt.args.deviceID))
+			require.Zero(t, resp.CameraTimeLapseVideos.TotalCount)
+			require.Zero(t, len(resp.CameraTimeLapseVideos.Edges))
 		})
 	}
 }

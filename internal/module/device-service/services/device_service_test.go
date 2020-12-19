@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
 	"github.com/stretchr/testify/assert"
 )
@@ -111,4 +113,72 @@ func createDevice() *pb.CreateDeviceResponse {
 	}
 	device, _ := deviceService.CreateDevice(ctx, testDevice)
 	return device
+}
+
+func TestDeviceService_ListDevice(t *testing.T) {
+	device := createDevice()
+	type args struct {
+		ctx context.Context
+		in  *pb.ListDeviceRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test ListDevice", args{context.Background(), &pb.ListDeviceRequest{
+			SearchParam: &base.SearchParam{
+				Ids: []int64{device.Id},
+				QueryFields: []string{
+					"edges",
+					"edges.id",
+					"edges.name",
+					"edges.ip",
+					"edges.port",
+					"edges.accessKey",
+					"edges.secretKey",
+					"edges.username",
+					"edges.password",
+					"edges.deviceModel.id",
+					"edges.deviceModel.name",
+					"edges.deviceModel.desc",
+					"edges.deviceModel.deviceType",
+					"edges.deviceModel.cameraCompany",
+					"edges.attributes",
+					"edges.attributes.id",
+					"edges.attributes.key",
+					"edges.attributes.value",
+					"edges.attributes.name",
+					"edges.attributes.createdAt",
+					"edges.attributes.updatedAt",
+					"edges.telemetries",
+					"edges.telemetries.id",
+					"edges.telemetries.key",
+					"edges.telemetries.value",
+					"edges.telemetries.name",
+					"edges.telemetries.factor",
+					"edges.telemetries.unit",
+					"edges.telemetries.unitName",
+					"edges.telemetries.scale",
+					"edges.telemetries.createdAt",
+					"edges.telemetries.updatedAt",
+					"edges.createdAt",
+					"edges.updatedAt",
+					"totalCount",
+				},
+			},
+			DeviceType: ptrs.Int64Ptr(int64(pb.DeviceType_Camera)),
+		}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := deviceService.ListDevice(tt.args.ctx, tt.args.in)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeviceService.ListDevice() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, 1, len(got.Edges))
+			assert.LessOrEqual(t, int64(1), got.TotalCount)
+		})
+	}
 }
