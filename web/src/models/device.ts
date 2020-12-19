@@ -16,11 +16,8 @@ export interface IDevice {
     port: number
     accessKey: string
     secretKey: string
-    deviceModelName: string,
-    deviceModelDesc: string,
     deviceModelID: number
-    deviceModelDeviceType: number
-    deviceModelCameraCompany: number
+    deviceModel: IDeviceModel
     health?: number
     username: string
     password: string

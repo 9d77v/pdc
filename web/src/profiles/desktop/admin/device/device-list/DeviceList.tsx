@@ -91,7 +91,9 @@ export const DeviceList = (props: IDeviceListProps) => {
         for (let element of tempData) {
             let t: any = {
                 id: element.id,
-                deviceModelName: element.deviceModelName,
+                deviceModel: {
+                    name: element.deviceModel.name
+                },
                 deviceModelID: element.deviceModelID,
                 ip: element.ip,
                 port: element.port,
@@ -250,7 +252,7 @@ export const DeviceList = (props: IDeviceListProps) => {
                             <div style={{ display: "flex", flexDirection: "column", textAlign: "left" }}
                                 onClick={() => props.setCurrentSelectItem(item)}>
                                 <span>
-                                    <Tag color="geekblue" style={{ width: "fit-content" }}>{item.deviceModelName}</Tag>
+                                    <Tag color="geekblue" style={{ width: "fit-content" }}>{item.deviceModel.name}</Tag>
                                     <Badge status={status} />
                                     {statusStr}
                                 </span>

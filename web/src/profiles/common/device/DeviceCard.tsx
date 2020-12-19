@@ -128,9 +128,9 @@ const DeviceCards = (props: IDeviceCardsProps) => {
     }, [])
 
     const cards = dataResource.map((dataItem: any) => {
-        const cardItems = dataItem.telemetries.map((t: any) => {
+        const cardItems = dataItem.telemetries.map((t: any, index: number) => {
             const value = t.value === null ? "-" : (t.factor * (t.value || 0)).toFixed(t.scale)
-            return <div key={t.telemetryID}>{t.name}: {value}{t.unit}</div>
+            return <div key={index}>{t.name}: {value}{t.unit}</div>
         })
         return (<Card
             key={dataItem.id}
