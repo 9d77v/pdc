@@ -28,7 +28,9 @@ export const DeviceTabs = (props: IDeviceTabsProps) => {
     return (
         <div style={{ width: "100%" }}>
             <Header style={{ color: "white", textAlign: "left" }}>
-                <Tag color="geekblue" style={{ width: "fit-content" }}>{DeviceTypeMap.get(device?.deviceModelDeviceType)}</Tag>
+                <Tag color="geekblue" style={{ width: "fit-content" }}>
+                    {DeviceTypeMap.get(device?.deviceModel.deviceType)}
+                </Tag>
                 {device?.name}
             </Header>
             <Tabs type="card" style={{ backgroundColor: "#fff" }}>
@@ -41,7 +43,7 @@ export const DeviceTabs = (props: IDeviceTabsProps) => {
                         data={device?.attributes || []} />
                 </TabPane>
                 {
-                    device?.deviceModelDeviceType !== 1 ?
+                    device?.deviceModel.deviceType !== 1 ?
                         <TabPane tab="遥测" key="3">
                             <TelemetryTable
                                 id={id}

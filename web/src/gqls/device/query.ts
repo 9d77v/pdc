@@ -67,7 +67,9 @@ query devices($searchParam:SearchParam!) {
       id
       name
       deviceModelID
-      deviceModelName
+      deviceModel{
+        name
+      }
       ip
       port
       username
@@ -106,10 +108,13 @@ query devices( $searchParam:SearchParam!) {
       username
       password
       deviceModelID
-      deviceModelName
-      deviceModelDesc
-      deviceModelDeviceType
-      deviceModelCameraCompany
+      deviceModel{
+        id
+        name
+        desc
+        deviceType
+        cameraCompany
+      }
       attributes{
         id
         key

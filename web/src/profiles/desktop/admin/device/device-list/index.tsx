@@ -8,8 +8,10 @@ export default function DeviceModelIndex() {
         id: 0,
         name: "",
         deviceModelID: 0,
-        deviceModelName: "",
-        deviceModelDesc: "",
+        deviceModel: {
+            name: "",
+            desc: ""
+        },
         createdAt: 0,
         updatedAt: 0,
     })
