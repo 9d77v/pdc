@@ -97,3 +97,63 @@ func (m *Device) GetByID(id uint) error {
 		return db.Model(&Telemetry{})
 	}).First(m)
 }
+
+//ToDevicePBs ..
+func (m *Device) ToDevicePBs(data []*Device) []*pb.Device {
+	result := make([]*pb.Device, 0, len(data))
+	for _, v := range data {
+		r := m.toDevicePB(v)
+		result = append(result, r)
+	}
+	return result
+}
+
+func (m *Device) toDevicePB(device *Device) *pb.Device {
+	as := make([]*pb.DeviceAttribute, 0, len(device.Attributes))
+	for _, v := range device.Attributes {
+		as = append(as, &pb.DeviceAttribute{
+			Id:        int64(v.ID),
+			Key:       v.AttributeModel.Key,
+			Name:      v.AttributeModel.Name,
+			Value:     v.Value,
+			CreatedAt: v.CreatedAt.Unix(),
+			UpdatedAt: v.UpdatedAt.Unix(),
+		})
+	}
+	ts := make([]*pb.DeviceTelemetry, 0, len(device.Telemetries))
+	for _, v := range device.Telemetries {
+		ts = append(ts, &pb.DeviceTelemetry{
+			Id:        int64(v.ID),
+			Key:       v.TelemetryModel.Key,
+			Name:      v.TelemetryModel.Name,
+			Unit:      v.TelemetryModel.Unit,
+			UnitName:  v.TelemetryModel.UnitName,
+			Factor:    v.TelemetryModel.Factor,
+			Scale:     int64(v.TelemetryModel.Scale),
+			CreatedAt: v.CreatedAt.Unix(),
+			UpdatedAt: v.UpdatedAt.Unix(),
+		})
+	}
+	return &pb.Device{
+		Id:        int64(device.ID),
+		Name:      device.Name,
+		Ip:        device.IP,
+		Port:      int64(device.Port),
+		AccessKey: device.AccessKey,
+		SecretKey: device.SecretKey,
+		Username:  device.Username,
+		Password:  device.Password,
+		DeviceModel: &pb.DeviceModel{
+			Id:            int64(device.DeviceModelID),
+			Name:          device.DeviceModel.Name,
+			Desc:          device.DeviceModel.Desc,
+			DeviceType:    pb.DeviceType(device.DeviceModel.DeviceType),
+			CameraCompany: pb.CameraCompany(device.DeviceModel.CameraCompany),
+		},
+
+		Attributes:  as,
+		Telemetries: ts,
+		CreatedAt:   device.CreatedAt.Unix(),
+		UpdatedAt:   device.UpdatedAt.Unix(),
+	}
+}

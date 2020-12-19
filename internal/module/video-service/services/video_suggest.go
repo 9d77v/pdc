@@ -5,7 +5,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
@@ -19,7 +18,7 @@ type videoSuggest struct {
 }
 
 func newVideoSuggest(ctx context.Context,
-	searchParam model.SearchParam, episodeID int64, scheme string) *videoSuggest {
+	searchParam *base.SearchParam, episodeID int64, scheme string) *videoSuggest {
 	return &videoSuggest{
 		Search:    base.NewSearch(ctx, searchParam, scheme),
 		episodeID: episodeID,
@@ -43,7 +42,7 @@ func (s *videoSuggest) execute() (*model.VideoIndexConnection, error) {
 	searchService := elasticsearch.GetClient().Search().
 		Index(elasticsearch.AliasVideo).
 		Query(s.BoolQuery).
-		Size(int(ptrs.Int64(s.SearchParam.PageSize))).
+		Size(int(s.SearchParam.PageSize)).
 		Sort("_score", false).
 		Sort("title.keyword", true)
 	searchResult, err := searchService.Do(s.Ctx)

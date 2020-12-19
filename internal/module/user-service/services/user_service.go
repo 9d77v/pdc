@@ -93,7 +93,7 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 }
 
 //ListUser ..
-func (s UserService) ListUser(ctx context.Context, searchParam model.SearchParam, scheme string) (int64, []*model.User, error) {
+func (s UserService) ListUser(ctx context.Context, searchParam *base.SearchParam, scheme string) (int64, []*model.User, error) {
 	var user base.Repository = models.NewUser()
 	user.FuzzyQuery(searchParam.Keyword, "name")
 	data := make([]*models.User, 0)

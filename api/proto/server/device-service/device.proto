@@ -1,11 +1,15 @@
 syntax = "proto3";
 
 package pb;
-option go_package = ".;pb";
+option go_package = "internal/module/device-service/pb";
+import "base/base.proto";
+import "device-service/device_model.proto";
 
 service DeviceService {
   rpc CreateDevice(CreateDeviceRequest) returns(CreateDeviceResponse) {}
   rpc UpdateDevice(UpdateDeviceRequest) returns(UpdateDeviceResponse) {}
+  rpc ListDevice(ListDeviceRequest) returns(ListDeviceResponse) {}
+  rpc CameraCapture(CameraCaptureRequest) returns(CameraCaptureResponse) {}
 }
 
 message CreateDeviceRequest {
@@ -29,3 +33,61 @@ message UpdateDeviceRequest {
 }
 
 message UpdateDeviceResponse { int64 id = 1; }
+
+message ListDeviceRequest {
+  base.SearchParam search_param = 1;
+  optional int64 deviceType = 2;
+}
+
+message ListDeviceResponse {
+  int64 total_count = 1;
+  repeated Device edges = 2;
+}
+
+message Device {
+  int64 id = 1;
+  int64 device_model_id = 2;
+  string name = 3;
+  string ip = 4;
+  int64 port = 5;
+  string access_key = 6;
+  string secret_key = 7;
+  DeviceModel device_model = 8;
+  repeated DeviceAttribute attributes = 9;
+  repeated DeviceTelemetry telemetries = 10;
+  string username = 11;
+  string password = 12;
+  int64 created_at = 13;
+  int64 updated_at = 14;
+}
+
+message DeviceAttribute {
+  int64 id = 1;
+  int64 device_id = 2;
+  string key = 3;
+  string name = 4;
+  string value = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}
+
+message DeviceTelemetry {
+  int64 id = 1;
+  int64 device_id = 2;
+  string key = 3;
+  string name = 4;
+  double value = 5;
+  double factor = 6;
+  string unit = 7;
+  string unit_name = 8;
+  int64 scale = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+message CameraCaptureRequest {
+  uint32 device_id = 1;
+  string scheme = 2;
+}
+
+message CameraCaptureResponse { string image_url = 1; }

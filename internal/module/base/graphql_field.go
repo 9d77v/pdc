@@ -13,6 +13,40 @@ type GraphQLField struct {
 	Fields   []string
 }
 
+//ForGraphQLField get fields from queryFields
+func ForGraphQLField(queryFields []string, prefix string) GraphQLField {
+	field := GraphQLField{}
+	if prefix == "" {
+		field.FieldMap = getFirstLayerFields(queryFields)
+	} else {
+		field.FieldMap = getOtherLayerFields(queryFields, prefix)
+	}
+	field.Fields = getFields(field.FieldMap)
+	return field
+}
+
+func getFirstLayerFields(queryFields []string) map[string]bool {
+	fieldMap := make(map[string]bool)
+	for _, v := range queryFields {
+		if !strings.Contains(v, ".") {
+			fieldMap[v] = true
+		}
+	}
+	return fieldMap
+}
+
+func getOtherLayerFields(queryFields []string, prefix string) map[string]bool {
+	fieldMap := make(map[string]bool)
+	for _, v := range queryFields {
+		if strings.HasPrefix(v, prefix) {
+			trimStr := strings.TrimPrefix(v, prefix)
+			trimArr := strings.Split(trimStr, ".")
+			fieldMap[trimArr[0]] = true
+		}
+	}
+	return fieldMap
+}
+
 //NewGraphQLField get graphql field from context
 func NewGraphQLField(ctx context.Context, prefix string) GraphQLField {
 	field := GraphQLField{}
@@ -58,7 +92,7 @@ func getFields(fieldMap map[string]bool) []string {
 //getPreloads ..
 func getPreloads(ctx context.Context) []string {
 	return getNestedPreloads(
-		graphql.GetRequestContext(ctx),
+		graphql.GetOperationContext(ctx),
 		graphql.CollectFieldsCtx(ctx, nil),
 		"",
 	)

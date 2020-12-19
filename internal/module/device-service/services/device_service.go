@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
@@ -20,8 +19,7 @@ type DeviceService struct {
 }
 
 //CreateDevice  ..
-func (s DeviceService) CreateDevice(ctx context.Context,
-	in *pb.CreateDeviceRequest) (*pb.CreateDeviceResponse, error) {
+func (s DeviceService) CreateDevice(ctx context.Context, in *pb.CreateDeviceRequest) (*pb.CreateDeviceResponse, error) {
 	resp := new(pb.CreateDeviceResponse)
 	m := models.NewDeviceFromPB(in)
 	deviceModel := models.NewDeviceModel()
@@ -57,8 +55,7 @@ func (s DeviceService) CreateDevice(ctx context.Context,
 }
 
 //UpdateDevice ..
-func (s DeviceService) UpdateDevice(ctx context.Context,
-	in *pb.UpdateDeviceRequest) (*pb.UpdateDeviceResponse, error) {
+func (s DeviceService) UpdateDevice(ctx context.Context, in *pb.UpdateDeviceRequest) (*pb.UpdateDeviceResponse, error) {
 	resp := &pb.UpdateDeviceResponse{
 		Id: in.Id,
 	}
@@ -76,32 +73,34 @@ func (s DeviceService) UpdateDevice(ctx context.Context,
 }
 
 //ListDevice ..
-func (s DeviceService) ListDevice(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (int64, []*model.Device, error) {
-	device := models.NewDevice()
-	device.FuzzyQuery(searchParam.Keyword, "name")
-	if deviceType != nil {
-		device.SelectDeviceType(ptrs.Int64(deviceType))
+func (s DeviceService) ListDevice(ctx context.Context, in *pb.ListDeviceRequest) (*pb.ListDeviceResponse, error) {
+	resp := new(pb.ListDeviceResponse)
+	m := models.NewDevice()
+	m.FuzzyQuery(in.SearchParam.Keyword, "name")
+	if in.DeviceType != nil {
+		in.SearchParam.TableName = m.TableName()
+		m.SelectDeviceType(ptrs.Int64(in.DeviceType))
 	}
 	omitFields := []string{"attributes", "telemetries",
-		"deviceModelName", "deviceModelDesc",
-		"deviceModelDeviceType", "deviceModelCameraCompany"}
+		"deviceModel"}
 	replaceFunc := func(field base.GraphQLField) error {
-		if deviceType != nil {
-			device.SelectWithPrefix(field.Fields, device.TableName()+".", omitFields...)
+		if in.DeviceType != nil {
+			m.SelectWithPrefix(field.Fields, m.TableName()+".", omitFields...)
 		}
 		if field.FieldMap["attributes"] {
-			device.Preload("Attributes").Preload("Attributes.AttributeModel")
+			m.Preload("Attributes").Preload("Attributes.AttributeModel")
 		}
 		if field.FieldMap["telemetries"] {
-			device.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
+			m.Preload("Telemetries").Preload("Telemetries.TelemetryModel")
 		}
-		if field.FieldMap["deviceModelName"] || field.FieldMap["deviceModelDesc"] ||
-			field.FieldMap["deviceModelDeviceType"] || field.FieldMap["deviceModelCameraCompany"] {
-			device.Preload("DeviceModel")
+		if field.FieldMap["deviceModel"] {
+			m.Preload("DeviceModel")
 		}
 		return nil
 	}
 	data := make([]*models.Device, 0)
-	total, err := s.GetConnection(ctx, device, searchParam, &data, replaceFunc, omitFields...)
-	return total, getDevices(data), err
+	total, err := s.GetNewConnection(m, in.SearchParam, &data, replaceFunc, omitFields...)
+	resp.TotalCount = total
+	resp.Edges = m.ToDevicePBs(data)
+	return resp, err
 }

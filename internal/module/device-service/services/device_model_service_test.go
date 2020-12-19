@@ -8,6 +8,7 @@ import (
 
 	"github.com/9d77v/go-lib/clients/config"
 	"github.com/9d77v/pdc/internal/db/db"
+	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
 	"github.com/stretchr/testify/assert"
@@ -51,7 +52,9 @@ func initDB() {
 }
 
 func clean() {
-	err := db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceDashboardTelemetry{}).Error
+	err := db.GetDB().Where("1 = 1").Unscoped().Delete(&models.CameraTimeLapseVideo{}).Error
+	checkErr(err)
+	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceDashboardTelemetry{}).Error
 	checkErr(err)
 	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceDashboardCamera{}).Error
 	checkErr(err)
@@ -337,6 +340,63 @@ func TestDeviceModelService_DeleteTelemetryModel(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := deviceModelService.DeleteTelemetryModel(tt.args.ctx, tt.args.in)
 			assert.Equal(t, tt.wantErr, err != nil)
+		})
+	}
+}
+
+func TestDeviceModelService_ListDeviceModel(t *testing.T) {
+	deviceModel, _ := deviceModelService.CreateDeviceModel(ctx, testDeviceModel)
+	type args struct {
+		ctx context.Context
+		in  *pb.ListDeviceModelRequest
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"test ListDeviceModel", args{context.Background(), &pb.ListDeviceModelRequest{
+			SearchParam: &base.SearchParam{
+				Ids: []int64{deviceModel.Id},
+				QueryFields: []string{
+					"edges",
+					"edges.id",
+					"edges.name",
+					"edges.desc",
+					"edges.deviceType",
+					"edges.cameraCompany",
+					"edges.attributeModels",
+					"edges.attributeModels.id",
+					"edges.attributeModels.key",
+					"edges.attributeModels.name",
+					"edges.attributeModels.createdAt",
+					"edges.attributeModels.updatedAt",
+					"edges.telemetryModels",
+					"edges.telemetryModels.id",
+					"edges.telemetryModels.key",
+					"edges.telemetryModels.name",
+					"edges.telemetryModels.factor",
+					"edges.telemetryModels.unit",
+					"edges.telemetryModels.unitName",
+					"edges.telemetryModels.scale",
+					"edges.telemetryModels.createdAt",
+					"edges.telemetryModels.updatedAt",
+					"edges.createdAt",
+					"edges.updatedAt",
+					"totalCount",
+				},
+			},
+		}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := deviceModelService.ListDeviceModel(tt.args.ctx, tt.args.in)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeviceModelService.ListDeviceModel() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			assert.EqualValues(t, 1, len(got.Edges))
+			assert.LessOrEqual(t, int64(1), got.TotalCount)
 		})
 	}
 }

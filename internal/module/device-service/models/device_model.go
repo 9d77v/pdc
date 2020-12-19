@@ -55,3 +55,52 @@ func (m *DeviceModel) GetByID(id uint) error {
 func (m *DeviceModel) IsHikivisionCamera(deviceType pb.DeviceType, cameraCompany pb.CameraCompany) bool {
 	return deviceType == pb.DeviceType_Camera && cameraCompany == pb.CameraCompany_Hikvision
 }
+
+//ToDeviceModelPBs ..
+func (m *DeviceModel) ToDeviceModelPBs(data []*DeviceModel) []*pb.DeviceModel {
+	result := make([]*pb.DeviceModel, 0, len(data))
+	for _, v := range data {
+		r := m.toDeviceModelPB(v)
+		result = append(result, r)
+	}
+	return result
+}
+
+func (m *DeviceModel) toDeviceModelPB(deviceModel *DeviceModel) *pb.DeviceModel {
+	as := make([]*pb.AttributeModel, 0, len(deviceModel.AttributeModels))
+	for _, v := range deviceModel.AttributeModels {
+		as = append(as, &pb.AttributeModel{
+			Id:            int64(v.ID),
+			DeviceModelId: int64(v.DeviceModelID),
+			Key:           v.Key,
+			Name:          v.Name,
+			CreatedAt:     v.CreatedAt.Unix(),
+			UpdatedAt:     v.UpdatedAt.Unix(),
+		})
+	}
+	ts := make([]*pb.TelemetryModel, 0, len(deviceModel.TelemetryModels))
+	for _, v := range deviceModel.TelemetryModels {
+		ts = append(ts, &pb.TelemetryModel{
+			Id:            int64(v.ID),
+			DeviceModelId: int64(v.DeviceModelID),
+			Key:           v.Key,
+			Name:          v.Name,
+			Factor:        v.Factor,
+			Unit:          v.Unit,
+			UnitName:      v.UnitName,
+			Scale:         int64(v.Scale),
+			CreatedAt:     v.CreatedAt.Unix(),
+			UpdatedAt:     v.UpdatedAt.Unix(),
+		})
+	}
+	return &pb.DeviceModel{
+		Id:              int64(deviceModel.ID),
+		Name:            deviceModel.Name,
+		Desc:            deviceModel.Desc,
+		DeviceType:      pb.DeviceType(deviceModel.DeviceType),
+		AttributeModels: as,
+		TelemetryModels: ts,
+		CreatedAt:       deviceModel.CreatedAt.Unix(),
+		UpdatedAt:       deviceModel.UpdatedAt.Unix(),
+	}
+}

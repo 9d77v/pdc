@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 
-	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
@@ -125,9 +124,12 @@ func (s DeviceModelService) DeleteTelemetryModel(ctx context.Context,
 }
 
 //ListDeviceModel ..
-func (s DeviceModelService) ListDeviceModel(ctx context.Context, searchParam model.SearchParam) (int64, []*model.DeviceModel, error) {
-	var deviceModel base.Repository = models.NewDeviceModel()
-	deviceModel.FuzzyQuery(searchParam.Keyword, "name")
+func (s DeviceModelService) ListDeviceModel(ctx context.Context,
+	in *pb.ListDeviceModelRequest) (*pb.ListDeviceModelResponse, error) {
+	resp := new(pb.ListDeviceModelResponse)
+	m := models.NewDeviceModel()
+	var deviceModel base.Repository = m
+	deviceModel.FuzzyQuery(in.SearchParam.Keyword, "name")
 	replaceFunc := func(field base.GraphQLField) error {
 		if field.FieldMap["attributeModels"] {
 			deviceModel.Preload("AttributeModels", func(db *gorm.DB) *gorm.DB {
@@ -142,7 +144,9 @@ func (s DeviceModelService) ListDeviceModel(ctx context.Context, searchParam mod
 		return nil
 	}
 	data := make([]*models.DeviceModel, 0)
-	total, err := s.GetConnection(ctx, deviceModel, searchParam, &data, replaceFunc,
+	total, err := s.GetNewConnection(deviceModel, in.SearchParam, &data, replaceFunc,
 		"attributeModels", "telemetryModels")
-	return total, getDeviceModels(data), err
+	resp.TotalCount = total
+	resp.Edges = m.ToDeviceModelPBs(data)
+	return resp, err
 }

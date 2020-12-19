@@ -1,8 +1,9 @@
 syntax = "proto3";
 
 package pb;
-option go_package = ".;pb";
-import "device_model.proto";
+option go_package = "internal/module/device-service/pb";
+import "base/base.proto";
+import "device-service/device_model.proto";
 
 service DeviceDashboardService {
   rpc CreateDeviceDashboard(CreateDeviceDashboardRequest)
@@ -16,6 +17,12 @@ service DeviceDashboardService {
       returns(RemoveTelemetriesResponse) {}
   rpc AddCameras(AddCamerasRequest) returns(AddCamerasResponse) {}
   rpc RemoveCameras(RemoveCamerasRequest) returns(RemoveCamerasResponse) {}
+  rpc ListDeviceDashboard(ListDeviceDashboardRequest)
+      returns(ListDeviceDashboardResponse) {}
+  rpc ListAppDeviceDashboards(ListAppDeviceDashboardRequest)
+      returns(ListAppDeviceDashboardResponse) {}
+  rpc ListCameraTimeLapseVideo(ListCameraTimeLapseVideoRequest)
+      returns(ListCameraTimeLapseVideoResponse) {}
 }
 
 message CreateDeviceDashboardRequest {
@@ -59,3 +66,75 @@ message AddCamerasResponse { repeated int64 ids = 1; }
 message RemoveCamerasRequest { repeated int64 ids = 1; }
 
 message RemoveCamerasResponse { repeated int64 ids = 1; }
+
+message ListDeviceDashboardRequest { base.SearchParam search_param = 1; }
+
+message ListDeviceDashboardResponse {
+  int64 total_count = 1;
+  repeated DeviceDashboard edges = 2;
+}
+
+message ListAppDeviceDashboardRequest {
+  repeated string query_fields = 1;
+  optional int64 deviceType = 2;
+}
+
+message ListAppDeviceDashboardResponse {
+  int64 total_count = 1;
+  repeated DeviceDashboard edges = 2;
+}
+
+message DeviceDashboard {
+  int64 id = 1;
+  string name = 2;
+  bool is_visible = 3;
+  DeviceType device_type = 4;
+  repeated DeviceDashboardTelemetry telemetries = 5;
+  repeated DeviceDashboardCamera cameras = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}
+
+message DeviceDashboardTelemetry {
+  int64 id = 1;
+  int64 device_dashboard_id = 2;
+  int64 device_id = 3;
+  string device_name = 4;
+  int64 telemetry_id = 5;
+  string key = 6;
+  string name = 7;
+  double value = 8;
+  double factor = 9;
+  string unit = 10;
+  string unit_name = 11;
+  int64 scale = 12;
+  int64 created_at = 13;
+  int64 updated_at = 14;
+}
+
+message DeviceDashboardCamera {
+  int64 id = 1;
+  int64 device_dashboard_id = 2;
+  int64 device_id = 3;
+  string device_name = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+}
+
+message ListCameraTimeLapseVideoRequest {
+  repeated string query_fields = 1;
+  int64 deviceID = 2;
+  string scheme = 3;
+}
+
+message ListCameraTimeLapseVideoResponse {
+  int64 total_count = 1;
+  repeated CameraTimeLapseVideo edges = 2;
+}
+
+message CameraTimeLapseVideo {
+  int64 id = 1;
+  int64 device_id = 2;
+  string date = 3;
+  string video_url = 4;
+}

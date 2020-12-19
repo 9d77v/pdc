@@ -12,6 +12,7 @@ import (
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/middleware"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
+	"github.com/9d77v/pdc/internal/utils"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -182,7 +183,9 @@ func (r *mutationResolver) RemoveDeviceDashboardCamera(ctx context.Context, ids 
 
 func (r *mutationResolver) CameraCapture(ctx context.Context, deviceID int64) (string, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return deviceService.CameraCapture(ctx, deviceID, scheme)
+	resp, err := deviceService.CameraCapture(context.Background(),
+		&pb.CameraCaptureRequest{DeviceId: uint32(deviceID), Scheme: scheme})
+	return resp.ImageUrl, err
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
@@ -193,7 +196,7 @@ func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, obj
 func (r *queryResolver) Users(ctx context.Context, searchParam model.SearchParam) (*model.UserConnection, error) {
 	con := new(model.UserConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := userService.ListUser(ctx, searchParam, scheme)
+	total, data, err := userService.ListUser(ctx, getSearchParam(ctx, searchParam), scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -210,7 +213,7 @@ func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, 
 func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool, episodeID *int64) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := videoService.ListVideo(ctx, searchParam, scheme, isFilterVideoSeries, episodeID)
+	total, data, err := videoService.ListVideo(ctx, getSearchParam(ctx, searchParam), scheme, isFilterVideoSeries, episodeID)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -218,7 +221,7 @@ func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchPara
 
 func (r *queryResolver) VideoSerieses(ctx context.Context, searchParam model.SearchParam, episodeID *int64) (*model.VideoSeriesConnection, error) {
 	con := new(model.VideoSeriesConnection)
-	total, data, err := videoService.ListVideoSeries(ctx, searchParam, episodeID)
+	total, data, err := videoService.ListVideoSeries(ctx, getSearchParam(ctx, searchParam), episodeID)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -226,19 +229,19 @@ func (r *queryResolver) VideoSerieses(ctx context.Context, searchParam model.Sea
 
 func (r *queryResolver) SearchVideo(ctx context.Context, searchParam model.SearchParam) (*model.VideoIndexConnection, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return videoService.SearchVideo(ctx, searchParam, scheme)
+	return videoService.SearchVideo(ctx, getSearchParam(ctx, searchParam), scheme)
 }
 
 func (r *queryResolver) SimilarVideos(ctx context.Context, searchParam model.SearchParam, episodeID int64) (*model.VideoIndexConnection, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return videoService.SimilarVideos(ctx, searchParam, episodeID, scheme)
+	return videoService.SimilarVideos(ctx, getSearchParam(ctx, searchParam), episodeID, scheme)
 }
 
 func (r *queryResolver) Things(ctx context.Context, searchParam model.SearchParam) (*model.ThingConnection, error) {
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.ThingConnection)
-	total, data, err := thingService.ListThing(ctx, searchParam, user.ID, scheme)
+	total, data, err := thingService.ListThing(ctx, getSearchParam(ctx, searchParam), user.ID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -258,47 +261,50 @@ func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, search
 	user := middleware.ForContext(ctx)
 	scheme := middleware.ForSchemeContext(ctx)
 	con := new(model.HistoryConnection)
-	total, data, err := historyService.ListHistory(ctx, sourceType, searchParam, subSourceID, user.ID, scheme)
+	total, data, err := historyService.ListHistory(ctx, sourceType, getSearchParam(ctx, searchParam), subSourceID, user.ID, scheme)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
 }
 
 func (r *queryResolver) DeviceModels(ctx context.Context, searchParam model.SearchParam) (*model.DeviceModelConnection, error) {
-	con := new(model.DeviceModelConnection)
-	total, data, err := deviceModelService.ListDeviceModel(ctx, searchParam)
-	con.TotalCount = total
-	con.Edges = data
-	return con, err
+	resp, err := deviceModelService.ListDeviceModel(context.Background(),
+		&pb.ListDeviceModelRequest{SearchParam: getSearchParam(ctx, searchParam)})
+	return getDeviceModelConnection(resp), err
 }
 
 func (r *queryResolver) Devices(ctx context.Context, searchParam model.SearchParam, deviceType *int64) (*model.DeviceConnection, error) {
-	con := new(model.DeviceConnection)
-	total, data, err := deviceService.ListDevice(ctx, searchParam, deviceType)
-	con.TotalCount = total
-	con.Edges = data
-	return con, err
+	resp, err := deviceService.ListDevice(context.Background(), &pb.ListDeviceRequest{
+		SearchParam: getSearchParam(ctx, searchParam),
+		DeviceType:  deviceType,
+	})
+	return getDeviceConnection(resp), err
 }
 
 func (r *queryResolver) DeviceDashboards(ctx context.Context, searchParam model.SearchParam) (*model.DeviceDashboardConnection, error) {
-	con := new(model.DeviceDashboardConnection)
-	total, data, err := deviceDashboardService.ListDeviceDashboards(ctx, searchParam)
-	con.TotalCount = total
-	con.Edges = data
-	return con, err
+	resp, err := deviceDashboardService.ListDeviceDashboards(context.Background(), &pb.ListDeviceDashboardRequest{
+		SearchParam: getSearchParam(ctx, searchParam),
+	})
+	return getDeviceDashboardConnection(resp), err
 }
 
 func (r *queryResolver) AppDeviceDashboards(ctx context.Context, deviceType *int64) (*model.DeviceDashboardConnection, error) {
-	con := new(model.DeviceDashboardConnection)
-	total, data, err := deviceDashboardService.AppDeviceDashboards(ctx, deviceType)
-	con.TotalCount = total
-	con.Edges = data
-	return con, err
+	resp, err := deviceDashboardService.ListAppDeviceDashboards(context.Background(), &pb.ListAppDeviceDashboardRequest{
+		DeviceType:  deviceType,
+		QueryFields: utils.GetPreloads(ctx),
+	})
+	return getAppDeviceDashboardConnection(resp), err
 }
 
 func (r *queryResolver) CameraTimeLapseVideos(ctx context.Context, deviceID int64) (*model.CameraTimeLapseVideoConnection, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return deviceDashboardService.CameraTimeLapseVideos(ctx, deviceID, scheme)
+	resp, err := deviceDashboardService.ListCameraTimeLapseVideos(context.Background(),
+		&pb.ListCameraTimeLapseVideoRequest{
+			QueryFields: utils.GetPreloads(ctx),
+			DeviceID:    deviceID,
+			Scheme:      scheme,
+		})
+	return getCameraTimeLapseVideoConnection(resp), err
 }
 
 // Mutation returns generated.MutationResolver implementation.

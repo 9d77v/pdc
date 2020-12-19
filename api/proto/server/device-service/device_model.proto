@@ -1,7 +1,8 @@
 syntax = "proto3";
 
 package pb;
-option go_package = ".;pb";
+option go_package = "internal/module/device-service/pb";
+import "base/base.proto";
 
 service DeviceModelService {
   rpc CreateDeviceModel(CreateDeviceModelRequest)
@@ -20,6 +21,7 @@ service DeviceModelService {
       returns(UpdateTelemetryModelResponse) {}
   rpc DeleteTelemetryModel(DeleteTelemetryModelRequest)
       returns(DeleteTelemetryModelResponse) {}
+  rpc ListDeviceModel(ListDeviceModelRequest) returns(ListDeviceModelResponse);
 }
 
 enum DeviceType { Default = 0; Camera = 1; }
@@ -87,3 +89,44 @@ message UpdateTelemetryModelResponse { int64 id = 1; }
 message DeleteTelemetryModelRequest { repeated int64 ids = 1; }
 
 message DeleteTelemetryModelResponse { repeated int64 ids = 1; }
+
+message ListDeviceModelRequest { base.SearchParam search_param = 1; }
+
+message ListDeviceModelResponse {
+  int64 total_count = 1;
+  repeated DeviceModel edges = 2;
+}
+
+message DeviceModel {
+  int64 id = 1;
+  string name = 2;
+  DeviceType device_type = 3;
+  string desc = 4;
+  repeated AttributeModel attribute_models = 5;
+  repeated TelemetryModel telemetry_models = 6;
+  CameraCompany camera_company = 7;
+  int64 created_at = 8;
+  int64 updated_at = 9;
+}
+
+message AttributeModel {
+  int64 id = 1;
+  int64 device_model_id = 2;
+  string key = 3;
+  string name = 4;
+  int64 created_at = 5;
+  int64 updated_at = 6;
+}
+
+message TelemetryModel {
+  int64 id = 1;
+  int64 device_model_id = 2;
+  string key = 3;
+  string name = 4;
+  double factor = 5;
+  string unit = 6;
+  string unit_name = 7;
+  int64 scale = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+}
