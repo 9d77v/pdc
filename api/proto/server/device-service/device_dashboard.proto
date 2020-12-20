@@ -4,6 +4,7 @@ package pb;
 option go_package = "internal/module/device-service/pb";
 import "base/base.proto";
 import "device-service/device_model.proto";
+import "google/protobuf/timestamp.proto";
 
 service DeviceDashboardService {
   rpc CreateDeviceDashboard(CreateDeviceDashboardRequest)
@@ -91,8 +92,8 @@ message DeviceDashboard {
   DeviceType device_type = 4;
   repeated DeviceDashboardTelemetry telemetries = 5;
   repeated DeviceDashboardCamera cameras = 6;
-  int64 created_at = 7;
-  int64 updated_at = 8;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
 }
 
 message DeviceDashboardTelemetry {
@@ -108,8 +109,8 @@ message DeviceDashboardTelemetry {
   string unit = 10;
   string unit_name = 11;
   int64 scale = 12;
-  int64 created_at = 13;
-  int64 updated_at = 14;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
 }
 
 message DeviceDashboardCamera {
@@ -117,8 +118,8 @@ message DeviceDashboardCamera {
   int64 device_dashboard_id = 2;
   int64 device_id = 3;
   string device_name = 4;
-  int64 created_at = 5;
-  int64 updated_at = 6;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 message ListCameraTimeLapseVideoRequest {

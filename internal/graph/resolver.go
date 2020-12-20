@@ -185,8 +185,8 @@ func toDeviceModel(deviceModel *pb.DeviceModel) *model.DeviceModel {
 			DeviceModelID: v.DeviceModelId,
 			Key:           v.Key,
 			Name:          v.Name,
-			CreatedAt:     v.CreatedAt,
-			UpdatedAt:     v.UpdatedAt,
+			CreatedAt:     v.CreatedAt.GetSeconds(),
+			UpdatedAt:     v.UpdatedAt.GetSeconds(),
 		})
 	}
 	ts := make([]*model.TelemetryModel, 0, len(deviceModel.TelemetryModels))
@@ -200,8 +200,8 @@ func toDeviceModel(deviceModel *pb.DeviceModel) *model.DeviceModel {
 			Unit:          v.Unit,
 			UnitName:      v.UnitName,
 			Scale:         int64(v.Scale),
-			CreatedAt:     v.CreatedAt,
-			UpdatedAt:     v.UpdatedAt,
+			CreatedAt:     v.CreatedAt.GetSeconds(),
+			UpdatedAt:     v.UpdatedAt.GetSeconds(),
 		})
 	}
 	return &model.DeviceModel{
@@ -212,8 +212,8 @@ func toDeviceModel(deviceModel *pb.DeviceModel) *model.DeviceModel {
 		AttributeModels: as,
 		TelemetryModels: ts,
 		CameraCompany:   int64(deviceModel.CameraCompany),
-		CreatedAt:       deviceModel.CreatedAt,
-		UpdatedAt:       deviceModel.UpdatedAt,
+		CreatedAt:       deviceModel.CreatedAt.GetSeconds(),
+		UpdatedAt:       deviceModel.UpdatedAt.GetSeconds(),
 	}
 }
 
@@ -241,8 +241,8 @@ func toDevice(device *pb.Device) *model.Device {
 			Key:       v.Key,
 			Name:      v.Name,
 			Value:     v.Value,
-			CreatedAt: v.CreatedAt,
-			UpdatedAt: v.UpdatedAt,
+			CreatedAt: v.CreatedAt.GetSeconds(),
+			UpdatedAt: v.UpdatedAt.GetSeconds(),
 		})
 	}
 	ts := make([]*model.Telemetry, 0, len(device.Telemetries))
@@ -255,8 +255,8 @@ func toDevice(device *pb.Device) *model.Device {
 			UnitName:  v.UnitName,
 			Factor:    v.Factor,
 			Scale:     v.Scale,
-			CreatedAt: v.CreatedAt,
-			UpdatedAt: v.UpdatedAt,
+			CreatedAt: v.CreatedAt.GetSeconds(),
+			UpdatedAt: v.UpdatedAt.GetSeconds(),
 		})
 	}
 	return &model.Device{
@@ -277,8 +277,8 @@ func toDevice(device *pb.Device) *model.Device {
 		},
 		Attributes:  as,
 		Telemetries: ts,
-		CreatedAt:   device.CreatedAt,
-		UpdatedAt:   device.UpdatedAt,
+		CreatedAt:   device.CreatedAt.GetSeconds(),
+		UpdatedAt:   device.UpdatedAt.GetSeconds(),
 	}
 }
 
@@ -312,8 +312,8 @@ func toDeviceDashboard(deviceDashboard *pb.DeviceDashboard) *model.DeviceDashboa
 			UnitName:          v.UnitName,
 			Factor:            v.Factor,
 			Scale:             v.Scale,
-			CreatedAt:         v.CreatedAt,
-			UpdatedAt:         v.UpdatedAt,
+			CreatedAt:         v.CreatedAt.GetSeconds(),
+			UpdatedAt:         v.UpdatedAt.GetSeconds(),
 		})
 	}
 	cs := make([]*model.DeviceDashboardCamera, 0, len(deviceDashboard.Cameras))
@@ -323,8 +323,8 @@ func toDeviceDashboard(deviceDashboard *pb.DeviceDashboard) *model.DeviceDashboa
 			DeviceDashboardID: v.DeviceDashboardId,
 			DeviceID:          v.DeviceId,
 			DeviceName:        v.DeviceName,
-			CreatedAt:         v.CreatedAt,
-			UpdatedAt:         v.UpdatedAt,
+			CreatedAt:         v.CreatedAt.GetSeconds(),
+			UpdatedAt:         v.UpdatedAt.GetSeconds(),
 		})
 	}
 	return &model.DeviceDashboard{
@@ -334,8 +334,8 @@ func toDeviceDashboard(deviceDashboard *pb.DeviceDashboard) *model.DeviceDashboa
 		Telemetries: ts,
 		Cameras:     cs,
 		DeviceType:  int64(deviceDashboard.DeviceType),
-		CreatedAt:   deviceDashboard.CreatedAt,
-		UpdatedAt:   deviceDashboard.UpdatedAt,
+		CreatedAt:   deviceDashboard.CreatedAt.GetSeconds(),
+		UpdatedAt:   deviceDashboard.UpdatedAt.GetSeconds(),
 	}
 }
 
