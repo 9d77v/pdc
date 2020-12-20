@@ -4,6 +4,7 @@ package pb;
 option go_package = "internal/module/device-service/pb";
 import "base/base.proto";
 import "device-service/device_model.proto";
+import "google/protobuf/timestamp.proto";
 
 service DeviceService {
   rpc CreateDevice(CreateDeviceRequest) returns(CreateDeviceResponse) {}
@@ -57,8 +58,8 @@ message Device {
   repeated DeviceTelemetry telemetries = 10;
   string username = 11;
   string password = 12;
-  int64 created_at = 13;
-  int64 updated_at = 14;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
 }
 
 message DeviceAttribute {
@@ -67,8 +68,8 @@ message DeviceAttribute {
   string key = 3;
   string name = 4;
   string value = 5;
-  int64 created_at = 6;
-  int64 updated_at = 7;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
 
 message DeviceTelemetry {
@@ -81,8 +82,8 @@ message DeviceTelemetry {
   string unit = 7;
   string unit_name = 8;
   int64 scale = 9;
-  int64 created_at = 10;
-  int64 updated_at = 11;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
 }
 
 message CameraCaptureRequest {

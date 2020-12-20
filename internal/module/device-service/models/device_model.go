@@ -4,6 +4,7 @@ import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
+	"github.com/golang/protobuf/ptypes"
 	"gorm.io/gorm"
 )
 
@@ -69,17 +70,21 @@ func (m *DeviceModel) ToDeviceModelPBs(data []*DeviceModel) []*pb.DeviceModel {
 func (m *DeviceModel) toDeviceModelPB(deviceModel *DeviceModel) *pb.DeviceModel {
 	as := make([]*pb.AttributeModel, 0, len(deviceModel.AttributeModels))
 	for _, v := range deviceModel.AttributeModels {
+		createdAt, _ := ptypes.TimestampProto(v.CreatedAt)
+		updatedAt, _ := ptypes.TimestampProto(v.UpdatedAt)
 		as = append(as, &pb.AttributeModel{
 			Id:            int64(v.ID),
 			DeviceModelId: int64(v.DeviceModelID),
 			Key:           v.Key,
 			Name:          v.Name,
-			CreatedAt:     v.CreatedAt.Unix(),
-			UpdatedAt:     v.UpdatedAt.Unix(),
+			CreatedAt:     createdAt,
+			UpdatedAt:     updatedAt,
 		})
 	}
 	ts := make([]*pb.TelemetryModel, 0, len(deviceModel.TelemetryModels))
 	for _, v := range deviceModel.TelemetryModels {
+		createdAt, _ := ptypes.TimestampProto(v.CreatedAt)
+		updatedAt, _ := ptypes.TimestampProto(v.UpdatedAt)
 		ts = append(ts, &pb.TelemetryModel{
 			Id:            int64(v.ID),
 			DeviceModelId: int64(v.DeviceModelID),
@@ -89,10 +94,12 @@ func (m *DeviceModel) toDeviceModelPB(deviceModel *DeviceModel) *pb.DeviceModel 
 			Unit:          v.Unit,
 			UnitName:      v.UnitName,
 			Scale:         int64(v.Scale),
-			CreatedAt:     v.CreatedAt.Unix(),
-			UpdatedAt:     v.UpdatedAt.Unix(),
+			CreatedAt:     createdAt,
+			UpdatedAt:     updatedAt,
 		})
 	}
+	createdAt, _ := ptypes.TimestampProto(deviceModel.CreatedAt)
+	updatedAt, _ := ptypes.TimestampProto(deviceModel.UpdatedAt)
 	return &pb.DeviceModel{
 		Id:              int64(deviceModel.ID),
 		Name:            deviceModel.Name,
@@ -100,7 +107,7 @@ func (m *DeviceModel) toDeviceModelPB(deviceModel *DeviceModel) *pb.DeviceModel 
 		DeviceType:      pb.DeviceType(deviceModel.DeviceType),
 		AttributeModels: as,
 		TelemetryModels: ts,
-		CreatedAt:       deviceModel.CreatedAt.Unix(),
-		UpdatedAt:       deviceModel.UpdatedAt.Unix(),
+		CreatedAt:       createdAt,
+		UpdatedAt:       updatedAt,
 	}
 }

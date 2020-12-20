@@ -3,6 +3,7 @@ syntax = "proto3";
 package pb;
 option go_package = "internal/module/device-service/pb";
 import "base/base.proto";
+import "google/protobuf/timestamp.proto";
 
 service DeviceModelService {
   rpc CreateDeviceModel(CreateDeviceModelRequest)
@@ -105,8 +106,8 @@ message DeviceModel {
   repeated AttributeModel attribute_models = 5;
   repeated TelemetryModel telemetry_models = 6;
   CameraCompany camera_company = 7;
-  int64 created_at = 8;
-  int64 updated_at = 9;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
 }
 
 message AttributeModel {
@@ -114,8 +115,8 @@ message AttributeModel {
   int64 device_model_id = 2;
   string key = 3;
   string name = 4;
-  int64 created_at = 5;
-  int64 updated_at = 6;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 message TelemetryModel {
@@ -127,6 +128,6 @@ message TelemetryModel {
   string unit = 6;
   string unit_name = 7;
   int64 scale = 8;
-  int64 created_at = 9;
-  int64 updated_at = 10;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
 }

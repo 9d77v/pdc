@@ -4,6 +4,7 @@ import (
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
+	"github.com/golang/protobuf/ptypes"
 	"gorm.io/gorm"
 )
 
@@ -111,17 +112,21 @@ func (m *Device) ToDevicePBs(data []*Device) []*pb.Device {
 func (m *Device) toDevicePB(device *Device) *pb.Device {
 	as := make([]*pb.DeviceAttribute, 0, len(device.Attributes))
 	for _, v := range device.Attributes {
+		createdAt, _ := ptypes.TimestampProto(v.CreatedAt)
+		updatedAt, _ := ptypes.TimestampProto(v.UpdatedAt)
 		as = append(as, &pb.DeviceAttribute{
 			Id:        int64(v.ID),
 			Key:       v.AttributeModel.Key,
 			Name:      v.AttributeModel.Name,
 			Value:     v.Value,
-			CreatedAt: v.CreatedAt.Unix(),
-			UpdatedAt: v.UpdatedAt.Unix(),
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		})
 	}
 	ts := make([]*pb.DeviceTelemetry, 0, len(device.Telemetries))
 	for _, v := range device.Telemetries {
+		createdAt, _ := ptypes.TimestampProto(v.CreatedAt)
+		updatedAt, _ := ptypes.TimestampProto(v.UpdatedAt)
 		ts = append(ts, &pb.DeviceTelemetry{
 			Id:        int64(v.ID),
 			Key:       v.TelemetryModel.Key,
@@ -130,10 +135,12 @@ func (m *Device) toDevicePB(device *Device) *pb.Device {
 			UnitName:  v.TelemetryModel.UnitName,
 			Factor:    v.TelemetryModel.Factor,
 			Scale:     int64(v.TelemetryModel.Scale),
-			CreatedAt: v.CreatedAt.Unix(),
-			UpdatedAt: v.UpdatedAt.Unix(),
+			CreatedAt: createdAt,
+			UpdatedAt: updatedAt,
 		})
 	}
+	createdAt, _ := ptypes.TimestampProto(device.CreatedAt)
+	updatedAt, _ := ptypes.TimestampProto(device.UpdatedAt)
 	return &pb.Device{
 		Id:        int64(device.ID),
 		Name:      device.Name,
@@ -150,10 +157,9 @@ func (m *Device) toDevicePB(device *Device) *pb.Device {
 			DeviceType:    pb.DeviceType(device.DeviceModel.DeviceType),
 			CameraCompany: pb.CameraCompany(device.DeviceModel.CameraCompany),
 		},
-
 		Attributes:  as,
 		Telemetries: ts,
-		CreatedAt:   device.CreatedAt.Unix(),
-		UpdatedAt:   device.UpdatedAt.Unix(),
+		CreatedAt:   createdAt,
+		UpdatedAt:   updatedAt,
 	}
 }
