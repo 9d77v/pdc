@@ -26,8 +26,12 @@ func (s Service) GetByID(r Repository, id uint, columns []string) error {
 }
 
 //RecordNotExist ..
-func (s Service) RecordNotExist(r Repository, id uint) bool {
-	total, err := r.IDQuery(id).Pagination(0, 1).Count(r)
+func (s Service) RecordNotExist(r Repository, id interface{}, uid ...uint) bool {
+	r.IDQuery(id).Pagination(0, 1)
+	if len(uid) > 0 && uid[0] != 0 {
+		r.IDQuery(uid[0], "uid")
+	}
+	total, err := r.Count(r)
 	return err != nil || total == 0
 }
 

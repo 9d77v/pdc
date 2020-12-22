@@ -23,6 +23,10 @@ protoc-base: api/proto/server/base/*.proto
 	protoc --go_out=internal/module/base api/proto/server/base/*.proto
 	mv internal/module/base/github.com/9d77v/pdc/internal/module/base/*.go internal/module/base/
 	rm -rf internal/module/base/github.com
+protoc-note: api/proto/server/note-service/*.proto
+	protoc -I./api/proto/server \
+	--go_out=plugins=grpc:. \
+	api/proto/server/note-service/*.proto
 protoc-device: api/proto/server/device-service/*.proto
 	protoc -I./api/proto/server \
 	--go_out=plugins=grpc:. \
