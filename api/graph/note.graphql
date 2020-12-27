@@ -1,0 +1,43 @@
+input   NewNote {
+  id: String!
+  parentID: String!
+  uid:ID!
+  noteType: Int!
+  level:  Int!
+  title:String!
+  color: String!
+  state: Int!
+  version:Int!
+  createdAt: Int!
+  updatedAt: Int!
+  content: String!
+  tags: [String!]
+  sha1: String!
+}
+
+type Note {
+  id: String!
+  parentID: String!
+  uid:ID!
+  noteType: Int!
+  level:  Int!
+  title:String!
+  color: String!
+  state: Int!
+  version:Int!
+  createdAt: Int!
+  updatedAt: Int!
+  content: String!
+  tags: [String!]
+  sha1: String!
+}
+
+input  SyncNotesInput{
+    lastUpdateTime:Int!
+    unsyncedNotes:[NewNote!]
+}
+
+type SyncNotesResponse{
+    lastUpdateTime:Int!
+    list:[Note!]
+}

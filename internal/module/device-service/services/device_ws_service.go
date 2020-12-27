@@ -8,6 +8,7 @@ import (
 
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
+	"github.com/9d77v/pdc/internal/module/device-service/chmodels"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 	devicePB "github.com/9d77v/pdc/internal/module/device-service/pb"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
@@ -70,6 +71,11 @@ func (s DeviceService) CameraCapture(ctx context.Context,
 	m := models.NewDevice()
 	if s.RecordNotExist(m, uint(in.DeviceId)) {
 		return resp, status.Error(codes.NotFound, "数据不存在")
+	}
+	deviceHealth := chmodels.NewDeviceHealth()
+	deviceHealth.DeviceID = in.DeviceId
+	if deviceHealth.IsUnhealthy() {
+		return resp, nil
 	}
 	bucketName := "camera"
 	now := time.Now()

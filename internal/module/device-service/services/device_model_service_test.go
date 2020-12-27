@@ -14,7 +14,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testDBName = "pdc_test"
+var migrateTables = []interface{}{
+	&models.CameraTimeLapseVideo{},
+	&models.DeviceDashboardCamera{},
+	&models.DeviceDashboardTelemetry{},
+	&models.DeviceDashboard{},
+	&models.Telemetry{},
+	&models.Attribute{},
+	&models.Device{},
+	&models.AttributeModel{},
+	&models.TelemetryModel{},
+	&models.DeviceModel{},
+}
 
 func TestMain(m *testing.M) {
 	initDB()
@@ -29,54 +40,23 @@ func initDB() {
 		Port:         5432,
 		User:         "postgres",
 		Password:     "123456",
-		Name:         testDBName,
+		Name:         "pdc_test",
 		MaxIdleConns: 10,
 		MaxOpenConns: 100,
 		EnableLog:    true,
 	}
-	err := db.GetDB(config).AutoMigrate(
-		&models.DeviceModel{},
-		&models.TelemetryModel{},
-		&models.AttributeModel{},
-		&models.Device{},
-		&models.Attribute{},
-		&models.Telemetry{},
-		&models.DeviceDashboard{},
-		&models.DeviceDashboardTelemetry{},
-		&models.DeviceDashboardCamera{},
-		&models.CameraTimeLapseVideo{},
-	)
+	err := db.GetDB(config).AutoMigrate(migrateTables...)
 	if err != nil {
 		fmt.Println("auto migrate failed:", err)
 	}
 }
 
 func clean() {
-	err := db.GetDB().Where("1 = 1").Unscoped().Delete(&models.CameraTimeLapseVideo{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceDashboardTelemetry{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceDashboardCamera{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceDashboard{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.Attribute{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.Telemetry{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.Device{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.AttributeModel{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.TelemetryModel{}).Error
-	checkErr(err)
-	err = db.GetDB().Where("1 = 1").Unscoped().Delete(&models.DeviceModel{}).Error
-	checkErr(err)
-}
-
-func checkErr(err error) {
-	if err != nil {
-		log.Println("error:", err)
+	for _, v := range migrateTables {
+		err := db.GetDB().Where("1 = 1").Unscoped().Delete(v).Error
+		if err != nil {
+			log.Println("error:", err)
+		}
 	}
 }
 
