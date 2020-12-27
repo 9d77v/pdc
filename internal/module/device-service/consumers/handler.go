@@ -97,13 +97,11 @@ func batchSaveTelemetry(telemetries []*pb.Telemetry) {
 		}
 		deviceTelemetries = append(deviceTelemetries,
 			chmodels.DeviceTelemetry{
-				ActionTime:      actionTime,
-				ActionTimeNanos: uint32(actionTime.Nanosecond()),
-				DeviceID:        v.DeviceID,
-				TelemetryID:     v.ID,
-				Value:           v.Value,
-				CreatedAt:       now,
-				CreatedAtNanos:  uint32(now.Nanosecond()),
+				ActionTime:  actionTime,
+				DeviceID:    v.DeviceID,
+				TelemetryID: v.ID,
+				Value:       v.Value,
+				CreatedAt:   now,
 			})
 	}
 	err := clickhouse.GetDB().Create(&deviceTelemetries).Error
@@ -155,12 +153,10 @@ func batchSaveHealth(healths []*pb.Health) {
 		}
 		deviceHealths = append(deviceHealths,
 			chmodels.DeviceHealth{
-				ActionTime:      actionTime,
-				ActionTimeNanos: uint32(actionTime.Nanosecond()),
-				DeviceID:        v.DeviceID,
-				Value:           float64(v.Value),
-				CreatedAt:       now,
-				CreatedAtNanos:  uint32(now.Nanosecond()),
+				ActionTime: actionTime,
+				DeviceID:   v.DeviceID,
+				Value:      float64(v.Value),
+				CreatedAt:  now,
 			})
 	}
 	err := clickhouse.GetDB().Create(&deviceHealths).Error
