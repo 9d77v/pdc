@@ -17,7 +17,7 @@ export const EpisodePage: FC = () => {
     const history = useHistory()
     const location = useLocation()
     const query = new URLSearchParams(location.search)
-    const episodeID = query.get("episode_id")
+    const episodeID = query.get("epid")
     const autoJump = query.get("autoJump")
 
     const { error, data } = useQuery(GET_VIDEO_DETAIL,
@@ -44,7 +44,7 @@ export const EpisodePage: FC = () => {
     const historyInfo = data?.histories.edges.length > 0 ? data?.histories.edges[0] : null
     useEffect(() => {
         if (historyInfo && autoJump === "true" && Number(historyInfo.subSourceID !== Number(episodeID))) {
-            history.replace(AppPath.VIDEO_DETAIL + "?episode_id=" + historyInfo.subSourceID)
+            history.replace(AppPath.VIDEO_DETAIL + "?epid=" + historyInfo.subSourceID)
         }
     }, [historyInfo, history, autoJump, episodeID])
 
@@ -83,7 +83,6 @@ export const EpisodePage: FC = () => {
                     height={231}
                     width={"100%"}
                     autoplay={false}
-                    autoDestroy={false}
                     currentTime={(Number(historyInfo?.subSourceID) !== 0 && Number(historyInfo?.subSourceID) === Number(videoDetail.episodeItem.id)) ? historyInfo?.currentTime : 0}
                 />
             </div>

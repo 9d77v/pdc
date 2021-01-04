@@ -26,7 +26,6 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
     minWidth,
     minHeight,
     autoplay,
-    autoDestroy,
 }) => {
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()
@@ -41,9 +40,6 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
         controls: true,
     };
 
-    if (autoDestroy === undefined) {
-        autoDestroy = true
-    }
     useEffect(() => {
         if (videoNode && url) {
             if (!player) {
@@ -52,12 +48,9 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
             }
         }
         return () => {
-            if (autoDestroy) {
-                player?.dispose()
-            }
+            player?.dispose()
         }
-    }, [videoNode, props, player, url,
-        autoDestroy]);
+    }, [videoNode, props, player, url]);
 
     return (
         <div data-vjs-player

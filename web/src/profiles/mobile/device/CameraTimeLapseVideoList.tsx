@@ -34,13 +34,12 @@ const CameraTimeLapseVideoList: FC<ICameraTimeLapseVideoListProps> = ({
                         }}
                     >{value.date.substring(5)}</span>}
                     description={
-                        <div style={{ height: 180 }}><CommonPlayer
-                            id={index}
-                            url={value.videoURL}
-                            height={180}
-                            width={"calc(100% - 2px)"}
-                            autoDestroy={true}
-                        />
+                        <div style={{ height: 180 }}>
+                            <CommonPlayer
+                                id={index}
+                                url={value.videoURL}
+                                height={180}
+                                width={"calc(100% - 2px)"} />
                         </div>}
                 />
             })

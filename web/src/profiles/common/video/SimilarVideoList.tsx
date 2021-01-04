@@ -1,5 +1,4 @@
 import React, { FC, useMemo } from 'react'
-import { useHistory } from 'react-router-dom'
 import Img from 'src/components/img'
 import { AppPath } from 'src/consts/path'
 import { VideoCardModel } from 'src/models/video'
@@ -11,13 +10,12 @@ interface ISimilarVideoListProps {
 const SimilarVideoList: FC<ISimilarVideoListProps> = ({
     data
 }) => {
-    const history = useHistory()
     const videos: JSX.Element[] = useMemo(() => {
         if (data) {
             return data.map((video: VideoCardModel, index: number) => {
-                const link = AppPath.VIDEO_DETAIL + "?episode_id=" + video.episodeID + "&autoJump=true"
+                const link = AppPath.VIDEO_DETAIL + "?epid=" + video.episodeID + "&autoJump=true"
                 return (<div key={index}
-                    onClick={() => history.push(link)}
+                    onClick={() => window.location.href = link}
                     style={{ display: "flex", cursor: "pointer", paddingBottom: 10 }}>
                     <div style={{ width: 160 }}
                     >
@@ -40,11 +38,11 @@ const SimilarVideoList: FC<ISimilarVideoListProps> = ({
                             全{video.totalNum}话
                             </div>
                     </div>
-                </div>)
+                </div >)
             })
         }
         return []
-    }, [data, history])
+    }, [data])
     return (
         <div style={{ marginTop: 10 }}>
             <div

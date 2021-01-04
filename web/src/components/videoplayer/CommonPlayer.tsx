@@ -16,7 +16,6 @@ export interface VideoPlayerProps {
     minHeight?: number
     minWidth?: number
     autoplay?: boolean
-    autoDestroy?: boolean
 }
 
 const CommonPlayer: React.FC<VideoPlayerProps> = ({
@@ -27,7 +26,6 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
     minWidth,
     minHeight,
     autoplay,
-    autoDestroy,
 }) => {
     const videoKey = "custom-video-" + id
     const [videoNode, setVideoNode] = useState()
@@ -47,10 +45,6 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
         }
     }, [autoplay, url])
 
-    if (autoDestroy === undefined) {
-        autoDestroy = true
-    }
-
     useEffect(() => {
         if (videoNode && url) {
             if (!player) {
@@ -61,12 +55,11 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
             }
         }
         return () => {
-            if (autoDestroy) {
+            if (player) {
                 player?.dispose()
             }
         }
-    }, [videoNode, props, player, url,
-        autoDestroy]);
+    }, [videoNode, props, player, url]);
 
     return (
         <div data-vjs-player

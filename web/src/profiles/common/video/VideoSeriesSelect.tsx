@@ -15,7 +15,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
             const items = data[0].items
             seriesName = data[0].name
             seriesButtons = items.map((value: any, index: number) => {
-                const link = AppPath.VIDEO_DETAIL + "?episode_id=" + value.episodeID + "&autoJump=true"
+                const link = AppPath.VIDEO_DETAIL + "?epid=" + value.episodeID + "&autoJump=true"
                 if (videoID === Number(value.videoID)) {
                     return <div
                         key={"pdc-button-" + value.videoID}

@@ -16,7 +16,7 @@ export const VideoCard: FC<IVideoCardProps> = ({
     totalNum
 }) => {
     const history = useHistory()
-    const link = AppPath.VIDEO_DETAIL + "?episode_id=" + episodeID + "&autoJump=true"
+    const link = AppPath.VIDEO_DETAIL + "?epid=" + episodeID + "&autoJump=true"
     return (
         <div
             onClick={() => {
@@ -39,7 +39,7 @@ export const MobileVideoCard: React.FC<IVideoCardProps> = ({
     totalNum
 }) => {
     const history = useHistory()
-    const link = AppPath.VIDEO_DETAIL + "?episode_id=" + episodeID + "&autoJump=true"
+    const link = AppPath.VIDEO_DETAIL + "?epid=" + episodeID + "&autoJump=true"
     return (
         <div
             onClick={() => {

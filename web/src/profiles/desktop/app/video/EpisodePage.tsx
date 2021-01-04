@@ -19,7 +19,7 @@ export const EpisodePage: FC = () => {
     const history = useHistory()
     const location = useLocation()
     const query = new URLSearchParams(location.search)
-    const episodeID = query.get("episode_id")
+    const episodeID = query.get("epid")
     const autoJump = query.get("autoJump")
 
     const { error, data } = useQuery(GET_VIDEO_DETAIL,
@@ -46,7 +46,7 @@ export const EpisodePage: FC = () => {
 
     useEffect(() => {
         if (historyInfo && autoJump === "true" && Number(historyInfo.subSourceID !== Number(episodeID))) {
-            window.location.replace(AppPath.VIDEO_DETAIL + "?episode_id=" + historyInfo.subSourceID)
+            window.location.replace(AppPath.VIDEO_DETAIL + "?epid=" + historyInfo.subSourceID)
         }
     }, [historyInfo, history, autoJump, episodeID])
 
@@ -84,8 +84,7 @@ export const EpisodePage: FC = () => {
             display: 'flex', flexDirection: 'row', height: '100%', width: "100%", overflowX: "scroll"
         }}>
             <div style={{
-                display: 'flex', flexDirection: 'column', padding: 10,
-                width: 1080, height: 891,
+                display: 'flex', flexDirection: 'column', padding: 10
             }}>
                 <VideoPlayer
                     theme={videoDetail.videoItem.theme}
@@ -93,10 +92,9 @@ export const EpisodePage: FC = () => {
                     episodeID={videoDetail.episodeItem.id}
                     url={videoDetail.episodeItem.url}
                     subtitles={videoDetail.episodeItem.subtitles}
-                    height={"100%"}
-                    width={"100%"}
+                    height={707}
+                    width={1088}
                     autoplay={false}
-                    autoDestroy={false}
                     currentTime={(Number(historyInfo?.subSourceID) !== 0 && Number(historyInfo?.subSourceID) === Number(videoDetail.episodeItem.id)) ? historyInfo?.currentTime : 0}
                 />
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
@@ -118,7 +116,7 @@ export const EpisodePage: FC = () => {
                     </div>
                 </div>
             </div>
-            <div style={{ margin: 20, display: "flex", flexDirection: 'column', width: 350 }}>
+            <div style={{ margin: 20, display: "flex", flexDirection: 'column', maxWidth: 350, flex: 1 }}>
                 <VideoSelect data={videoDetail.video?.episodes} num={videoDetail.num} />
                 <br />
                 {videoSeries}
