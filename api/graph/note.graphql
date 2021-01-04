@@ -40,8 +40,4 @@ input  SyncNotesInput{
 type SyncNotesResponse{
     lastUpdateTime:Int!
     list:[Note!]
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes

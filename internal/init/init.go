@@ -16,10 +16,12 @@ import (
 	device "github.com/9d77v/pdc/internal/module/device-service/models"
 
 	history "github.com/9d77v/pdc/internal/module/history-service/models"
+	note "github.com/9d77v/pdc/internal/module/note-service/models"
 	thing "github.com/9d77v/pdc/internal/module/thing-service/models"
 	user "github.com/9d77v/pdc/internal/module/user-service/models"
 	video_consumers "github.com/9d77v/pdc/internal/module/video-service/consumers"
 	video "github.com/9d77v/pdc/internal/module/video-service/models"
+
 	"github.com/9d77v/pdc/internal/utils"
 )
 
@@ -64,6 +66,9 @@ func autoMergePostgresTables() {
 		&video.Subtitle{},
 		&video.VideoSeries{},
 		&video.VideoSeriesItem{},
+		//note
+		&note.Note{},
+		&note.NoteHistory{},
 	)
 	if err != nil {
 		log.Println("auto migrate error:", err)

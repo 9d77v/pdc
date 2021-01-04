@@ -91,7 +91,7 @@ func TestDeviceService_CameraCapture(t *testing.T) {
 		{"test  device not online", args{ctx, &devicePB.CameraCaptureRequest{
 			DeviceId: uint32(device.ID),
 			Scheme:   "http",
-		}}, "", true},
+		}}, "", false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
