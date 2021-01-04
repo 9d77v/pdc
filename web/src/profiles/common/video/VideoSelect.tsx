@@ -12,7 +12,7 @@ const VideoSelect = (props: IVideoSelectProps) => {
     let buttons: any[] = []
     if (data && data.length > 0) {
         buttons = data.map((value: any, index: number) => {
-            const link = AppPath.VIDEO_DETAIL + "?episode_id=" + value.id
+            const link = AppPath.VIDEO_DETAIL + "?epid=" + value.id
             if (index === num) {
                 return <div key={"pdc-button-" + value.id} className={"pdc-button-selected"}  >
                     {value.num}

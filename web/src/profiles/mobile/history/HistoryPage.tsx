@@ -32,16 +32,16 @@ export default function HistoryPage() {
 
     const dataArr = data?.histories?.edges || []
     const options = dataArr?.map((value: any, index: number) => {
-        const link = AppPath.VIDEO_DETAIL + "?episode_id=" + value.subSourceID
+        const link = AppPath.VIDEO_DETAIL + "?epid=" + value.subSourceID
         return <div key={index} style={{ display: "flex", height: 123 }} >
             <div style={{ marginLeft: 20, marginRight: 20, padding: 10, cursor: "pointer" }}
-                onClick={() => history.push(link)}>
+                onClick={() => window.location.href = link}>
                 <Img src={value.cover} width={160} height={100}
                     currentTime={value.currentTime} remainingTime={value.remainingTime} />
             </div>
             <div style={{ borderBottom: "1px solid #e5e9ef", position: "relative", width: "100%" }}>
                 <div style={{ fontSize: 14, color: "#222", marginTop: 20, cursor: "pointer" }}
-                    onClick={() => history.push(link)}
+                    onClick={() => window.location.href = link}
                 >{value.title}</div>
                 <div style={{ position: "absolute", bottom: 0 }}>
                     <div>  {value.platform === "desktop" ? <DesktopOutlined /> : <MobileOutlined />}  {formatDetailTime(value.updatedAt)}</div>

@@ -31,7 +31,7 @@ export default function HistoryPage() {
 
     const dataArr = data?.histories?.edges || []
     const timelineOptions = dataArr?.map((value: any, index: number) => {
-        const link = AppPath.VIDEO_DETAIL + "?episode_id=" + value.subSourceID
+        const link = AppPath.VIDEO_DETAIL + "?epid=" + value.subSourceID
         return <Timeline.Item key={index}  >
             <div
                 style={{ display: "flex", height: 123 }}>
@@ -39,13 +39,13 @@ export default function HistoryPage() {
                     {formatRelativeTime(value.updatedAt)}
                 </div>
                 <div style={{ margin: 10, marginLeft: 20, marginRight: 20, padding: 10, cursor: "pointer" }}
-                    onClick={() => history.push(link)}>
+                    onClick={() => window.location.href = link}>
                     <Img src={value.cover} width={160} height={100}
                         currentTime={value.currentTime} remainingTime={value.remainingTime} />
                 </div>
                 <div style={{ borderBottom: "1px solid #e5e9ef", width: "100%" }}>
                     <div style={{ fontSize: 14, color: "#222", marginTop: 20, cursor: "pointer" }}
-                        onClick={() => history.push(link)}
+                        onClick={() => window.location.href = link}
                     >{value.title}</div>
                     <div style={{ position: "absolute", bottom: 0 }}>
                         {value.platform === "desktop" ? <DesktopOutlined /> : <MobileOutlined />} {value.remainingTime === 0 ? "第" + value.num + "话" +

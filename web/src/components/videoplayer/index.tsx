@@ -22,12 +22,13 @@ export interface VideoPlayerProps {
     episodeID: number
     url: string
     subtitles: [SubtitleProps] | null
-    height?: any
-    width?: any
-    minHeight?: number
-    minWidth?: number
+    height?: string | number
+    width?: string | number
+    minHeight?: string | number
+    minWidth?: string | number
+    maxHeight?: string | number
+    maxWidth?: string | number
     autoplay?: boolean
-    autoDestroy?: boolean
     currentTime?: number
 }
 
@@ -39,10 +40,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     subtitles,
     height,
     width,
-    minWidth,
     minHeight,
+    minWidth,
+    maxWidth,
+    maxHeight,
     autoplay,
-    autoDestroy,
     currentTime = 0,
 }) => {
     const location = useLocation();
@@ -65,10 +67,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             loop: false,
         }
     }, [autoplay, url])
-
-    if (autoDestroy === undefined) {
-        autoDestroy = true
-    }
 
     useEffect(() => {
         if (videoNode && url) {
@@ -118,16 +116,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }
         }
         return () => {
+            if (isApp && player) {
+                recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime())
+            }
             player?.dispose()
         }
-    }, [videoNode, props, player, url, subtitles,
-        autoDestroy, episodeID, isApp, videoID, currentTime]);
+    }, [videoNode, props, player, url, subtitles, episodeID, isApp, videoID, currentTime]);
 
     return (
         <div data-vjs-player
             style={{
                 width: width, height: height,
-                minWidth: minWidth, minHeight: minHeight
+                minWidth: minWidth, minHeight: minHeight,
+                maxWidth: maxWidth, maxHeight: maxHeight
             }} >
             <video id={videoKey}
                 playsInline
