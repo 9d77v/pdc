@@ -68,4 +68,6 @@ type Mutation {
   addDeviceDashboardCamera(input:NewDeviceDashboardCamera!):DeviceDashboard!
   removeDeviceDashboardCamera(ids:[Int!]!):DeviceDashboard!
   cameraCapture(deviceID:Int!):String!
+
+  syncNotes(input:SyncNotesInput!): SyncNotesResponse!
 }

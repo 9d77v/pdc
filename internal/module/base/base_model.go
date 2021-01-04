@@ -13,13 +13,15 @@ import (
 //Repository 。。
 type Repository interface {
 	SetDB(db *gorm.DB)
+	ReSetDB()
+	GetDB() *gorm.DB
 	Table(name string, args ...interface{}) Repository
 	SelectWithPrefix(fields []string, prefix string, omitFields ...string) Repository
 	Select(fields []string, omitFields ...string) Repository
 	LeftJoin(query string, args ...interface{}) Repository
 	FuzzyQuery(keyword string, field string) Repository
-	IDQuery(id uint, idFieldName ...string) Repository
-	IDArrayQuery(ids []uint, idFieldName ...string) Repository
+	IDQuery(id interface{}, idFieldName ...string) Repository
+	IDArrayQuery(ids interface{}, idFieldName ...string) Repository
 	Where(query interface{}, args ...interface{}) Repository
 	Pagination(offset, limit int) Repository
 	Sort(sorts []*Sort) Repository
@@ -32,11 +34,15 @@ type Repository interface {
 	Create(value interface{}) error
 	Updates(value interface{}) error
 	Delete(value interface{}, ids []int64) error
+	Begin()
+	Rollback()
+	Commit() error
 }
 
 //Model ..
 type Model struct {
 	db *gorm.DB
+	tx *gorm.DB
 }
 
 //DefaultModel ..
@@ -51,17 +57,28 @@ type DefaultModel struct {
 //SetDB ..
 func (m *Model) SetDB(db *gorm.DB) {
 	m.db = db
+	m.tx = db
+}
+
+//GetDB ..
+func (m *Model) GetDB() *gorm.DB {
+	return m.db
+}
+
+//ReSetDB ..
+func (m *Model) ReSetDB() {
+	m.tx = m.db
 }
 
 //Table ..
 func (m *Model) Table(name string, args ...interface{}) Repository {
-	m.db = m.db.Table(name, args)
+	m.tx = m.tx.Table(name, args)
 	return m
 }
 
 //SelectWithPrefix 选择字段带上特定前缀
 func (m *Model) SelectWithPrefix(fields []string, prefix string, omitFields ...string) Repository {
-	m.db = m.db.Select(m.toDBFieldsWithPrefix(fields, prefix,
+	m.tx = m.tx.Select(m.toDBFieldsWithPrefix(fields, prefix,
 		append([]string{"__typename"}, omitFields...)...))
 	return m
 }
@@ -110,41 +127,58 @@ func (m *Model) camelToSnack(s string) string {
 
 //Select 选择字段
 func (m *Model) Select(fields []string, omitFields ...string) Repository {
-	m.db = m.db.Select(m.toDBFields(fields, append([]string{"__typename"}, omitFields...)...))
+	m.tx = m.tx.Select(m.toDBFields(fields, append([]string{"__typename"}, omitFields...)...))
 	return m
 }
 
 //LeftJoin 左连接
 func (m *Model) LeftJoin(query string, args ...interface{}) Repository {
-	m.db = m.db.Joins("left join "+query, args...)
+	m.tx = m.tx.Joins("left join "+query, args...)
 	return m
 }
 
 //FuzzyQuery 增加模糊查询
 func (m *Model) FuzzyQuery(keyword string, field string) Repository {
 	if keyword != "" {
-		m.db = m.db.Where(field+" like ?", "%"+keyword+"%")
+		m.tx = m.tx.Where(field+" like ?", "%"+keyword+"%")
 	}
 	return m
 }
 
 //IDQuery id查询
-func (m *Model) IDQuery(id uint, idFieldName ...string) Repository {
-	m.db = m.db.Where(m.getFieldName(idFieldName...)+" = ?", id)
+func (m *Model) IDQuery(id interface{}, idFieldName ...string) Repository {
+	m.tx = m.tx.Where(m.getFieldName(idFieldName...)+" = ?", id)
 	return m
 }
 
 //IDArrayQuery ids查询
-func (m *Model) IDArrayQuery(ids []uint, idFieldName ...string) Repository {
-	if len(ids) > 0 {
-		m.db = m.db.Where(m.getFieldName(idFieldName...)+" in (?)", ids)
+func (m *Model) IDArrayQuery(ids interface{}, idFieldName ...string) Repository {
+	switch ids.(type) {
+	case []int64:
+		t := ids.([]int64)
+		if len(t) == 0 {
+			return m
+		}
+	case []uint:
+		t := ids.([]uint)
+		if len(t) == 0 {
+			return m
+		}
+	case []string:
+		t := ids.([]string)
+		if len(t) == 0 {
+			return m
+		}
+	default:
+		return m
 	}
+	m.tx = m.tx.Where(m.getFieldName(idFieldName...)+" in (?)", ids)
 	return m
 }
 
 //Where where查询
 func (m *Model) Where(query interface{}, args ...interface{}) Repository {
-	m.db = m.db.Where(query, args...)
+	m.tx = m.tx.Where(query, args...)
 	return m
 }
 
@@ -159,7 +193,7 @@ func (m *Model) getFieldName(idFieldName ...string) string {
 //Pagination 分页
 func (m *Model) Pagination(offset, limit int) Repository {
 	if limit > 0 {
-		m.db = m.db.Offset(offset).Limit(limit)
+		m.tx = m.tx.Offset(offset).Limit(limit)
 	}
 	return m
 }
@@ -171,81 +205,95 @@ func (m *Model) Sort(sorts []*Sort) Repository {
 		if v.IsAsc {
 			sort = " ASC"
 		}
-		m.db = m.db.Order(v.Field + sort)
+		m.tx = m.tx.Order(v.Field + sort)
 	}
 	return m
 }
 
 //Order 排序
 func (m *Model) Order(value interface{}) Repository {
-	m.db = m.db.Order(value)
+	m.tx = m.tx.Order(value)
 	return m
 }
 
 //Preload 预加载
 func (m *Model) Preload(query string, args ...interface{}) Repository {
-	m.db = m.db.Preload(query, args...)
+	m.tx = m.tx.Preload(query, args...)
 	return m
 }
 
 //First 查找按主键排序第一条数据
 func (m *Model) First(dest interface{}) error {
-	err := m.db.First(dest).Error
+	err := m.tx.First(dest).Error
+	m.ReSetDB()
 	return err
 }
 
 //Take 查找单条数据
 func (m *Model) Take(dest interface{}) error {
-	err := m.db.Take(dest).Error
+	err := m.tx.Take(dest).Error
+	m.ReSetDB()
 	return err
 }
 
 //Find 查找数据
 func (m *Model) Find(dest interface{}) error {
-	err := m.db.Find(dest).Error
+	err := m.tx.Find(dest).Error
+	m.ReSetDB()
 	return err
 }
 
 //Count 查询数据总量
 func (m *Model) Count(model interface{}) (total int64, err error) {
-	err = m.db.Model(model).Count(&total).Error
+	err = m.tx.Model(model).Count(&total).Error
 	return
 }
 
 //Create 新建数据
-func (m *Model) Create(value interface{}) error {
-	return m.db.Create(value).Error
+func (m *Model) Create(value interface{}) (err error) {
+	err = m.tx.Create(value).Error
+	m.ReSetDB()
+	return
 }
 
 //Updates 更新数据
-func (m *Model) Updates(value interface{}) error {
-	return m.db.Updates(value).Error
+func (m *Model) Updates(value interface{}) (err error) {
+	err = m.tx.Updates(value).Error
+	m.ReSetDB()
+	return
 }
 
 //Save 保存数据
-func (m *Model) Save(value interface{}) error {
-	return m.db.Save(value).Error
+func (m *Model) Save(value interface{}) (err error) {
+	err = m.tx.Save(value).Error
+	m.ReSetDB()
+	return
 }
 
 //Delete 删除数据
-func (m *Model) Delete(value interface{}, ids []int64) error {
+func (m *Model) Delete(value interface{}, ids []int64) (err error) {
+	defer func() {
+		m.ReSetDB()
+	}()
 	if len(ids) == 0 {
 		return nil
 	}
-	return m.db.Delete(value, ids).Error
+	err = m.tx.Delete(value, ids).Error
+	return
 }
 
 //Begin 开启事务
 func (m *Model) Begin() {
 	m.db = m.db.Begin()
+	m.ReSetDB()
 }
 
 //Rollback 撤回事务
 func (m *Model) Rollback() {
-	m.db.Rollback()
+	m.tx.Rollback()
 }
 
 //Commit 提交事务
-func (m *Model) Commit() error {
-	return m.db.Commit().Error
+func (m *Model) Commit() (err error) {
+	return m.tx.Commit().Error
 }

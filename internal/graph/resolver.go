@@ -2,6 +2,7 @@ package graph
 
 import (
 	"context"
+	"time"
 
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/graph/model"
@@ -9,8 +10,12 @@ import (
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
 	device "github.com/9d77v/pdc/internal/module/device-service/services"
 	history "github.com/9d77v/pdc/internal/module/history-service/services"
+	notePB "github.com/9d77v/pdc/internal/module/note-service/pb"
+	note "github.com/9d77v/pdc/internal/module/note-service/services"
 	thing "github.com/9d77v/pdc/internal/module/thing-service/services"
 	user "github.com/9d77v/pdc/internal/module/user-service/services"
+	"github.com/golang/protobuf/ptypes"
+
 	video "github.com/9d77v/pdc/internal/module/video-service/services"
 	"github.com/9d77v/pdc/internal/utils"
 )
@@ -31,6 +36,7 @@ var (
 	deviceService          = device.DeviceService{}
 	deviceModelService     = device.DeviceModelService{}
 	deviceDashboardService = device.DeviceDashboardService{}
+	noteService            = note.NoteService{}
 )
 
 func getCreateDeviceModelRequest(input model.NewDeviceModel) *pb.CreateDeviceModelRequest {
@@ -297,6 +303,7 @@ func toDeviceDashboards(data []*pb.DeviceDashboard) []*model.DeviceDashboard {
 	}
 	return result
 }
+
 func toDeviceDashboard(deviceDashboard *pb.DeviceDashboard) *model.DeviceDashboard {
 	ts := make([]*model.DeviceDashboardTelemetry, 0, len(deviceDashboard.Telemetries))
 	for _, v := range deviceDashboard.Telemetries {
@@ -368,5 +375,62 @@ func toCameraTimeLapseVideo(video *pb.CameraTimeLapseVideo) *model.CameraTimeLap
 		DeviceID: video.DeviceId,
 		Date:     video.Date,
 		VideoURL: video.VideoUrl,
+	}
+}
+
+func getNotes(data []*model.NewNote) []*notePB.Note {
+	result := make([]*notePB.Note, 0, len(data))
+	for _, v := range data {
+		r := getNote(v)
+		result = append(result, r)
+	}
+	return result
+}
+func getNote(m *model.NewNote) *notePB.Note {
+	createdAt, _ := ptypes.TimestampProto(time.Unix(m.CreatedAt, 0))
+	updatedAt, _ := ptypes.TimestampProto(time.Unix(m.UpdatedAt, 0))
+	return &notePB.Note{
+		Id:        m.ID,
+		ParentId:  m.ParentID,
+		Uid:       m.UID,
+		NoteType:  notePB.NoteType(m.NoteType),
+		Level:     int32(m.Level),
+		Title:     m.Title,
+		Color:     m.Color,
+		State:     notePB.NoteState(m.State),
+		Version:   int32(m.Version),
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+		Content:   m.Content,
+		Tags:      m.Tags,
+		Sha1:      m.Sha1,
+	}
+}
+
+func toNotes(data []*notePB.Note) []*model.Note {
+	result := make([]*model.Note, 0, len(data))
+	for _, v := range data {
+		r := toNote(v)
+		result = append(result, r)
+	}
+	return result
+}
+
+func toNote(m *notePB.Note) *model.Note {
+	return &model.Note{
+		ID:        m.Id,
+		ParentID:  m.ParentId,
+		UID:       m.Uid,
+		NoteType:  int64(m.NoteType),
+		Level:     int64(m.Level),
+		Title:     m.Title,
+		Color:     m.Color,
+		State:     int64(m.State),
+		Version:   int64(m.Version),
+		CreatedAt: m.CreatedAt.Seconds,
+		UpdatedAt: m.UpdatedAt.Seconds,
+		Content:   m.Content,
+		Tags:      m.Tags,
+		Sha1:      m.Sha1,
 	}
 }

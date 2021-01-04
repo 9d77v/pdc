@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"time"
 
 	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/oss"
@@ -12,7 +13,9 @@ import (
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/middleware"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
+	notePB "github.com/9d77v/pdc/internal/module/note-service/pb"
 	"github.com/9d77v/pdc/internal/utils"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
@@ -186,6 +189,20 @@ func (r *mutationResolver) CameraCapture(ctx context.Context, deviceID int64) (s
 	resp, err := deviceService.CameraCapture(context.Background(),
 		&pb.CameraCaptureRequest{DeviceId: uint32(deviceID), Scheme: scheme})
 	return resp.ImageUrl, err
+}
+
+func (r *mutationResolver) SyncNotes(ctx context.Context, input model.SyncNotesInput) (*model.SyncNotesResponse, error) {
+	user := middleware.ForContext(ctx)
+	t, _ := ptypes.TimestampProto(time.Unix(input.LastUpdateTime, 0))
+	resp, err := noteService.SyncNotes(context.Background(), &notePB.SyncNotesRequest{
+		Uid:            int64(user.ID),
+		LastUpdateTime: t,
+		UnsyncedNotes:  getNotes(input.UnsyncedNotes),
+	})
+	return &model.SyncNotesResponse{
+		LastUpdateTime: resp.LastUpdateTime.Seconds,
+		List:           toNotes(resp.List),
+	}, err
 }
 
 func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {

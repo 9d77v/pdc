@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/9d77v/go-lib/clients/config"
+	"github.com/9d77v/pdc/internal/db/clickhouse"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
@@ -15,22 +16,24 @@ import (
 )
 
 var migrateTables = []interface{}{
-	&models.CameraTimeLapseVideo{},
-	&models.DeviceDashboardCamera{},
-	&models.DeviceDashboardTelemetry{},
-	&models.DeviceDashboard{},
-	&models.Telemetry{},
-	&models.Attribute{},
-	&models.Device{},
-	&models.AttributeModel{},
-	&models.TelemetryModel{},
 	&models.DeviceModel{},
+	&models.TelemetryModel{},
+	&models.AttributeModel{},
+	&models.Device{},
+	&models.Attribute{},
+	&models.Telemetry{},
+	&models.DeviceDashboard{},
+	&models.DeviceDashboardTelemetry{},
+	&models.DeviceDashboardCamera{},
+	&models.CameraTimeLapseVideo{},
 }
 
 func TestMain(m *testing.M) {
 	initDB()
+	initClickhouse()
 	m.Run()
 	clean()
+	cleanClickhouse()
 }
 
 func initDB() {
@@ -52,11 +55,40 @@ func initDB() {
 }
 
 func clean() {
-	for _, v := range migrateTables {
-		err := db.GetDB().Where("1 = 1").Unscoped().Delete(v).Error
+	for i := len(migrateTables) - 1; i > -1; i-- {
+		err := db.GetDB().Where("1 = 1").Unscoped().Delete(migrateTables[i]).Error
 		if err != nil {
 			log.Println("error:", err)
 		}
+	}
+}
+
+func initClickhouse() {
+	config := &config.DBConfig{
+		Driver:       "clickhouse",
+		Host:         "domain.local",
+		Port:         9001,
+		User:         "",
+		Password:     "",
+		Name:         "pdc_test",
+		MaxIdleConns: 10,
+		MaxOpenConns: 100,
+		EnableLog:    false,
+	}
+	err := clickhouse.GetDB(config).AutoMigrate(migrateTables...)
+	if err != nil {
+		fmt.Println("auto migrate failed:", err)
+	}
+}
+
+func cleanClickhouse() {
+	err := clickhouse.GetDB().Exec("ALTER TABLE pdc_device_health DELETE WHERE 1=1").Error
+	if err != nil {
+		log.Println("error:", err)
+	}
+	err = clickhouse.GetDB().Exec("ALTER TABLE pdc_device_telemetry DELETE WHERE 1=1").Error
+	if err != nil {
+		log.Println("error:", err)
 	}
 }
 

@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package pb;
+option go_package = "internal/module/note-service/pb";
+import "google/protobuf/timestamp.proto";
+
+service NoteService {
+  rpc SyncNotes(SyncNotesRequest) returns(SyncNotesResponse) {}
+}
+
+enum NoteType { Directory = 0; File = 1; }
+
+enum NoteState { Normal = 0; InRubbish = 1; IsDeleted = 2; }
+
+message Note {
+  string id = 1;
+  string parent_id = 2;
+  int64 uid = 3;
+  NoteType note_type = 4;
+  int32 level = 5;
+  string title = 6;
+  string color = 7;
+  NoteState state = 8;
+  int32 version = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+  string content = 12;
+  repeated string tags = 13;
+  string sha1 = 14;
+}
+
+message SyncNotesRequest {
+  int64 uid = 1;
+  google.protobuf.Timestamp last_update_time = 2;
+  repeated Note unsynced_notes = 3;
+}
+
+message SyncNotesResponse {
+  google.protobuf.Timestamp last_update_time = 1;
+  repeated Note list = 2;
+}
