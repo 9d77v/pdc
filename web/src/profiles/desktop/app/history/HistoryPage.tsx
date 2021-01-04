@@ -19,7 +19,8 @@ export default function HistoryPage() {
                     page: 1,
                     pageSize: 50,
                 }
-            }
+            },
+            fetchPolicy: "cache-and-network"
         })
 
     useEffect(() => {
@@ -34,7 +35,7 @@ export default function HistoryPage() {
         return <Timeline.Item key={index}  >
             <div
                 style={{ display: "flex", height: 123 }}>
-                <div style={{ display: "flex", alignItems: "center", width: 120 }}>
+                <div style={{ display: "flex", width: 120 }}>
                     {formatRelativeTime(value.updatedAt)}
                 </div>
                 <div style={{ margin: 10, marginLeft: 20, marginRight: 20, padding: 10, cursor: "pointer" }}

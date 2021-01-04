@@ -67,10 +67,10 @@ const MobileIndex = () => {
             <Route exact path={AppPath.HISTORY} >
                 <HistoryPage />
             </Route>
-            <Route exact path={AppPath.DEVICE_CAMERA}  >
+            <Route exact path={AppPath.DEVICE_CAMERA_DETAIL}  >
                 <DeviceCameraDetail />
             </Route>
-            <Route exact path={AppPath.DEVICE}  >
+            <Route path={AppPath.DEVICE}  >
                 <DeviceIndex />
             </Route>
             <Route exact path={AppPath.UTIL_CALCULATOR}  >

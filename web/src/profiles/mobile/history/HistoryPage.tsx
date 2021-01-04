@@ -21,6 +21,7 @@ export default function HistoryPage() {
                     pageSize: 50,
                 }
             },
+            fetchPolicy: "cache-and-network"
         })
 
     useEffect(() => {

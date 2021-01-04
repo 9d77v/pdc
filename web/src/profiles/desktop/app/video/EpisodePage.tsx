@@ -46,7 +46,7 @@ export const EpisodePage: FC = () => {
 
     useEffect(() => {
         if (historyInfo && autoJump === "true" && Number(historyInfo.subSourceID !== Number(episodeID))) {
-            history.replace(AppPath.VIDEO_DETAIL + "?episode_id=" + historyInfo.subSourceID)
+            window.location.replace(AppPath.VIDEO_DETAIL + "?episode_id=" + historyInfo.subSourceID)
         }
     }, [historyInfo, history, autoJump, episodeID])
 

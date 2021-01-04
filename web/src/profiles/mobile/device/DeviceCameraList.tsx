@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/react-hooks"
 import React, { useMemo } from "react"
 import { useHistory } from "react-router-dom"
 import { Card } from "src/components/Card"
+import { AppPath } from "src/consts/path"
 import { GET_MOBILE_HOME_DEVICES } from "src/gqls/device/query"
 import CameraPicture from "src/profiles/common/device/CameraPicture"
 
@@ -20,8 +21,8 @@ const DeviceCameraList = () => {
                 const cardItems = dataItem.cameras.map((t: any, index: number) => {
                     return (<div style={{ width: "100%" }} key={index}
                         onClick={() => {
-                            history.push(`/app/device/camera?device_id=${t.deviceID}&device_name=${t.deviceName}`)
-
+                            history.push(AppPath.DEVICE_CAMERA_DETAIL +
+                                `?device_id=${t.deviceID}&device_name=${t.deviceName}`)
                         }} >
                         <div style={{ textAlign: "left", margin: 10 }}>{t.deviceName}</div>
                         <CameraPicture

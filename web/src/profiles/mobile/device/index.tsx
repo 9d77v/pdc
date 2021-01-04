@@ -1,17 +1,22 @@
 import React from "react"
-import { useHistory } from "react-router-dom";
+import { Route, useHistory, useLocation } from "react-router-dom";
 import { Icon, NavBar, Tabs } from "antd-mobile";
 import DeviceCards from "src/profiles/common/device/DeviceCard";
 import DeviceCameraList from "./DeviceCameraList";
+import { AppPath } from "src/consts/path";
 
 
 export default function DeviceIndex() {
     const history = useHistory()
-
     const tabs = [
         { title: "遥测" },
         { title: "摄像头" },
     ];
+    const location = useLocation()
+    let initialPage = 0
+    if (location.pathname === AppPath.DEVICE_CAMERA) {
+        initialPage = 1
+    }
 
     return (
         <div style={{ height: "100%", textAlign: "center" }}>
@@ -23,12 +28,25 @@ export default function DeviceIndex() {
             >设备</NavBar>
             <div style={{ marginTop: 45 }}>
                 <Tabs tabs={tabs}
-                    initialPage={0}
-                    onChange={(tab, index) => { console.log('onChange', index, tab); }}
-                    onTabClick={(tab, index) => { console.log('onTabClick', index, tab); }}
+                    initialPage={initialPage}
+                    onChange={(tab, index) => {
+                    }}
+                    onTabClick={(tab, index) => {
+                        if (index !== initialPage) {
+                            if (index === 1) {
+                                window.location.replace(AppPath.DEVICE_CAMERA)
+                            } else {
+                                history.replace(AppPath.DEVICE_TELEMETRY)
+                            }
+                        }
+                    }}
                 >
-                    <DeviceCards width={160} />
-                    <DeviceCameraList />
+                    <Route exact path={AppPath.DEVICE_TELEMETRY}  >
+                        <DeviceCards width={160} />
+                    </Route>
+                    <Route exact path={AppPath.DEVICE_CAMERA}  >
+                        <DeviceCameraList />
+                    </Route>
                 </Tabs>
             </div>
         </div>)

@@ -1,6 +1,5 @@
 import React, { useMemo } from "react"
 import "src/styles/button.less"
-import { useHistory } from "react-router-dom"
 import { AppPath } from "src/consts/path"
 interface IVideoSeriesSelectProps {
     data: any
@@ -9,7 +8,6 @@ interface IVideoSeriesSelectProps {
 
 const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
     const { data, videoID } = props
-    const history = useHistory()
     const series = useMemo(() => {
         let seriesName: string = ""
         let seriesButtons: any[] = []
@@ -28,7 +26,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
                 return <div
                     key={"pdc-button-" + value.videoID}
                     className={"pdc-button"}
-                    onClick={() => { history.replace(link) }}
+                    onClick={() => { window.location.replace(link) }}
                 >
                     {value.alias}
                 </div>
@@ -38,7 +36,7 @@ const VideoSeriesSelect = (props: IVideoSeriesSelectProps) => {
             seriesButtons: seriesButtons,
             seriesName: seriesName
         }
-    }, [data, history, videoID])
+    }, [data, videoID])
 
     return (
         <div>
