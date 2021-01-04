@@ -18,7 +18,7 @@ const publicData: IApp[] = [
     }, {
         text: "设备",
         icon: <DashboardOutlined style={{ fontSize: 26 }} />,
-        url: AppPath.DEVICE
+        url: AppPath.DEVICE_TELEMETRY
     }
 ]
 

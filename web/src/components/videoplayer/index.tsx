@@ -118,9 +118,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }
         }
         return () => {
-            if (autoDestroy) {
-                player?.dispose()
-            }
+            player?.dispose()
         }
     }, [videoNode, props, player, url, subtitles,
         autoDestroy, episodeID, isApp, videoID, currentTime]);

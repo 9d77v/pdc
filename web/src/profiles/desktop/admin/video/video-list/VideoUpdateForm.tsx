@@ -115,7 +115,7 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
                 <Form.Item name="isHideOnMobile" label="是否手机隐藏" valuePropName='checked'>
                     <Switch />
                 </Form.Item>
-                <Form.Item name="theme" label="主题" hidden>
+                <Form.Item name="theme" label="主题" >
                     <Select onChange={() => { }}>
                         <Select.Option value="">默认</Select.Option>
                         <Select.Option value="vjs-theme-lemon">柠檬</Select.Option>

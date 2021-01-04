@@ -3,6 +3,7 @@ const AppPath = {
     DEVICE: "/app/device",
     DEVICE_TELEMETRY: "/app/device/telemetry",
     DEVICE_CAMERA: "/app/device/camera",
+    DEVICE_CAMERA_DETAIL: "/app/device/camera/detail",
     VIDEO: "/app/video",
     VIDEO_DETAIL: "/app/video/detail",
     VIDEO_SUGGEST: "/app/video/suggest",

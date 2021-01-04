@@ -65,7 +65,7 @@ const DesktopIndex = () => {
                             <Route exact path={AppPath.DEVICE_CAMERA}>
                                 <DeviceCamera />
                             </Route>
-                            <Route exact path={AppPath.VIDEO_DETAIL}  >
+                            <Route exact path={AppPath.VIDEO_DETAIL}>
                                 <EpisodePage />
                             </Route>
                             <Route exact path={AppPath.VIDEO_SUGGEST}>

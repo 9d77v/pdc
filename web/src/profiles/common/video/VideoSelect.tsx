@@ -1,5 +1,4 @@
 import React from "react"
-import { useHistory } from "react-router-dom"
 import { AppPath } from "src/consts/path"
 import "src/styles/button.less"
 
@@ -10,7 +9,6 @@ interface IVideoSelectProps {
 
 const VideoSelect = (props: IVideoSelectProps) => {
     const { data, num } = props
-    const history = useHistory()
     let buttons: any[] = []
     if (data && data.length > 0) {
         buttons = data.map((value: any, index: number) => {
@@ -22,7 +20,7 @@ const VideoSelect = (props: IVideoSelectProps) => {
             }
             return <div key={"pdc-button-" + value.id}
                 className={"pdc-button"}
-                onClick={() => { history.replace(link) }} >
+                onClick={() => { window.location.replace(link) }} >
                 {value.num}
             </div>
         })
