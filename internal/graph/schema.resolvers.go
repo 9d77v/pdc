@@ -284,6 +284,10 @@ func (r *queryResolver) Histories(ctx context.Context, sourceType *int64, search
 	return con, err
 }
 
+func (r *queryResolver) HistoryStatistic(ctx context.Context, sourceType *int64) (*model.HistoryStatistic, error) {
+	return historyService.HistoryStatistic(ctx, sourceType)
+}
+
 func (r *queryResolver) DeviceModels(ctx context.Context, searchParam model.SearchParam) (*model.DeviceModelConnection, error) {
 	resp, err := deviceModelService.ListDeviceModel(context.Background(),
 		&pb.ListDeviceModelRequest{SearchParam: getSearchParam(ctx, searchParam)})

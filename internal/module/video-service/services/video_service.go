@@ -169,9 +169,8 @@ func (s VideoService) CreateEpisode(ctx context.Context,
 //UpdateEpisode ..
 func (s VideoService) UpdateEpisode(ctx context.Context,
 	input model.NewUpdateEpisode) (*model.Episode, error) {
-	episode := new(models.Episode)
-	fields := s.GetInputFields(ctx)
-	if err := s.GetByID(episode, uint(input.ID), fields); err != nil {
+	episode := models.NewEpisode()
+	if err := s.GetByID(episode, uint(input.ID), []string{"id"}); err != nil {
 		return nil, err
 	}
 	updateMap := map[string]interface{}{

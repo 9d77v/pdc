@@ -18,7 +18,8 @@ type Query {
   thingAnalyze(dimension:String!,index:String!,start:Int,group:String!):PieLineSerieData!
 
   histories(sourceType:Int,searchParam:SearchParam!,subSourceID:ID):HistoryConnection! 
-  
+  historyStatistic(sourceType:Int):HistoryStatistic!
+
   deviceModels(searchParam:SearchParam!):DeviceModelConnection!
   devices(searchParam:SearchParam!,deviceType: Int):DeviceConnection!
   deviceDashboards(searchParam:SearchParam!):DeviceDashboardConnection!
