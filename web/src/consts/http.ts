@@ -39,7 +39,8 @@ export const recordHistory = async (
     subSourceID: number,
     currentTime: number,
     remainingTime: number,
-    duration: number) => {
+    duration: number,
+    clientTs: number) => {
     const body = JSON.stringify({
         operationName: "recordHistory",
         query: `mutation recordHistory($input:NewHistoryInput!){
@@ -55,7 +56,8 @@ export const recordHistory = async (
                 "platform": isMobile() ? "mobile" : "desktop",
                 "currentTime": currentTime,
                 "remainingTime": remainingTime,
-                "duration": duration
+                "duration": duration,
+                "clientTs": clientTs
             }
         }
     })

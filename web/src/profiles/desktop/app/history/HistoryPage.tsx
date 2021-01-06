@@ -2,15 +2,12 @@ import React, { useEffect } from "react"
 import { Timeline, message } from "antd"
 import { useQuery } from "@apollo/react-hooks"
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons'
-import { useHistory } from "react-router-dom"
 import Img from "src/components/img"
 import { formatRelativeTime } from "src/utils/util"
 import { AppPath } from "src/consts/path"
 import { LIST_HISTORY } from "src/gqls/history/query"
 
 export default function HistoryPage() {
-
-    const history = useHistory()
     const { error, data } = useQuery(LIST_HISTORY,
         {
             variables: {

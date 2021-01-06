@@ -3,11 +3,13 @@ import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
 import "video.js/dist/video-js.min.css"
 import "./index.less"
 import "./vjs-theme-lemon.less"
+import "./vjs-theme-pc.less"
+
 
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import { useLocation } from 'react-router-dom'
 import { recordHistory } from 'src/consts/http'
-import { watch } from 'fs'
+import { isMobile } from 'src/utils/util'
 
 const lang: any = video_zhCN
 lang["Picture-in-Picture"] = "画中画"
@@ -69,17 +71,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }
     }, [autoplay, url])
 
-    let duration = 0
-    let timer: any
-    const record = () => {
-        window.clearInterval(timer);
-        if (isApp && player) {
-            recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime(), duration)
-            duration = 0
-        }
-    }
-
     useEffect(() => {
+        let duration = 0
+        let timer: any
+        const record = () => {
+            window.clearInterval(timer);
+            if (isApp && player) {
+                recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime(), duration, Date.now() / 1000)
+                duration = 0
+            }
+        }
+
         if (videoNode && url) {
             if (!player) {
                 let tmpPlayer = videojs(videoNode, props, () => {
@@ -137,6 +139,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }
     }, [videoNode, props, player, url, subtitles, episodeID, isApp, videoID, currentTime]);
 
+    if (!isMobile()) {
+        theme = "vjs-theme-pc " + theme
+    }
     return (
         <div data-vjs-player
             style={{

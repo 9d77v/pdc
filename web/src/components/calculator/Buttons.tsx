@@ -58,10 +58,6 @@ const Buttons: React.FC<IButtonsProps> = ({
         const newOperation = formula + newValue
         switch (newValue) {
             case '0':
-                if (opt === '0') {
-                    break
-                }
-            // eslint-disable-next-line
             case '1':
             case '2':
             case '3':
@@ -71,6 +67,9 @@ const Buttons: React.FC<IButtonsProps> = ({
             case '7':
             case '8':
             case '9':
+                if (newValue === '0' && opt === "0") {
+                    break
+                }
                 if (opt.length === calcOptions.maxOperationLength) {
                     return
                 }

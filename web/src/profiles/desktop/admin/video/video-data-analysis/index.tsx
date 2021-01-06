@@ -28,25 +28,27 @@ const VideoDataAnalysisIndex = () => {
         }
         return {
             value: time,
-            suffix: suffix
+            suffix: suffix,
+            precision: 2
         }
     }
     const cards = useMemo(() => {
         if (data) {
             const showData = data.historyStatistic.data
             const cardTitles: string[] = ["观看人数", "观看动画数", "观看视频数", "观看时长"]
-            console.log(showData)
             return showData.map((value: any, index: number) => {
                 let arrow = null
                 let percent = 0
                 let color = "black"
                 let today = {
                     value: value[0],
-                    suffix: ""
+                    suffix: "",
+                    precision: 0
                 }
                 let yesterday = {
                     value: value[1],
-                    suffix: ""
+                    suffix: "",
+                    precision: 0
                 }
                 if (value[1] > value[2]) {
                     arrow = <ArrowUpOutlined />
@@ -71,8 +73,8 @@ const VideoDataAnalysisIndex = () => {
                 }
                 return (<Col span={6} key={index}>
                     <Card title={cardTitles[index]}>
-                        <Statistic title="今日" value={today.value} suffix={today.suffix} />
-                        <Statistic title="昨日" value={yesterday.value} suffix={yesterday.suffix} />
+                        <Statistic title="今日" value={today.value} suffix={today.suffix} precision={today.precision} />
+                        <Statistic title="昨日" value={yesterday.value} suffix={yesterday.suffix} precision={today.precision} />
                         <Statistic title="较前日" value={percent}
                             precision={2}
                             valueStyle={{ color: color }}
