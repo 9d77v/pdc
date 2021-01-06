@@ -10,6 +10,7 @@ type History {
 	platform:String!
     currentTime: Float!
     remainingTime: Float!
+	duration: Float!
 	updatedAt: Int!
 }
 
@@ -25,4 +26,10 @@ input NewHistoryInput{
 	platform:String!
     currentTime: Float!
     remainingTime: Float!
+	duration: Float!
+	clientTs: Float!
+}
+
+type HistoryStatistic{
+	data: [[Float!]!]!
 }

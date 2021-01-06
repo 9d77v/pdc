@@ -1,7 +1,6 @@
 package chmodels
 
 import (
-	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -34,9 +33,17 @@ func initDB() {
 		MaxOpenConns: 100,
 		EnableLog:    false,
 	}
-	err := clickhouse.GetDB(config).AutoMigrate(migrateTables...)
+	err := clickhouse.GetDB(config).Set("gorm:table_options",
+		"engine=MergeTree() ORDER BY (device_id,telemetry_id,action_time) PARTITION BY (device_id)").
+		AutoMigrate(&DeviceTelemetry{})
 	if err != nil {
-		fmt.Println("auto migrate failed:", err)
+		log.Println("auto migrate error:", err)
+	}
+	err = clickhouse.GetDB().Set("gorm:table_options",
+		"engine=MergeTree() ORDER BY (device_id,action_time) PARTITION BY (device_id)").
+		AutoMigrate(&DeviceHealth{})
+	if err != nil {
+		log.Println("auto migrate error:", err)
 	}
 }
 

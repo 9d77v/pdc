@@ -12,6 +12,8 @@ import (
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
 	ch_device "github.com/9d77v/pdc/internal/module/device-service/chmodels"
+	ch_history "github.com/9d77v/pdc/internal/module/history-service/chmodels"
+
 	device_consumers "github.com/9d77v/pdc/internal/module/device-service/consumers"
 	device "github.com/9d77v/pdc/internal/module/device-service/models"
 
@@ -55,7 +57,6 @@ func autoMergePostgresTables() {
 		&device.CameraTimeLapseVideo{},
 		//history
 		&history.History{},
-		&history.HistoryLog{},
 		//thing
 		&thing.Thing{},
 		//user
@@ -85,6 +86,12 @@ func autoMergeClickhouseTables() {
 	err = clickhouse.GetDB().Set("gorm:table_options",
 		"engine=MergeTree() ORDER BY (device_id,action_time) PARTITION BY (device_id)").
 		AutoMigrate(&ch_device.DeviceHealth{})
+	if err != nil {
+		log.Println("auto migrate error:", err)
+	}
+	err = clickhouse.GetDB().Set("gorm:table_options",
+		"engine=MergeTree() ORDER BY (source_type,uid,source_id,sub_source_id,server_ts) PARTITION BY (source_type,uid)").
+		AutoMigrate(&ch_history.HistoryLog{})
 	if err != nil {
 		log.Println("auto migrate error:", err)
 	}
