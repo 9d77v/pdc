@@ -7,6 +7,7 @@ import "./vjs-theme-lemon.less"
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
 import { useLocation } from 'react-router-dom'
 import { recordHistory } from 'src/consts/http'
+import { watch } from 'fs'
 
 const lang: any = video_zhCN
 lang["Picture-in-Picture"] = "画中画"
@@ -68,6 +69,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }
     }, [autoplay, url])
 
+    let duration = 0
+    let timer: any
+    const record = () => {
+        window.clearInterval(timer);
+        if (isApp && player) {
+            recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime(), duration)
+            duration = 0
+        }
+    }
+
     useEffect(() => {
         if (videoNode && url) {
             if (!player) {
@@ -81,21 +92,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         }, true)
                     }
                 })
-                tmpPlayer.on("pause", () => {
-                    if (isApp) {
-                        recordHistory(1, videoID, episodeID, tmpPlayer.currentTime(), tmpPlayer.remainingTime())
-                    }
+                tmpPlayer.on('play', () => {
+                    timer = setInterval(() => {
+                        duration += 0.25
+                    }, 250)
                 })
+                tmpPlayer.on(["pause", "ended"], record)
                 tmpPlayer.currentTime(currentTime)
                 setPlayer(tmpPlayer)
             } else {
                 player.src(url)
-                player.off(["pause", "ready"])
+                player.off(["pause", "ready", "ended"])
                 player.currentTime(currentTime)
-                player.on("pause", () => {
-                    if (isApp) {
-                        recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime())
-                    }
+                player.on(["pause", "ended"], record)
+                player.on('play', () => {
+                    timer = setInterval(() => {
+                        duration += 0.25
+                    }, 250)
                 })
                 player.ready(() => {
                     const oldTracks = player.remoteTextTracks();
@@ -115,10 +128,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 })
             }
         }
+
+        window.addEventListener("beforeunload", record, false);
         return () => {
-            if (isApp && player) {
-                recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime())
-            }
+            record()
+            window.removeEventListener("beforeunload", record);
             player?.dispose()
         }
     }, [videoNode, props, player, url, subtitles, episodeID, isApp, videoID, currentTime]);

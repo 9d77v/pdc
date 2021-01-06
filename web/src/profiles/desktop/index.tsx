@@ -22,6 +22,7 @@ import DeviceTelemetry from './app/device/DeviceTelemetry'
 import DeviceCamera from './app/device/DeviceCamera'
 import { GET_USER } from 'src/gqls/user/query'
 import { EpisodePage } from './app/video/EpisodePage'
+import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -106,6 +107,9 @@ const DesktopIndex = () => {
                             </Route>
                             <Route exact path={AdminPath.VIDEO_SEREIS_LIST}>
                                 <VideoSeriesTable />
+                            </Route>
+                            <Route exact path={AdminPath.VIDEO_DATA_ANALYSIS}>
+                                <VideoDataAnalysisIndex />
                             </Route>
                             <Route exact path={AdminPath.DEVICE_MODEL_LIST}>
                                 <DeviceModelIndex />

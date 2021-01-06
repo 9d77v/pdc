@@ -89,6 +89,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["settings-video"],
         "defaultSelectedKeys": ['video-series-list']
     }],
+    [AdminPath.VIDEO_DATA_ANALYSIS, {
+        "defaultOpenKeys": ["settings-video"],
+        "defaultSelectedKeys": ['video-data_analysis']
+    }],
     [AdminPath.DEVICE, {
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-list']
@@ -283,6 +287,9 @@ const AdminMenu = (props: IAppHeaderProps) => {
                 </Menu.Item>
                 <Menu.Item key="video-series-list" >
                     <Link to={AdminPath.VIDEO_SEREIS_LIST}>{PathDict.get(AdminPath.VIDEO_SEREIS_LIST)}</Link>
+                </Menu.Item>
+                <Menu.Item key="video-data_analysis" >
+                    <Link to={AdminPath.VIDEO_DATA_ANALYSIS}>{PathDict.get(AdminPath.VIDEO_DATA_ANALYSIS)}</Link>
                 </Menu.Item>
             </SubMenu>
             <SubMenu
