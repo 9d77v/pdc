@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import videojs, { VideoJsPlayerOptions, VideoJsPlayer } from 'video.js'
+import React, { useEffect, useState } from 'react'
+import videojs, { VideoJsPlayer } from 'video.js'
 import "video.js/dist/video-js.min.css"
 import "./index.less"
 import video_zhCN from 'video.js/dist/lang/zh-CN.json'
@@ -31,8 +31,8 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()
 
-    const props: VideoJsPlayerOptions = useMemo(() => {
-        return {
+    useEffect(() => {
+        const props = {
             autoplay: autoplay,
             sources: [{
                 src: url,
@@ -43,9 +43,7 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
             playbackRates: [0.5, 1, 2, 4, 16],
             loop: false,
         }
-    }, [autoplay, url])
 
-    useEffect(() => {
         if (videoNode && url) {
             if (!player) {
                 let tmpPlayer = videojs(videoNode, props, () => { })
@@ -59,7 +57,7 @@ const CommonPlayer: React.FC<VideoPlayerProps> = ({
                 player?.dispose()
             }
         }
-    }, [videoNode, props, player, url]);
+    }, [videoNode, player, autoplay, url]);
 
     return (
         <div data-vjs-player

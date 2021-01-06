@@ -38,7 +38,9 @@ export const recordHistory = async (
     sourceID: number,
     subSourceID: number,
     currentTime: number,
-    remainingTime: number) => {
+    remainingTime: number,
+    duration: number,
+    clientTs: number) => {
     const body = JSON.stringify({
         operationName: "recordHistory",
         query: `mutation recordHistory($input:NewHistoryInput!){
@@ -53,7 +55,9 @@ export const recordHistory = async (
                 "subSourceID": subSourceID,
                 "platform": isMobile() ? "mobile" : "desktop",
                 "currentTime": currentTime,
-                "remainingTime": remainingTime
+                "remainingTime": remainingTime,
+                "duration": duration,
+                "clientTs": clientTs
             }
         }
     })
@@ -85,7 +89,8 @@ const request = async (body: string, needToken?: boolean): Promise<any> => {
         method: 'POST',
         headers: myHeaders,
         body: body,
-        redirect: 'follow' as const
+        redirect: 'follow' as const,
+        keepalive: true
     };
     const data = await fetch("/api", requestOptions)
     return data.json()

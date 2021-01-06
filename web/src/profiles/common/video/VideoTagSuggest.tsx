@@ -47,8 +47,8 @@ const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
         }
     }, [error])
 
-    const videos = data ? data.searchVideo.edges : []
     const cards = useMemo(() => {
+        const videos = data ? data.searchVideo.edges : []
         return videos.map((item: any, index: number) => {
             if (isMobile()) {
                 return <MobileVideoCard
@@ -67,7 +67,7 @@ const VideoTagSuggest: FC<IVideoTagSuggestProps> = ({
                 totalNum={item.totalNum}
             />
         })
-    }, [videos])
+    }, [data])
 
     let timer: any
     const next = () => {

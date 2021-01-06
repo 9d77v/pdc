@@ -19,5 +19,13 @@ query histories($sourceType: Int, $searchParam: SearchParam!) {
     }
   }
 }
-`;
-export { LIST_HISTORY }
+`
+
+const HISTORY_STATISTIC = gql`
+query historyStatistic($sourceType: Int) {
+  historyStatistic(sourceType: $sourceType) {
+    data
+  }
+}
+`
+export { LIST_HISTORY, HISTORY_STATISTIC }

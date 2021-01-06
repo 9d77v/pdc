@@ -30,17 +30,17 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
     const [videoNode, setVideoNode] = useState()
     const [player, setPlayer] = useState<VideoJsPlayer>()
 
-    const props: VideoJsPlayerOptions = {
-        autoplay: autoplay,
-        sources: [{
-            src: url,
-            type: 'application/vnd.apple.mpegurl',
-        }],
-        language: "zh-CN",
-        controls: true,
-    };
-
     useEffect(() => {
+        const props: VideoJsPlayerOptions = {
+            autoplay: autoplay,
+            sources: [{
+                src: url,
+                type: 'application/vnd.apple.mpegurl',
+            }],
+            language: "zh-CN",
+            controls: true,
+        }
+
         if (videoNode && url) {
             if (!player) {
                 let tmpPlayer = videojs(videoNode, props)
@@ -50,7 +50,7 @@ const LivePlayer: React.FC<LivePlayerProps> = ({
         return () => {
             player?.dispose()
         }
-    }, [videoNode, props, player, url]);
+    }, [videoNode, player, autoplay, url]);
 
     return (
         <div data-vjs-player
