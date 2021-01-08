@@ -76,7 +76,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         let timer: any
         const record = () => {
             window.clearInterval(timer);
-            if (isApp && player) {
+            if (isApp && player && duration > 0) {
                 recordHistory(1, videoID, episodeID, player.currentTime(), player.remainingTime(), duration, Date.now() / 1000)
                 duration = 0
             }

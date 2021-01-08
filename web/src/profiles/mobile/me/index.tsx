@@ -1,12 +1,11 @@
 import React from "react"
 import { useHistory } from "react-router-dom"
 import { apolloClient } from "src/utils/apollo_client"
-import { QrcodeOutlined, LogoutOutlined, LockOutlined } from '@ant-design/icons'
+import { QrcodeOutlined, LogoutOutlined, LockOutlined, LineChartOutlined } from '@ant-design/icons'
 import { List } from "antd-mobile"
 import { UserBrief } from "src/profiles/mobile/common/UserBrief"
 import { NewUser } from "src/models/user"
 import { AppPath } from "src/consts/path"
-
 
 interface IMeIndexProps {
     user: NewUser
@@ -20,6 +19,7 @@ export default function MeIndex(props: IMeIndexProps) {
         apolloClient.resetStore()
         history.push(AppPath.LOGIN)
     }
+
     return (
         <div style={{
             height: "100%",
@@ -47,6 +47,13 @@ export default function MeIndex(props: IMeIndexProps) {
                     arrow="horizontal"
                 >
                     手势密码
+                </Item>
+                <Item
+                    thumb={<LineChartOutlined />}
+                    onClick={() => history.push(AppPath.USER_DATA_ANALYSIS)}
+                    arrow="horizontal"
+                >
+                    数据统计
                 </Item>
                 <Item
                     thumb={<LogoutOutlined />}

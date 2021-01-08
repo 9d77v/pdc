@@ -1,4 +1,3 @@
-import React from "react"
 import { AppPath } from "src/consts/path"
 import "src/styles/button.less"
 

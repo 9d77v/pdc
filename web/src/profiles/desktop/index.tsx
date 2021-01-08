@@ -23,6 +23,7 @@ import DeviceCamera from './app/device/DeviceCamera'
 import { GET_USER } from 'src/gqls/user/query'
 import { EpisodePage } from './app/video/EpisodePage'
 import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
+import DataAnalysisIndex from './app/user/DataAnalysisIndex'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -92,6 +93,9 @@ const DesktopIndex = () => {
                             </Route>
                             <Route exact path={AppPath.USER_ACCOUNT}>
                                 <UpdatePasswordForm />
+                            </Route>
+                            <Route exact path={AppPath.USER_DATA_ANALYSIS}>
+                                <DataAnalysisIndex />
                             </Route>
                             <Route exact path={AppPath.UTIL_CALCULATOR}>
                                 <Calculator />

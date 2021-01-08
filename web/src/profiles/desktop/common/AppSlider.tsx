@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import {
     PlaySquareOutlined, ShoppingOutlined, UserOutlined, LockOutlined,
     ProfileOutlined, HomeOutlined, DashboardOutlined, ToolOutlined,
-    CalculatorOutlined
+    CalculatorOutlined, LineChartOutlined
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
@@ -44,6 +44,10 @@ const locationMap = new Map<string, any>([
     [AppPath.USER_ACCOUNT, {
         "defaultOpenKeys": ["user"],
         "defaultSelectedKeys": ['user-account']
+    }],
+    [AppPath.USER_DATA_ANALYSIS, {
+        "defaultOpenKeys": ["user"],
+        "defaultSelectedKeys": ['user-data_analysis']
     }],
     [AppPath.VIDEO, {
         "defaultOpenKeys": ["video"],
@@ -234,6 +238,14 @@ const AppMenu = (props: IAppHeaderProps) => {
                         <span>
                             <LockOutlined />
                             <span>{PathDict.get(AppPath.USER_ACCOUNT)}</span>
+                        </span>
+                    </Link>
+                </Menu.Item>
+                <Menu.Item key="user-data_analysis">
+                    <Link to={AppPath.USER_DATA_ANALYSIS}>
+                        <span>
+                            <LineChartOutlined />
+                            <span>{PathDict.get(AppPath.USER_DATA_ANALYSIS)}</span>
                         </span>
                     </Link>
                 </Menu.Item>

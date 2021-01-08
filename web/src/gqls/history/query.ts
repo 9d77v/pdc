@@ -28,4 +28,11 @@ query historyStatistic($sourceType: Int) {
   }
 }
 `
-export { LIST_HISTORY, HISTORY_STATISTIC }
+const APP_HISTORY_STATISTIC = gql`
+query appHistoryStatistic($sourceType: Int) {
+  appHistoryStatistic(sourceType: $sourceType) {
+    data
+  }
+}
+`
+export { LIST_HISTORY, HISTORY_STATISTIC, APP_HISTORY_STATISTIC }
