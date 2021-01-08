@@ -20,6 +20,7 @@ import { EpisodePage } from './video/EpisodePage'
 import DeviceIndex from './device'
 import DeviceCameraDetail from './device/DeviceCameraDetail'
 import { GET_USER } from 'src/gqls/user/query'
+import DataAnalysisIndex from './me/DataAnalysisIndex'
 
 
 const MeIndex = React.lazy(() => import('./me'))
@@ -84,6 +85,9 @@ const MobileIndex = () => {
             </Route>
             <Route exact path={AppPath.USER_GESTURE_PASSWORD}  >
                 <GesturePassword />
+            </Route>
+            <Route exact path={AppPath.USER_DATA_ANALYSIS}>
+                <DataAnalysisIndex />
             </Route>
             <Route exact path={AppPath.UESR_QECODE}  >
                 <QRCodePage user={user} />
