@@ -1,6 +1,8 @@
 package models
 
 import (
+	"context"
+
 	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/module/base"
 )
@@ -9,6 +11,7 @@ import (
 type Histroyer interface {
 	GetSourceID(subSourceID *int64) uint
 	JoinSource(r base.Repository, tableName string, sourceID uint) error
+	GetStatistic(ctx context.Context, uid uint) [][]float64
 }
 
 //CreateHistory retrun history depends on sourcetype
