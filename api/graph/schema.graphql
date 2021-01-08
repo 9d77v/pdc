@@ -19,6 +19,7 @@ type Query {
 
   histories(sourceType:Int,searchParam:SearchParam!,subSourceID:ID):HistoryConnection! 
   historyStatistic(sourceType:Int):HistoryStatistic!
+  appHistoryStatistic(sourceType:Int):HistoryStatistic!
 
   deviceModels(searchParam:SearchParam!):DeviceModelConnection!
   devices(searchParam:SearchParam!,deviceType: Int):DeviceConnection!

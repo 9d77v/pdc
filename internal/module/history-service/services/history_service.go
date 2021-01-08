@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"strconv"
 	"time"
 
 	"github.com/9d77v/go-lib/ptrs"
@@ -17,7 +16,6 @@ import (
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/history-service/chmodels"
 	"github.com/9d77v/pdc/internal/module/history-service/models"
-	redisGo "github.com/go-redis/redis/v8"
 )
 
 //HistoryService ..
@@ -75,26 +73,23 @@ func (s HistoryService) saveToCache(hl *chmodels.HistoryLog) {
 	dataMap[redis.PrefixVideoDataAnime] = hl.SourceID
 	dataMap[redis.PrefixVideoDataEpisode] = hl.SubSourceID
 	ctx := context.Background()
-	var err error
+	pipe := redis.GetClient().Pipeline()
 	for k, v := range dataMap {
-		key := fmt.Sprintf("%s:%s", k, today)
-		err = redis.GetClient().HSet(ctx, key, v, hl.ServerTs.Unix()).Err()
-		if err != nil {
-			log.Println("redis set failed:", err)
-		}
-		err = redis.GetClient().Expire(ctx, key, 72*time.Hour).Err()
-		if err != nil {
-			log.Println("redis expire key failed:", err)
+		keys := []string{fmt.Sprintf("%s:%s", k, today), fmt.Sprintf("%s:%s:%d", k, today, hl.UID)}
+		for _, key := range keys {
+			pipe.HSet(ctx, key, v, hl.ServerTs.Unix())
+			pipe.Expire(ctx, key, 72*time.Hour)
 		}
 	}
-	durationKey := fmt.Sprintf("%s:%s", redis.PrefixVideoDataDuration, today)
-	err = redis.GetClient().IncrByFloat(ctx, durationKey, hl.Duration).Err()
-	if err != nil {
-		log.Println("redis set failed:", err)
+	durationKeys := []string{fmt.Sprintf("%s:%s", redis.PrefixVideoDataDuration, today),
+		fmt.Sprintf("%s:%s:%d", redis.PrefixVideoDataDuration, today, hl.UID)}
+	for _, durationKey := range durationKeys {
+		pipe.IncrByFloat(ctx, durationKey, hl.Duration)
+		pipe.Expire(ctx, durationKey, 72*time.Hour)
 	}
-	err = redis.GetClient().Expire(ctx, durationKey, 72*time.Hour).Err()
+	_, err := pipe.Exec(ctx)
 	if err != nil {
-		log.Println("redis expire key failed:", err)
+		log.Println("redis set cache key failed:", err)
 	}
 }
 
@@ -139,40 +134,16 @@ func (s HistoryService) ListHistory(ctx context.Context,
 //HistoryStatistic ..
 func (s HistoryService) HistoryStatistic(ctx context.Context, sourceType *int64) (*model.HistoryStatistic, error) {
 	result := new(model.HistoryStatistic)
-	now := time.Now()
-	today := now.Format("2006-01-02")
-	yesterday := now.Add(-24 * time.Hour).Format("2006-01-02")
-	theDayBeforeYesterday := now.Add(-48 * time.Hour).Format("2006-01-02")
-	days := []string{today, yesterday, theDayBeforeYesterday}
-	keyPrefixs := []string{redis.PrefixVideoDataUser, redis.PrefixVideoDataAnime,
-		redis.PrefixVideoDataEpisode}
-	pipe := redis.GetClient().Pipeline()
-	m, n := len(keyPrefixs), len(days)
-	intCmds := make([]*redisGo.IntCmd, 0, m*n)
-	for _, keyPrefix := range keyPrefixs {
-		for _, day := range days {
-			cmd := pipe.HLen(ctx, fmt.Sprintf("%s:%s", keyPrefix, day))
-			intCmds = append(intCmds, cmd)
-		}
-	}
-	stringCmds := make([]*redisGo.StringCmd, 0, n)
-	for _, day := range days {
-		cmd := pipe.Get(ctx, fmt.Sprintf("%s:%s", redis.PrefixVideoDataDuration, day))
-		stringCmds = append(stringCmds, cmd)
-	}
-	pipe.Exec(ctx)
-	data := make([][]float64, m+1)
-	for i := 0; i < m; i++ {
-		data[i] = make([]float64, 0, n)
-		for j := 0; j < n; j++ {
-			data[i] = append(data[i], float64(intCmds[i*n+j].Val()))
-		}
-	}
-	data[m] = make([]float64, 0, n)
-	for i := 0; i < n; i++ {
-		v, _ := strconv.ParseFloat(stringCmds[i].Val(), 64)
-		data[m] = append(data[m], v)
-	}
-	result.Data = data
+	historyer := models.CreateHistory(sourceType)
+	result.Data = historyer.GetStatistic(ctx, 0)
+	return result, nil
+}
+
+//AppHistoryStatistic ..
+func (s HistoryService) AppHistoryStatistic(ctx context.Context, sourceType *int64,
+	uid uint) (*model.HistoryStatistic, error) {
+	result := new(model.HistoryStatistic)
+	historyer := models.CreateHistory(sourceType)
+	result.Data = historyer.GetStatistic(ctx, uid)
 	return result, nil
 }
