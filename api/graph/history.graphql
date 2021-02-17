@@ -3,7 +3,7 @@ type History {
 	sourceType:Int!
 	sourceID: Int!
 	title:String!
-	num:Int!
+	num:Float!
 	subTitle:String!
 	cover:String!
 	subSourceID: Int!  
