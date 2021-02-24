@@ -34,11 +34,23 @@ func (s NoteService) SyncNotes(ctx context.Context,
 		return
 	}
 	createNotes, updateNotes, deleteNotes, clientShouldSyncNotes := m.ClassifyNotes(serverNotes, in.UnsyncedNotes)
-	err = m.Create(&createNotes)
-	if err != nil {
-		m.Rollback()
-		err = status.Errorf(codes.Internal, "新增数据出错")
-		return
+	if len(createNotes) > 0 {
+		err = m.Create(createNotes)
+		if err != nil {
+			m.Rollback()
+			err = status.Errorf(codes.Internal, "新增数据出错")
+			return
+		}
+		for _, v := range createNotes {
+			if v.NoteType == int8(pb.NoteType_File) {
+				err = m.Create(models.NewNoteHistory(v))
+				if err != nil {
+					m.Rollback()
+					err = status.Errorf(codes.Internal, "新增数据历史出错")
+					return
+				}
+			}
+		}
 	}
 	err = m.UpdateNotes(updateNotes)
 	if err != nil {

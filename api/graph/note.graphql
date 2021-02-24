@@ -1,7 +1,7 @@
 input   NewNote {
   id: String!
   parentID: String!
-  uid:ID!
+  uid:String!
   noteType: Int!
   level:  Int!
   title:String!
@@ -18,7 +18,7 @@ input   NewNote {
 type Note {
   id: String!
   parentID: String!
-  uid:ID!
+  uid:String!
   noteType: Int!
   level:  Int!
   title:String!
