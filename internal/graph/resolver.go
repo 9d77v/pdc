@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
@@ -392,7 +393,7 @@ func getNote(m *model.NewNote) *notePB.Note {
 	return &notePB.Note{
 		Id:        m.ID,
 		ParentId:  m.ParentID,
-		Uid:       m.UID,
+		Uid:       int64(consts.GetDecodeUID(m.UID)),
 		NoteType:  notePB.NoteType(m.NoteType),
 		Level:     int32(m.Level),
 		Title:     m.Title,
@@ -420,7 +421,7 @@ func toNote(m *notePB.Note) *model.Note {
 	return &model.Note{
 		ID:        m.Id,
 		ParentID:  m.ParentId,
-		UID:       m.Uid,
+		UID:       consts.GetEncodeUID(uint(m.Uid)),
 		NoteType:  int64(m.NoteType),
 		Level:     int64(m.Level),
 		Title:     m.Title,

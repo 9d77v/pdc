@@ -216,7 +216,9 @@ func (m *Note) GetLatestNotes(notes []*Note) []*Note {
 	for _, v := range notes {
 		ids = append(ids, v.ID)
 	}
-	m.IDArrayQuery(ids).Find(&result)
+	if len(ids) > 0 {
+		m.IDArrayQuery(ids).Find(&result)
+	}
 	return result
 }
 
