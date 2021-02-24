@@ -1,4 +1,16 @@
 import dayjs from 'dayjs'
+import jwt_decode from 'jwt-decode'
+
+import * as crypto from 'crypto'
+
+// Sha1
+export async function Sha1(str: string): Promise<string> {
+    const hash = crypto.createHash('sha1')
+    hash.update(str, 'utf8')
+    str = hash.digest('hex')
+    return str
+}
+
 function isMobile(): boolean {
     return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)
 }
@@ -36,4 +48,24 @@ function formatRelativeTime(t: number): string {
     return day
 }
 
-export { isMobile, formatTimeLength, formatDetailTime, formatRelativeTime, isIPhone }
+function randomColor(): string {
+    return '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6)
+}
+
+function shortTitle(str: string | undefined, length: number): string {
+    return str === undefined ? '' : (str.length > length ? str.substring(0, length) + '...' : str)
+}
+
+function getUID() {
+    const token = localStorage.getItem('accessToken') || "";
+    if (token === "") {
+        return ""
+    }
+    const accessToken: any = jwt_decode(token)
+    return accessToken.uid
+}
+
+export {
+    isMobile, formatTimeLength, formatDetailTime, formatRelativeTime, isIPhone, randomColor,
+    shortTitle, getUID
+}

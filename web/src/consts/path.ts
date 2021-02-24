@@ -25,6 +25,7 @@ const AppPath = {
     CONTACT_ADD: "/app/contact/addContact",
     UTIL: "/app/util",
     UTIL_CALCULATOR: "/app/util/calculator",
+    UTIL_NOTE: "/app/util/note",
     MSG: "/app/msg"
 }
 
@@ -62,6 +63,7 @@ const PathDict = new Map<string, string>([
     [AppPath.THING_LIST, '物品列表'],
     [AppPath.THING_ANALYSIS, '物品分析'],
     [AppPath.UTIL, '工具'],
+    [AppPath.UTIL_NOTE, '记事本'],
     [AppPath.UTIL_CALCULATOR, '计算器'],
     [AdminPath.HOME, '首页'],
     [AdminPath.VIDEO, '视频管理'],

@@ -1,13 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-    PlaySquareOutlined, ShoppingOutlined, UserOutlined, LockOutlined,
+    PlaySquareOutlined, UserOutlined, LockOutlined,
     ProfileOutlined, HomeOutlined, DashboardOutlined, ToolOutlined,
-    CalculatorOutlined, LineChartOutlined
+    CalculatorOutlined, LineChartOutlined, BookOutlined
 } from '@ant-design/icons'
 import { Layout, Menu } from 'antd'
 import { Link, useLocation } from 'react-router-dom'
 import { AdminPath, AppPath, PathDict } from 'src/consts/path'
-
+import {
+    useRecoilState,
+    useRecoilValue,
+} from 'recoil';
+import userStore from 'src/module/user/user.store'
+import globalStore from 'src/module/global/global.store'
 
 const { Sider } = Layout
 const { SubMenu } = Menu
@@ -36,6 +41,10 @@ const locationMap = new Map<string, any>([
     [AppPath.UTIL_CALCULATOR, {
         "defaultOpenKeys": ["util"],
         "defaultSelectedKeys": ['util-calculator']
+    }],
+    [AppPath.UTIL_NOTE, {
+        "defaultOpenKeys": ["util"],
+        "defaultSelectedKeys": ['util-note']
     }],
     [AppPath.USER_PROFILE, {
         "defaultOpenKeys": ["user"],
@@ -124,12 +133,12 @@ const locationMap = new Map<string, any>([
 ])
 
 interface IAppHeaderProps {
-    roleID: number
     config?: any
 }
 
 const AppMenu = (props: IAppHeaderProps) => {
-    const { config, roleID } = props
+    const loginDisplay = useRecoilValue(userStore.loginDisplay)
+    const { config } = props
     return (
         <Menu
             mode="inline"
@@ -146,7 +155,7 @@ const AppMenu = (props: IAppHeaderProps) => {
             </Menu.Item>
             <SubMenu
                 key="video"
-                style={{ display: roleID > 0 ? "block" : "none" }}
+                style={{ display: loginDisplay }}
                 title={
                     <span>
                         <PlaySquareOutlined />
@@ -166,7 +175,7 @@ const AppMenu = (props: IAppHeaderProps) => {
             </SubMenu>
             <SubMenu
                 key="device"
-                style={{ display: roleID > 0 ? "block" : "none" }}
+                style={{ display: loginDisplay }}
                 title={
                     <span>
                         <DashboardOutlined />
@@ -183,7 +192,7 @@ const AppMenu = (props: IAppHeaderProps) => {
             </SubMenu>
             {/* <SubMenu
                 key="thing"
-                style={{ display: roleID >= 1 && roleID <= 3 ? "block" : "none" }}
+                style={{ display: currentUserInfo.roleID >= 1 && currentUserInfo.roleID <= 3 ? "block" : "none" }}
                 title={
                     <span>
                         <ShoppingOutlined />
@@ -203,7 +212,7 @@ const AppMenu = (props: IAppHeaderProps) => {
             </SubMenu> */}
             <SubMenu
                 key="util"
-                style={{ display: roleID > 0 ? "block" : "none" }}
+                style={{ display: loginDisplay }}
                 title={
                     <span>
                         <ToolOutlined />
@@ -215,6 +224,12 @@ const AppMenu = (props: IAppHeaderProps) => {
                     <Link to={AppPath.UTIL_CALCULATOR}>   <span>
                         <CalculatorOutlined />
                         <span>{PathDict.get(AppPath.UTIL_CALCULATOR)}</span>
+                    </span></Link>
+                </Menu.Item>
+                <Menu.Item key="util-note">
+                    <Link to={AppPath.UTIL_NOTE}>   <span>
+                        <BookOutlined />
+                        <span>{PathDict.get(AppPath.UTIL_NOTE)}</span>
                     </span></Link>
                 </Menu.Item>
             </SubMenu>
@@ -255,7 +270,9 @@ const AppMenu = (props: IAppHeaderProps) => {
 }
 
 const AdminMenu = (props: IAppHeaderProps) => {
-    const { config, roleID } = props
+    const ownerDisplay = useRecoilValue(userStore.ownerDisplay)
+    const adminDisplay = useRecoilValue(userStore.adminDisplay)
+    const { config } = props
     return (
         <Menu
             mode="inline"
@@ -272,7 +289,7 @@ const AdminMenu = (props: IAppHeaderProps) => {
             </Menu.Item>
             <SubMenu
                 key="settings-user"
-                style={{ display: (roleID === 1) ? "block" : "none" }}
+                style={{ display: ownerDisplay }}
                 title={
                     <span>
                         <UserOutlined />
@@ -286,7 +303,7 @@ const AdminMenu = (props: IAppHeaderProps) => {
             </SubMenu>
             <SubMenu
                 key="settings-video"
-                style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
+                style={{ display: adminDisplay }}
                 title={
                     <span>
                         <PlaySquareOutlined />
@@ -306,7 +323,7 @@ const AdminMenu = (props: IAppHeaderProps) => {
             </SubMenu>
             <SubMenu
                 key="settings-device"
-                style={{ display: (roleID === 1 || roleID === 2) ? "block" : "none" }}
+                style={{ display: adminDisplay }}
                 title={
                     <span>
                         <DashboardOutlined />
@@ -330,14 +347,18 @@ const AdminMenu = (props: IAppHeaderProps) => {
 }
 
 export const AppSlider = (props: IAppHeaderProps) => {
-    const [collapsed, setCollapsed] = useState(false)
+    const [collapsed, setCollapsed] = useRecoilState(globalStore.menuCollapsed)
     const location = useLocation()
     let config = locationMap.get(location.pathname) || []
-    const roleID = props.roleID
     const isApp = location.pathname.indexOf("/app") >= 0
-
     return (
-        <Sider width={200} className="site-layout-background" collapsible collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)}>
-            {isApp ? <AppMenu roleID={roleID} config={config} /> : <AdminMenu roleID={roleID} config={config} />}
+        <Sider width={200} style={{
+            overflow: 'auto',
+            height: '100vh',
+            marginTop: 64,
+            position: 'fixed',
+            left: 0,
+        }} collapsible collapsed={collapsed} onCollapse={() => setCollapsed(!collapsed)}>
+            {isApp ? <AppMenu config={config} /> : <AdminMenu config={config} />}
         </Sider>)
 }

@@ -3,17 +3,16 @@ import { Layout, Dropdown, Avatar, Button } from 'antd'
 import { Link, useHistory, useLocation } from "react-router-dom"
 import { apolloClient } from "src/utils/apollo_client"
 import { AdminPath, AppPath } from "src/consts/path"
-
+import {
+    useRecoilValue,
+} from 'recoil';
+import userStore from "src/module/user/user.store"
 
 const { Header } = Layout
 
-interface IAppHeaderProps {
-    name: string
-    avatar: string
-    roleID: number
-}
+export const AppHeader = () => {
+    const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
 
-export const AppHeader = (props: IAppHeaderProps) => {
     const history = useHistory()
     const logout = () => {
         localStorage.clear()
@@ -30,7 +29,6 @@ export const AppHeader = (props: IAppHeaderProps) => {
     }
 
     const location = useLocation()
-    const roleID = props.roleID
     const isApp = location.pathname.indexOf("/app") >= 0
     if (isApp) {
         document.title = "个人数据中心"
@@ -38,7 +36,7 @@ export const AppHeader = (props: IAppHeaderProps) => {
         document.title = "个人数据中心管理后台"
     }
     return (
-        <Header className="header">
+        <Header style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
             <Link to={AppPath.HOME} style={{ fontSize: 26, color: "white", textAlign: "left", float: 'left' }}>{document.title}</Link>
             <div ></div>
             <div style={{ float: 'right', height: 56, alignItems: 'center', display: 'flex' }}>
@@ -53,14 +51,14 @@ export const AppHeader = (props: IAppHeaderProps) => {
                             <Avatar style={{
                                 backgroundColor: "#00a2ae",
                                 marginBottom: 20
-                            }} size={80} gap={1} src={props.avatar} >{props.name}</Avatar>
-                            <div className="title">{props.name}</div>
+                            }} size={80} gap={1} src={currentUserInfo.avatar} >{currentUserInfo.name}</Avatar>
+                            <div className="title">{currentUserInfo.name}</div>
                             <Button
-                                style={(roleID === 1 || roleID === 2) ? { display: "flex", marginBottom: 15 } : { display: "none" }}
+                                style={(currentUserInfo.roleID === 1 || currentUserInfo.roleID === 2) ? { display: "flex", marginBottom: 15 } : { display: "none" }}
                                 onClick={() => isApp ? gotoAdmin() : gotoApp()} > {isApp ? "系统设置" : "退出设置"}</Button>
                             <Button onClick={() => logout()} danger >退出登录</Button>
                         </div>} >
-                    <Avatar style={{ backgroundColor: "#00a2ae", verticalAlign: 'middle', float: 'left' }} size={"large"} gap={1} src={props.avatar} >{props.name}</Avatar>
+                    <Avatar style={{ backgroundColor: "#00a2ae", verticalAlign: 'middle', float: 'left' }} size={"large"} gap={1} src={currentUserInfo.avatar} >{currentUserInfo.name}</Avatar>
                 </Dropdown>
             </div >
         </Header>)

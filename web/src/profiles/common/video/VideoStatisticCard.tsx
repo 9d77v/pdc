@@ -49,19 +49,15 @@ const VideoStatisticCards = (props: IVideoStatisticCardsProps) => {
             if (value[1] > value[2]) {
                 arrow = <ArrowUpOutlined />
                 color = '#3f8600'
-                if (value[1] === 0) {
+                if (value[2] === 0) {
                     percent = 1
                 } else {
-                    percent = value[2] / value[1]
+                    percent = (value[1] / value[2]) - 1
                 }
             } else if (value[1] < value[2]) {
                 arrow = <ArrowDownOutlined />
                 color = '#cf1322'
-                if (value[2] === 0) {
-                    percent = 1
-                } else {
-                    percent = value[1] / value[2]
-                }
+                percent = 1 - (value[1] / value[2])
             }
             if (cardTitles[index] === "观看时长") {
                 today = formatDuration(value[0])
