@@ -1,18 +1,18 @@
-import { NewUser } from 'src/models/user';
 import { Button, Icon, List, NavBar } from 'antd-mobile'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import QrReader from 'react-qr-reader'
 import { useHistory } from 'react-router-dom'
 import { AppPath } from 'src/consts/path';
+import userStore from 'src/module/user/user.store';
+import {
+    useRecoilValue,
+} from 'recoil'
 
 
 const Item = List.Item;
 
-interface IScannerProps {
-    user: NewUser
-}
-
-export const Scanner = (props: IScannerProps) => {
+export const Scanner = () => {
+    const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const history = useHistory()
     const [result, setResult] = useState("")
     const [resultDiv, setResultDiv] = useState(<div />)
@@ -26,11 +26,11 @@ export const Scanner = (props: IScannerProps) => {
     }
 
     useEffect(() => {
-        if (props.user && result !== "" && (result.indexOf("http://") !== -1 || result.indexOf("https://") !== -1)) {
+        if (currentUserInfo && result !== "" && (result.indexOf("http://") !== -1 || result.indexOf("https://") !== -1)) {
             if (result.indexOf("/pdc/") !== -1) {
                 const arr = result.split("/")
                 const id = arr[arr.length - 1]
-                if (id !== props.user.uid) {
+                if (id !== currentUserInfo.uid) {
                     setResultDiv(
                         <Button type="primary" onClick={() => {
                             const path = AppPath.CONTACT_ADD + "?url=" + btoa(result)
@@ -53,7 +53,7 @@ export const Scanner = (props: IScannerProps) => {
                 )
             }
         }
-    }, [result, history, props])
+    }, [result, history, currentUserInfo])
     return (
         <div style={{ height: "100%", textAlign: "center" }}>
             <NavBar

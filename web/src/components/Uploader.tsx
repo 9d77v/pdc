@@ -97,8 +97,15 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
             showRemoveIcon: true,
         },
         beforeUpload: (file: File) => {
-            return new Promise<void>(async (resolve) => {
+            return new Promise<File>(async (resolve) => {
                 let fileType = getType(file)
+                if (isSubtitleType(fileType)) {
+                    const vttText = await getVttFromFile(file);
+                    const blob = new Blob([vttText], {
+                        type: 'text/vtt',
+                    })
+                    file = new File([blob], file.name, { type: 'text/vtt', lastModified: Date.now() });
+                }
                 let fileName = file.name
                 let fileString = ""
                 if (isSubtitleType(fileType)) {
@@ -117,20 +124,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
                 fileName = filePathPrefix === undefined ? fileName : filePathPrefix + fileName
                 const data = await getUploadURL(bucketName, fileName);
                 setAction(data.data.presignedUrl)
-                resolve();
-            });
-        },
-        transformFile(file: File) {
-            return new Promise<File>(async (resolve) => {
-                const fileType = getType(file)
-                if (isSubtitleType(fileType)) {
-                    const vttText = await getVttFromFile(file);
-                    const blob = new Blob([vttText], {
-                        type: 'text/vtt',
-                    })
-                    file = new File([blob], file.name, { type: 'text/vtt', lastModified: Date.now() });
-                }
-                resolve(file)
+                resolve(file);
             });
         },
         onSuccess: (response: any, file: UploadFile) => {

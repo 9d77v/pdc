@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
     Route,
 } from "react-router-dom"
+import {
+    useRecoilValue,
+    useSetRecoilState,
+} from 'recoil';
 import { Layout } from 'antd'
 import "./index.less"
 import { ConfigProvider } from 'antd'
@@ -10,7 +14,6 @@ import { AppHeader } from './common/AppHeader'
 import { AppSlider } from './common/AppSlider'
 import { AppNavigator } from './common/AppNavigator'
 import { useQuery } from '@apollo/react-hooks'
-import { NewUser } from 'src/models/user'
 import { AdminPath, AppPath } from 'src/consts/path'
 import UpdateProfileForm from './app/user/UpdateFrofileForm'
 import UpdatePasswordForm from './app/user/UpdatePasswordForm'
@@ -24,6 +27,10 @@ import { GET_USER } from 'src/gqls/user/query'
 import { EpisodePage } from './app/video/EpisodePage'
 import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
 import DataAnalysisIndex from './app/user/DataAnalysisIndex'
+import NoteIndex from './app/note'
+import userStore from 'src/module/user/user.store'
+import { Content } from 'antd/lib/layout/layout';
+import globalStore from 'src/module/global/global.store';
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -41,23 +48,26 @@ const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-li
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
 
 const DesktopIndex = () => {
-    const { data } = useQuery(GET_USER)
-    const user: NewUser = data?.userInfo
+    const setCurrentUserInfo = useSetRecoilState(userStore.currentUserInfo)
+    const collapsed = useRecoilValue(globalStore.menuCollapsed)
+
+    const { data, refetch } = useQuery(GET_USER)
+    useEffect(() => {
+        if (data) {
+            setCurrentUserInfo(data.userInfo)
+        }
+    }, [data, setCurrentUserInfo])
     return (
         <ConfigProvider locale={zhCN}>
             <Layout style={{ textAlign: "center" }}>
-                <AppHeader
-                    name={user ? user.name.toString() : ""}
-                    avatar={user ? user.avatar.toString() : ""}
-                    roleID={user ? user.roleID : 0} />
+                <AppHeader />
                 <Layout style={{
-                    overflow: 'auto',
-                    height: 'calc(100vh - 64px)',
+                    minHeight: 'calc(100vh - 64px)',
                 }}>
-                    <AppSlider roleID={user ? user.roleID : 0} />
-                    <Layout style={{ padding: '10px' }}>
+                    <AppSlider />
+                    <Layout style={{ padding: '10px', marginLeft: collapsed ? 100 : 220, marginTop: 64, minHeight: 'calc(100vh - 64px)' }}>
                         <AppNavigator />
-                        <div className={"wall"}>
+                        <Content>
                             <Route exact path={AppPath.HOME}>
                                 欢迎使用个人数据中心
                             </Route>
@@ -89,13 +99,16 @@ const DesktopIndex = () => {
                                 <ThingTable />
                             </Route>
                             <Route exact path={AppPath.USER_PROFILE}>
-                                <UpdateProfileForm user={user} />
+                                <UpdateProfileForm refetch={refetch} />
                             </Route>
                             <Route exact path={AppPath.USER_ACCOUNT}>
                                 <UpdatePasswordForm />
                             </Route>
                             <Route exact path={AppPath.USER_DATA_ANALYSIS}>
                                 <DataAnalysisIndex />
+                            </Route>
+                            <Route path={AppPath.UTIL_NOTE}>
+                                <NoteIndex />
                             </Route>
                             <Route exact path={AppPath.UTIL_CALCULATOR}>
                                 <Calculator />
@@ -127,7 +140,7 @@ const DesktopIndex = () => {
                             <Route exact path={AdminPath.USER_LIST}>
                                 <UserTable />
                             </Route>
-                        </div>
+                        </Content>
                     </Layout>
                 </Layout>
             </Layout>

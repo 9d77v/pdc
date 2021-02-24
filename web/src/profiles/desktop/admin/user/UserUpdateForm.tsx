@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { GenderMap, RoleMap, FullRoleMap } from 'src/consts/consts';
 import { Uploader } from 'src/components/Uploader';
 import dayjs from 'dayjs';
-import { IUpdateUser } from 'src/models/user';
+import { IUpdateUser } from 'src/module/user/user.model';
 
 
 interface IUserUpdateFormProps {

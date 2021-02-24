@@ -6,19 +6,21 @@ import { Uploader } from "src/components/Uploader"
 import dayjs from 'dayjs'
 import { useMutation } from '@apollo/react-hooks'
 import { NavBar, Icon } from 'antd-mobile'
-import { NewUser } from 'src/models/user'
 import { UPDATE_PROFILE } from 'src/gqls/user/mutation'
-
+import {
+    useRecoilValue,
+} from 'recoil'
+import userStore from 'src/module/user/user.store'
 
 interface IUpdateProfileFormProps {
-    user: NewUser
+    refetch: () => void
 }
 
 export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
-    user
+    refetch
 }) => {
+    const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const history = useHistory()
-
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)
@@ -53,6 +55,7 @@ export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
         setLoading(false)
         if (!data.errors) {
             message.success("更新个人资料成功")
+            refetch()
             history.goBack()
         }
     }
@@ -76,12 +79,12 @@ export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
     }
     useEffect(() => {
         form.setFieldsValue({
-            name: user?.name,
-            gender: user?.gender,
-            birthDate: dayjs(user?.birthDate * 1000),
-            ip: user?.ip
+            name: currentUserInfo?.name,
+            gender: currentUserInfo?.gender,
+            birthDate: dayjs(currentUserInfo?.birthDate * 1000),
+            ip: currentUserInfo?.ip
         })
-    }, [form, user])
+    }, [form, currentUserInfo])
     return (
         <div style={{ height: "100%" }}>
             <NavBar

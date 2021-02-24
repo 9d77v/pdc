@@ -41,7 +41,29 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
             "isHideOnMobile": data.isHideOnMobile,
             "theme": data.theme
         })
-    }, [form, data])
+    }, [data, form])
+
+    const handleOK = () => {
+        form.setFieldsValue({
+            "cover": url,
+        })
+        form
+            .validateFields()
+            .then((values: any) => {
+                form.resetFields()
+                onUpdate(values)
+            })
+            .catch(info => {
+                console.log('Validate Failed:', info)
+            })
+        setUrl('')
+    }
+
+    const handleCancel = () => {
+        onCancel()
+        form.resetFields()
+        setUrl('')
+    }
 
     return (
         <Modal
@@ -49,30 +71,11 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
             title="编辑视频"
             okText="确定"
             cancelText="取消"
-            onCancel={
-                () => {
-                    onCancel()
-                    form.resetFields()
-                    setUrl('')
-                }
-            }
+            onCancel={handleCancel}
             getContainer={false}
-            onOk={() => {
-                form.setFieldsValue({
-                    "cover": url,
-                })
-                form
-                    .validateFields()
-                    .then((values: any) => {
-                        form.resetFields()
-                        onUpdate(values)
-                    })
-                    .catch(info => {
-                        console.log('Validate Failed:', info)
-                    })
-                setUrl('')
-            }}
+            onOk={handleOK}
             maskClosable={false}
+            mask={true}
         >
             <Form
                 {...layout}

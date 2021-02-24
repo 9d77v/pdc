@@ -4,17 +4,17 @@ import { GenderMap } from "src/consts/consts"
 import { Uploader } from "src/components/Uploader"
 import dayjs from 'dayjs'
 import { useMutation } from '@apollo/react-hooks'
-import { NewUser } from 'src/models/user'
 import { UPDATE_PROFILE } from 'src/gqls/user/mutation'
-
+import userStore from 'src/module/user/user.store'
+import {
+    useRecoilValue,
+} from 'recoil'
 
 interface IUpdateProfileFormProps {
-    user: NewUser
+    refetch: () => void
 }
-
-const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
-    user
-}) => {
+const UpdateProfileForm: FC<IUpdateProfileFormProps> = (props: IUpdateProfileFormProps) => {
+    const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const [url, setUrl] = useState("")
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)
@@ -33,7 +33,6 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
             value={key}
             key={'user_gender_options_' + key}>{value}</Select.Option>)
     })
-
 
     const onUpdate = async (values: any) => {
         setLoading(true)
@@ -59,8 +58,9 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
         })
         form
             .validateFields()
-            .then((values: any) => {
-                onUpdate(values)
+            .then(async (values: any) => {
+                await onUpdate(values)
+                props.refetch()
             })
             .catch(info => {
                 console.log('Validate Failed:', info)
@@ -72,12 +72,12 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
     }
     useEffect(() => {
         form.setFieldsValue({
-            name: user?.name,
-            gender: user?.gender,
-            birthDate: dayjs(user?.birthDate * 1000),
-            ip: user?.ip
+            name: currentUserInfo.name,
+            gender: currentUserInfo.gender,
+            birthDate: dayjs(currentUserInfo.birthDate * 1000),
+            ip: currentUserInfo.ip
         })
-    }, [form, user])
+    }, [form, currentUserInfo])
     return (
         <div style={{ display: "flex", justifyContent: "center", padding: 20, height: "100%" }}>
             <Form

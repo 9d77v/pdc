@@ -15,7 +15,7 @@ export default function DeviceModelIndex() {
     })
     return (
         <div style={{ display: "flex", backgroundColor: "#e9f1f1" }}>
-            <div style={{ width: 350, padding: 10 }}>
+            <div style={{ width: 380, padding: 10 }}>
                 <DeviceModelList currentSelectID={currentSelectItem.id}
                     setCurrentSelectItem={setCurrentSelectItem} />
             </div>

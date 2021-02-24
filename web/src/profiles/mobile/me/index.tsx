@@ -4,15 +4,11 @@ import { apolloClient } from "src/utils/apollo_client"
 import { QrcodeOutlined, LogoutOutlined, LockOutlined, LineChartOutlined } from '@ant-design/icons'
 import { List } from "antd-mobile"
 import { UserBrief } from "src/profiles/mobile/common/UserBrief"
-import { NewUser } from "src/models/user"
 import { AppPath } from "src/consts/path"
-
-interface IMeIndexProps {
-    user: NewUser
-}
 const Item = List.Item
 
-export default function MeIndex(props: IMeIndexProps) {
+export default function MeIndex() {
+
     const history = useHistory()
     const logout = () => {
         localStorage.clear()
@@ -27,7 +23,7 @@ export default function MeIndex(props: IMeIndexProps) {
             flexDirection: "column", paddingTop: 20,
             backgroundColor: "#eee"
         }}>
-            <UserBrief user={props?.user} host={document.location.host} />
+            <UserBrief host={document.location.host} />
             <List renderHeader={() => ''}>
                 <Item
                     thumb={<QrcodeOutlined />}

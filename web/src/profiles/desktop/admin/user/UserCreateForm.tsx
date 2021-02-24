@@ -2,11 +2,11 @@ import { Modal, Form, Input, Select, DatePicker } from 'antd';
 import React, { FC, useState } from 'react'
 import { GenderMap, RoleMap } from 'src/consts/consts';
 import { Uploader } from 'src/components/Uploader';
-import { NewUser } from 'src/models/user';
+import { IUser } from 'src/module/user/user.model';
 
 interface IUserCreateFormProps {
     visible: boolean;
-    onCreate: (values: NewUser) => void;
+    onCreate: (values: IUser) => void;
     onCancel: () => void;
 }
 

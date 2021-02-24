@@ -1,6 +1,7 @@
 import React from "react"
 import { useHistory } from "react-router-dom"
 import "src/styles/card.less"
+import "./index.less"
 import { Grid } from "antd-mobile"
 import {
     PlayCircleOutlined, DashboardOutlined,
@@ -22,7 +23,7 @@ const publicData: IApp[] = [
     }
 ]
 
-const privateData: IApp[] = [
+const utilData: IApp[] = [
     // {
     //     "text": "通讯录",
     //     "icon": <ContactsOutlined style={{ fontSize: 26, color: "brown" }} />,
@@ -33,23 +34,25 @@ const privateData: IApp[] = [
     //     icon: <LockOutlined style={{ fontSize: 26, color: "red" }} />,
     //     url: "/app/util/password"
     // },
-    // {
-    //     "text": "记事本",
-    //     "icon": <BookOutlined style={{ fontSize: 26, color: "green" }} />,
-    //     "url": "/app/note"
-    // },
+    {
+        text: "记事本",
+        icon: <BookOutlined style={{ fontSize: 26, color: "green" }} />,
+        url: AppPath.UTIL_NOTE
+    },
     {
         text: "计算器",
         icon: <CalculatorOutlined style={{ fontSize: 26, color: "blue" }} />,
         url: AppPath.UTIL_CALCULATOR
     }
 ]
+
 export default function HomeIndex() {
     const history = useHistory()
     return (
         <>
+            <div className="sub-title">应用</div>
             <Grid data={publicData} columnNum={4} onClick={(item: any) => history.push(item.url)} />
-            <br />
-            <Grid data={privateData} columnNum={4} onClick={(item: any) => history.push(item.url)} />
+            <div className="sub-title">工具</div>
+            <Grid data={utilData} columnNum={4} onClick={(item: any) => history.push(item.url)} />
         </>)
 }

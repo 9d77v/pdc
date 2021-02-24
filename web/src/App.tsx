@@ -1,4 +1,7 @@
 import React, { Suspense, useEffect } from 'react'
+import {
+  RecoilRoot,
+} from 'recoil';
 import { ApolloProvider } from '@apollo/react-hooks'
 import { apolloClient } from './utils/apollo_client'
 import { isMobile } from './utils/util'
@@ -28,21 +31,23 @@ const App = () => {
     }
   }, [])
   return (
-    <Suspense fallback={<Spin />}>
-      <ApolloProvider client={apolloClient}>
-        <Router>
-          <Switch>
-            <Route exact path="/">
-              <Redirect to={AppPath.LOGIN} />
-            </Route>
-            <Route exact path={AppPath.GESTURE_LOGIN} component={GestureLogin} />
-            <Route exact path={AppPath.LOGIN} component={Login} />
-            <Route path="/app" component={isMobile() ? MobileIndex : DesktopIndex} />
-            <Route path="/admin" component={DesktopIndex} />
-          </Switch>
-        </Router >
-      </ApolloProvider >
-    </Suspense >
+    <RecoilRoot>
+      <Suspense fallback={<Spin />}>
+        <ApolloProvider client={apolloClient}>
+          <Router>
+            <Switch>
+              <Route exact path="/">
+                <Redirect to={AppPath.LOGIN} />
+              </Route>
+              <Route exact path={AppPath.GESTURE_LOGIN} component={GestureLogin} />
+              <Route exact path={AppPath.LOGIN} component={Login} />
+              <Route path="/app" component={isMobile() ? MobileIndex : DesktopIndex} />
+              <Route path="/admin" component={DesktopIndex} />
+            </Switch>
+          </Router >
+        </ApolloProvider >
+      </Suspense >
+    </RecoilRoot>
   )
 }
 

@@ -48,6 +48,7 @@ export const SubtitleForm: FC<IModalFormProps> = ({ visible, onCancel }) => {
                     setUrl('')
                 }
             }
+            getContainer={false}
             maskClosable={false}
         >
             <Form form={form} layout="vertical" name="subtitleForm" initialValues={{ name: "简体中文" }}>

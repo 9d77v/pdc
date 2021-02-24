@@ -11,7 +11,6 @@ import HomeNavBar from './home/HomeNavBar'
 import { Scanner } from './home/scanner'
 import { QRCodePage } from './me/QRCodePage'
 import { AddFriendPage } from './contact/AddFriendPage'
-import { NewUser } from 'src/models/user'
 import { AppPath } from 'src/consts/path'
 import CalculatorMobile from './home/calculator'
 import VideoIndex from './video'
@@ -21,7 +20,10 @@ import DeviceIndex from './device'
 import DeviceCameraDetail from './device/DeviceCameraDetail'
 import { GET_USER } from 'src/gqls/user/query'
 import DataAnalysisIndex from './me/DataAnalysisIndex'
-
+import {
+    useSetRecoilState,
+} from 'recoil';
+import userStore from 'src/module/user/user.store'
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
@@ -33,8 +35,13 @@ const MobileIndex = () => {
     const [selectedTab, setSelectedTab] = useState("homeTab")
     const [visible, setVisible] = useState(false)
     const history = useHistory()
-    const { data } = useQuery(GET_USER)
-    const user: NewUser = data?.userInfo
+    const setCurrentUserInfo = useSetRecoilState(userStore.currentUserInfo)
+    const { data, refetch } = useQuery(GET_USER)
+    useEffect(() => {
+        if (data) {
+            setCurrentUserInfo(data.userInfo)
+        }
+    }, [data, setCurrentUserInfo])
     const location = useLocation()
     useEffect(() => {
         let isHome = true
@@ -78,7 +85,7 @@ const MobileIndex = () => {
                 <CalculatorMobile />
             </Route>
             <Route exact path={AppPath.USER_PROFILE}  >
-                <UpdateProfileForm user={user} />
+                <UpdateProfileForm refetch={refetch} />
             </Route>
             <Route exact path={AppPath.USER_ACCOUNT}  >
                 <UpdatePasswordForm />
@@ -90,10 +97,10 @@ const MobileIndex = () => {
                 <DataAnalysisIndex />
             </Route>
             <Route exact path={AppPath.UESR_QECODE}  >
-                <QRCodePage user={user} />
+                <QRCodePage />
             </Route>
             <Route exact path={AppPath.SCANNER}  >
-                <Scanner user={user} />
+                <Scanner />
             </Route>
             <Route exact path={AppPath.CONTACT_ADD}  >
                 <AddFriendPage />
@@ -147,7 +154,7 @@ const MobileIndex = () => {
                     }}
                 >
                     <Route exact path={AppPath.USER}  >
-                        <MeIndex user={user} />
+                        <MeIndex />
                     </Route>
                 </TabBar.Item>
             </TabBar>
