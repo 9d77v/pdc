@@ -5,25 +5,33 @@ import { useRecoilValue } from 'recoil'
 import 'src/styles/editor.less'
 import noteStore from 'src/module/note/note.store'
 import CodeBlock from 'src/components/CodeBlock'
-
+import gfm from 'remark-gfm'
+import Tex from '@matejmazur/react-katex'
+import math from 'remark-math'
+import 'katex/dist/katex.min.css'
 const NotePage = () => {
     const currentNote = useRecoilValue(noteStore.currentNote)
 
     return (
-        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', paddingTop: 12 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', paddingTop: 12, marginBottom: 32 }}>
             <div
                 style={{
                     width: "100%",
                     maxWidth: 760,
+                    minHeight: 766,
                     height: "100%",
-                    minHeight: 760,
                     backgroundColor: "#fff", boxShadow: '3px 3px 3px 3px darkgrey',
-                    marginBottom: 16, marginLeft: 12, marginRight: 12,
+                    marginLeft: 12, marginRight: 12
                 }}>
                 <div style={{ fontSize: 36, height: 56, marginTop: 24, marginBottom: 24, textAlign: 'center', fontWeight: 600, whiteSpace: 'normal' }}>{currentNote.title}</div>
                 <div style={{ margin: "0 24px", maxWidth: 666, width: "100%", textAlign: 'left' }} >
                     <React.Suspense fallback={<Spin />}>
-                        <ReactMarkdown source={currentNote.content || ''} renderers={{ code: CodeBlock }} escapeHtml={false} />
+                        <ReactMarkdown children={currentNote.content || ''} plugins={[[gfm, { singleTilde: false }], [math]]} renderers={{
+                            code: CodeBlock,
+                            inlineMath: ({ value }) => <Tex math={value} />,
+                            math: ({ value }) => <Tex block math={value} />
+                        }}
+                            escapeHtml={false} />
                     </React.Suspense>
                 </div>
             </div>

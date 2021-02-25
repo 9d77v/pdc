@@ -62,85 +62,86 @@ const DesktopIndex = () => {
             <Layout style={{ textAlign: "center" }}>
                 <AppHeader />
                 <Layout style={{
-                    minHeight: 'calc(100vh - 64px)',
+                    height: 'calc(100vh - 64px)',
                 }}>
                     <AppSlider />
-                    <Layout style={{ padding: '10px', marginLeft: collapsed ? 100 : 220, marginTop: 64, minHeight: 'calc(100vh - 64px)' }}>
+                    <Layout style={{
+                        padding: '10px', paddingLeft: collapsed ? 100 : 220, marginTop: 64,
+                        minHeight: 'calc(100vh - 64px)', height: "100%", backgroundColor: "#fff"
+                    }}>
                         <AppNavigator />
-                        <Content>
-                            <Route exact path={AppPath.HOME}>
-                                欢迎使用个人数据中心
+                        <Route exact path={AppPath.HOME}>
+                            欢迎使用个人数据中心
                             </Route>
-                            <Route exact path={AppPath.DEVICE_TELEMETRY}>
-                                <DeviceTelemetry />
+                        <Route exact path={AppPath.DEVICE_TELEMETRY}>
+                            <DeviceTelemetry />
+                        </Route>
+                        <Route exact path={AppPath.DEVICE_CAMERA}>
+                            <DeviceCamera />
+                        </Route>
+                        <Route exact path={AppPath.VIDEO_DETAIL}>
+                            <EpisodePage />
+                        </Route>
+                        <Route exact path={AppPath.VIDEO_SUGGEST}>
+                            <VideoIndex />
+                        </Route>
+                        <Route exact path={AppPath.VIDEO_SEARCH}>
+                            <VideoSearch />
+                        </Route>
+                        <Route exact path={AppPath.HISTORY}>
+                            <HistoryPage />
+                        </Route>
+                        <Route exact path={AppPath.THING_DASHBOARD}>
+                            <ThingDashboard />
+                        </Route>
+                        <Route exact path={AppPath.THING_ANALYSIS}>
+                            <ThingAnalysis />
+                        </Route>
+                        <Route exact path={AppPath.THING_LIST}>
+                            <ThingTable />
+                        </Route>
+                        <Route exact path={AppPath.USER_PROFILE}>
+                            <UpdateProfileForm refetch={refetch} />
+                        </Route>
+                        <Route exact path={AppPath.USER_ACCOUNT}>
+                            <UpdatePasswordForm />
+                        </Route>
+                        <Route exact path={AppPath.USER_DATA_ANALYSIS}>
+                            <DataAnalysisIndex />
+                        </Route>
+                        <Route path={AppPath.UTIL_NOTE}>
+                            <NoteIndex />
+                        </Route>
+                        <Route exact path={AppPath.UTIL_CALCULATOR}>
+                            <Calculator />
+                        </Route>
+                        <Route exact path={AdminPath.HOME}>
+                            欢迎使用个人数据中心管理后台
                             </Route>
-                            <Route exact path={AppPath.DEVICE_CAMERA}>
-                                <DeviceCamera />
-                            </Route>
-                            <Route exact path={AppPath.VIDEO_DETAIL}>
-                                <EpisodePage />
-                            </Route>
-                            <Route exact path={AppPath.VIDEO_SUGGEST}>
-                                <VideoIndex />
-                            </Route>
-                            <Route exact path={AppPath.VIDEO_SEARCH}>
-                                <VideoSearch />
-                            </Route>
-                            <Route exact path={AppPath.HISTORY}>
-                                <HistoryPage />
-                            </Route>
-                            <Route exact path={AppPath.THING_DASHBOARD}>
-                                <ThingDashboard />
-                            </Route>
-                            <Route exact path={AppPath.THING_ANALYSIS}>
-                                <ThingAnalysis />
-                            </Route>
-                            <Route exact path={AppPath.THING_LIST}>
-                                <ThingTable />
-                            </Route>
-                            <Route exact path={AppPath.USER_PROFILE}>
-                                <UpdateProfileForm refetch={refetch} />
-                            </Route>
-                            <Route exact path={AppPath.USER_ACCOUNT}>
-                                <UpdatePasswordForm />
-                            </Route>
-                            <Route exact path={AppPath.USER_DATA_ANALYSIS}>
-                                <DataAnalysisIndex />
-                            </Route>
-                            <Route path={AppPath.UTIL_NOTE}>
-                                <NoteIndex />
-                            </Route>
-                            <Route exact path={AppPath.UTIL_CALCULATOR}>
-                                <Calculator />
-                            </Route>
-                            <Route exact path={AdminPath.HOME}>
-                                欢迎使用个人数据中心管理后台
-                            </Route>
-                            <Route exact path={AdminPath.VIDEO_LIST}>
-                                <VideoTable />
-                            </Route>
-                            <Route exact path={AdminPath.VIDEO_CREATE}>
-                                <VideoCreateIndex />
-                            </Route>
-                            <Route exact path={AdminPath.VIDEO_SEREIS_LIST}>
-                                <VideoSeriesTable />
-                            </Route>
-                            <Route exact path={AdminPath.VIDEO_DATA_ANALYSIS}>
-                                <VideoDataAnalysisIndex />
-                            </Route>
-                            <Route exact path={AdminPath.DEVICE_MODEL_LIST}>
-                                <DeviceModelIndex />
-                            </Route>
-                            <Route exact path={AdminPath.DEVICE_DASHBOARD_LIST}>
-                                <DeviceDashboardList />
-                            </Route>
-                            <Route exact path={AdminPath.DEVICE_LIST}>
-                                <DeviceIndex />
-                            </Route>
-                            <Route exact path={AdminPath.USER_LIST}>
-                                <UserTable />
-                            </Route>
-                        </Content>
+                        <Route exact path={AdminPath.VIDEO_LIST}>
+                            <VideoTable />
+                        </Route>
+                        <Route exact path={AdminPath.VIDEO_CREATE}>
+                            <VideoCreateIndex />
+                        </Route>
+                        <Route exact path={AdminPath.VIDEO_SEREIS_LIST}>
+                            <VideoSeriesTable />
+                        </Route>
+                        <Route exact path={AdminPath.VIDEO_DATA_ANALYSIS}>
+                            <VideoDataAnalysisIndex />
+                        </Route>
+                        <Route exact path={AdminPath.DEVICE_MODEL_LIST}>
+                            <DeviceModelIndex />
+                        </Route>
+                        <Route exact path={AdminPath.DEVICE_DASHBOARD_LIST}>
+                            <DeviceDashboardList />
+                        </Route>
+                        <Route exact path={AdminPath.DEVICE_LIST}>
+                            <DeviceIndex />
+                        </Route>
+                        <Route exact path={AdminPath.USER_LIST}>
+                            <UserTable />
+                        </Route>
                     </Layout>
                 </Layout>
             </Layout>
