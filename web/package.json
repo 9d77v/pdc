@@ -6,6 +6,7 @@
     "@alitajs/gesture-password-react": "^1.0.6",
     "@apollo/link-context": "^2.0.0-beta.3",
     "@apollo/react-hooks": "^4.0.0",
+    "@matejmazur/react-katex": "^3.1.3",
     "@nano-sql/core": "^2.3.7",
     "@types/react-color": "^3.0.4",
     "@types/react-syntax-highlighter": "^13.5.0",
@@ -37,13 +38,12 @@
     "react-syntax-highlighter": "^15.4.3",
     "react-use-websocket": "^2.4.1",
     "recoil": "^0.1.2",
+    "remark-gfm": "^1.0.0",
+    "remark-math": "^4.0.0",
     "subsrt": "^1.1.1",
     "video.js": "^7.11.4"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.11.9",
-    "@testing-library/react": "^11.2.5",
-    "@testing-library/user-event": "^12.7.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/echarts": "^4.9.3",
     "@types/jest": "^26.0.20",
