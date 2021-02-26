@@ -140,6 +140,7 @@ const request = async (body: string, needToken?: boolean): Promise<any> => {
         headers: myHeaders,
         body: body,
         redirect: 'follow' as const,
+        mode: "same-origin" as const,
         keepalive: true
     };
     const data = await fetch("/api", requestOptions)

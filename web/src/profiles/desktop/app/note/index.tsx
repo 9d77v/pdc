@@ -86,8 +86,8 @@ const NoteIndex = () => {
                             <span><Button type="primary" icon={<EyeOutlined className="pdc-note-button-icon" />}
                                 onClick={() => updateCurrentNote(currentNote.id, !currentNote.editable)} title={"预览"} /> </span> :
                             <span><Button type="primary" icon={<EditOutlined className="pdc-note-button-icon" />} onClick={() => updateCurrentNote(currentNote.id, !currentNote.editable)} title={"编辑"} />
-                                {/* <a onClick={this.downloadMDFile} title={this.props.noteStore.currentNote.title + ".md"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-markdown" theme="twoTone" /></a>
-                                <a onClick={this.downloadPDFFile} title={this.props.noteStore.currentNote.title + ".pdf"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-pdf" theme="twoTone" /></a> */}
+                                {/* <a onClick={this.downloadMDFile} title={currentNote.title + ".md"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-markdown" theme="twoTone" /></a> */}
+                                {/* <a onClick={this.downloadPDFFile} title={currentNote.title + ".pdf"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-pdf" theme="twoTone" /></a> */}
                             </span> : ''
                     }
                 </div>

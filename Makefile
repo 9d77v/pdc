@@ -1,6 +1,6 @@
 APP=pdc
-BASE_VERSION=0.0.14
-BASE_DEPLOY_VERSION=0.0.2
+BASE_VERSION=0.0.15
+BASE_DEPLOY_VERSION=0.0.3
 BASE_DEPLOY_FFMPEG_VERSION=0.0.1
 DOCKER_DIR=build/package
 IMAGE_TAG=$(shell git log --pretty=format:"%ad_%h" -1 --date=short)
@@ -18,22 +18,27 @@ gosec:
 
 #protoc gen
 protoc-iot: api/proto/iot/*.proto
-	protoc --go_out=pkg/iot/sdk/pb api/proto/iot/*.proto
+	protoc 	-I./api/proto/iot \
+	-I./api/proto/include \
+	--go_out=pkg/iot/sdk/pb \
+	api/proto/iot/*.proto
 protoc-base: api/proto/server/base/*.proto
 	protoc --go_out=internal/module/base api/proto/server/base/*.proto
 	mv internal/module/base/github.com/9d77v/pdc/internal/module/base/*.go internal/module/base/
 	rm -rf internal/module/base/github.com
 protoc-note: api/proto/server/note-service/*.proto
 	protoc -I./api/proto/server \
+	-I./api/proto/include \
 	--go_out=plugins=grpc:. \
 	api/proto/server/note-service/*.proto
 protoc-device: api/proto/server/device-service/*.proto
 	protoc -I./api/proto/server \
+	-I./api/proto/include \
 	--go_out=plugins=grpc:. \
 	--experimental_allow_proto3_optional \
 	api/proto/server/device-service/*.proto
 
-gen:  protoc-iot protoc-device api
+gen:  protoc-iot protoc-device  protoc-note api
 	echo "generated all code"
 	
 #docker

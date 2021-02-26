@@ -1,6 +1,6 @@
 module github.com/9d77v/pdc
 
-go 1.15
+go 1.16
 
 require (
 	github.com/99designs/gqlgen v0.11.3

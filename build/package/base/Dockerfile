@@ -1,8 +1,7 @@
-FROM golang:1.15.0-alpine3.12
+FROM golang:1.16.0-alpine3.13
 
 WORKDIR /app
 ENV CGO_ENABLED 0
-ENV GO111MODULE on
 ENV GOPROXY=https://goproxy.cn
 
 RUN echo "http://mirrors.aliyun.com/alpine/v3.11/main/" > /etc/apk/repositories \

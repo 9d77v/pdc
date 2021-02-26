@@ -30,27 +30,23 @@ const NoteEditForm: FC<INoteEditForm> = ({
     updateCurrentNote
 }) => {
     const buttons: IButton[] = [
-        { icon: <CheckSquareOutlined />, type: 'over', content: '\n\n- [ ] task1\n- [x] task1\n- [ ] task1\n' },
-        { text: 'H1', type: 'before', content: '# ' },
-        { text: 'H2', type: 'before', content: '## ' },
-        { text: 'H3', type: 'before', content: '### ' },
-        { text: 'H4', type: 'before', content: '#### ' },
-        { text: 'H5', type: 'before', content: '##### ' },
-        { text: 'H6', type: 'before', content: '###### ' },
+        { icon: <CheckSquareOutlined />, type: 'over', content: '- [ ] 任务1\n- [x] 任务2\n- [ ] 任务3\n' },
+        { text: 'H', type: 'before', content: '#' },
         { icon: <BoldOutlined />, type: 'ba', content: '**' },
         { icon: <ItalicOutlined />, type: 'ba', content: '*' },
         { icon: <StrikethroughOutlined />, type: 'ba', content: '~~' },
         { icon: <OrderedListOutlined />, type: 'over', content: '\n1. 事项1\n2. 事项2\n3. 事项3' },
         { icon: <UnorderedListOutlined />, type: 'over', content: '\n- 事项1\n- 事项2\n- 事项3' },
         { icon: <CodeOutlined />, type: 'ba', content: '```\n' },
-        { icon: <LinkOutlined />, type: 'before', content: '[迷之](http://www.9d77v.me "迷之")' },
+        { icon: <LinkOutlined />, type: 'over', content: '[个人数据中心](https://github.com/9d77v/pdc "Github地址")' },
         {
             icon: <TableOutlined />, type: 'over',
             content: `
-        \n| Syntax      | Description | Test Text     |
-        | :---        |    :----   |          :--- |
-        | Header      | Title       | Here's this   |
-        | Paragraph   | Text        | And more      |` },
+|序号| 问 | 答 |
+| :---| :---| :--- |
+| 1  | Who are you? |I'm your friend.|
+| 2  | Where are you?|I'm here.|` },
+
         { icon: <ClockCircleOutlined />, type: 'clock-circle', content: '' },
     ]
     const [contentNode, setContentNode] = useState<HTMLTextAreaElement | null>(null)
@@ -94,7 +90,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
                         data.substring(contentNode.selectionStart, data.length)
                 } else if (type === 'before') {
                     content = data.substring(0, contentNode.selectionStart) +
-                        buttonContent +
+                        buttonContent + " 标题" +
                         data.substring(contentNode.selectionStart, data.length)
                 } else {
                     content = data.substring(0, contentNode.selectionStart) + buttonContent +
@@ -108,8 +104,8 @@ const NoteEditForm: FC<INoteEditForm> = ({
                         buttonContent.split('').reverse().join('') +
                         data.substring(contentNode.selectionEnd, data.length)
                 } else if (type === 'before') {
-                    content = data.substring(0, contentNode.selectionStart) +
-                        buttonContent +
+                    content = data.substring(0, contentNode.selectionStart - 1) +
+                        buttonContent + " " +
                         data.substring(contentNode.selectionStart, data.length)
                 } else {
                     content = data.substring(0, contentNode.selectionStart) +
@@ -129,7 +125,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
             style={{
                 width: 32, height: 32, fontWeight: 500,
                 justifyContent: 'center', alignItems: 'center',
-                display: 'inline-flex'
+                display: 'flex', float: 'left'
             }}>{v.text}</Button>
     })
 
@@ -150,7 +146,9 @@ const NoteEditForm: FC<INoteEditForm> = ({
                     <Input placeholder="标题" onChange={onTitleChange} />
                 </Form.Item>
                 <Affix offsetTop={64}>
-                    {icons}
+                    <div style={{ display: "flex", flexWrap: "wrap" }}>
+                        {icons}
+                    </div>
                 </Affix>
                 <Form.Item
                     name="content"
