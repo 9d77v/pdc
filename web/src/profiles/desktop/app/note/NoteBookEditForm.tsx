@@ -24,13 +24,13 @@ const NoteEditBookForm: FC<INoteEditBookFormProps> = ({
         wrapperCol: { span: 15 },
     }
     const [background, setBackground] = useState(note.color)
-
     useEffect(() => {
         setBackground(note.color)
         form.setFieldsValue({
+            "title": note.title,
             "color": note.color
         })
-    }, [note.color, form])
+    }, [note, form])
 
     const handleChangeComplete = (color: any) => {
         setBackground(color.hex)
@@ -73,7 +73,7 @@ const NoteEditBookForm: FC<INoteEditBookFormProps> = ({
                 layout="horizontal"
                 name="deviceDashboardUpdateForm"
                 style={{ maxHeight: 600 }}
-                initialValues={{ title: "快速笔记", color: note.color }}>
+                initialValues={{ title: note.title, color: note.color }}>
                 <Form.Item
                     name="title"
                     label="标题"
