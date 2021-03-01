@@ -20,6 +20,7 @@ const NoteIndex = () => {
     const setNoteTrees = useSetRecoilState(noteStore.noteTrees)
     const [noteSyncStatus, setNoteSyncStatus] = useRecoilState(noteStore.noteSyncStatus)
     const setNotes = useSetRecoilState(noteStore.notes)
+
     const sync = async () => {
         if (currentUser.uid !== "") {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)

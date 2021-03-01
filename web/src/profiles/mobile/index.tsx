@@ -24,6 +24,7 @@ import {
     useSetRecoilState,
 } from 'recoil';
 import userStore from 'src/module/user/user.store'
+import NoteIndex from './note'
 
 const MeIndex = React.lazy(() => import('./me'))
 const HomeIndex = React.lazy(() => import('./home'))
@@ -83,6 +84,9 @@ const MobileIndex = () => {
             </Route>
             <Route exact path={AppPath.UTIL_CALCULATOR}  >
                 <CalculatorMobile />
+            </Route>
+            <Route exact path={AppPath.UTIL_NOTE}  >
+                <NoteIndex />
             </Route>
             <Route exact path={AppPath.USER_PROFILE}  >
                 <UpdateProfileForm refetch={refetch} />

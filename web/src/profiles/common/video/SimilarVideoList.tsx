@@ -23,7 +23,7 @@ const SimilarVideoList: FC<ISimilarVideoListProps> = ({
                             src={video.cover}
                             width={160}
                             height={100}
-                            hideModal={true} />
+                        />
                     </div>
                     <div style={{
                         flex: 1,

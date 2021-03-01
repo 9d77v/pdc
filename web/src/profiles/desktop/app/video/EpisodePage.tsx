@@ -98,7 +98,7 @@ export const EpisodePage: FC = () => {
                     currentTime={(Number(historyInfo?.subSourceID) !== 0 && Number(historyInfo?.subSourceID) === Number(videoDetail.episodeItem.id)) ? historyInfo?.currentTime : 0}
                 />
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'row', flex: 1 }}>
-                    <Img src={videoDetail.videoItem.cover} />
+                    <Img src={videoDetail.videoItem.cover} showModal />
                     <div style={{ display: 'flex', textAlign: "left", paddingLeft: 10, flexDirection: 'column', flex: 1, paddingInline: 10 }} >
                         <div style={{ fontSize: 18, display: "flex" }}> {videoDetail.videoItem.title}{tagNodes}</div>
                         <div style={{ paddingRight: 10 }}> 全{videoDetail.videoItem.episodes.length}话</div>
