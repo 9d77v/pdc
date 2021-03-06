@@ -1,20 +1,32 @@
-import { Icon, List, Modal, SwipeAction, Toast } from 'antd-mobile';
-import { useRecoilValue } from 'recoil';
+import { List, Modal, SwipeAction, Toast } from 'antd-mobile';
+import { FC } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { LongPressAction } from 'src/components/LongPressAction';
 import { INote, NoteType } from 'src/module/note/note.model';
 import noteStore from 'src/module/note/note.store';
-
+import userStore from 'src/module/user/user.store';
+import {
+    FolderTwoTone, FileTwoTone
+} from '@ant-design/icons';
 const Item = List.Item;
 const alert = Modal.alert
 const prompt = Modal.prompt
 const operation = Modal.operation
 
-
-const NoteList = () => {
-    const notes = useRecoilValue(noteStore.notes)
-
-    const onClick = (index: number) => {
-        // this.props.noteStore.nextNoteList(this.props.noteStore.notes[index])
+interface INoteListProps {
+    updateCurrentNote: (id: string, editable?: boolean, navTitle?: string,) => Promise<void>
+}
+const NoteList: FC<INoteListProps> = ({
+    updateCurrentNote
+}) => {
+    const [notes, setNotes] = useRecoilState(noteStore.notes)
+    const currentUser = useRecoilValue(userStore.currentUserInfo)
+    const nextNoteList = async (item: INote, editable: boolean = false) => {
+        if (item.id !== "") {
+            await updateCurrentNote(item.id, editable, item.title)
+            const notes = await noteStore.findByParentID(item.id, currentUser.uid)
+            setNotes(notes)
+        }
     }
 
     const onLongPress = (note: INote) => {
@@ -71,13 +83,11 @@ const NoteList = () => {
         listItems = notes.map((item: INote, i: number) => {
             const listItem = <Item
                 style={{ height: 60 }}
-                onClick={() => onClick(i)}
-            ><Icon style={{
-                flex: 1, color: item.note_type === NoteType.Directory ? "brown" : "blue",
-                paddingRight: 20, paddingLeft: 6, fontSize: 32
-            }}
-                type={item.note_type === NoteType.Directory ? "folder" : "file"} />
-                {item.title === undefined ? '' : item.title}
+                onClick={() => nextNoteList(item)}
+            >
+                {item.note_type === NoteType.Directory ? <FolderTwoTone
+                    className="pdc-note-icon" twoToneColor={item.color} /> : <FileTwoTone className="pdc-note-icon" twoToneColor={item.color} />}
+                <span style={{ marginLeft: 10 }}> {item.title === undefined ? '' : item.title}</span>
             </Item>
             if (/Android/i.test(navigator.userAgent)) {
                 return (
@@ -107,7 +117,6 @@ const NoteList = () => {
                 >
                     {listItem}
                 </SwipeAction>
-
             )
         }
         )

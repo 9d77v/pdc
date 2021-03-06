@@ -1,4 +1,4 @@
-import { Affix, Button, Form, Input } from 'antd'
+import { Button, Form, Input } from 'antd'
 import dayjs from "dayjs";
 import * as React from 'react'
 import 'src/styles/editor.less'
@@ -10,7 +10,6 @@ import {
     ItalicOutlined, StrikethroughOutlined, OrderedListOutlined, UnorderedListOutlined,
     CodeOutlined, LinkOutlined, TableOutlined, ClockCircleOutlined
 } from '@ant-design/icons';
-import NotePage from './NotePage'
 import { SyncStatus } from 'src/module/note/note.model'
 
 interface IButton {
@@ -21,7 +20,7 @@ interface IButton {
 }
 
 interface INoteEditForm {
-    updateCurrentNote: (id: string, editable: boolean) => Promise<void>
+    updateCurrentNote: (id: string, editable: boolean, navTitle: string) => Promise<void>
 }
 
 const NoteEditForm: FC<INoteEditForm> = ({
@@ -57,7 +56,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
         setTimeout(async () => {
             const title = form.getFieldValue('title')
             await noteStore.updateNoteFile(currentNote.id, title, currentNote.content || '')
-            await updateCurrentNote(currentNote.id, true)
+            await updateCurrentNote(currentNote.id, true, title)
             setNoteSyncStatus(SyncStatus.Unsync)
         }, 300)
     }
@@ -66,7 +65,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
         setTimeout(async () => {
             const content = form.getFieldValue('content')
             await noteStore.updateNoteFile(currentNote.id, currentNote.title || '', content)
-            await updateCurrentNote(currentNote.id, true)
+            await updateCurrentNote(currentNote.id, true, currentNote.title || '')
             setNoteSyncStatus(SyncStatus.Unsync)
         }, 300)
     }
@@ -127,44 +126,36 @@ const NoteEditForm: FC<INoteEditForm> = ({
     })
 
     return (
-        <div style={{ display: 'flex' }}>
-            <Form
-                form={form}
-                name="noteEditForm"
-                initialValues={{ title: currentNote.title, content: currentNote.content }}
-                style={{ width: "50%", marginLeft: 10, marginRight: 10 }}
+        <Form
+            form={form}
+            name="noteEditForm"
+            initialValues={{ title: currentNote.title, content: currentNote.content }}
+            style={{ padding: 5 }}
+        >
+            <Form.Item
+                name="title"
+                rules={[{ required: true, message: '请输入标题!' }, {
+                    max: 50, message: '标题最多50字'
+                }]}
             >
-                <Form.Item
-                    name="title"
-                    rules={[{ required: true, message: '请输入标题!' }, {
-                        max: 50, message: '标题最多50字'
-                    }]}
-                >
-                    <Input placeholder="标题" onChange={onTitleChange} />
-                </Form.Item>
-                <Affix offsetTop={64}>
-                    <div style={{ display: "flex", flexWrap: "wrap" }}>
-                        {icons}
-                    </div>
-                </Affix>
-                <Form.Item
-                    name="content"
-                    rules={[{ required: true, message: '请输入内容!' }, {
-                        max: 10000, message: '内容最多10000字'
-                    }]}
-                >
-                    <textarea
-                        style={{ width: "100%" }}
-                        ref={node => setContentNode(node)}
-                        placeholder="内容" rows={30} id='note-edit-form-content'
-                        onChange={onContentChange} />
-                </Form.Item>
-            </Form>
-            <div style={{
-                justifyContent: "center", display: "inline-flex", marginBottom: 18,
-                width: "50%",
-            }}>  <NotePage /></div>
-        </div >
+                <Input placeholder="标题" onChange={onTitleChange} />
+            </Form.Item>
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+                {icons}
+            </div>
+            <Form.Item
+                name="content"
+                rules={[{ required: true, message: '请输入内容!' }, {
+                    max: 10000, message: '内容最多10000字'
+                }]}
+            >
+                <textarea
+                    style={{ width: "100%", overflow: "auto" }}
+                    ref={node => setContentNode(node)}
+                    placeholder="内容" rows={30} id='note-edit-form-content'
+                    onChange={onContentChange} />
+            </Form.Item>
+        </Form>
     )
 }
 

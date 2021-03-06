@@ -1,6 +1,6 @@
-import { Button, Icon, Modal, NavBar, Toast } from 'antd-mobile';
-import React, { useEffect, useState } from 'react';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { Icon, Modal, NavBar, Toast } from 'antd-mobile';
+import React, { useEffect } from 'react';
+import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
 import CircleButton, { ICircleButtonProps } from 'src/components/CircleButton';
 import { NoteType, SyncStatus } from 'src/module/note/note.model';
 import noteStore from 'src/module/note/note.store';
@@ -8,30 +8,25 @@ import {
     PlusOutlined,
     EditOutlined,
     CloudTwoTone,
-    SyncOutlined
-} from '@ant-design/icons';
-import { noteDBInit } from 'src/db/db';
-import userStore from 'src/module/user/user.store';
-import { useHistory } from 'react-router-dom';
-import NoteList from './NoteList';
-// import { SelectKey } from 'src/constants/app';
-// import { MainStore } from 'src/stores/main.store';
-// import { NoteStore } from 'src/stores/note.store';
-// import { CircleButton, ICircleButtonProps } from '../components/CircleButton';
-// import { NoteEditForm } from './components/NoteEditForm';
-// import { NoteForm } from './components/NoteForm';
-// import NoteList from './components/NoteList';
-// import NoteNavBar from './components/NoteNavBar';
+    SyncOutlined,
+    EyeOutlined,
+} from '@ant-design/icons'
+import { noteDBInit } from 'src/db/db'
+import userStore from 'src/module/user/user.store'
+import { useHistory } from 'react-router-dom'
+import NoteList from './NoteList'
+import { Button, message } from 'antd'
+import NotePage from 'src/profiles/desktop/app/note/NotePage'
+import NoteEditForm from './NoteEditForm';
 
 const prompt = Modal.prompt;
 
 const NoteIndex = () => {
-    const [visible, setVisible] = useState(false)
-    const [navVisible, setNavVisible] = useState(false)
     const currentUser = useRecoilValue(userStore.currentUserInfo)
-    const currentNote = useRecoilValue(noteStore.currentNote)
+    const resetCurrentNote = useResetRecoilState(noteStore.currentNote)
+    const [currentNote, setCurrentNote] = useRecoilState(noteStore.currentNote)
     const [noteSyncStatus, setNoteSyncStatus] = useRecoilState(noteStore.noteSyncStatus)
-    const [notes, setNotes] = useRecoilState(noteStore.notes)
+    const setNotes = useSetRecoilState(noteStore.notes)
     const history = useHistory()
 
     const sync = async () => {
@@ -48,9 +43,28 @@ const NoteIndex = () => {
     }
 
     useEffect(() => {
-        noteDBInit()
-        setTimeout(sync, 1000)
+        (async () => {
+            await noteDBInit()
+            await sync()
+        })()
     }, [])
+
+    const updateCurrentNote = async (id: string, editable: boolean = false, navTitle?: string) => {
+        try {
+            if (id === 'root') {
+                resetCurrentNote()
+            } else {
+                const result = await noteStore.getByID(id, currentUser.uid)
+                if (result) {
+                    result.editable = editable
+                    result.navTitle = navTitle || ""
+                    setCurrentNote(result)
+                }
+            }
+        } catch (error) {
+            message.error("更新当前笔记失败：" + error)
+        }
+    }
 
     const onNewNoteBookClick = () => {
         prompt(
@@ -77,8 +91,8 @@ const NoteIndex = () => {
         //     uid: this.props.mainStore.currentUser.uid,
         //     level: this.props.noteStore.currentNote.level + 1,
         //     version: 1,
-        //     create_time: moment().toISOString(),
-        //     update_time: moment().toISOString(),
+        //     create_time: dayjs().toISOString(),
+        //     update_time: dayjs().toISOString(),
         //     tags: [],
         //     note_type: NoteType.File,
         //     sync_status: SyncStatus.Unsync,
@@ -86,29 +100,40 @@ const NoteIndex = () => {
         // })
     }
 
-    const handleVisibleChange = (visible: boolean) => {
-        setVisible(visible)
-    }
-
-
     let data: ICircleButtonProps[] = [
+        // {
+        //     right: 32,
+        //     radius: 60,
+        //     bottom: 0,
+        //     display: currentNote.note_type === NoteType.Directory &&
+        //         currentNote.level < 2 ? 'flex' : 'none',
+        //     icon: <PlusOutlined className="pdc-note-button-icon" />,
+        //     onClick: onNewNoteBookClick,
+        // },
+        // {
+        //     right: 32,
+        //     radius: 60,
+        //     bottom: 0,
+        //     display: (currentNote.note_type === NoteType.Directory && currentNote.level === 2) ||
+        //         (currentNote.note_type === NoteType.File && !currentNote.editable) ? 'flex' : 'none',
+        //     icon: <EditOutlined />,
+        //     onClick: () => {
+        //         if (currentNote.note_type === NoteType.Directory && currentNote.level === 2) {
+
+        //         } else if (currentNote.note_type === NoteType.File && !currentNote.editable) {
+        //             updateCurrentNote(currentNote.id, true, currentNote.navTitle)
+        //         }
+        //     },
+        // },
         {
             right: 32,
             radius: 60,
             bottom: 0,
-            display: currentNote.note_type === NoteType.Directory &&
-                currentNote.level < 2 ? 'flex' : 'none',
-            icon: <PlusOutlined className="pdc-note-button-icon" />,
-            onClick: onNewNoteBookClick,
-        },
-        {
-            right: 32,
-            radius: 60,
-            bottom: 0,
-            display: currentNote.note_type === NoteType.Directory &&
-                currentNote.level > 1 ? 'flex' : 'none',
-            icon: <EditOutlined />,
-            onClick: onNewNoteClick,
+            display: (currentNote.note_type === NoteType.File && currentNote.editable) ? 'flex' : 'none',
+            icon: <EyeOutlined />,
+            onClick: () => {
+                updateCurrentNote(currentNote.id, false, currentNote.navTitle)
+            },
         }
     ]
     data = data.filter(v => v.display === 'flex')
@@ -128,36 +153,46 @@ const NoteIndex = () => {
         )
     })
 
-    const beforeNoteList = () => {
-
+    const beforeNoteList = async () => {
+        const notes = await noteStore.findByParentID(currentNote.parent_id, currentUser.uid)
+        setNotes(notes)
+        const note = await noteStore.getByID(currentNote.parent_id, currentUser.uid)
+        await updateCurrentNote(note?.id || 'root', false, note?.title || '记事本')
     }
+
     return (
-        <div style={{ height: '100%', width: "100%", backgroundColor: '#fff' }}>
+        <div style={{
+            height: '100%', width: "100%", backgroundColor: '#fff', display: "flex",
+            flexDirection: "column", overflowY: "scroll"
+        }}>
             <NavBar
                 mode="light"
                 icon={<Icon type="left"
                     onClick={() => currentNote.id === 'root' ? history.goBack() : beforeNoteList()} />}
-                onLeftClick={() => beforeNoteList}
-                leftContent={currentNote.id === 'root' ? '' : <span onClick={beforeNoteList}>返回</span>}
-                rightContent={currentNote.note_type === NoteType.Directory ? '' : (
-                    <a style={{ float: 'right', marginRight: 10, position: 'absolute', top: 10, right: 6 }}
-                        onClick={() => sync()} >
-                        <Button icon={noteSyncStatus === SyncStatus.Synced ? <CloudTwoTone className="pdc-note-button-icon" /> :
-                            <SyncOutlined className="pdc-note-button-icon" style={{ color: "#1890ff" }} spin={noteSyncStatus === SyncStatus.Syncing} />}
-                            onClick={() => {
-                                if (noteSyncStatus === SyncStatus.Unsync) {
-                                    sync()
-                                }
-                            }}
-                        />
-                    </ a>
-                )}
-            >{currentNote.navTitle}
+                onLeftClick={() => beforeNoteList()}
+                leftContent={currentNote.id === 'root' ? '' : <span onClick={beforeNoteList}>{currentNote.navTitle}</span>}
+                rightContent={
+                    // {currentNote.note_type === NoteType.File ?
+                    //     currentNote.editable ?
+                    //         <span style={{ marginRight: 10 }}><Button type="primary" icon={<EyeOutlined className="pdc-note-button-icon" />}
+                    //             onClick={() => updateCurrentNote(currentNote.id, currentNote.navTitle, !currentNote.editable)} /> </span> :
+                    //         <span><Button type="primary" icon={<EditOutlined className="pdc-note-button-icon" />} onClick={() => updateCurrentNote(currentNote.id, currentNote.navTitle, !currentNote.editable)} />
+                    //             {/* <a onClick={this.downloadMDFile} title={currentNote.title + ".md"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-markdown" theme="twoTone" /></a> */}
+                    //             {/* <a onClick={this.downloadPDFFile} title={currentNote.title + ".pdf"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-pdf" theme="twoTone" /></a> */}
+                    //         </span> : ''
+                    // }
+                    <Button icon={noteSyncStatus === SyncStatus.Synced ? <CloudTwoTone className="pdc-note-button-icon" /> :
+                        <SyncOutlined className="pdc-note-button-icon" style={{ color: "#1890ff" }} spin={noteSyncStatus === SyncStatus.Syncing} />}
+                        onClick={() => {
+                            if (noteSyncStatus === SyncStatus.Unsync) {
+                                sync()
+                            }
+                        }}
+                    />
+                }
+            >{currentNote.id === 'root' ? "记事本" : ""}
             </NavBar>
-            {currentNote.note_type === NoteType.Directory ? <NoteList /> : ""
-                // currentNote.editable ? <NoteEditForm noteStore={noteStore} /> :
-                //     <NoteForm noteStore={noteStore} />}
-            }
+            {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <NotePage />)}
             {buttons}
         </div>
 
