@@ -68,7 +68,6 @@
   bottom: 0;
   width: auto;
   height: auto;
-
   font-size: 16px;
 }
 
@@ -77,36 +76,100 @@ pre {
 }
 
 blockquote {
-  color: #666;
   margin: 0;
-  padding-left: 3em;
-  border-left: 0.5em #eee solid;
+  padding: 0.5em;
+  border-left: 0.8em #b4b6b8 solid;
+  background-color: #F7F9FA;
 }
 
-tr {
-  border-top: 1px solid #c6cbd1;
-  background: #fff;
+blockquote p {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0;
+  color: #8c8c8c;
 }
 
-th,
-td {
-  padding: 6px 13px;
-  border: 1px solid #dfe2e5;
+blockquote> :first-child {
+  margin-top: 0;
 }
 
-table tr:nth-child(2n) {
-  background: #f6f8fa;
+blockquote> :last-child {
+  margin-bottom: 0;
 }
 
 p img {
   max-width: 100%;
 }
 
-table {
-  overflow-x: auto;
-  display: block;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #404040;
+  line-height: 32px;
+  font-weight: 600;
 }
 
 h1 {
-  font-size: 32px;
+  margin-bottom: 18px;
+  font-size: 30px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  font-size: 13px;
+}
+
+//table
+table {
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+th,
+td {
+  border: 1px solid #999;
+  padding: 3px 10px;
+}
+
+table thead tr {
+  background-color: #85a9f5;
+  color: #fff;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #eee;
+}
+
+table tbody tr:hover {
+  background-color: #ccc;
+}
+
+table tbody tr td:first-child {
+  color: #f40;
+}
+
+table tfoot tr td {
+  text-align: right;
+  padding-right: 20px;
 }

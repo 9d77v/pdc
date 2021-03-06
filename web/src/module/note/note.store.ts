@@ -18,7 +18,7 @@ class NoteStore {
             id: 'root',
             uid: getUID(),
             parent_id: '',
-            navTitle: '',
+            navTitle: '记事本',
             level: 0,
             version: 1,
             sync_status: SyncStatus.Synced,

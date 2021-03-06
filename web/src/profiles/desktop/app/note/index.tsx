@@ -13,6 +13,7 @@ import NoteEditForm from './NoteEditForm'
 import NotePage from './NotePage'
 import NoteTree from './NoteTree'
 import { nSQL } from '@nano-sql/core'
+import { isMobile } from 'src/utils/util'
 const NoteIndex = () => {
     const resetCurrentNote = useResetRecoilState(noteStore.currentNote)
     const currentUser = useRecoilValue(userStore.currentUserInfo)
@@ -20,6 +21,7 @@ const NoteIndex = () => {
     const setNoteTrees = useSetRecoilState(noteStore.noteTrees)
     const [noteSyncStatus, setNoteSyncStatus] = useRecoilState(noteStore.noteSyncStatus)
     const setNotes = useSetRecoilState(noteStore.notes)
+
     const sync = async () => {
         if (currentUser.uid !== "") {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
@@ -34,8 +36,10 @@ const NoteIndex = () => {
         }
     }
     useEffect(() => {
-        noteDBInit()
-        setTimeout(sync, 1000)
+        (async () => {
+            await noteDBInit()
+            await sync()
+        })()
     }, [])
 
     const updateCurrentNote = async (id: string, editable: boolean = false) => {
@@ -68,7 +72,9 @@ const NoteIndex = () => {
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column" }} >
+        <div style={{
+            display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9"
+        }} >
             <div style={{ padding: 10 }}>
                 <NoteTree updateCurrentNote={updateCurrentNote} />
                 <div style={{ display: 'table-cell', paddingLeft: 12 }}>
@@ -92,7 +98,10 @@ const NoteIndex = () => {
                     }
                 </div>
             </div>
-            {currentNote.level < 3 ? <NoteBookBoard updateCurrentNote={updateCurrentNote} initNoteTree={initNoteTree} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} initNoteTree={initNoteTree} /> : <NotePage />)}
+            {currentNote.level < 3 ? <NoteBookBoard updateCurrentNote={updateCurrentNote} initNoteTree={initNoteTree} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> :
+                <div style={{
+                    justifyContent: "center", display: "inline-flex", marginBottom: 18,
+                }}><NotePage /></div>)}
         </div >
     )
 }

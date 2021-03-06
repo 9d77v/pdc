@@ -10,7 +10,7 @@ interface ImageProps {
     height?: number | string
     currentTime?: number,
     remainingTime?: number,
-    hideModal?: boolean
+    showModal?: boolean
 }
 
 const Img: React.FC<ImageProps> = ({
@@ -19,7 +19,7 @@ const Img: React.FC<ImageProps> = ({
     height,
     currentTime,
     remainingTime,
-    hideModal = false
+    showModal = false
 }) => {
     const [visible, setVisible] = useState(false)
     const ref: any = useRef();
@@ -43,7 +43,7 @@ const Img: React.FC<ImageProps> = ({
             position: "relative",
             overflowY: "hidden"
         }}>
-        {hideModal ? null : <Modal
+        {showModal ? <Modal
             title="查看图片"
             visible={visible}
             destroyOnClose={true}
@@ -52,7 +52,7 @@ const Img: React.FC<ImageProps> = ({
             footer={null}
         >
             {src ? <img src={src} alt="图片不存在" /> : "暂无图片"}
-        </Modal>}
+        </Modal> : null}
         {src ? isVisible && (<div style={{ width: "100%", height: "100%" }}>
             <img src={src}
                 alt="图片不存在"

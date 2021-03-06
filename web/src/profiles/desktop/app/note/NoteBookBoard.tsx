@@ -64,17 +64,12 @@ const NoteBookBoard: FC<INoteBookBoardProps> = ({ updateCurrentNote, initNoteTre
                     bordered={false}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', backgroundColor: '#c0c0c0' }}
                 >
-                    <div>
+                    <div style={{ width: 105 }}>
                         {item.note_type === NoteType.Directory ? <FolderTwoTone
                             className="pdc-note-icon" twoToneColor={item.color} /> : <FileTwoTone className="pdc-note-icon" twoToneColor={item.color} />}
-                        <div>{shortTitle(item.title, 8)}</div>
+                        <div>{shortTitle(item.title, 10)}</div>
                     </div>
                 </Card>
-                {/* <div style={{ float: 'right', marginRight: 10, position: 'absolute', top: 10, right: 6 }} >
-                    {item.sync_status === SyncStatus.Synced ? <CloudTwoTone /> : <SyncOutlined spin={item.sync_status === SyncStatus.Syncing}
-                    //  onClick={noteStore.saveNote.bind(this, item.id)}
-                    />}
-                </div> */}
                 <Popover
                     content={
                         <div >
@@ -209,7 +204,7 @@ const NoteBookBoard: FC<INoteBookBoardProps> = ({ updateCurrentNote, initNoteTre
         if (currentUser.uid !== "") {
             setTimeout(async () => {
                 await refreshNoteBoard()
-            }, 300)
+            }, 500)
         }
     }, [currentUser])
 

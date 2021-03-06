@@ -2,13 +2,14 @@ import {
     atom,
     selector,
 } from 'recoil';
+import { getUID } from 'src/utils/util';
 import { IUser } from './user.model';
 
 class UserStore {
     currentUserInfo = atom<IUser>({
         key: 'currentUserInfo',
         default: {
-            uid: "",
+            uid: getUID(),
             name: "",
             password: "",
             avatar: "",

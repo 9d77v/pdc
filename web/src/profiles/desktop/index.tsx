@@ -29,7 +29,6 @@ import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
 import DataAnalysisIndex from './app/user/DataAnalysisIndex'
 import NoteIndex from './app/note'
 import userStore from 'src/module/user/user.store'
-import { Content } from 'antd/lib/layout/layout';
 import globalStore from 'src/module/global/global.store';
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
