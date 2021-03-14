@@ -139,7 +139,7 @@ const NoteBookBoard: FC<INoteBookBoardProps> = ({ updateCurrentNote, initNoteTre
                 updated_at: now,
             }).exec()
             const newNoteBook: any = data[0]
-            // 创建LEVEL2文件夹，自动创建空的笔记,并同步到服务器
+            // 创建LEVEL2文件夹，自动创建空的笔记
             if (newNoteBook.level === 2) {
                 const result = await nSQL("note").query('upsert', {
                     parent_id: newNoteBook.id,

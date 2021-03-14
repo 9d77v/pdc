@@ -103,6 +103,7 @@ class NoteStore {
         let data: any[] = await nSQL("note").query('upsert', {
             parent_id: note.parent_id,
             uid: note.uid,
+            title: "笔记",
             note_type: NoteType.File,
             level: note.level,
             state: NoteState.Normal,
