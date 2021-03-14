@@ -9,7 +9,6 @@ import {
     FolderTwoTone, FileTwoTone,
 } from '@ant-design/icons';
 import dayjs from "dayjs";
-import { syncNotes } from "src/consts/http";
 
 class NoteStore {
     currentNote = atom<INote>({
@@ -99,48 +98,12 @@ class NoteStore {
             .exec()
         return result
     }
-
-    syncNote = async (unsyncedNotes: any[]) => {
-        const lastUpdateTime = parseInt(localStorage.getItem("note_last_update_time") || "") || 0
-        const result = await syncNotes(lastUpdateTime, unsyncedNotes)
-        const data = result.data.syncNotes.list
-        if (data.length > 0) {
-            const remoteData = data.map((v: any) => {
-                return {
-                    id: v.id,
-                    parent_id: v.parent_id,
-                    uid: v.uid,
-                    note_type: v.note_type,
-                    level: v.level,
-                    title: v.title,
-                    content: v.content,
-                    tags: v.tags,
-                    state: v.state,
-                    version: v.version,
-                    sha1: v.sha1,
-                    sync_status: SyncStatus.Synced,
-                    color: v.color,
-                    created_at: dayjs(v.created_at * 1000).toISOString(),
-                    updated_at: dayjs(v.updated_at * 1000).toISOString(),
-                }
-            })
-            for (const remoteNote of remoteData) {
-                if (remoteNote.state === NoteState.Deleted) {
-                    await this.deleteLocalNote(remoteNote)
-                } else {
-                    await nSQL("note").query('upsert', remoteNote).exec()
-                }
-            }
-            localStorage.setItem("note_last_update_time", result.data.syncNotes.last_update_time)
-        }
-    }
-
-
     insertNoteFile = async (note: INote): Promise<string> => {
         const now = dayjs().toISOString()
         let data: any[] = await nSQL("note").query('upsert', {
             parent_id: note.parent_id,
             uid: note.uid,
+            title: "笔记",
             note_type: NoteType.File,
             level: note.level,
             state: NoteState.Normal,

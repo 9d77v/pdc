@@ -14572,6 +14572,11 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
+web-vitals@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.npm.taobao.org/web-vitals/download/web-vitals-1.1.0.tgz?cache=0&sync_timestamp=1610592258004&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fweb-vitals%2Fdownload%2Fweb-vitals-1.1.0.tgz#7f410d9a1f7a1cd5d952806b45776204b47dc274"
+  integrity sha1-f0ENmh96HNXZUoBrRXdiBLR9wnQ=
+
 webidl-conversions@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npm.taobao.org/webidl-conversions/download/webidl-conversions-5.0.0.tgz#ae59c8a00b121543a2acc65c0434f57b0fc11aff"

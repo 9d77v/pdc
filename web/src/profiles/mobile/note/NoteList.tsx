@@ -1,8 +1,8 @@
 import { List, Modal, SwipeAction, Toast } from 'antd-mobile';
 import { FC } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { LongPressAction } from 'src/components/LongPressAction';
-import { INote, NoteType } from 'src/module/note/note.model';
+import { INote, NoteType, SyncStatus } from 'src/module/note/note.model';
 import noteStore from 'src/module/note/note.store';
 import userStore from 'src/module/user/user.store';
 import {
@@ -21,6 +21,9 @@ const NoteList: FC<INoteListProps> = ({
 }) => {
     const [notes, setNotes] = useRecoilState(noteStore.notes)
     const currentUser = useRecoilValue(userStore.currentUserInfo)
+    const setNoteSyncStatus = useSetRecoilState(noteStore.noteSyncStatus)
+    const currentNote = useRecoilValue(noteStore.currentNote)
+
     const nextNoteList = async (item: INote, editable: boolean = false) => {
         if (item.id !== "") {
             await updateCurrentNote(item.id, editable, item.title)
@@ -44,8 +47,10 @@ const NoteList: FC<INoteListProps> = ({
                 if (title.length > 20) {
                     Toast.info('标题长度不能超过20', 1);
                 } else {
-                    // await this.props.noteStore.updateNote(note, title)
-                    // await this.props.noteStore.listLocalNote(this.props.noteStore.currentNote.id)
+                    await noteStore.updateNoteBrief(note.id, title, note.color || "")
+                    const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
+                    setNotes(notes)
+                    setNoteSyncStatus(SyncStatus.Unsync)
                 }
             },
             'default',
@@ -65,11 +70,10 @@ const NoteList: FC<INoteListProps> = ({
         alert('确认删除', confirmText, [
             {
                 text: '确认', onPress: async () => {
-                    // await this.props.noteStore.hideNote(note)
-                    // setTimeout(() => {
-                    //     this.props.noteStore.listLocalNote(this.props.noteStore.currentNote.id)
-                    // }, 300)
-
+                    await noteStore.hideNote(note.id)
+                    const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
+                    setNotes(notes)
+                    setNoteSyncStatus(SyncStatus.Unsync)
                 }
             },
             { text: '取消' }
@@ -122,7 +126,7 @@ const NoteList: FC<INoteListProps> = ({
         )
     }
     return (
-        <List >
+        <List style={{ overflowY: "scroll" }}>
             {listItems}
         </List>
     )

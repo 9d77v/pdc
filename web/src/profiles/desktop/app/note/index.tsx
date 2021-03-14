@@ -1,5 +1,5 @@
 import { Button, message } from 'antd'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil'
 import { noteDBInit } from 'src/db/db'
 import { NoteState, NoteType, SyncStatus } from 'src/module/note/note.model'
@@ -13,7 +13,9 @@ import NoteEditForm from './NoteEditForm'
 import NotePage from './NotePage'
 import NoteTree from './NoteTree'
 import { nSQL } from '@nano-sql/core'
-import { isMobile } from 'src/utils/util'
+import dayjs from 'dayjs'
+import { SYNC_NOTES } from 'src/gqls/note/mutation'
+import { useMutation } from '@apollo/react-hooks'
 const NoteIndex = () => {
     const resetCurrentNote = useResetRecoilState(noteStore.currentNote)
     const currentUser = useRecoilValue(userStore.currentUserInfo)
@@ -21,12 +23,13 @@ const NoteIndex = () => {
     const setNoteTrees = useSetRecoilState(noteStore.noteTrees)
     const [noteSyncStatus, setNoteSyncStatus] = useRecoilState(noteStore.noteSyncStatus)
     const setNotes = useSetRecoilState(noteStore.notes)
+    const [syncNotes] = useMutation(SYNC_NOTES);
 
     const sync = async () => {
         if (currentUser.uid !== "") {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
             setNoteSyncStatus(SyncStatus.Syncing)
-            await noteStore.syncNote(result)
+            await syncNote(result)
             initNoteTree()
             if (currentNote.note_type === NoteType.Directory) {
                 const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
@@ -35,6 +38,66 @@ const NoteIndex = () => {
             setNoteSyncStatus(SyncStatus.Synced)
         }
     }
+
+    const syncNote = async (unsyncedNotes: any[]) => {
+        const lastUpdateTime = parseInt(localStorage.getItem("note_last_update_time") || "") || 0
+        const result = await syncNotes({
+            variables: {
+                "input": {
+                    "lastUpdateTime": lastUpdateTime === null ? 0 : lastUpdateTime,
+                    "unsyncedNotes": unsyncedNotes.map((note: any) => {
+                        return {
+                            id: note.id,
+                            parentID: note.parent_id,
+                            uid: note.uid,
+                            noteType: note.note_type,
+                            level: note.level,
+                            title: note.title,
+                            color: note.color,
+                            state: note.state,
+                            version: note.version,
+                            createdAt: dayjs(note.created_at).unix(),
+                            updatedAt: dayjs(note.updated_at).unix(),
+                            content: note.content || '',
+                            tags: note.tags,
+                            sha1: note.sha1 || '',
+                        }
+                    })
+                }
+            }
+        })
+        const data = result.data.syncNotes.list
+        if (data.length > 0) {
+            const remoteData = data.map((v: any) => {
+                return {
+                    id: v.id,
+                    parent_id: v.parent_id,
+                    uid: v.uid,
+                    note_type: v.note_type,
+                    level: v.level,
+                    title: v.title,
+                    content: v.content,
+                    tags: v.tags,
+                    state: v.state,
+                    version: v.version,
+                    sha1: v.sha1,
+                    sync_status: SyncStatus.Synced,
+                    color: v.color,
+                    created_at: dayjs(v.created_at * 1000).toISOString(),
+                    updated_at: dayjs(v.updated_at * 1000).toISOString(),
+                }
+            })
+            for (const remoteNote of remoteData) {
+                if (remoteNote.state === NoteState.Deleted) {
+                    await noteStore.deleteLocalNote(remoteNote)
+                } else {
+                    await nSQL("note").query('upsert', remoteNote).exec()
+                }
+            }
+            localStorage.setItem("note_last_update_time", result.data.syncNotes.last_update_time)
+        }
+    }
+
     useEffect(() => {
         (async () => {
             await noteDBInit()
