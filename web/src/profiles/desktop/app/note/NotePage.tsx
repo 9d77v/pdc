@@ -22,6 +22,7 @@ const NotePage = () => {
                 minHeight: 766,
                 height: "100%",
                 backgroundColor: "#fff",
+                wordWrap: "break-word"
             }}>
             <div style={{ fontSize: 36, height: 56, marginTop: 12, marginBottom: 12, textAlign: 'center', fontWeight: 600, whiteSpace: 'normal' }}>{currentNote.title}</div>
             <div style={{ paddingLeft: 32, paddingRight: 32, width: "100%", textAlign: 'left' }} >
