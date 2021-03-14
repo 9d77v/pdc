@@ -301,7 +301,7 @@ const NoteIndex = () => {
                 }
             >{currentNote.id === 'root' ? "记事本" : ""}
             </NavBar>
-            {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <NotePage />)}
+            {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <div style={{ overflowY: "scroll" }}><NotePage /></div>)}
             {buttons}
         </div>
 
