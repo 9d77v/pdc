@@ -64,57 +64,6 @@ export const recordHistory = async (
     return await request(body, true)
 }
 
-export const syncNotes = async (lastUpdateTime: number, data: any[]) => {
-    const body = JSON.stringify({
-        operationName: "syncNotes",
-        query: `mutation syncNotes($input:SyncNotesInput!){
-\n            syncNotes(input:$input){
-\n                  last_update_time:lastUpdateTime
-\n                  list{
-\n                    id
-\n                    parent_id:parentID
-\n                    uid
-\n                    note_type:noteType
-\n                    level
-\n                    title
-\n                    color
-\n                    state
-\n                    version
-\n                    created_at:createdAt
-\n                    updated_at:updatedAt
-\n                    content
-\n                    tags
-\n                    sha1
-\n                  }
-\n            }
-\n         }`,
-        variables: {
-            "input": {
-                "lastUpdateTime": lastUpdateTime === null ? 0 : lastUpdateTime,
-                "unsyncedNotes": data.map((note: any) => {
-                    return {
-                        id: note.id,
-                        parentID: note.parent_id,
-                        uid: note.uid,
-                        noteType: note.note_type,
-                        level: note.level,
-                        title: note.title,
-                        color: note.color,
-                        state: note.state,
-                        version: note.version,
-                        createdAt: dayjs(note.created_at).unix(),
-                        updatedAt: dayjs(note.updated_at).unix(),
-                        content: note.content || '',
-                        tags: note.tags,
-                        sha1: note.sha1 || '',
-                    }
-                })
-            }
-        }
-    })
-    return await request(body, true)
-}
-
 const request = async (body: string, needToken?: boolean): Promise<any> => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");

@@ -64,7 +64,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
 
     const onContentChange = async () => {
         setTimeout(async () => {
-            const content = form.getFieldValue('content')
+            const content = form.getFieldValue('content').substring(0, 100000);
             await noteStore.updateNoteFile(currentNote.id, currentNote.title || '', content)
             await updateCurrentNote(currentNote.id, true)
             setNoteSyncStatus(SyncStatus.Unsync)
@@ -150,7 +150,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
                 <Form.Item
                     name="content"
                     rules={[{ required: true, message: '请输入内容!' }, {
-                        max: 10000, message: '内容最多10000字'
+                        max: 100000, message: '内容最多100000字'
                     }]}
                 >
                     <textarea
