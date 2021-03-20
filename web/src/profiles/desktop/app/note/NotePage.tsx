@@ -8,7 +8,6 @@ import gfm from 'remark-gfm'
 import Tex from '@matejmazur/react-katex'
 import math from 'remark-math'
 import 'katex/dist/katex.min.css'
-import { isMobile } from 'src/utils/util'
 
 const CodeBlock = React.lazy(() => import('src/components/CodeBlock'))
 const NotePage = () => {

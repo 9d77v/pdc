@@ -152,7 +152,7 @@ const NoteEditForm: FC<INoteEditForm> = ({
                 <textarea
                     style={{ width: "100%", overflow: "auto" }}
                     ref={node => setContentNode(node)}
-                    placeholder="内容" rows={30} id='note-edit-form-content'
+                    placeholder="内容" rows={25} id='note-edit-form-content'
                     onChange={onContentChange} />
             </Form.Item>
         </Form>
