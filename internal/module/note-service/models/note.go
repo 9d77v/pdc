@@ -183,17 +183,19 @@ func (m *Note) canUpdate(in *pb.Note) bool {
 
 //UpdateNotes ...
 func (m *Note) UpdateNotes(notes []*Note) error {
+	now := time.Now()
 	for _, v := range notes {
 		err := m.Table(m.TableName()).IDQuery(v.ID).Updates(map[string]interface{}{
-			"parent_id": v.ParentID,
-			"level":     v.Level,
-			"title":     v.Title,
-			"state":     v.State,
-			"version":   v.Version,
-			"color":     v.Color,
-			"content":   v.Content,
-			"tags":      v.Tags,
-			"sha1":      v.SHA1,
+			"parent_id":  v.ParentID,
+			"level":      v.Level,
+			"title":      v.Title,
+			"state":      v.State,
+			"version":    v.Version,
+			"color":      v.Color,
+			"content":    v.Content,
+			"tags":       v.Tags,
+			"sha1":       v.SHA1,
+			"updated_at": now,
 		})
 		if err != nil {
 			return err
@@ -225,7 +227,8 @@ func (m *Note) GetLatestNotes(notes []*Note) []*Note {
 //DeleteAllChildNodes ...
 func (m *Note) DeleteAllChildNodes() (err error) {
 	err = m.IDQuery(m.ID).Table(m.TableName()).Updates(map[string]interface{}{
-		"state": int8(pb.NoteState_IsDeleted),
+		"state":      int8(pb.NoteState_IsDeleted),
+		"updated_at": time.Now(),
 	})
 	if m.NoteType == int8(pb.NoteType_Directory) {
 		notes, subErr := m.List(m.ID, m.UID)
