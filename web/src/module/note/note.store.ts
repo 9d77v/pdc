@@ -3,7 +3,7 @@ import {
     atom,
 } from 'recoil';
 import { nSQL } from "@nano-sql/core";
-import { getUID, Sha1 } from "src/utils/util";
+import { getUID, randomColor, Sha1 } from "src/utils/util";
 import React from "react";
 import {
     FolderTwoTone, FileTwoTone,
@@ -161,7 +161,7 @@ class NoteStore {
             state: note.state,
             version: 1,
             sync_status: SyncStatus.Unsync,
-            color: note.color,
+            color: randomColor(),
             created_at: now,
             updated_at: now,
         }).exec()
