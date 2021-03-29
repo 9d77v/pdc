@@ -132,12 +132,12 @@ func (m *Note) ListToMap(notes []*Note) map[string]*Note {
 
 //ClassifyNotes classify notes for create,update,delete and client should sync
 func (m *Note) ClassifyNotes(serverNotes []*Note,
-	clientNotes []*pb.Note) ([]*Note, []*Note, []*Note, []*pb.Note) {
+	clientNotes []*pb.Note) ([]*Note, []*Note, []*Note, []*Note) {
 	serverNoteMap := m.ListToMap(serverNotes)
 	createNotes := make([]*Note, 0)
 	updateNotes := make([]*Note, 0)
 	deleteNotes := make([]*Note, 0)
-	clientShouldSyncNotes := make([]*pb.Note, 0)
+	clientShouldSyncNotes := make([]*Note, 0)
 	for _, clientNote := range clientNotes {
 		currentNote := serverNoteMap[clientNote.Id]
 		if currentNote == nil {
@@ -146,7 +146,7 @@ func (m *Note) ClassifyNotes(serverNotes []*Note,
 			createNotes = append(createNotes, NewNoteFromPB(clientNote))
 		} else if clientNote.State == pb.NoteState_IsDeleted {
 			if currentNote.State == int8(pb.NoteState_IsDeleted) {
-				clientShouldSyncNotes = append(clientShouldSyncNotes, clientNote)
+				clientShouldSyncNotes = append(clientShouldSyncNotes, currentNote)
 			} else {
 				deleteNotes = append(deleteNotes, NewNoteFromPB(clientNote))
 			}
@@ -154,18 +154,18 @@ func (m *Note) ClassifyNotes(serverNotes []*Note,
 			clientNote.Version = currentNote.Version + 1
 			updateNotes = append(updateNotes, NewNoteFromPB(clientNote))
 		} else {
-			clientShouldSyncNotes = append(clientShouldSyncNotes, clientNote)
+			clientShouldSyncNotes = append(clientShouldSyncNotes, currentNote)
 		}
 		delete(serverNoteMap, clientNote.Id)
 	}
 	for _, v := range serverNoteMap {
-		clientShouldSyncNotes = append(clientShouldSyncNotes, v.toNotePB())
+		clientShouldSyncNotes = append(clientShouldSyncNotes, v)
 	}
 	return createNotes, updateNotes, deleteNotes, clientShouldSyncNotes
 }
 
 func (m *Note) canUpdate(in *pb.Note) bool {
-	if m.Version > in.Version {
+	if m.Version >= in.Version {
 		return false
 	}
 	if m.Title != in.Title || m.Color != in.Color || m.ParentID != in.ParentId ||
