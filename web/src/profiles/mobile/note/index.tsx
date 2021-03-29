@@ -40,12 +40,17 @@ const NoteIndex = () => {
         if (currentUser.uid !== "") {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
             setNoteSyncStatus(SyncStatus.Syncing)
-            await syncNote(result)
+            try {
+                await syncNote(result)
+                setNoteSyncStatus(SyncStatus.Synced)
+            } catch (error) {
+                setNoteSyncStatus(SyncStatus.Unsync)
+            }
             if (currentNote.note_type === NoteType.Directory) {
                 const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
                 setNotes(notes)
             }
-            setNoteSyncStatus(SyncStatus.Synced)
+            await updateCurrentNote(currentNote.id, currentNote.editable, currentNote.navTitle)
         }
     }
 
@@ -288,7 +293,6 @@ const NoteIndex = () => {
                 icon={<Icon type="left"
                     onClick={() => currentNote.id === 'root' ? history.goBack() : beforeNoteList()} />}
                 onLeftClick={() => beforeNoteList()}
-                leftContent={currentNote.id === 'root' ? '' : <span onClick={beforeNoteList}>{currentNote.navTitle}</span>}
                 rightContent={
                     <Button icon={noteSyncStatus === SyncStatus.Synced ? <CloudTwoTone className="pdc-note-button-icon" /> :
                         <SyncOutlined className="pdc-note-button-icon" style={{ color: "#1890ff" }} spin={noteSyncStatus === SyncStatus.Syncing} />}
@@ -299,9 +303,9 @@ const NoteIndex = () => {
                         }}
                     />
                 }
-            >{currentNote.id === 'root' ? "记事本" : ""}
+            >{currentNote.id === 'root' ? "记事本" : currentNote.navTitle}
             </NavBar>
-            {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <div style={{ overflowY: "scroll" }}><NotePage /></div>)}
+            {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <div style={{ overflowY: "scroll" }}><NotePage hideTitle /></div>)}
             {buttons}
         </div>
 

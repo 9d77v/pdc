@@ -66,6 +66,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
             }, 2000)
         } else if (err.statusCode === 403) {
             message.error("无操作权限")
+        } else {
+            message.error("网络错误")
         }
     } else if (graphQLErrors) {
         graphQLErrors.map(({ message, locations, path }) =>

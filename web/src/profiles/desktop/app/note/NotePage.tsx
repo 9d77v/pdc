@@ -8,9 +8,16 @@ import gfm from 'remark-gfm'
 import Tex from '@matejmazur/react-katex'
 import math from 'remark-math'
 import 'katex/dist/katex.min.css'
+import { FC } from 'react'
+
+interface INotePage {
+    hideTitle?: boolean
+}
 
 const CodeBlock = React.lazy(() => import('src/components/CodeBlock'))
-const NotePage = () => {
+const NotePage: FC<INotePage> = ({
+    hideTitle = false
+}) => {
     const currentNote = useRecoilValue(noteStore.currentNote)
 
     return (
@@ -23,7 +30,7 @@ const NotePage = () => {
                 backgroundColor: "#fff",
                 wordWrap: "break-word"
             }}>
-            <div style={{ fontSize: 36, height: 56, marginTop: 12, marginBottom: 12, textAlign: 'center', fontWeight: 600, whiteSpace: 'normal' }}>{currentNote.title}</div>
+            {hideTitle ? null : <div style={{ fontSize: 36, height: 56, marginTop: 12, marginBottom: 12, textAlign: 'center', fontWeight: 600, whiteSpace: 'normal' }}>{currentNote.title}</div>}
             <div style={{ paddingLeft: 32, paddingRight: 32, width: "100%", textAlign: 'left' }} >
                 <React.Suspense fallback={<Spin />}>
                     <ReactMarkdown

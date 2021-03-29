@@ -29,13 +29,18 @@ const NoteIndex = () => {
         if (currentUser.uid !== "") {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
             setNoteSyncStatus(SyncStatus.Syncing)
-            await syncNote(result)
-            initNoteTree()
+            try {
+                await syncNote(result)
+                setNoteSyncStatus(SyncStatus.Synced)
+            } catch (error) {
+                setNoteSyncStatus(SyncStatus.Unsync)
+            }
             if (currentNote.note_type === NoteType.Directory) {
                 const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
                 setNotes(notes)
             }
-            setNoteSyncStatus(SyncStatus.Synced)
+            initNoteTree()
+            updateCurrentNote(currentNote.id, currentNote.editable)
         }
     }
 
