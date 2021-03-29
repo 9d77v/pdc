@@ -165,7 +165,7 @@ func (m *Note) ClassifyNotes(serverNotes []*Note,
 }
 
 func (m *Note) canUpdate(in *pb.Note) bool {
-	if m.Version >= in.Version {
+	if m.Version > in.Version {
 		return false
 	}
 	if m.Title != in.Title || m.Color != in.Color || m.ParentID != in.ParentId ||
