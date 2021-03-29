@@ -40,6 +40,7 @@ const NoteIndex = () => {
                 setNotes(notes)
             }
             initNoteTree()
+            updateCurrentNote(currentNote.id, currentNote.editable)
         }
     }
 

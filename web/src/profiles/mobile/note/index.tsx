@@ -50,6 +50,7 @@ const NoteIndex = () => {
                 const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
                 setNotes(notes)
             }
+            await updateCurrentNote(currentNote.id, currentNote.editable, currentNote.navTitle)
         }
     }
 
