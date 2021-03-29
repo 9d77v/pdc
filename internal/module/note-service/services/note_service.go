@@ -68,9 +68,9 @@ func (s NoteService) SyncNotes(ctx context.Context,
 		}
 	}
 	notes := m.GetLatestNotes(append(append(createNotes, updateNotes...), deleteNotes...))
-	clientShouldSyncNotes = append(clientShouldSyncNotes, m.ToNotePBs(m.Sorts(notes))...)
+	clientShouldSyncNotes = append(clientShouldSyncNotes, m.Sorts(notes)...)
 	response.LastUpdateTime = ptypes.TimestampNow()
-	response.List = clientShouldSyncNotes
+	response.List = m.ToNotePBs(clientShouldSyncNotes)
 	err = m.Commit()
 	return
 }
