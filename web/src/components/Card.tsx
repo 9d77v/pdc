@@ -4,7 +4,7 @@ import React from "react"
 interface ICardProps {
     title: string
     width: string | number
-    height: number
+    height?: string | number
     cardItems: JSX.Element[]
     onClick?: ((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void) | undefined
 }
