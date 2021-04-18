@@ -34,7 +34,6 @@ const DeviceCameraList = () => {
                 return (<Card
                     key={dataItem.id}
                     title={dataItem.name}
-                    height={300}
                     width={"100%"}
                     cardItems={cardItems}
                 />

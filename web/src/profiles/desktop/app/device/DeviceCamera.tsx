@@ -23,12 +23,12 @@ const DeviceCamera = () => {
         if (data) {
             return data.appDeviceDashboards.edges.map((dataItem: any) => {
                 const cardItems = dataItem.cameras.map((t: any, index: number) => {
-                    return (<div style={{ width: "100%" }} key={index}>
+                    return (<div key={index}>
                         <div style={{ textAlign: "left", margin: 10 }}>{t.deviceName}</div>
                         <LivePlayer
                             url={`/hls/stream${t.deviceID}.m3u8`}
                             height={200}
-                            width={280}
+                            width={300}
                             autoplay={true}
                         />
                     </div>)
@@ -36,8 +36,7 @@ const DeviceCamera = () => {
                 return (<Card
                     key={dataItem.id}
                     title={dataItem.name}
-                    height={320}
-                    width={320}
+                    width={340}
                     cardItems={cardItems}
                 />
                 )
