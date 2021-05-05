@@ -81,8 +81,7 @@ func (s DeviceService) ListDevice(ctx context.Context, in *pb.ListDeviceRequest)
 		in.SearchParam.TableName = m.TableName()
 		m.SelectDeviceType(ptrs.Int64(in.DeviceType))
 	}
-	omitFields := []string{"attributes", "telemetries",
-		"deviceModel"}
+	omitFields := []string{"attributes", "telemetries", "deviceModel"}
 	replaceFunc := func(field base.GraphQLField) error {
 		if in.DeviceType != nil {
 			m.SelectWithPrefix(field.Fields, m.TableName()+".", omitFields...)

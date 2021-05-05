@@ -11,7 +11,7 @@ type NoteHistory struct {
 	base.Model
 	ID        int64     `gorm:"column:id;size:36;NOT NULL;PRIMARY_KEY"`
 	NoteID    string    `gorm:"column:note_id;size:36;NOT NULL;index:note_id"`
-	UID       int64     `gorm:"NOT NULL;index:uid"`
+	UID       int64     `gorm:"NOT NULL;index:note_uid"`
 	Title     string    `gorm:"size:50;NOT NULL"`
 	Content   string    `gorm:"NOT NULL"`
 	Version   int32     `gorm:"NOT NULL"`
