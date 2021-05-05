@@ -38,7 +38,14 @@ protoc-device: api/proto/server/device-service/*.proto
 	--experimental_allow_proto3_optional \
 	api/proto/server/device-service/*.proto
 
-gen:  protoc-iot protoc-device  protoc-note api
+protoc-book: api/proto/server/book-service/*.proto
+	protoc -I./api/proto/server \
+	-I./api/proto/include \
+	--go_out=plugins=grpc:. \
+	--experimental_allow_proto3_optional \
+	api/proto/server/book-service/*.proto
+
+gen:  protoc-iot protoc-device protoc-book protoc-note api
 	echo "generated all code"
 	
 #docker

@@ -17,6 +17,7 @@ import (
 	device_consumers "github.com/9d77v/pdc/internal/module/device-service/consumers"
 	device "github.com/9d77v/pdc/internal/module/device-service/models"
 
+	book "github.com/9d77v/pdc/internal/module/book-service/models"
 	history "github.com/9d77v/pdc/internal/module/history-service/models"
 	note "github.com/9d77v/pdc/internal/module/note-service/models"
 	thing "github.com/9d77v/pdc/internal/module/thing-service/models"
@@ -70,6 +71,11 @@ func autoMergePostgresTables() {
 		//note
 		&note.Note{},
 		&note.NoteHistory{},
+		//book
+		&book.Book{},
+		&book.BookShelf{},
+		&book.BookPosition{},
+		&book.BookBorrowReturn{},
 	)
 	if err != nil {
 		log.Println("auto migrate error:", err)

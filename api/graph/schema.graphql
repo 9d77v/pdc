@@ -26,6 +26,11 @@ type Query {
   deviceDashboards(searchParam:SearchParam!):DeviceDashboardConnection!
   appDeviceDashboards(deviceType: Int):DeviceDashboardConnection!
   cameraTimeLapseVideos(deviceID:Int!):CameraTimeLapseVideoConnection!
+
+  books(searchParam:SearchParam!):BookConnection!
+  bookShelfs(searchParam:SearchParam!):BookShelfConnection!
+  bookPositions(searchParam:SearchParam!,bookID:Int,bookShelfID:Int):BookPositionConnection!
+  bookBorrowReturn(searchParam:SearchParam!,bookID:Int):BookBorrowReturnConnection!
 } 
 
 type Mutation {
@@ -72,4 +77,12 @@ type Mutation {
   cameraCapture(deviceID:Int!):String!
 
   syncNotes(input:SyncNotesInput!): SyncNotesResponse!
+
+  createBookShelf(input:NewBookShelf!):BookShelf!
+  updateBookShelf(input:NewUpdateBookShelf!):BookShelf!
+  createBook(input:NewBook!):Book!
+  createBookPosition(input:NewBookPosition!):BookPosition!
+  updateBookPosition(input:NewUpdateBookPosition!):BookPosition!
+  borrowBook(bookID:Int!,uid:Int!):BookBorrowReturn
+  backBook(bookID:Int!,uid:Int!):BookBorrowReturn
 }

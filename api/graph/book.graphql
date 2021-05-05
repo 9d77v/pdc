@@ -1,0 +1,113 @@
+type Book{
+    id: ID!
+	isbn: String!
+	name: String!
+	desc: String!
+	cover: String!
+	author: [String!]!
+	translator: [String!]!
+	publishingHouse: String!
+	edition: String!
+	printedTimes: String!
+	printedSheets: String!
+	format: String!
+	wordCount: Int!
+	pricing: Float!
+	purchasePrice: Float!
+	purchaseTime: Int!
+	purchaseSource: String!
+	bookBorrowUID: Int!
+    createdAt: Int!
+    updatedAt: Int!
+}
+
+type BookShelf {
+	id: ID!
+	name: String!
+	layerNum: Int!
+	partitionNum: Int!
+    createdAt: Int!
+    updatedAt: Int!
+}
+
+type BookPosition{
+	id: ID!
+	bookShelfID: Int!
+	bookID: Int!
+	layer: Int!
+	partition: Int!
+    createdAt: Int!
+    updatedAt: Int!
+}
+
+type BookBorrowReturn{
+	id: Int!
+	bookID: Int!
+	uid: Int!
+	operation: Int!
+    createdAt: Int!
+}
+
+input  NewBook{
+	isbn: String!
+	name: String!
+	desc: String!
+	cover: String!
+	author: [String!]!
+	translator: [String!]!
+	publishingHouse: String!
+	edition: String!
+	printedTimes: String!
+	printedSheets: String!
+	format: String!
+	wordCount: Int!
+	pricing: Float!
+	purchasePrice: Float!
+	purchaseTime: Int!
+	purchaseSource: String!
+} 
+
+input NewBookShelf {
+	name: String!
+	layerNum: Int!
+	partitionNum: Int!
+}
+
+input NewUpdateBookShelf {
+	id: Int!
+	name: String!
+}
+
+input NewBookPosition{
+	bookShelfID: Int!
+	bookID: Int!
+	layer: Int!
+	partition: Int!
+}
+
+input NewUpdateBookPosition{
+	id: Int!
+	bookShelfID: Int!
+	layer: Int!
+	partition: Int!
+}
+
+type BookConnection {
+  totalCount: Int!
+  edges:[Book!]!
+}
+
+type BookShelfConnection {
+  totalCount: Int!
+  edges:[BookShelf!]!
+}
+
+type BookPositionConnection {
+  totalCount: Int!
+  edges:[BookPosition!]!
+}
+
+type BookBorrowReturnConnection {
+  totalCount: Int!
+  edges:[BookBorrowReturn!]!
+}
