@@ -1,25 +1,21 @@
-import dayjs from "dayjs";
-
-export interface IUser {
+export interface I[[.Name]] {
     uid: string
     name: string
     password: string
     avatar: string
     roleID: number
     gender: number
-    color: string
-    birthDate: dayjs.Dayjs
+    birthDate: number
     ip: string
 }
 
-export interface IUpdateUser {
+export interface IUpdate[[.Name]] {
     id: number
     name: string
     avatar: string
     password: string
     roleID: number
     gender: number
-    color: string
-    birthDate: dayjs.Dayjs
+    birthDate: number
     ip: string
 }

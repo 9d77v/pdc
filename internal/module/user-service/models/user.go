@@ -13,14 +13,14 @@ import (
 //User 用户
 type User struct {
 	base.DefaultModel
-	Name      string `gorm:"size:50;unique;NOT NULL;"`
-	Password  string `gorm:"size:256;NOT NULL;"`
-	Avatar    string `gorm:"size:200;NOT NULL;"`
-	RoleID    int    //用户角色，1：owner，2：manager，3：normal user,4: guest
-	Gender    int    //性别，0:male,1:female，2：unknown
-	Color     string `gorm:"size:50;NOT NULL;"` //favorite color
-	BirthDate time.Time
-	IP        string `gorm:"size:50;NOT NULL;"` //check if user is online
+	Name      string    `gorm:"size:50;unique;NOT NULL;comment:'姓名';"`
+	Password  string    `gorm:"size:256;NOT NULL;comment:'密码'"`
+	Avatar    string    `gorm:"size:200;NOT NULL;comment:'头像'"`
+	RoleID    int       `gorm:"comment:'角色'"` //用户角色，1：owner，2：manager，3：normal user,4: guest
+	Gender    int       `gorm:"comment:'性别'"` //性别，0:male,1:female，2：unknown
+	Color     string    `gorm:"comment:'颜色'"` //favorite color
+	BirthDate time.Time `gorm:"comment:'出生年月'"`
+	IP        string    `gorm:"size:50;NOT NULL;comment:'ip地址'"` //check if user is online
 }
 
 //NewUser ..
