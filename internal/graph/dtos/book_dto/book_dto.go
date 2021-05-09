@@ -1,33 +1,38 @@
 package book_dto
 
 import (
+	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/book-service/pb"
 )
 
-func GetBookConnection(data *pb.ListBookResponse) *model.BookConnection {
+func GetBookConnection(data *pb.ListBookResponse, scheme string) *model.BookConnection {
 	return &model.BookConnection{
 		TotalCount: data.TotalCount,
-		Edges:      toBooks(data.Edges),
+		Edges:      toBooks(data.Edges, scheme),
 	}
 }
 
-func toBooks(data []*pb.Book) []*model.Book {
+func toBooks(data []*pb.Book, scheme string) []*model.Book {
 	result := make([]*model.Book, 0, len(data))
 	for _, v := range data {
-		r := toBook(v)
+		r := toBook(v, scheme)
 		result = append(result, r)
 	}
 	return result
 }
 
-func toBook(book *pb.Book) *model.Book {
+func toBook(book *pb.Book, scheme string) *model.Book {
+	cover := ""
+	if book.Cover != "" {
+		cover = oss.GetOSSPrefixByScheme(scheme) + book.Cover
+	}
 	return &model.Book{
 		ID:              book.Id,
 		Isbn:            book.Isbn,
 		Name:            book.Name,
 		Desc:            book.Desc,
-		Cover:           book.Cover,
+		Cover:           cover,
 		Author:          book.Author,
 		Translator:      book.Translator,
 		PublishingHouse: book.PublishingHouse,

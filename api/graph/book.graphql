@@ -24,6 +24,7 @@ type Book{
 type BookShelf {
 	id: ID!
 	name: String!
+	cover: String!
 	layerNum: Int!
 	partitionNum: Int!
     createdAt: Int!
@@ -67,14 +68,35 @@ input  NewBook{
 	purchaseSource: String!
 } 
 
+input  NewUpdateBook{
+	id: ID!
+	name: String!
+	desc: String!
+	cover: String!
+	author: [String!]!
+	translator: [String!]!
+	publishingHouse: String!
+	edition: String!
+	printedTimes: String!
+	printedSheets: String!
+	format: String!
+	wordCount: Int!
+	pricing: Float!
+	purchasePrice: Float!
+	purchaseTime: Int!
+	purchaseSource: String!
+} 
+
 input NewBookShelf {
 	name: String!
+	cover: String!
 	layerNum: Int!
 	partitionNum: Int!
 }
 
 input NewUpdateBookShelf {
 	id: Int!
+	cover: String!
 	name: String!
 }
 

@@ -18,7 +18,7 @@ type setPresignedURLSignedMsg struct {
 
 func (m *setPresignedURLSignedMsg) sendData(deviceMsg *pb.DeviceUpMsg) {
 	presignedURLMsg := deviceMsg.GetPresignedUrlMsg()
-	requestURL, err := oss.GetPresignedURL(context.Background(), presignedURLMsg.BucketName, presignedURLMsg.ObjectName, "")
+	_, requestURL, err := oss.GetPresignedURL(context.Background(), presignedURLMsg.BucketName, presignedURLMsg.ObjectName, "")
 	if err != nil {
 		return
 	}

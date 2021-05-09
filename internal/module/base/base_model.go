@@ -115,7 +115,10 @@ func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
 func (m *Model) camelToSnack(s string) string {
 	newStr := ""
 	for i := 0; i < len(s); i++ {
-		if unicode.IsUpper(rune(s[i])) {
+		if i+2 < len(s) && unicode.IsUpper(rune(s[i])) && s[i+1:i+3] == "ID" {
+			newStr += "_" + strings.ToLower(s[i:i+3])
+			i += 2
+		} else if unicode.IsUpper(rune(s[i])) {
 			newStr += "_" + strings.ToLower(string(s[i]))
 		} else {
 			newStr += string(s[i])

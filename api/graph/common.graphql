@@ -30,3 +30,8 @@ input SearchParam{
     isRandom: Boolean
     isMobile: Boolean
 }
+
+type PresignedUrlResponse{
+    ok: Boolean!
+    url: String!
+}

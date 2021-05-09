@@ -25,6 +25,38 @@ func (s BookService) CreateBook(ctx context.Context, in *pb.CreateBookRequest) (
 	return resp, err
 }
 
+//UpdateBook ..
+func (s BookService) UpdateBook(ctx context.Context,
+	in *pb.UpdateBookRequest) (*pb.UpdateBookResponse, error) {
+	resp := &pb.UpdateBookResponse{
+		Id: in.Id,
+	}
+	m := models.NewBook()
+	if s.RecordNotExist(m, uint(in.Id)) {
+		return resp, status.Error(codes.NotFound, "数据不存在")
+	}
+	updateMap := map[string]interface{}{
+		"name":             in.Name,
+		"desc":             in.Desc,
+		"author":           &in.Author,
+		"translator":       &in.Translator,
+		"publishing_house": in.PublishingHouse,
+		"edition":          in.Edition,
+		"printed_times":    in.PrintedTimes,
+		"printed_sheets":   in.PrintedSheets,
+		"format":           in.Format,
+		"word_count":       in.WordCount,
+		"pricing":          in.Pricing,
+		"purchase_price":   in.PurchasePrice,
+		"purchase_time":    in.PurchaseTime.AsTime(),
+		"purchase_source":  in.PurchaseSource,
+	}
+	if in.Cover != "" {
+		updateMap["cover"] = in.Cover
+	}
+	return resp, m.Updates(updateMap)
+}
+
 //CreateBookShelf ..
 func (s BookService) CreateBookShelf(ctx context.Context,
 	in *pb.CreateBookShelfRequest) (*pb.CreateBookShelfResponse, error) {
@@ -45,9 +77,13 @@ func (s BookService) UpdateBookShelf(ctx context.Context,
 	if s.RecordNotExist(m, uint(in.Id)) {
 		return resp, status.Error(codes.NotFound, "数据不存在")
 	}
-	return resp, m.Updates(map[string]interface{}{
+	updateMap := map[string]interface{}{
 		"name": in.Name,
-	})
+	}
+	if in.Cover != "" {
+		updateMap["cover"] = in.Cover
+	}
+	return resp, m.Updates(updateMap)
 }
 
 //CreateBookPosition ..
