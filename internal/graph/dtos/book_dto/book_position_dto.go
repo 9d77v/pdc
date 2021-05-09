@@ -23,7 +23,7 @@ func toBookPositions(data []*pb.BookPosition) []*model.BookPosition {
 
 func toBookPosition(bookPosition *pb.BookPosition) *model.BookPosition {
 	return &model.BookPosition{
-		BookShelfID: bookPosition.BookShelfID,
+		BookshelfID: bookPosition.BookshelfId,
 		BookID:      bookPosition.BookID,
 		Layer:       int64(bookPosition.Layer),
 		Partition:   int64(bookPosition.Partition),

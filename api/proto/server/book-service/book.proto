@@ -6,11 +6,11 @@ import "base/base.proto";
 import "google/protobuf/timestamp.proto";
 
 service BookService {
-  rpc CreateBookShelf(CreateBookShelfRequest)
-      returns (CreateBookShelfResponse) {}
-  rpc UpdateBookShelf(UpdateBookShelfRequest)
-      returns (UpdateBookShelfResponse) {}
-  rpc ListBookShelf(ListBookShelfRequest) returns (ListBookShelfResponse) {}
+  rpc CreateBookshelf(CreateBookshelfRequest)
+      returns (CreateBookshelfResponse) {}
+  rpc UpdateBookshelf(UpdateBookshelfRequest)
+      returns (UpdateBookshelfResponse) {}
+  rpc ListBookshelf(ListBookshelfRequest) returns (ListBookshelfResponse) {}
   rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {}
   rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {}
   rpc CreateBookPosition(CreateBookPositionRequest)
@@ -68,23 +68,23 @@ message UpdateBookRequest {
 
 message UpdateBookResponse { int64 id = 1; }
 
-message CreateBookShelfRequest {
+message CreateBookshelfRequest {
   string name = 1;
   string cover = 2;
   int32 layerNum = 3;
   int32 partition_num = 4;
 }
 
-message CreateBookShelfResponse { int64 id = 1; }
-message UpdateBookShelfRequest {
+message CreateBookshelfResponse { int64 id = 1; }
+message UpdateBookshelfRequest {
   int64 id = 1;
   string name = 2;
   string cover = 3;
 }
-message UpdateBookShelfResponse { int64 id = 1; }
+message UpdateBookshelfResponse { int64 id = 1; }
 
 message CreateBookPositionRequest {
-  int64 book_shelf_id = 1;
+  int64 bookshelf_id = 1;
   int64 book_id = 2;
   int32 layer = 3;
   int32 partition = 4;
@@ -93,7 +93,7 @@ message CreateBookPositionResponse { int64 id = 1; }
 
 message UpdateBookPositionRequest {
   int64 id = 1;
-  int64 book_shelf_id = 2;
+  int64 bookshelf_id = 2;
   int32 layer = 3;
   int32 partition = 4;
 }
@@ -111,11 +111,11 @@ message ReturnBookRequest {
 }
 message ReturnBookResponse { int64 id = 1; }
 
-message ListBookShelfRequest { base.SearchParam search_param = 1; }
+message ListBookshelfRequest { base.SearchParam search_param = 1; }
 
-message ListBookShelfResponse {
+message ListBookshelfResponse {
   int64 total_count = 1;
-  repeated BookShelf edges = 2;
+  repeated Bookshelf edges = 2;
 }
 
 message ListBookRequest { base.SearchParam search_param = 1; }
@@ -125,7 +125,7 @@ message ListBookResponse {
   repeated Book edges = 2;
 }
 
-message BookShelf {
+message Bookshelf {
   int64 id = 1;
   string name = 2;
   string cover = 3;
@@ -160,8 +160,8 @@ message Book {
 
 message ListBookPositionRequest {
   base.SearchParam search_param = 1;
-  optional int64 bookID = 2;
-  optional int64 bookShelfID = 3;
+  optional int64 book_id = 2;
+  optional int64 bookshelf_id = 3;
 }
 
 message ListBookPositionResponse {
@@ -171,8 +171,8 @@ message ListBookPositionResponse {
 
 message BookPosition {
   int64 id = 1;
-  int64 bookShelfID = 2;
-  BookShelf bookShelf = 3;
+  int64 bookshelf_id = 2;
+  Bookshelf bookshelf = 3;
   int64 bookID = 4;
   Book book = 5;
   uint32 layer = 6;

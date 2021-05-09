@@ -20,7 +20,10 @@ func TestModel_camelToSnack(t *testing.T) {
 		args   args
 		want   string
 	}{
-		{"test camel to snack", fields{}, args{"ssBBAccd"}, "ss_b_b_accd"},
+		{"test camel to snack", fields{}, args{"ssBaAccd"}, "ss_ba_accd"},
+		{"test camel to snack", fields{}, args{"UID"}, "uid"},
+		{"test camel to snack", fields{}, args{"videoURL"}, "video_url"},
+		{"test camel to snack", fields{}, args{"PID"}, "pid"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

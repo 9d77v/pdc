@@ -73,7 +73,7 @@ func autoMergePostgresTables() {
 		&note.NoteHistory{},
 		//book
 		&book.Book{},
-		&book.BookShelf{},
+		&book.Bookshelf{},
 		&book.BookPosition{},
 		&book.BookBorrowReturn{},
 	)

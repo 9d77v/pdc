@@ -21,7 +21,7 @@ type Book{
     updatedAt: Int!
 }
 
-type BookShelf {
+type Bookshelf {
 	id: ID!
 	name: String!
 	cover: String!
@@ -33,7 +33,7 @@ type BookShelf {
 
 type BookPosition{
 	id: ID!
-	bookShelfID: Int!
+	bookshelfID: Int!
 	bookID: Int!
 	layer: Int!
 	partition: Int!
@@ -87,21 +87,21 @@ input  NewUpdateBook{
 	purchaseSource: String!
 } 
 
-input NewBookShelf {
+input NewBookshelf {
 	name: String!
 	cover: String!
 	layerNum: Int!
 	partitionNum: Int!
 }
 
-input NewUpdateBookShelf {
+input NewUpdateBookshelf {
 	id: Int!
 	cover: String!
 	name: String!
 }
 
 input NewBookPosition{
-	bookShelfID: Int!
+	bookshelfID: Int!
 	bookID: Int!
 	layer: Int!
 	partition: Int!
@@ -109,7 +109,7 @@ input NewBookPosition{
 
 input NewUpdateBookPosition{
 	id: Int!
-	bookShelfID: Int!
+	bookshelfID: Int!
 	layer: Int!
 	partition: Int!
 }
@@ -119,9 +119,9 @@ type BookConnection {
   edges:[Book!]!
 }
 
-type BookShelfConnection {
+type BookshelfConnection {
   totalCount: Int!
-  edges:[BookShelf!]!
+  edges:[Bookshelf!]!
 }
 
 type BookPositionConnection {

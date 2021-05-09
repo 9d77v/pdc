@@ -7,8 +7,8 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-//BookShelf 书架
-type BookShelf struct {
+//Bookshelf 书架
+type Bookshelf struct {
 	base.DefaultModel
 	Name         string `gorm:"size:100;NOT NULL;comment:'书架名'"`
 	Cover        string `gorm:"size:200;NOT NULL;comment:'图片'"`
@@ -16,15 +16,15 @@ type BookShelf struct {
 	PartitionNum int8   `gorm:"comment:'分区数'"`
 }
 
-//NewBookShelf ..
-func NewBookShelf() *BookShelf {
-	m := &BookShelf{}
+//NewBookshelf ..
+func NewBookshelf() *Bookshelf {
+	m := &Bookshelf{}
 	m.SetDB(db.GetDB())
 	return m
 }
 
-func NewBookShelfFromPB(in *pb.CreateBookShelfRequest) *BookShelf {
-	m := &BookShelf{
+func NewBookshelfFromPB(in *pb.CreateBookshelfRequest) *Bookshelf {
+	m := &Bookshelf{
 		Name:         in.Name,
 		Cover:        in.Cover,
 		LayerNum:     int8(in.LayerNum),
@@ -34,24 +34,25 @@ func NewBookShelfFromPB(in *pb.CreateBookShelfRequest) *BookShelf {
 	return m
 }
 
-//ToBookShelfPBs ..
-func (m *BookShelf) ToBookShelfPBs(data []*BookShelf) []*pb.BookShelf {
-	result := make([]*pb.BookShelf, 0, len(data))
+//ToBookshelfPBs ..
+func (m *Bookshelf) ToBookshelfPBs(data []*Bookshelf) []*pb.Bookshelf {
+	result := make([]*pb.Bookshelf, 0, len(data))
 	for _, v := range data {
-		r := m.toBookShelfPB(v)
+		r := m.toBookshelfPB(v)
 		result = append(result, r)
 	}
 	return result
 }
 
-func (m *BookShelf) toBookShelfPB(bookShelf *BookShelf) *pb.BookShelf {
-	createdAt, _ := ptypes.TimestampProto(bookShelf.CreatedAt)
-	updatedAt, _ := ptypes.TimestampProto(bookShelf.UpdatedAt)
-	return &pb.BookShelf{
-		Id:           int64(bookShelf.ID),
-		Name:         bookShelf.Name,
-		LayerNum:     int32(bookShelf.LayerNum),
-		PartitionNum: int32(bookShelf.PartitionNum),
+func (m *Bookshelf) toBookshelfPB(bookshelf *Bookshelf) *pb.Bookshelf {
+	createdAt, _ := ptypes.TimestampProto(bookshelf.CreatedAt)
+	updatedAt, _ := ptypes.TimestampProto(bookshelf.UpdatedAt)
+	return &pb.Bookshelf{
+		Id:           int64(bookshelf.ID),
+		Name:         bookshelf.Name,
+		Cover:        bookshelf.Cover,
+		LayerNum:     int32(bookshelf.LayerNum),
+		PartitionNum: int32(bookshelf.PartitionNum),
 		CreatedAt:    createdAt,
 		UpdatedAt:    updatedAt,
 	}

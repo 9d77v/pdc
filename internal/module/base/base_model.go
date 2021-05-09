@@ -115,17 +115,23 @@ func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
 func (m *Model) camelToSnack(s string) string {
 	newStr := ""
 	for i := 0; i < len(s); i++ {
-		if i+2 < len(s) && unicode.IsUpper(rune(s[i])) && s[i+1:i+3] == "ID" {
-			newStr += "_" + strings.ToLower(s[i:i+3])
-			i += 2
-		} else if unicode.IsUpper(rune(s[i])) {
-			newStr += "_" + strings.ToLower(string(s[i]))
+		if unicode.IsUpper(rune(s[i])) {
+			j := i + 1
+			for ; j < len(s) && unicode.IsUpper(rune(s[j])); j++ {
+			}
+			if j == len(s) {
+				j--
+			}
+			if i != 0 {
+				newStr += "_"
+			}
+			newStr += strings.ToLower(string(s[i : j+1]))
+			i = j
 		} else {
 			newStr += string(s[i])
 		}
 	}
-	newStr = strings.ReplaceAll(newStr, "_i_d", "_id")
-	return strings.ReplaceAll(newStr, "_u_r_l", "_url")
+	return newStr
 }
 
 //Select 选择字段
