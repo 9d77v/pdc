@@ -29,8 +29,7 @@ import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
 import DataAnalysisIndex from './app/user/DataAnalysisIndex'
 import NoteIndex from './app/note'
 import userStore from 'src/module/user/user.store'
-import globalStore from 'src/module/global/global.store';
-import BookTable from './admin/book/book-list/BookTable';
+import globalStore from 'src/module/global/global.store'
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -46,6 +45,10 @@ const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
 
 const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
+
+const BookTable = React.lazy(() => import('./admin/book/book-list/BookTable'))
+const BookshelfTable = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfTable'))
+
 
 const DesktopIndex = () => {
     const setCurrentUserInfo = useSetRecoilState(userStore.currentUserInfo)
@@ -141,6 +144,9 @@ const DesktopIndex = () => {
                         </Route>
                         <Route exact path={AdminPath.BOOK_LIST}>
                             <BookTable />
+                        </Route>
+                        <Route exact path={AdminPath.BOOKSHELF_LIST}>
+                            <BookshelfTable />
                         </Route>
                         <Route exact path={AdminPath.USER_LIST}>
                             <UserTable />

@@ -1,6 +1,6 @@
 import { Modal, Form, Input[[.InputComponents]] } from 'antd'[[.CustomComponents]]
 import { FC, useEffect } from 'react'
-import { IUpdate[[.Name]] } from 'src/module/[[.LowerName]]/[[.LowerName]].model'
+import { IUpdate[[.Name]] } from 'src/module/[[.Module]]/[[.LowerName]].model'
 
 interface I[[.Name]]UpdateFormProps {
     visible: boolean

@@ -1,6 +1,6 @@
 import { Modal, Form, Input[[.InputComponents]] } from 'antd'[[.CustomComponents]]
 import { FC } from 'react'
-import { I[[.Name]] } from 'src/module/[[.LowerName]]/[[.LowerName]].model'
+import { I[[.Name]] } from 'src/module/[[.Module]]/[[.LowerName]].model'
 
 interface I[[.Name]]CreateFormProps {
     visible: boolean
