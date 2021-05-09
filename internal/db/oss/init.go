@@ -96,18 +96,22 @@ func InitMinioBuckets() {
 }
 
 //GetPresignedURL ..
-func GetPresignedURL(ctx context.Context, bucketName, objectName, scheme string) (string, error) {
+func GetPresignedURL(ctx context.Context, bucketName, objectName, scheme string) (bool, string, error) {
 	var minioClient *minio.Client
 	if scheme == "https" {
 		minioClient = GetSecureMinioClient()
 	} else {
 		minioClient = GetMinioClient()
 	}
+	_, err := minioClient.StatObject(ctx, bucketName, objectName, minio.StatObjectOptions{})
+	if err == nil {
+		return true, fmt.Sprintf("/%s/%s", bucketName, objectName), nil
+	}
 	u, err := minioClient.PresignedPutObject(ctx, bucketName, objectName, 6*time.Hour)
 	if err != nil {
-		return "", err
+		return true, "", err
 	}
-	return u.String(), nil
+	return false, u.String(), nil
 }
 
 //GetOSSPrefix ..

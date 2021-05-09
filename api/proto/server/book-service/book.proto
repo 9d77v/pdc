@@ -12,6 +12,7 @@ service BookService {
       returns (UpdateBookShelfResponse) {}
   rpc ListBookShelf(ListBookShelfRequest) returns (ListBookShelfResponse) {}
   rpc CreateBook(CreateBookRequest) returns (CreateBookResponse) {}
+  rpc UpdateBook(UpdateBookRequest) returns (UpdateBookResponse) {}
   rpc CreateBookPosition(CreateBookPositionRequest)
       returns (CreateBookPositionResponse) {}
   rpc UpdateBookPosition(UpdateBookPositionRequest)
@@ -46,16 +47,39 @@ message CreateBookRequest {
 
 message CreateBookResponse { int64 id = 1; }
 
+message UpdateBookRequest {
+  int64 id = 1;
+  string name = 2;
+  string desc = 3;
+  string cover = 4;
+  repeated string author = 5;
+  repeated string translator = 6;
+  string publishing_house = 7;
+  string edition = 8;
+  string printed_times = 9;
+  string printed_sheets = 10;
+  string format = 11;
+  int64 word_count = 12;
+  double pricing = 13;
+  double purchase_price = 14;
+  google.protobuf.Timestamp purchase_time = 15;
+  string purchase_source = 16;
+}
+
+message UpdateBookResponse { int64 id = 1; }
+
 message CreateBookShelfRequest {
   string name = 1;
-  int32 layerNum = 2;
-  int32 partition_num = 3;
+  string cover = 2;
+  int32 layerNum = 3;
+  int32 partition_num = 4;
 }
 
 message CreateBookShelfResponse { int64 id = 1; }
 message UpdateBookShelfRequest {
   int64 id = 1;
   string name = 2;
+  string cover = 3;
 }
 message UpdateBookShelfResponse { int64 id = 1; }
 
@@ -104,10 +128,11 @@ message ListBookResponse {
 message BookShelf {
   int64 id = 1;
   string name = 2;
-  int32 layerNum = 3;
-  int32 partition_num = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
+  string cover = 3;
+  int32 layerNum = 4;
+  int32 partition_num = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
 
 message Book {

@@ -3,7 +3,7 @@
 # https://gqlgen.com/getting-started/
 
 type Query {
-  presignedUrl(bucketName:String!,objectName:String!):String!
+  presignedUrl(bucketName:String!,objectName:String!):PresignedUrlResponse!
 
   users(searchParam:SearchParam!):UserConnection!
   userInfo(uid:ID):User!
@@ -81,6 +81,7 @@ type Mutation {
   createBookShelf(input:NewBookShelf!):BookShelf!
   updateBookShelf(input:NewUpdateBookShelf!):BookShelf!
   createBook(input:NewBook!):Book!
+  updateBook(input:NewUpdateBook!):Book!
   createBookPosition(input:NewBookPosition!):BookPosition!
   updateBookPosition(input:NewUpdateBookPosition!):BookPosition!
   borrowBook(bookID:Int!,uid:Int!):BookBorrowReturn

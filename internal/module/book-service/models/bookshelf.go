@@ -11,6 +11,7 @@ import (
 type BookShelf struct {
 	base.DefaultModel
 	Name         string `gorm:"size:100;NOT NULL;comment:'书架名'"`
+	Cover        string `gorm:"size:200;NOT NULL;comment:'图片'"`
 	LayerNum     int8   `gorm:"comment:'层数'"`
 	PartitionNum int8   `gorm:"comment:'分区数'"`
 }
@@ -25,6 +26,7 @@ func NewBookShelf() *BookShelf {
 func NewBookShelfFromPB(in *pb.CreateBookShelfRequest) *BookShelf {
 	m := &BookShelf{
 		Name:         in.Name,
+		Cover:        in.Cover,
 		LayerNum:     int8(in.LayerNum),
 		PartitionNum: int8(in.PartitionNum),
 	}

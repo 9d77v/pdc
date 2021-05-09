@@ -307,6 +307,29 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) 
 	return &model.Book{ID: resp.GetId()}, err
 }
 
+func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdateBook) (*model.Book, error) {
+	t, _ := ptypes.TimestampProto(time.Unix(input.PurchaseTime, 0))
+	resp, err := bookService.UpdateBook(ctx, &bookPB.UpdateBookRequest{
+		Id:              input.ID,
+		Name:            input.Name,
+		Desc:            input.Desc,
+		Cover:           input.Cover,
+		Author:          input.Author,
+		Translator:      input.Translator,
+		PublishingHouse: input.PublishingHouse,
+		Edition:         input.Edition,
+		PrintedTimes:    input.PrintedTimes,
+		PrintedSheets:   input.PrintedSheets,
+		Format:          input.Format,
+		WordCount:       input.WordCount,
+		Pricing:         input.Pricing,
+		PurchasePrice:   input.PurchasePrice,
+		PurchaseTime:    t,
+		PurchaseSource:  input.PurchaseSource,
+	})
+	return &model.Book{ID: resp.GetId()}, err
+}
+
 func (r *mutationResolver) CreateBookPosition(ctx context.Context, input model.NewBookPosition) (*model.BookPosition, error) {
 	resp, err := bookService.CreateBookPosition(ctx, &bookPB.CreateBookPositionRequest{
 		BookShelfId: input.BookShelfID,
@@ -343,9 +366,14 @@ func (r *mutationResolver) BackBook(ctx context.Context, bookID int64, uid int64
 	return &model.BookBorrowReturn{ID: resp.Id}, err
 }
 
-func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (string, error) {
+func (r *queryResolver) PresignedURL(ctx context.Context, bucketName string, objectName string) (*model.PresignedURLResponse, error) {
 	scheme := middleware.ForSchemeContext(ctx)
-	return oss.GetPresignedURL(ctx, bucketName, objectName, scheme)
+	ok, url, err := oss.GetPresignedURL(ctx, bucketName, objectName, scheme)
+	resp := &model.PresignedURLResponse{
+		Ok:  ok,
+		URL: url,
+	}
+	return resp, err
 }
 
 func (r *queryResolver) Users(ctx context.Context, searchParam model.SearchParam) (*model.UserConnection, error) {
@@ -475,14 +503,16 @@ func (r *queryResolver) Books(ctx context.Context, searchParam model.SearchParam
 	resp, err := bookService.ListBook(context.Background(), &bookPB.ListBookRequest{
 		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
 	})
-	return book_dto.GetBookConnection(resp), err
+	scheme := middleware.ForSchemeContext(ctx)
+	return book_dto.GetBookConnection(resp, scheme), err
 }
 
 func (r *queryResolver) BookShelfs(ctx context.Context, searchParam model.SearchParam) (*model.BookShelfConnection, error) {
 	resp, err := bookService.ListBookShelf(context.Background(), &bookPB.ListBookShelfRequest{
 		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
 	})
-	return book_dto.GetBookShelfConnection(resp), err
+	scheme := middleware.ForSchemeContext(ctx)
+	return book_dto.GetBookShelfConnection(resp, scheme), err
 }
 
 func (r *queryResolver) BookPositions(ctx context.Context, searchParam model.SearchParam, bookID *int64, bookShelfID *int64) (*model.BookPositionConnection, error) {
