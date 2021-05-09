@@ -1,6 +1,7 @@
-import { Form, Input, Switch, DatePicker, Select } from 'antd'
-import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
-import { Uploader } from 'src/components/Uploader'
+import { Form, Input, Switch, Select } from 'antd'
+import { DatePicker } from 'src/components'
+import { forwardRef, Ref, useImperativeHandle, useState } from 'react'
+import { Uploader } from 'src/components'
 
 
 const { TextArea } = Input

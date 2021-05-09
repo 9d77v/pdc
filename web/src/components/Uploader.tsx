@@ -7,6 +7,7 @@ import crypto from 'crypto'
 import { getVttFromFile, getType } from 'src/utils/subtitle';
 import { getTextFromFile, replaceURL } from 'src/utils/file';
 import { supportedSubtitleSuffix } from 'src/consts/consts';
+import { uuid } from '@nano-sql/core/lib/utilities';
 
 interface UploaderProps {
     fileLimit: number
@@ -16,11 +17,11 @@ interface UploaderProps {
     setURL: (e: any) => any
 }
 
-
-export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPrefix, validFileTypes, setURL }) => {
+const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPrefix, validFileTypes, setURL }) => {
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
+    const [uploading, setUploading] = useState(true)
     const emptyFile: UploadFile = { uid: "", size: 0, name: "", type: "" }
     const [succeedFile, setSucceedFile] = useState(emptyFile)
     let isMulti = false
@@ -62,11 +63,13 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
             }
             if (fileLimit === 1) {
                 if (fileURLs.length === 1) {
+                    console.log(fileURLs[0])
                     setURL(fileURLs[0])
                 } else {
                     setURL("")
                 }
             } else {
+                console.log(fileURLs)
                 setURL(fileURLs)
             }
         }
@@ -97,7 +100,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
             showRemoveIcon: true,
         },
         beforeUpload: (file: File) => {
-            return new Promise<File>(async (resolve) => {
+            return new Promise<File | boolean>(async (resolve) => {
                 let fileType = getType(file)
                 if (isSubtitleType(fileType)) {
                     const vttText = await getVttFromFile(file);
@@ -123,8 +126,27 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
                 }
                 fileName = filePathPrefix === undefined ? fileName : filePathPrefix + fileName
                 const data = await getUploadURL(bucketName, fileName);
-                setAction(data.data.presignedUrl)
-                resolve(file);
+                if (data.data.presignedUrl.ok) {
+                    const url = data.data.presignedUrl.url
+                    const newFile: UploadFile = {
+                        uid: uuid(),
+                        size: file.size,
+                        name: file.name,
+                        type: file.type
+                    }
+                    if (fileLimit === 1) {
+                        setURL(url)
+                        setFileList([newFile])
+                    } else {
+                        newFile.status = 'done';
+                        newFile.url = url
+                        setFileList([...fileList, newFile])
+                    }
+                    resolve(false)
+                } else {
+                    setAction(data.data.presignedUrl.url)
+                    resolve(file)
+                }
             });
         },
         onSuccess: (response: any, file: UploadFile) => {
@@ -132,6 +154,7 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
             const index = action.indexOf("?")
             const url = replaceURL(action.substring(0, index))
             if (fileLimit === 1) {
+                console.log(url)
                 setURL(url)
                 setFileList([file])
             } else {
@@ -201,3 +224,5 @@ export const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, fileP
         </Upload.Dragger>
     )
 }
+
+export default Uploader

@@ -1,6 +1,6 @@
 import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
-import React, { useState, useEffect, FC } from 'react'
-import { Uploader } from 'src/components/Uploader'
+import { useState, useEffect, FC } from 'react'
+import { Uploader } from 'src/components'
 import { Episode } from 'src/models/video'
 import { SubtitleForm } from './SubtitleForm'
 import {
@@ -178,10 +178,10 @@ export const EpisodeUpdateForm: FC<IEpisodeUpdateFormProps> = ({
                                     ))}
                                 </ul>
                             ) : (
-                                    <Typography.Text className="ant-form-text" type="secondary">
-                                        暂无字幕
-                                    </Typography.Text>
-                                )
+                                <Typography.Text className="ant-form-text" type="secondary">
+                                    暂无字幕
+                                </Typography.Text>
+                            )
                         }}
                     </Form.Item>
 

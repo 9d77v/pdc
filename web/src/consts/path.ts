@@ -40,6 +40,10 @@ const AdminPath = {
     DEVICE_MODEL_LIST: "/admin/device/device-model-list",
     DEVICE_DASHBOARD_LIST: "/admin/device/device-dashboard-list",
     DEVICE_LIST: "/admin/device/device-list",
+    BOOK: "/admin/book",
+    BOOK_LIST: "/admin/book/book-list",
+    BOOKSHELF_LIST: "/admin/book/bookshelf-list",
+    BOOK_BORROW_RETURN_LIST: "/admin/book/book-borrow-return-list",
     USER: "/admin/user",
     USER_LIST: "/admin/user/user-list"
 }
@@ -75,6 +79,10 @@ const PathDict = new Map<string, string>([
     [AdminPath.DEVICE_LIST, '设备列表'],
     [AdminPath.DEVICE_MODEL_LIST, '设备模板列表'],
     [AdminPath.DEVICE_DASHBOARD_LIST, '设备仪表盘'],
+    [AdminPath.BOOK, '书籍管理'],
+    [AdminPath.BOOK_LIST, '书籍列表'],
+    [AdminPath.BOOKSHELF_LIST, '书架列表'],
+    [AdminPath.BOOK_BORROW_RETURN_LIST, '书籍借还列表'],
     [AdminPath.USER, '用户管理'],
     [AdminPath.USER_LIST, '用户列表'],
 ])

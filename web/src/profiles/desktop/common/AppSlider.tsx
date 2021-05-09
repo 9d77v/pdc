@@ -1,4 +1,3 @@
-import React from 'react'
 import {
     PlaySquareOutlined, UserOutlined, LockOutlined,
     ProfileOutlined, HomeOutlined, DashboardOutlined, ToolOutlined,
@@ -122,6 +121,14 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["settings-device"],
         "defaultSelectedKeys": ['device-dashboard-list']
     }],
+    [AdminPath.BOOK, {
+        "defaultOpenKeys": ["settings-book"],
+        "defaultSelectedKeys": ['book-list']
+    }],
+    [AdminPath.BOOK_LIST, {
+        "defaultOpenKeys": ["settings-book"],
+        "defaultSelectedKeys": ['book-list']
+    }],
     [AdminPath.USER, {
         "defaultOpenKeys": ["settings-user"],
         "defaultSelectedKeys": ['user-list']
@@ -235,6 +242,7 @@ const AppMenu = (props: IAppHeaderProps) => {
             </SubMenu>
             <SubMenu
                 key="user"
+                style={{ display: loginDisplay }}
                 title={
                     <span>
                         <UserOutlined />
@@ -340,7 +348,26 @@ const AdminMenu = (props: IAppHeaderProps) => {
                 <Menu.Item key="device-model-list" >
                     <Link to={AdminPath.DEVICE_MODEL_LIST}>{PathDict.get(AdminPath.DEVICE_MODEL_LIST)}</Link>
                 </Menu.Item>
-
+            </SubMenu>
+            <SubMenu
+                key="settings-book"
+                style={{ display: adminDisplay }}
+                title={
+                    <span>
+                        <BookOutlined />
+                        <span>{PathDict.get(AdminPath.BOOK)}</span>
+                    </span>
+                }
+            >
+                <Menu.Item key="book-list" >
+                    <Link to={AdminPath.BOOK_LIST}>{PathDict.get(AdminPath.BOOK_LIST)}</Link>
+                </Menu.Item>
+                <Menu.Item key="bookshelf-list" >
+                    <Link to={AdminPath.BOOKSHELF_LIST}>{PathDict.get(AdminPath.BOOKSHELF_LIST)}</Link>
+                </Menu.Item>
+                <Menu.Item key="book-borrow-return-list" >
+                    <Link to={AdminPath.BOOK_BORROW_RETURN_LIST}>{PathDict.get(AdminPath.BOOK_BORROW_RETURN_LIST)}</Link>
+                </Menu.Item>
             </SubMenu>
         </Menu>
     )

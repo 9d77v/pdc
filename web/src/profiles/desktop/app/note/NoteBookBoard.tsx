@@ -178,11 +178,11 @@ const NoteBookBoard: FC<INoteBookBoardProps> = ({ updateCurrentNote, initNoteTre
         setLevelTwoBook(await noteStore.findLevelTwoBooks("root", currentUser.uid))
         setMoveNoteVisible(true)
     }
-
     const copyNote = async (item: INote) => {
-        await noteStore.copyNote(item, currentUser.uid)
+        const id = await noteStore.copyNote(item, currentUser.uid)
         await refreshNoteBoard()
         setNoteSyncStatus(SyncStatus.Unsync)
+        await updateCurrentNote(id, true)
     }
 
     const refreshNoteBoard = async () => {

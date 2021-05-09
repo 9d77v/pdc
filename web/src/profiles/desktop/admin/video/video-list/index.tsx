@@ -1,5 +1,5 @@
 import { Table, Button, message, Tag, Modal } from 'antd'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { useMutation } from '@apollo/react-hooks'
 import { EpisodeCreateForm } from './EpisodeCreateForm'
@@ -313,7 +313,8 @@ export default function VideoTable() {
         {
             title: '总话数', dataIndex: 'total', key: 'total',
             render: (value: number, record: any) => record.episodes.length
-        }, {
+        },
+        {
             title: '标签', dataIndex: 'tags', key: 'tags',
             render: (values: string[], record: any) => {
                 if (values) {
@@ -328,7 +329,8 @@ export default function VideoTable() {
                 }
                 return <div />
             }
-        }, {
+        },
+        {
             title: '是否显示', dataIndex: 'isShow', key: 'isShow',
             render: (value: Boolean, record: any) => (
                 value ? "是" : "否"

@@ -1,6 +1,6 @@
 import { Modal, Form, Input, Radio } from 'antd'
-import React, { FC, useState } from 'react'
-import { Uploader } from 'src/components/Uploader'
+import { FC, useState } from 'react'
+import { Uploader } from 'src/components'
 import { supportedSubtitleTypes } from 'src/consts/consts'
 
 interface ISubtitleUpdateFormProps {

@@ -1,3 +1,5 @@
+import dayjs from "dayjs"
+
 export interface IUser {
     uid: string
     name: string
@@ -5,7 +7,8 @@ export interface IUser {
     avatar: string
     roleID: number
     gender: number
-    birthDate: number
+    color: string
+    birthDate?: dayjs.Dayjs
     ip: string
 }
 
@@ -16,6 +19,7 @@ export interface IUpdateUser {
     password: string
     roleID: number
     gender: number
-    birthDate: number
+    color: string
+    birthDate?: dayjs.Dayjs
     ip: string
 }

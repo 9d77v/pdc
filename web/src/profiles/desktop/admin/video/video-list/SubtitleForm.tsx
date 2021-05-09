@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, FC } from 'react'
+import { useState, useRef, useEffect, FC } from 'react'
 import { Modal, Form, Radio } from 'antd'
-import { Uploader } from 'src/components/Uploader'
+import { Uploader } from 'src/components'
 import { supportedSubtitleTypes } from 'src/consts/consts'
 
 interface IModalFormProps {

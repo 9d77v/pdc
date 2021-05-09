@@ -1,16 +1,14 @@
 import React from "react"
 
-
 interface ICardProps {
     title: string
     width: string | number
-    height: number
+    height?: string | number
     cardItems: JSX.Element[]
     onClick?: ((event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void) | undefined
 }
 
-
-export const Card: React.FC<ICardProps> = ({
+const Card: React.FC<ICardProps> = ({
     title,
     width,
     height,
@@ -41,3 +39,4 @@ export const Card: React.FC<ICardProps> = ({
         </div >
     )
 }
+export default Card

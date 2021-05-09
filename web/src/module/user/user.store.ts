@@ -15,7 +15,8 @@ class UserStore {
             avatar: "",
             roleID: 0,
             gender: 0,
-            birthDate: 0,
+            color: "",
+            birthDate: undefined,
             ip: "",
         },
     })

@@ -14,7 +14,7 @@ interface PieProps {
     style?: React.CSSProperties
 }
 
-export const Pie: React.FC<PieProps> = ({
+const Pie: React.FC<PieProps> = ({
     title,
     name,
     data,
@@ -61,3 +61,5 @@ export const Pie: React.FC<PieProps> = ({
         option={option}
         style={style} />)
 }
+
+export default Pie

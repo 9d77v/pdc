@@ -9,7 +9,9 @@ import {
     FolderTwoTone, FileTwoTone,
 } from '@ant-design/icons';
 import dayjs from "dayjs";
-
+import { diaryRegex } from "src/consts/regex";
+require('dayjs/locale/zh-cn')
+dayjs.locale('zh-cn')
 class NoteStore {
     currentNote = atom<INote>({
         key: 'currentNote',
@@ -147,14 +149,40 @@ class NoteStore {
         }).exec()
     }
 
+    //新副本标题，
+    //1.默认最前方添加‘副本’二字
+    //2.存在数字时，返回数字加1
+    //3.为日期时返回下一日起
+    newCopyTitle = (title: string) => {
+        let newTitle = "副本 " + title
+        const reg = /\d+(\.\d+)?/g
+        const arr = title?.match(reg)
+        if (arr?.length === 1) {
+            newTitle = title?.replace(reg, (parseInt(arr[0]) + 1).toString()) || "副本 " + title
+        } else if (arr?.length === 2 && diaryRegex.test(title)) {
+            const year = dayjs().year()
+            let month = arr[0]
+            let day = arr[1]
+            if (month.length === 1) {
+                month = parseInt('0' + month).toString()
+            }
+            if (day.length === 1) {
+                day = parseInt('0' + day).toString()
+            }
+            newTitle = dayjs(year + '-' + month + '-' + day).add(1, 'day').format('MM月DD日 dddd')
+        }
+        return newTitle
+    }
+
     copyNote = async (note: INote, uid: string) => {
         const now = dayjs().toISOString()
-        await nSQL("note").query('upsert', {
+
+        let data: any[] = await nSQL("note").query('upsert', {
             parent_id: note.parent_id,
             uid: uid,
             note_type: NoteType.File,
             level: note.level,
-            title: "副本 " + note.title,
+            title: this.newCopyTitle(note.title || ''),
             content: note.content,
             sha1: note.sha1,
             tags: note.tags,
@@ -165,6 +193,7 @@ class NoteStore {
             created_at: now,
             updated_at: now,
         }).exec()
+        return data[0].id
     }
 
     hideNote = async (id: string) => {
