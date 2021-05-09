@@ -8,8 +8,8 @@ import { Img } from 'src/components'
 import { BookUpdateForm } from './BookUpdateForm'
 import { TablePaginationConfig } from 'antd/lib/table'
 import Search from 'antd/lib/input/Search'
-import { ADD_BOOK, UPDATE_BOOK } from 'src/gqls/book/mutation'
-import { LIST_BOOK } from 'src/gqls/book/query'
+import { ADD_BOOK, UPDATE_BOOK } from 'src/gqls/book/book.mutation'
+import { LIST_BOOK } from 'src/gqls/book/book.query'
 import { IUpdateBook, IBook } from 'src/module/book/book.model'
 
 export default function BookTable() {

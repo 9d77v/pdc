@@ -82,7 +82,7 @@ const PathDict = new Map<string, string>([
     [AdminPath.BOOK, '书籍管理'],
     [AdminPath.BOOK_LIST, '书籍列表'],
     [AdminPath.BOOKSHELF_LIST, '书架列表'],
-    [AdminPath.BOOK_BORROW_RETURN_LIST, '书籍借还列表'],
+    [AdminPath.BOOK_BORROW_RETURN_LIST, '书籍借阅列表'],
     [AdminPath.USER, '用户管理'],
     [AdminPath.USER_LIST, '用户列表'],
 ])

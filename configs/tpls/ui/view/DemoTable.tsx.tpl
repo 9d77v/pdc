@@ -7,9 +7,9 @@ import dayjs from 'dayjs'
 import { [[.Name]]UpdateForm } from './[[.Name]]UpdateForm'
 import { TablePaginationConfig } from 'antd/lib/table'
 import Search from 'antd/lib/input/Search'
-import { ADD_[[.TitleName]], UPDATE_[[.TitleName]] } from 'src/gqls/[[.LowerName]]/mutation'
-import { LIST_[[.TitleName]] } from 'src/gqls/[[.LowerName]]/query'
-import { IUpdate[[.Name]], I[[.Name]] } from 'src/module/[[.LowerName]]/[[.LowerName]].model'
+import { ADD_[[.TitleName]], UPDATE_[[.TitleName]] } from 'src/gqls/[[.Module]]/[[.LowerName]].mutation'
+import { LIST_[[.TitleName]] } from 'src/gqls/[[.Module]]/[[.LowerName]].query'
+import { IUpdate[[.Name]], I[[.Name]] } from 'src/module/[[.Module]]/[[.LowerName]].model'
 
 export default function [[.Name]]Table() {
     const [visible, setVisible] = useState(false)

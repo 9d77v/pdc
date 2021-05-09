@@ -129,6 +129,10 @@ const locationMap = new Map<string, any>([
         "defaultOpenKeys": ["settings-book"],
         "defaultSelectedKeys": ['book-list']
     }],
+    [AdminPath.BOOKSHELF_LIST, {
+        "defaultOpenKeys": ["settings-book"],
+        "defaultSelectedKeys": ['bookshelf-list']
+    }],
     [AdminPath.USER, {
         "defaultOpenKeys": ["settings-user"],
         "defaultSelectedKeys": ['user-list']

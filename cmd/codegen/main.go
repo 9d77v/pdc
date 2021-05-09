@@ -9,26 +9,26 @@ import (
 )
 
 func main() {
-	input := codegen.GetInput(&models.Book{}, "书籍")
+	input := codegen.GetInput(&models.BookShelf{}, "book", "书架")
 	generateGqls(input)
 	generateModel(input)
 	generateView(input)
 }
 
 func generateGqls(input *codegen.Input) {
-	outPutPath := fmt.Sprintf("web/src/gqls/%s", input.LowerName)
+	outPutPath := fmt.Sprintf("web/src/gqls/%s", input.Module)
 	os.MkdirAll(outPutPath, os.ModePerm)
 	codegen.GenerateCode(input, "configs/tpls/ui/gqls", outPutPath)
 }
 
 func generateModel(input *codegen.Input) {
-	outPutPath := fmt.Sprintf("web/src/module/%s", input.LowerName)
+	outPutPath := fmt.Sprintf("web/src/module/%s", input.Module)
 	os.MkdirAll(outPutPath, os.ModePerm)
 	codegen.GenerateCode(input, "configs/tpls/ui/module", outPutPath)
 }
 
 func generateView(input *codegen.Input) {
-	outPutPath := fmt.Sprintf("web/src/profiles/desktop/admin/%s/%s-list", input.LowerName, input.LowerName)
+	outPutPath := fmt.Sprintf("web/src/profiles/desktop/admin/%s/%s-list", input.Module, input.LowerName)
 	os.MkdirAll(outPutPath, os.ModePerm)
 	codegen.GenerateCode(input, "configs/tpls/ui/view", outPutPath)
 }

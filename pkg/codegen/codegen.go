@@ -12,6 +12,7 @@ import (
 )
 
 type Input struct {
+	Module           string
 	ModuleName       string
 	Name             string
 	LowerName        string
@@ -51,7 +52,7 @@ var typeMap = map[string]string{
 	"Time":        "dayjs.Dayjs",
 }
 
-func GetInput(data interface{}, moduleName string) *Input {
+func GetInput(data interface{}, module, moduleName string) *Input {
 	t := reflect.TypeOf(data).Elem()
 	columns := []*Column{}
 	inputComponentMap := map[string]bool{}
@@ -106,6 +107,7 @@ func GetInput(data interface{}, moduleName string) *Input {
 		cc = "\nimport { " + strings.Join(customComponents, ", ") + " } from 'src/components'"
 	}
 	return &Input{
+		Module:           module,
 		ModuleName:       moduleName,
 		Name:             t.Name(),
 		LowerName:        strings.ToLower(t.Name()),
