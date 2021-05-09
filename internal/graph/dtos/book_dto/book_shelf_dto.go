@@ -6,28 +6,28 @@ import (
 	"github.com/9d77v/pdc/internal/module/book-service/pb"
 )
 
-func GetBookShelfConnection(data *pb.ListBookShelfResponse, scheme string) *model.BookShelfConnection {
-	return &model.BookShelfConnection{
+func GetBookshelfConnection(data *pb.ListBookshelfResponse, scheme string) *model.BookshelfConnection {
+	return &model.BookshelfConnection{
 		TotalCount: data.TotalCount,
-		Edges:      toBookShelfs(data.Edges, scheme),
+		Edges:      toBookshelfs(data.Edges, scheme),
 	}
 }
 
-func toBookShelfs(data []*pb.BookShelf, scheme string) []*model.BookShelf {
-	result := make([]*model.BookShelf, 0, len(data))
+func toBookshelfs(data []*pb.Bookshelf, scheme string) []*model.Bookshelf {
+	result := make([]*model.Bookshelf, 0, len(data))
 	for _, v := range data {
-		r := toBookShelf(v, scheme)
+		r := toBookshelf(v, scheme)
 		result = append(result, r)
 	}
 	return result
 }
 
-func toBookShelf(bookShelf *pb.BookShelf, scheme string) *model.BookShelf {
+func toBookshelf(bookShelf *pb.Bookshelf, scheme string) *model.Bookshelf {
 	cover := ""
 	if bookShelf.Cover != "" {
 		cover = oss.GetOSSPrefixByScheme(scheme) + bookShelf.Cover
 	}
-	return &model.BookShelf{
+	return &model.Bookshelf{
 		ID:           bookShelf.Id,
 		Name:         bookShelf.Name,
 		Cover:        cover,

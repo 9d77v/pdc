@@ -11,16 +11,16 @@ import (
 type BookPosition struct {
 	base.DefaultModel
 	BookID      uint `gorm:"uniqueIndex:book_position_uix;comment:'书id'"`
-	BookShelfID uint `gorm:"comment:'书架id'"`
+	BookshelfID uint `gorm:"comment:'书架id'"`
 	Book
-	BookShelf
+	Bookshelf
 	Layer     int8 `gorm:"comment:'层'"`
 	Partition int8 `gorm:"comment:'分区'"`
 }
 
 func NewBookPositionFromPB(in *pb.CreateBookPositionRequest) *BookPosition {
 	m := &BookPosition{
-		BookShelfID: uint(in.BookShelfId),
+		BookshelfID: uint(in.BookshelfId),
 		BookID:      uint(in.BookId),
 		Layer:       int8(in.Layer),
 		Partition:   int8(in.Partition),
@@ -49,9 +49,9 @@ func (m *BookPosition) toBookPositionPB(bookPosition *BookPosition) *pb.BookPosi
 	createdAt, _ := ptypes.TimestampProto(bookPosition.CreatedAt)
 	updatedAt, _ := ptypes.TimestampProto(bookPosition.UpdatedAt)
 	return &pb.BookPosition{
-		BookShelfID: int64(bookPosition.BookShelfID),
-		BookShelf: &pb.BookShelf{
-			Name: bookPosition.BookShelf.Name,
+		BookshelfId: int64(bookPosition.BookshelfID),
+		Bookshelf: &pb.Bookshelf{
+			Name: bookPosition.Bookshelf.Name,
 		},
 		BookID: int64(bookPosition.BookID),
 		Book: &pb.Book{

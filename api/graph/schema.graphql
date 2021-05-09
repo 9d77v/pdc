@@ -28,8 +28,8 @@ type Query {
   cameraTimeLapseVideos(deviceID:Int!):CameraTimeLapseVideoConnection!
 
   books(searchParam:SearchParam!):BookConnection!
-  bookShelfs(searchParam:SearchParam!):BookShelfConnection!
-  bookPositions(searchParam:SearchParam!,bookID:Int,bookShelfID:Int):BookPositionConnection!
+  bookshelfs(searchParam:SearchParam!):BookshelfConnection!
+  bookPositions(searchParam:SearchParam!,bookID:Int,bookshelfID:Int):BookPositionConnection!
   bookBorrowReturn(searchParam:SearchParam!,bookID:Int):BookBorrowReturnConnection!
 } 
 
@@ -78,8 +78,8 @@ type Mutation {
 
   syncNotes(input:SyncNotesInput!): SyncNotesResponse!
 
-  createBookShelf(input:NewBookShelf!):BookShelf!
-  updateBookShelf(input:NewUpdateBookShelf!):BookShelf!
+  createBookshelf(input:NewBookshelf!):Bookshelf!
+  updateBookshelf(input:NewUpdateBookshelf!):Bookshelf!
   createBook(input:NewBook!):Book!
   updateBook(input:NewUpdateBook!):Book!
   createBookPosition(input:NewBookPosition!):BookPosition!

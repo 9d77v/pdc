@@ -267,21 +267,23 @@ func (r *mutationResolver) SyncNotes(ctx context.Context, input model.SyncNotesI
 	return note_dto.GetSyncNotesResponseConnection(resp), err
 }
 
-func (r *mutationResolver) CreateBookShelf(ctx context.Context, input model.NewBookShelf) (*model.BookShelf, error) {
-	resp, err := bookService.CreateBookShelf(ctx, &bookPB.CreateBookShelfRequest{
+func (r *mutationResolver) CreateBookshelf(ctx context.Context, input model.NewBookshelf) (*model.Bookshelf, error) {
+	resp, err := bookService.CreateBookshelf(ctx, &bookPB.CreateBookshelfRequest{
 		Name:         input.Name,
+		Cover:        input.Cover,
 		LayerNum:     int32(input.LayerNum),
 		PartitionNum: int32(input.PartitionNum),
 	})
-	return &model.BookShelf{ID: resp.GetId()}, err
+	return &model.Bookshelf{ID: resp.GetId()}, err
 }
 
-func (r *mutationResolver) UpdateBookShelf(ctx context.Context, input model.NewUpdateBookShelf) (*model.BookShelf, error) {
-	resp, err := bookService.UpdateBookShelf(ctx, &bookPB.UpdateBookShelfRequest{
-		Id:   input.ID,
-		Name: input.Name,
+func (r *mutationResolver) UpdateBookshelf(ctx context.Context, input model.NewUpdateBookshelf) (*model.Bookshelf, error) {
+	resp, err := bookService.UpdateBookshelf(ctx, &bookPB.UpdateBookshelfRequest{
+		Id:    input.ID,
+		Name:  input.Name,
+		Cover: input.Cover,
 	})
-	return &model.BookShelf{ID: resp.GetId()}, err
+	return &model.Bookshelf{ID: resp.GetId()}, err
 }
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
@@ -332,7 +334,7 @@ func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdate
 
 func (r *mutationResolver) CreateBookPosition(ctx context.Context, input model.NewBookPosition) (*model.BookPosition, error) {
 	resp, err := bookService.CreateBookPosition(ctx, &bookPB.CreateBookPositionRequest{
-		BookShelfId: input.BookShelfID,
+		BookshelfId: input.BookshelfID,
 		BookId:      input.BookID,
 		Layer:       int32(input.Layer),
 		Partition:   int32(input.Partition),
@@ -343,7 +345,7 @@ func (r *mutationResolver) CreateBookPosition(ctx context.Context, input model.N
 func (r *mutationResolver) UpdateBookPosition(ctx context.Context, input model.NewUpdateBookPosition) (*model.BookPosition, error) {
 	resp, err := bookService.UpdateBookPosition(ctx, &bookPB.UpdateBookPositionRequest{
 		Id:          input.ID,
-		BookShelfId: input.BookShelfID,
+		BookshelfId: input.BookshelfID,
 		Layer:       int32(input.Layer),
 		Partition:   int32(input.Partition),
 	})
@@ -507,19 +509,19 @@ func (r *queryResolver) Books(ctx context.Context, searchParam model.SearchParam
 	return book_dto.GetBookConnection(resp, scheme), err
 }
 
-func (r *queryResolver) BookShelfs(ctx context.Context, searchParam model.SearchParam) (*model.BookShelfConnection, error) {
-	resp, err := bookService.ListBookShelf(context.Background(), &bookPB.ListBookShelfRequest{
+func (r *queryResolver) Bookshelfs(ctx context.Context, searchParam model.SearchParam) (*model.BookshelfConnection, error) {
+	resp, err := bookService.ListBookshelf(context.Background(), &bookPB.ListBookshelfRequest{
 		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
 	})
 	scheme := middleware.ForSchemeContext(ctx)
-	return book_dto.GetBookShelfConnection(resp, scheme), err
+	return book_dto.GetBookshelfConnection(resp, scheme), err
 }
 
-func (r *queryResolver) BookPositions(ctx context.Context, searchParam model.SearchParam, bookID *int64, bookShelfID *int64) (*model.BookPositionConnection, error) {
+func (r *queryResolver) BookPositions(ctx context.Context, searchParam model.SearchParam, bookID *int64, bookshelfID *int64) (*model.BookPositionConnection, error) {
 	resp, err := bookService.ListBookPosition(context.Background(), &bookPB.ListBookPositionRequest{
 		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
-		BookID:      bookID,
-		BookShelfID: bookShelfID,
+		BookId:      bookID,
+		BookshelfId: bookshelfID,
 	})
 	return book_dto.GetBookPositionConnection(resp), err
 }

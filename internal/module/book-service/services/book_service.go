@@ -57,23 +57,23 @@ func (s BookService) UpdateBook(ctx context.Context,
 	return resp, m.Updates(updateMap)
 }
 
-//CreateBookShelf ..
-func (s BookService) CreateBookShelf(ctx context.Context,
-	in *pb.CreateBookShelfRequest) (*pb.CreateBookShelfResponse, error) {
-	resp := new(pb.CreateBookShelfResponse)
-	m := models.NewBookShelfFromPB(in)
+//CreateBookshelf ..
+func (s BookService) CreateBookshelf(ctx context.Context,
+	in *pb.CreateBookshelfRequest) (*pb.CreateBookshelfResponse, error) {
+	resp := new(pb.CreateBookshelfResponse)
+	m := models.NewBookshelfFromPB(in)
 	err := m.Create(m)
 	resp.Id = int64(m.ID)
 	return resp, err
 }
 
-//UpdateBookShelf ..
-func (s BookService) UpdateBookShelf(ctx context.Context,
-	in *pb.UpdateBookShelfRequest) (*pb.UpdateBookShelfResponse, error) {
-	resp := &pb.UpdateBookShelfResponse{
+//UpdateBookshelf ..
+func (s BookService) UpdateBookshelf(ctx context.Context,
+	in *pb.UpdateBookshelfRequest) (*pb.UpdateBookshelfResponse, error) {
+	resp := &pb.UpdateBookshelfResponse{
 		Id: in.Id,
 	}
-	m := models.NewBookShelf()
+	m := models.NewBookshelf()
 	if s.RecordNotExist(m, uint(in.Id)) {
 		return resp, status.Error(codes.NotFound, "数据不存在")
 	}
@@ -105,7 +105,7 @@ func (s BookService) UpdateBookPosition(ctx context.Context,
 		return resp, status.Error(codes.NotFound, "数据不存在")
 	}
 	return resp, m.Updates(map[string]interface{}{
-		"book_shelf_id": in.BookShelfId,
+		"book_shelf_id": in.BookshelfId,
 		"layer":         in.Layer,
 		"partition":     in.Partition,
 	})
@@ -189,15 +189,15 @@ func (s BookService) ListBook(ctx context.Context, in *pb.ListBookRequest) (*pb.
 	return resp, err
 }
 
-//ListBookShelf ..
-func (s BookService) ListBookShelf(ctx context.Context, in *pb.ListBookShelfRequest) (*pb.ListBookShelfResponse, error) {
-	resp := new(pb.ListBookShelfResponse)
-	m := models.NewBookShelf()
+//ListBookshelf ..
+func (s BookService) ListBookshelf(ctx context.Context, in *pb.ListBookshelfRequest) (*pb.ListBookshelfResponse, error) {
+	resp := new(pb.ListBookshelfResponse)
+	m := models.NewBookshelf()
 	m.FuzzyQuery(in.SearchParam.Keyword, "name")
-	data := make([]*models.BookShelf, 0)
+	data := make([]*models.Bookshelf, 0)
 	total, err := s.GetNewConnection(m, in.SearchParam, &data, nil)
 	resp.TotalCount = total
-	resp.Edges = m.ToBookShelfPBs(data)
+	resp.Edges = m.ToBookshelfPBs(data)
 	return resp, err
 }
 
@@ -206,11 +206,11 @@ func (s BookService) ListBookPosition(ctx context.Context, in *pb.ListBookPositi
 	resp := new(pb.ListBookPositionResponse)
 	m := models.NewBookPosition()
 	m.FuzzyQuery(in.SearchParam.Keyword, "name")
-	if in.BookID != nil {
-		m.IDQuery(*in.BookID, "book_id")
+	if in.BookId != nil {
+		m.IDQuery(*in.BookId, "book_id")
 	}
-	if in.BookShelfID != nil {
-		m.IDQuery(*in.BookShelfID, "book_shelf_id")
+	if in.BookshelfId != nil {
+		m.IDQuery(*in.BookshelfId, "book_shelf_id")
 	}
 	data := make([]*models.BookPosition, 0)
 	replaceFunc := func(field base.GraphQLField) error {
@@ -218,7 +218,7 @@ func (s BookService) ListBookPosition(ctx context.Context, in *pb.ListBookPositi
 			m.Preload("Book")
 		}
 		if field.FieldMap["bookShelf"] {
-			m.Preload("BookShelf")
+			m.Preload("Bookshelf")
 		}
 		return nil
 	}
@@ -243,7 +243,7 @@ func (s BookService) ListBookBorrowReturn(ctx context.Context, in *pb.ListBookBo
 			m.Preload("Book")
 		}
 		if field.FieldMap["bookShelf"] {
-			m.Preload("BookShelf")
+			m.Preload("Bookshelf")
 		}
 		return nil
 	}
