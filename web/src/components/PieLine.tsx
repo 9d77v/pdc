@@ -17,7 +17,7 @@ interface PieProps {
     style?: React.CSSProperties
 }
 
-export const PieLine: React.FC<PieProps> = ({
+const PieLine: React.FC<PieProps> = ({
     title,
     start,
     group,
@@ -160,3 +160,5 @@ const FormatData = (data: PieLineSerieData, start: dayjs.Dayjs, unit: string, gr
         source: source
     }
 }
+
+export default PieLine

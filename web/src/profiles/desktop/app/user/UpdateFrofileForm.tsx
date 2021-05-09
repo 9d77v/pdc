@@ -1,8 +1,8 @@
-import { Form, Input, Button, Select, DatePicker, message } from 'antd'
-import React, { useState, useEffect, FC } from 'react'
+import { Form, Input, Button, Select, message } from 'antd'
+import { DatePicker } from 'src/components'
+import { useState, useEffect, FC } from 'react'
 import { GenderMap } from "src/consts/consts"
-import { Uploader } from "src/components/Uploader"
-import dayjs from 'dayjs'
+import { Uploader } from "src/components"
 import { useMutation } from '@apollo/react-hooks'
 import { UPDATE_PROFILE } from 'src/gqls/user/mutation'
 import userStore from 'src/module/user/user.store'
@@ -74,7 +74,7 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = (props: IUpdateProfileFor
         form.setFieldsValue({
             name: currentUserInfo.name,
             gender: currentUserInfo.gender,
-            birthDate: dayjs(currentUserInfo.birthDate * 1000),
+            birthDate: currentUserInfo.birthDate,
             ip: currentUserInfo.ip
         })
     }, [form, currentUserInfo])

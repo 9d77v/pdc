@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from "dayjs"
 
 export interface IUser {
     uid: string
@@ -8,7 +8,7 @@ export interface IUser {
     roleID: number
     gender: number
     color: string
-    birthDate: dayjs.Dayjs
+    birthDate?: dayjs.Dayjs
     ip: string
 }
 
@@ -20,6 +20,6 @@ export interface IUpdateUser {
     roleID: number
     gender: number
     color: string
-    birthDate: dayjs.Dayjs
+    birthDate?: dayjs.Dayjs
     ip: string
 }

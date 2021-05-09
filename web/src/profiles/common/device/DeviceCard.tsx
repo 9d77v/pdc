@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef, useMemo } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { useQuery } from "@apollo/react-hooks";
 import useWebSocket from "react-use-websocket";
 import { iotTelemetrySocketURL } from "src/utils/ws_client";
 import { pb } from "src/pb/compiled";
 import "src/styles/card.less"
 import { blobToArrayBuffer } from "src/utils/file";
-import { Card } from "src/components/Card";
+import { Card } from "src/components";
 import { GET_MOBILE_HOME_DEVICES } from "src/gqls/device/query";
 
 interface IDeviceCardsProps {

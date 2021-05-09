@@ -1,4 +1,4 @@
-import { Table, Button, message } from 'antd'
+import { Table, Button, message[[.ShowComponents]] } from 'antd'
 import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { [[.Name]]CreateForm } from './[[.Name]]CreateForm'
@@ -21,14 +21,13 @@ export default function [[.Name]]Table() {
         showSizeChanger: true,
         total: 0
     })
-    const [update[[.Name]]Data, setUpdate[[.Name]]Data] = useState({
-        id: 0,
-[[range .Columns]][[if eq .Type "Time"]]
-        [[.Name]]: dayjs(0),[[else if eq .Type "int"]]
-        [[.Name]]: 0,
-    [[else]]    
-        [[.Name]]: "",
-[[end]][[end]]    })
+    const [update[[.Name]]Data, setUpdate[[.Name]]Data] = useState<IUpdate[[.Name]]>({
+        id: 0,[[range .Columns]][[if eq .TSType "dayjs.Dayjs"]]
+        [[.Name]]: undefined,[[else if eq .TSType "number"]]
+        [[.Name]]: 0,[[else if eq .TSType "string[]"]]
+        [[.Name]]: [],[[else]]    
+        [[.Name]]: "",[[end]][[end]]    
+    })
     const [keyword, setKeyword] = useState("")
     const [add[[.Name]]] = useMutation(ADD_[[.TitleName]])
     const [update[[.Name]]] = useMutation(UPDATE_[[.TitleName]])
@@ -48,16 +47,13 @@ export default function [[.Name]]Table() {
             fetchPolicy: "cache-and-network"
         })
 
-
     const on[[.Name]]Create = async (values: I[[.Name]]) => {
         await add[[.Name]]({
             variables: {
-                "input": {
-                [[range .Columns]][[if eq .Type "Time"]]
-                    "[[.Name]]": values.[[.Name]].unix(),
-                [[else]]    
-                    "[[.Name]]": values.[[.Name]],
-            [[end]][[end]]    }
+                "input": {[[range .Columns]][[if eq .Type "Time"]]
+                    "[[.Name]]": values.[[.Name]] ? values.[[.Name]].unix() : 0,[[else]]    
+                    "[[.Name]]": values.[[.Name]],[[end]][[end]]    
+                }
             }
         })
         setVisible(false)
@@ -69,9 +65,9 @@ export default function [[.Name]]Table() {
             variables: {
                 "input": {
                     "id": values.id,[[range .Columns]][[if eq .Type "Time"]]
-                    "[[.Name]]": values.[[.Name]].unix(),[[else]]    
-                    "[[.Name]]": values.[[.Name]],
-                [[end]][[end]]    }
+                    "[[.Name]]": values.[[.Name]] ? values.[[.Name]].unix() : 0,[[else]]    
+                    "[[.Name]]": values.[[.Name]],[[end]][[end]]    
+                }
             }
         })
         setUpdate[[.Name]]Visible(false)
@@ -111,30 +107,54 @@ export default function [[.Name]]Table() {
             }
         })
     }
+
     useEffect(() => {
         if (error) {
             message.error("接口请求失败！")
         }
     }, [error])
-    const columns = [
-        { title: '名称', dataIndex: 'name', key: 'name', width: 200 },
+
+    const columns = [ 
+        { title: 'ID', dataIndex: 'id', key: 'id', width: 80, fixed: "left" as const },[[range .Columns]][[if eq .TSType "dayjs.Dayjs"]]
         {
-            title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 160,
+            title: '[[.Comment]]', dataIndex: '[[.Name]]', key: '[[.Name]]', width: 140,
+            render: (value: number) => value ? dayjs(value * 1000).format("YYYY年MM月DD日") : ""
+        },[[else if eq .TSType "string[]"]]
+         {
+            title: '[[.Comment]]', dataIndex: '[[.Name]]', key: '[[.Name]]', width: 100,
+            render: (values: string[], record: any) => {
+                if (values) {
+                    const tagNodes = values.map((value: string, index: number) => {
+                        return (
+                            <Tag color={'cyan'} key={"[[.Name]]_" + record.id + "_" + index}>
+                                {value}
+                            </Tag>
+                        )
+                    })
+                    return <div>{tagNodes}</div>
+                }
+                return <div />
+            }
+        }, [[else]]    
+        { title: '[[.Comment]]', dataIndex: '[[.Name]]', key: '[[.Name]]', width: 100 },[[end]][[end]]  
+        {
+            title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 170,
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
-            title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt', width: 160,
+            title: '更新时间', dataIndex: 'updatedAt', key: 'updatedAt', width: 170,
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
         },
         {
             title: '操作', dataIndex: 'operation', key: 'operation', fixed: "right" as const, width: 120,
-            render: (value: any, record: IUpdate[[.Name]]) =>
+            render: (value: any, record: any) =>
                 <span><Button
                     onClick={() => {
                         setUpdate[[.Name]]Data({
-                            "id": record.id,
-                        [[range .Columns]]    "[[.Name]]": record.[[.Name]],
-                    [[end]]    })
+                            "id": record.id,[[range .Columns]][[if eq .TSType "dayjs.Dayjs"]]
+                            "[[.Name]]": record.[[.Name]] ? dayjs(record.[[.Name]] * 1000) : undefined,[[else]]
+                            "[[.Name]]": record.[[.Name]],[[end]][[end]] 
+                        })
                         setUpdate[[.Name]]Visible(true)
                     }}>编辑[[.ModuleName]]</Button>
                 </span>

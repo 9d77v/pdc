@@ -37,14 +37,12 @@ protoc-device: api/proto/server/device-service/*.proto
 	--go_out=plugins=grpc:. \
 	--experimental_allow_proto3_optional \
 	api/proto/server/device-service/*.proto
-
 protoc-book: api/proto/server/book-service/*.proto
 	protoc -I./api/proto/server \
 	-I./api/proto/include \
 	--go_out=plugins=grpc:. \
 	--experimental_allow_proto3_optional \
 	api/proto/server/book-service/*.proto
-
 gen:  protoc-iot protoc-device protoc-book protoc-note api
 	echo "generated all code"
 	

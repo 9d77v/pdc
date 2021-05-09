@@ -1,13 +1,14 @@
-import { Modal, Form, Input, Select, DatePicker } from 'antd';
-import React, { FC, useState } from 'react'
-import { GenderMap, RoleMap } from 'src/consts/consts';
-import { Uploader } from 'src/components/Uploader';
-import { IUser } from 'src/module/user/user.model';
+import { Modal, Form, Input, Select } from 'antd'
+import { DatePicker } from 'src/components'
+import { FC, useState } from 'react'
+import { GenderMap, RoleMap } from 'src/consts/consts'
+import { Uploader } from 'src/components'
+import { IUser } from 'src/module/user/user.model'
 
 interface IUserCreateFormProps {
-    visible: boolean;
-    onCreate: (values: IUser) => void;
-    onCancel: () => void;
+    visible: boolean
+    onCreate: (values: IUser) => void
+    onCancel: () => void
 }
 
 export const UserCreateForm: FC<IUserCreateFormProps> = ({
@@ -15,7 +16,7 @@ export const UserCreateForm: FC<IUserCreateFormProps> = ({
     onCreate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [url, setUrl] = useState('')
     const layout = {
         labelCol: { span: 5 },
@@ -54,12 +55,12 @@ export const UserCreateForm: FC<IUserCreateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onCreate(values);
+                        form.resetFields()
+                        onCreate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setUrl('')
             }}
             maskClosable={false}
@@ -128,5 +129,5 @@ export const UserCreateForm: FC<IUserCreateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

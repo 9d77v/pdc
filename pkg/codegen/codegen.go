@@ -12,17 +12,21 @@ import (
 )
 
 type Input struct {
-	ModuleName string
-	Name       string
-	LowerName  string
-	TitleName  string
-	Columns    []*Column
-	Components string
+	ModuleName       string
+	Name             string
+	LowerName        string
+	TitleName        string
+	Columns          []*Column
+	InputComponents  string
+	ShowComponents   string
+	CustomComponents string
+	HasTime          string
 }
 
 type Column struct {
 	Name    string
 	Type    string
+	TSType  string
 	Comment string
 }
 
@@ -36,36 +40,81 @@ const (
 	delimiterRight = "]]"
 )
 
+var typeMap = map[string]string{
+	"string":      "string",
+	"StringArray": "string[]",
+	"uint":        "number",
+	"int":         "number",
+	"int8":        "number",
+	"float32":     "number",
+	"float64":     "number",
+	"Time":        "dayjs.Dayjs",
+}
+
 func GetInput(data interface{}, moduleName string) *Input {
 	t := reflect.TypeOf(data).Elem()
 	columns := []*Column{}
-	componentMap := map[string]bool{}
+	inputComponentMap := map[string]bool{}
+	customComponentMap := map[string]bool{}
+	showComponentsMap := map[string]bool{}
+	importDayjs := ""
 	for i := 1; i < t.NumField(); i++ {
 		if strings.Contains(string(t.Field(i).Tag), "comment") {
-			if t.Field(i).Type.Name() == "Time" && !componentMap["DatePicker"] {
-				componentMap["DatePicker"] = true
+			tsType := typeMap[t.Field(i).Type.Name()]
+			if tsType == "dayjs.Dayjs" && !customComponentMap["DatePicker"] {
+				customComponentMap["DatePicker"] = true
+				importDayjs = "import dayjs from 'dayjs'"
+			} else if tsType == "string[]" && !inputComponentMap["Select"] {
+				inputComponentMap["Select"] = true
+			} else if tsType == "number" && !inputComponentMap["InputNumber"] {
+				inputComponentMap["InputNumber"] = true
+			}
+			if tsType == "string[]" && !showComponentsMap["Tag"] {
+				showComponentsMap["Tag"] = true
 			}
 			columns = append(columns, &Column{
 				Name:    formatFieldName(t.Field(i).Name),
 				Type:    t.Field(i).Type.Name(),
+				TSType:  tsType,
 				Comment: strings.Split(string(t.Field(i).Tag), "'")[1],
 			})
 		}
 	}
-	components := make([]string, len(componentMap))
+	inputComponents := make([]string, len(inputComponentMap))
+	customComponents := make([]string, len(customComponentMap))
+	showComponents := make([]string, len(showComponentsMap))
 	i := 0
-	for k := range componentMap {
-		components[i] = k
+	for k := range inputComponentMap {
+		inputComponents[i] = k
 		i++
 	}
-	sort.Strings(components)
+	i = 0
+	for k := range showComponentsMap {
+		showComponents[i] = k
+		i++
+	}
+	i = 0
+	for k := range customComponentMap {
+		customComponents[i] = k
+		i++
+	}
+	sort.Strings(inputComponents)
+	sort.Strings(showComponents)
+	sort.Strings(customComponents)
+	cc := ""
+	if len(customComponents) > 0 {
+		cc = "\nimport { " + strings.Join(customComponents, ", ") + " } from 'src/components'"
+	}
 	return &Input{
-		ModuleName: moduleName,
-		Name:       t.Name(),
-		LowerName:  strings.ToLower(t.Name()),
-		TitleName:  strings.ToTitle(t.Name()),
-		Columns:    columns,
-		Components: ", " + strings.Join(components, ", "),
+		ModuleName:       moduleName,
+		Name:             t.Name(),
+		LowerName:        strings.ToLower(t.Name()),
+		TitleName:        strings.ToTitle(t.Name()),
+		Columns:          columns,
+		InputComponents:  ", " + strings.Join(inputComponents, ", "),
+		ShowComponents:   ", " + strings.Join(showComponents, ", "),
+		CustomComponents: cc,
+		HasTime:          importDayjs,
 	}
 }
 
@@ -93,10 +142,17 @@ func GenerateCode(input *Input, tplPath, outputPath string) {
 	if err != nil {
 		log.Println("walk filepath failed:", err)
 	}
-
 	for _, v := range files {
+		if v.RawName == "form.tpl" {
+			continue
+		}
 		log.Println(v.FileName)
-		t, err := template.New(v.RawName).Delims(delimiterLeft, delimiterRight).ParseFiles(tplPath + "/" + v.RawName)
+		parseFiles := []string{tplPath + "/" + v.RawName}
+		if strings.Contains(v.FileName, "Form") {
+			parseFiles = append(parseFiles, tplPath+"/"+"form.tpl")
+		}
+		t, err := template.New(v.RawName).Delims(delimiterLeft, delimiterRight).
+			ParseFiles(parseFiles...)
 		if err != nil {
 			log.Println("parse file failed:", err)
 		}

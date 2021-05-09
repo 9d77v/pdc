@@ -21,11 +21,13 @@ export const DeviceDashboardUpdateForm: FC<IDeviceDashboardUpdateFormProps> = ({
         wrapperCol: { span: 15 },
     }
     useEffect(() => {
-        form.setFieldsValue({
-            "id": data.id,
-            "name": data.name,
-            "isVisible": data.isVisible
-        })
+        setTimeout(() => {
+            form.setFieldsValue({
+                "id": data.id,
+                "name": data.name,
+                "isVisible": data.isVisible
+            })
+        }, 3000);
     }, [form, data]);
     return (
         <Modal

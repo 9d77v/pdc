@@ -1,4 +1,4 @@
-import { Modal, Form, Input[[.Components]] } from 'antd'
+import { Modal, Form, Input[[.InputComponents]] } from 'antd'[[.CustomComponents]]
 import { FC, useEffect } from 'react'
 import { IUpdate[[.Name]] } from 'src/module/[[.LowerName]]/[[.LowerName]].model'
 
@@ -22,10 +22,9 @@ export const [[.Name]]UpdateForm: FC<I[[.Name]]UpdateFormProps> = ({
     }
     useEffect(() => {
         form.setFieldsValue({
-            "id": data.id,
-            [[range .Columns]]
-            "[[.Name]]": data.[[.Name]],
-        [[end]]})
+            "id": data.id,[[range .Columns]]
+            "[[.Name]]": data.[[.Name]],[[end]]
+        })
     }, [form, data])
     return (
         <Modal
@@ -65,16 +64,8 @@ export const [[.Name]]UpdateForm: FC<I[[.Name]]UpdateFormProps> = ({
                     noStyle
                 >
                     <Input hidden />
-                </Form.Item>[[range .Columns]]
-                <Form.Item
-                    name="[[.Name]]"
-                    label="[[.Comment]]"
-                    rules={[{ required: true, message: '请输入[[.Comment]]!' }]}
-                >
-                [[if eq .Type "Time"]]    <DatePicker />
-            [[else]]    <Input />,
-            [[end]]    </Form.Item>
-            [[end]]</Form>
+                </Form.Item>[[template "form" .]]
+            </Form>
         </Modal>
     )
 }

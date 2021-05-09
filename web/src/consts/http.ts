@@ -7,7 +7,10 @@ export const getUploadURL = async (bucketName: String, fileName: String) => {
     const body = JSON.stringify({
         operationName: "presignedUrl",
         query: ` query presignedUrl($bucketName: String!,$objectName:String!) {
- \n    presignedUrl(bucketName: $bucketName, objectName: $objectName)
+ \n    presignedUrl(bucketName: $bucketName, objectName: $objectName){
+    \n               ok
+    \n               url
+    \n            }
  \n  }`,
         variables: {
             "bucketName": bucketName,

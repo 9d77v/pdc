@@ -1,6 +1,6 @@
 import { Form, Radio } from 'antd'
-import React, { forwardRef, Ref, useImperativeHandle, useState } from 'react'
-import { Uploader } from 'src/components/Uploader'
+import { forwardRef, Ref, useImperativeHandle, useState } from 'react'
+import { Uploader } from 'src/components'
 import { supportedSubtitleTypes } from 'src/consts/consts'
 
 const VideoCreateStepThreeForm = (props: any, ref: Ref<any>) => {

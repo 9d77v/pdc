@@ -6,7 +6,7 @@ export interface ILongPressActionProps {
     onLongPress: () => void
 }
 
-export class LongPressAction extends React.Component<ILongPressActionProps> {
+export default class LongPressAction extends React.Component<ILongPressActionProps> {
 
     private buttonPressTimer: any
 

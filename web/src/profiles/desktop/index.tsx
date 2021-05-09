@@ -30,6 +30,7 @@ import DataAnalysisIndex from './app/user/DataAnalysisIndex'
 import NoteIndex from './app/note'
 import userStore from 'src/module/user/user.store'
 import globalStore from 'src/module/global/global.store';
+import BookTable from './admin/book/book-list/BookTable';
 
 const VideoTable = React.lazy(() => import('./admin/video/video-list'))
 const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
@@ -137,6 +138,9 @@ const DesktopIndex = () => {
                         </Route>
                         <Route exact path={AdminPath.DEVICE_LIST}>
                             <DeviceIndex />
+                        </Route>
+                        <Route exact path={AdminPath.BOOK_LIST}>
+                            <BookTable />
                         </Route>
                         <Route exact path={AdminPath.USER_LIST}>
                             <UserTable />

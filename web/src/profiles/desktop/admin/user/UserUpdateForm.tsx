@@ -1,16 +1,15 @@
-import { Modal, Form, Input, Select, DatePicker } from 'antd';
-import React, { FC, useEffect, useState } from 'react'
-import { GenderMap, RoleMap, FullRoleMap } from 'src/consts/consts';
-import { Uploader } from 'src/components/Uploader';
-import dayjs from 'dayjs';
-import { IUpdateUser } from 'src/module/user/user.model';
-
+import { Modal, Form, Input, Select } from 'antd'
+import { DatePicker } from 'src/components'
+import { FC, useEffect, useState } from 'react'
+import { GenderMap, RoleMap, FullRoleMap } from 'src/consts/consts'
+import { Uploader } from 'src/components'
+import { IUpdateUser } from 'src/module/user/user.model'
 
 interface IUserUpdateFormProps {
-    visible: boolean;
+    visible: boolean
     data: IUpdateUser,
-    onUpdate: (values: IUpdateUser) => void;
-    onCancel: () => void;
+    onUpdate: (values: IUpdateUser) => void
+    onCancel: () => void
 }
 
 export const UserUpdateForm: FC<IUserUpdateFormProps> = ({
@@ -19,7 +18,7 @@ export const UserUpdateForm: FC<IUserUpdateFormProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [form] = Form.useForm();
+    const [form] = Form.useForm()
     const [url, setUrl] = useState('')
     const layout = {
         labelCol: { span: 5 },
@@ -32,11 +31,10 @@ export const UserUpdateForm: FC<IUserUpdateFormProps> = ({
             "password": data.password,
             "roleID": data.roleID,
             "gender": data.gender,
-            "birthDate": dayjs(data.birthDate * 1000),
+            "birthDate": data.birthDate,
             "ip": data.ip,
         })
-    }, [form, data]);
-
+    }, [form, data])
     let genderOptions: any[] = []
     GenderMap.forEach((value: string, key: number) => {
         genderOptions.push(<Select.Option
@@ -78,12 +76,12 @@ export const UserUpdateForm: FC<IUserUpdateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields();
-                        onUpdate(values);
+                        form.resetFields()
+                        onUpdate(values)
                     })
                     .catch(info => {
-                        console.log('Validate Failed:', info);
-                    });
+                        console.log('Validate Failed:', info)
+                    })
                 setUrl('')
             }}
             maskClosable={false}
@@ -156,5 +154,5 @@ export const UserUpdateForm: FC<IUserUpdateFormProps> = ({
                 </Form.Item>
             </Form>
         </Modal>
-    );
-};
+    )
+}

@@ -1,7 +1,7 @@
 import { List, Modal, SwipeAction, Toast } from 'antd-mobile';
 import { FC } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { LongPressAction } from 'src/components/LongPressAction';
+import { LongPressAction } from 'src/components';
 import { INote, NoteType, SyncStatus } from 'src/module/note/note.model';
 import noteStore from 'src/module/note/note.store';
 import userStore from 'src/module/user/user.store';

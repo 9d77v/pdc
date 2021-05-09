@@ -1,4 +1,4 @@
-import { Modal, Form, Input[[.Components]] } from 'antd'
+import { Modal, Form, Input[[.InputComponents]] } from 'antd'[[.CustomComponents]]
 import { FC } from 'react'
 import { I[[.Name]] } from 'src/module/[[.LowerName]]/[[.LowerName]].model'
 
@@ -50,17 +50,9 @@ export const [[.Name]]CreateForm: FC<I[[.Name]]CreateFormProps> = ({
                 layout="horizontal"
                 name="[[.LowerName]]CreateForm"
                 style={{ maxHeight: 600, overflowY: "auto" }}
-                initialValues={{ roleID: 3, gender: 0 }}
-            >[[range .Columns]]
-                <Form.Item
-                    name="[[.Name]]"
-                    label="[[.Comment]]"
-                    rules={[{ required: true, message: '请输入[[.Comment]]!' }]}
-                >
-                [[if eq .Type "Time"]]    <DatePicker />
-            [[else]]    <Input />,
-            [[end]]    </Form.Item>
-            [[end]]</Form>
+                initialValues={{ }}
+            >[[template "form" .]]
+            </Form>
         </Modal>
     )
 }

@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/react-hooks"
 import { Modal } from "antd"
-import React, { useMemo, useState } from "react"
-import { Card } from "src/components/Card"
+import { useMemo, useState } from "react"
+import { Card } from "src/components"
 import { LivePlayer } from "src/components/videoplayer/LivePlayer"
 import { GET_MOBILE_HOME_DEVICES } from "src/gqls/device/query"
 

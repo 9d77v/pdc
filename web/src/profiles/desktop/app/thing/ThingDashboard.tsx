@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
-
+import { useEffect, useState } from "react"
 import { message, Select } from "antd"
 import { useQuery } from "@apollo/react-hooks"
-import { Pie } from "src/components/Pie"
+import { Pie } from "src/components"
 import { ConsumerExpenditureMap, ThingStatusMap } from "src/consts/consts"
 import { SerieData } from "src/consts/chart"
 import { THING_SERIES } from "src/gqls/thing/query"

@@ -1,5 +1,4 @@
 import { Icon, NavBar } from "antd-mobile"
-import React from "react"
 import { useHistory, useLocation } from "react-router-dom"
 import { LivePlayer } from "src/components/videoplayer/LivePlayer"
 import CameraTimeLapseVideoList from "./CameraTimeLapseVideoList"
