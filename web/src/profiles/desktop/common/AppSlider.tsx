@@ -369,9 +369,9 @@ const AdminMenu = (props: IAppHeaderProps) => {
                 <Menu.Item key="bookshelf-list" >
                     <Link to={AdminPath.BOOKSHELF_LIST}>{PathDict.get(AdminPath.BOOKSHELF_LIST)}</Link>
                 </Menu.Item>
-                <Menu.Item key="book-borrow-return-list" >
+                {/* <Menu.Item key="book-borrow-return-list" >
                     <Link to={AdminPath.BOOK_BORROW_RETURN_LIST}>{PathDict.get(AdminPath.BOOK_BORROW_RETURN_LIST)}</Link>
-                </Menu.Item>
+                </Menu.Item> */}
             </SubMenu>
         </Menu>
     )

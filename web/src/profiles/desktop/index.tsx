@@ -48,6 +48,8 @@ const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashb
 
 const BookTable = React.lazy(() => import('./admin/book/book-list/BookTable'))
 const BookshelfTable = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfTable'))
+const BookshelfDetail = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfDetail'))
+const BookDetail = React.lazy(() => import('./admin/book/book-list/BookDetail'))
 
 
 const DesktopIndex = () => {
@@ -147,6 +149,12 @@ const DesktopIndex = () => {
                         </Route>
                         <Route exact path={AdminPath.BOOKSHELF_LIST}>
                             <BookshelfTable />
+                        </Route>
+                        <Route exact path={AdminPath.BOOKSHELF_DETAIL}>
+                            <BookshelfDetail />
+                        </Route>
+                        <Route exact path={AdminPath.BOOK_DETAIL}>
+                            <BookDetail />
                         </Route>
                         <Route exact path={AdminPath.USER_LIST}>
                             <UserTable />

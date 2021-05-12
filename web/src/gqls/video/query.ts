@@ -80,15 +80,15 @@ const VIDEO_RANDOM_TAG_SUGGEST = gql`
 `;
 
 const VIDEO_COMBO = gql`
- query videos($searchParam:SearchParam!,$isFilterVideoSeries:Boolean=true) {
-   videos(searchParam:$searchParam,isFilterVideoSeries:$isFilterVideoSeries){
+ query videos($searchParam:SearchParam!,$filterVideosInVideoSeries:Boolean=true) {
+   videos(searchParam:$searchParam,filterVideosInVideoSeries:$filterVideosInVideoSeries){
        edges{
           value:id 
           text:title 
        }
    }
   }
-`;
+`
 
 const GET_VIDEO_DETAIL = gql`
 query videoDetail(

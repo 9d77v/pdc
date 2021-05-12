@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	input := codegen.GetInput(&models.BookShelf{}, "book", "书架")
+	input := codegen.GetInput(&models.Bookshelf{}, "book", "书架")
 	generateGqls(input)
 	generateModel(input)
 	generateView(input)

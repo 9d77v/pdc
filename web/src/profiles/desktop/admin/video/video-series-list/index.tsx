@@ -1,5 +1,5 @@
 import { Table, Button, message } from 'antd'
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery } from '@apollo/react-hooks'
 import { VideoSeriesCreateForm } from './VideoSeriesCreateForm'
 import { useMutation } from '@apollo/react-hooks'
