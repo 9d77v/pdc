@@ -35,8 +35,11 @@ type BookPosition{
 	id: ID!
 	bookshelfID: Int!
 	bookID: Int!
+	book: Book
+	bookshelf: Bookshelf
 	layer: Int!
 	partition: Int!
+	prevID: Int!
     createdAt: Int!
     updatedAt: Int!
 }
@@ -102,7 +105,7 @@ input NewUpdateBookshelf {
 
 input NewBookPosition{
 	bookshelfID: Int!
-	bookID: Int!
+	bookIDs: [Int!]!
 	layer: Int!
 	partition: Int!
 }
@@ -112,6 +115,7 @@ input NewUpdateBookPosition{
 	bookshelfID: Int!
 	layer: Int!
 	partition: Int!
+	prevID: Int!
 }
 
 type BookConnection {

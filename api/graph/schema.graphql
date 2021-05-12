@@ -8,7 +8,7 @@ type Query {
   users(searchParam:SearchParam!):UserConnection!
   userInfo(uid:ID):User!
 
-  videos(searchParam:SearchParam!,isFilterVideoSeries:Boolean,episodeID:ID):VideoConnection!
+  videos(searchParam:SearchParam!,filterVideosInVideoSeries:Boolean,episodeID:ID):VideoConnection!
   videoSerieses(searchParam:SearchParam!,episodeID:ID):VideoSeriesConnection!
   searchVideo(searchParam:SearchParam!):VideoIndexConnection!
   similarVideos(searchParam:SearchParam!,episodeID:ID!):VideoIndexConnection!
@@ -27,7 +27,7 @@ type Query {
   appDeviceDashboards(deviceType: Int):DeviceDashboardConnection!
   cameraTimeLapseVideos(deviceID:Int!):CameraTimeLapseVideoConnection!
 
-  books(searchParam:SearchParam!):BookConnection!
+  books(searchParam:SearchParam!,filterBooksInBookPositions:Boolean):BookConnection!
   bookshelfs(searchParam:SearchParam!):BookshelfConnection!
   bookPositions(searchParam:SearchParam!,bookID:Int,bookshelfID:Int):BookPositionConnection!
   bookBorrowReturn(searchParam:SearchParam!,bookID:Int):BookBorrowReturnConnection!
@@ -84,6 +84,7 @@ type Mutation {
   updateBook(input:NewUpdateBook!):Book!
   createBookPosition(input:NewBookPosition!):BookPosition!
   updateBookPosition(input:NewUpdateBookPosition!):BookPosition!
+  removeBookPosition(id:Int!):BookPosition!
   borrowBook(bookID:Int!,uid:Int!):BookBorrowReturn
   backBook(bookID:Int!,uid:Int!):BookBorrowReturn
 }

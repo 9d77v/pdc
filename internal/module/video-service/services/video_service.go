@@ -216,10 +216,10 @@ func (s VideoService) UpdateEpisode(ctx context.Context,
 
 //ListVideo ..
 func (s VideoService) ListVideo(ctx context.Context, searchParam *base.SearchParam,
-	scheme string, isFilterVideoSeries *bool, episodeID *int64) (int64, []*model.Video, error) {
+	scheme string, filterVideosInVideoSeries *bool, episodeID *int64) (int64, []*model.Video, error) {
 	var video models.VideoRepository = models.NewVideo()
 	video.FuzzyQuery(searchParam.Keyword, "title")
-	if ptrs.Bool(isFilterVideoSeries) {
+	if ptrs.Bool(filterVideosInVideoSeries) {
 		video.FilterVideoSeries()
 	}
 	if ptrs.Int64(episodeID) > 0 {

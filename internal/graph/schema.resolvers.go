@@ -335,7 +335,7 @@ func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdate
 func (r *mutationResolver) CreateBookPosition(ctx context.Context, input model.NewBookPosition) (*model.BookPosition, error) {
 	resp, err := bookService.CreateBookPosition(ctx, &bookPB.CreateBookPositionRequest{
 		BookshelfId: input.BookshelfID,
-		BookId:      input.BookID,
+		BookIds:     input.BookIDs,
 		Layer:       int32(input.Layer),
 		Partition:   int32(input.Partition),
 	})
@@ -348,6 +348,13 @@ func (r *mutationResolver) UpdateBookPosition(ctx context.Context, input model.N
 		BookshelfId: input.BookshelfID,
 		Layer:       int32(input.Layer),
 		Partition:   int32(input.Partition),
+	})
+	return &model.BookPosition{ID: resp.GetId()}, err
+}
+
+func (r *mutationResolver) RemoveBookPosition(ctx context.Context, id int64) (*model.BookPosition, error) {
+	resp, err := bookService.RemoveBookPosition(ctx, &bookPB.RemoveBookPositionRequest{
+		Id: id,
 	})
 	return &model.BookPosition{ID: resp.GetId()}, err
 }
@@ -395,10 +402,10 @@ func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, 
 	return user, nil
 }
 
-func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchParam, isFilterVideoSeries *bool, episodeID *int64) (*model.VideoConnection, error) {
+func (r *queryResolver) Videos(ctx context.Context, searchParam model.SearchParam, filterVideosInVideoSeries *bool, episodeID *int64) (*model.VideoConnection, error) {
 	con := new(model.VideoConnection)
 	scheme := middleware.ForSchemeContext(ctx)
-	total, data, err := videoService.ListVideo(ctx, common_dto.GetSearchParam(ctx, searchParam), scheme, isFilterVideoSeries, episodeID)
+	total, data, err := videoService.ListVideo(ctx, common_dto.GetSearchParam(ctx, searchParam), scheme, filterVideosInVideoSeries, episodeID)
 	con.TotalCount = total
 	con.Edges = data
 	return con, err
@@ -501,9 +508,10 @@ func (r *queryResolver) CameraTimeLapseVideos(ctx context.Context, deviceID int6
 	return device_dto.GetCameraTimeLapseVideoConnection(resp), err
 }
 
-func (r *queryResolver) Books(ctx context.Context, searchParam model.SearchParam) (*model.BookConnection, error) {
+func (r *queryResolver) Books(ctx context.Context, searchParam model.SearchParam, filterBooksInBookPositions *bool) (*model.BookConnection, error) {
 	resp, err := bookService.ListBook(context.Background(), &bookPB.ListBookRequest{
-		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
+		SearchParam:                common_dto.GetSearchParam(ctx, searchParam),
+		FilterBooksInBookPositions: filterBooksInBookPositions,
 	})
 	scheme := middleware.ForSchemeContext(ctx)
 	return book_dto.GetBookConnection(resp, scheme), err

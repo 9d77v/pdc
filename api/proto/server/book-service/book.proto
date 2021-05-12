@@ -17,6 +17,8 @@ service BookService {
       returns (CreateBookPositionResponse) {}
   rpc UpdateBookPosition(UpdateBookPositionRequest)
       returns (UpdateBookPositionResponse) {}
+  rpc RemoveBookPosition(RemoveBookPositionRequest)
+      returns (RemoveBookPositionResponse) {}
   rpc ListBook(ListBookRequest) returns (ListBookResponse) {}
   rpc ListBookPosition(ListBookPositionRequest)
       returns (ListBookPositionResponse) {}
@@ -85,9 +87,10 @@ message UpdateBookshelfResponse { int64 id = 1; }
 
 message CreateBookPositionRequest {
   int64 bookshelf_id = 1;
-  int64 book_id = 2;
+  repeated int64 book_ids = 2;
   int32 layer = 3;
   int32 partition = 4;
+  int64 prev_id = 5;
 }
 message CreateBookPositionResponse { int64 id = 1; }
 
@@ -96,8 +99,12 @@ message UpdateBookPositionRequest {
   int64 bookshelf_id = 2;
   int32 layer = 3;
   int32 partition = 4;
+  int64 prev_id = 5;
 }
 message UpdateBookPositionResponse { int64 id = 1; }
+
+message RemoveBookPositionRequest { int64 id = 1; }
+message RemoveBookPositionResponse { int64 id = 1; }
 
 message BorrowBookRequest {
   int64 book_id = 1;
@@ -118,7 +125,10 @@ message ListBookshelfResponse {
   repeated Bookshelf edges = 2;
 }
 
-message ListBookRequest { base.SearchParam search_param = 1; }
+message ListBookRequest {
+  base.SearchParam search_param = 1;
+  optional bool filterBooksInBookPositions = 2;
+}
 
 message ListBookResponse {
   int64 total_count = 1;
@@ -177,8 +187,9 @@ message BookPosition {
   Book book = 5;
   uint32 layer = 6;
   uint32 partition = 7;
-  google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
+  int64 prev_id = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
 }
 
 message ListBookBorrowReturnRequest {

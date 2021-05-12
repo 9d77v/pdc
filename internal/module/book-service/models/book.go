@@ -61,6 +61,11 @@ func NewBookFromPB(in *pb.CreateBookRequest) *Book {
 	return m
 }
 
+//TableName ..
+func (m *Book) TableName() string {
+	return db.TablePrefix() + "book"
+}
+
 //ToBookPBs ..
 func (m *Book) ToBookPBs(data []*Book) []*pb.Book {
 	result := make([]*pb.Book, 0, len(data))
