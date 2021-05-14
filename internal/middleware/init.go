@@ -34,9 +34,10 @@ var permissonMap = map[string][]int{
 	"things":              {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
 	"thingSeries":         {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
 	"thingAnalyze":        {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
-	"books":               {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
+	"books":               {consts.RoleAdmin, consts.RoleManager},
+	"searchBook":          {consts.RoleAdmin, consts.RoleManager, consts.RoleUser, consts.RoleGuest},
 	"bookshelfs":          {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
-	"bookPositions":       {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
+	"bookshelfDetail":     {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
 	"bookBorrowReturn":    {consts.RoleAdmin, consts.RoleManager, consts.RoleUser},
 
 	"createUser":     {consts.RoleAdmin},
@@ -93,6 +94,7 @@ var permissonMap = map[string][]int{
 	"updateBook":         {consts.RoleAdmin, consts.RoleManager},
 	"createBookPosition": {consts.RoleAdmin, consts.RoleManager},
 	"updateBookPosition": {consts.RoleAdmin, consts.RoleManager},
+	"removeBookPosition": {consts.RoleAdmin, consts.RoleManager},
 	"borrowBook":         {consts.RoleAdmin, consts.RoleManager},
 	"backBook":           {consts.RoleAdmin, consts.RoleManager},
 }

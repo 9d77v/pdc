@@ -35,8 +35,11 @@ type BookPosition{
 	id: ID!
 	bookshelfID: Int!
 	bookID: Int!
+	book: Book
+	bookshelf: Bookshelf
 	layer: Int!
 	partition: Int!
+	prevID: Int!
     createdAt: Int!
     updatedAt: Int!
 }
@@ -102,7 +105,7 @@ input NewUpdateBookshelf {
 
 input NewBookPosition{
 	bookshelfID: Int!
-	bookID: Int!
+	bookIDs: [Int!]!
 	layer: Int!
 	partition: Int!
 }
@@ -112,6 +115,7 @@ input NewUpdateBookPosition{
 	bookshelfID: Int!
 	layer: Int!
 	partition: Int!
+	prevID: Int!
 }
 
 type BookConnection {
@@ -132,4 +136,26 @@ type BookPositionConnection {
 type BookBorrowReturnConnection {
   totalCount: Int!
   edges:[BookBorrowReturn!]!
+}
+
+type BookIndex {
+    id: ID!
+	isbn: String!
+	name: String!
+	desc: String!
+	cover: String!
+	author: [String!]!
+	translator: [String!]!
+	publishingHouse: String!
+	edition: String!
+	printedTimes: String!
+	printedSheets: String!
+	format: String!
+	wordCount: Int!
+	pricing: Float!
+}
+
+type BookIndexConnection {
+  totalCount: Int!
+  edges:[BookIndex!]!
 }

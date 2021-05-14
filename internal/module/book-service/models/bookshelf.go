@@ -34,6 +34,11 @@ func NewBookshelfFromPB(in *pb.CreateBookshelfRequest) *Bookshelf {
 	return m
 }
 
+//TableName ..
+func (m *Bookshelf) TableName() string {
+	return db.TablePrefix() + "bookshelf"
+}
+
 //ToBookshelfPBs ..
 func (m *Bookshelf) ToBookshelfPBs(data []*Bookshelf) []*pb.Bookshelf {
 	result := make([]*pb.Bookshelf, 0, len(data))

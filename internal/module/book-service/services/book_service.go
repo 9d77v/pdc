@@ -3,7 +3,9 @@ package services
 import (
 	"context"
 	"errors"
+	"log"
 
+	"github.com/9d77v/go-lib/ptrs"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/book-service/models"
 	"github.com/9d77v/pdc/internal/module/book-service/pb"
@@ -90,10 +92,40 @@ func (s BookService) UpdateBookshelf(ctx context.Context,
 func (s BookService) CreateBookPosition(ctx context.Context,
 	in *pb.CreateBookPositionRequest) (*pb.CreateBookPositionResponse, error) {
 	resp := new(pb.CreateBookPositionResponse)
-	m := models.NewBookPositionFromPB(in)
-	err := m.Create(m)
+	m := models.NewBookPosition()
+	m.Begin()
+	err := m.GetLastBookPositionID(int(in.BookshelfId), int(in.Layer), int(in.Partition))
+	if err != nil {
+		m.Rollback()
+		return resp, err
+	}
+	bps := make([]*models.BookPosition, len(in.BookIds))
+	for i, id := range in.BookIds {
+		bps[i] = &models.BookPosition{
+			BookshelfID: uint(in.BookshelfId),
+			BookID:      uint(id),
+			Layer:       int8(in.Layer),
+			Partition:   int8(in.Partition),
+		}
+	}
+	err = m.Create(&bps)
+	if err != nil {
+		m.Rollback()
+		return resp, err
+	}
+	bps[0].PrevID = m.ID
+	for i := 1; i < len(bps); i++ {
+		bps[i].PrevID = bps[i-1].ID
+	}
+	if len(bps) > 1 || bps[0].PrevID != 0 {
+		err = m.Save(&bps)
+		if err != nil {
+			m.Rollback()
+			return resp, err
+		}
+	}
 	resp.Id = int64(m.ID)
-	return resp, err
+	return resp, m.Commit()
 }
 
 //UpdateBookPosition ..
@@ -109,6 +141,30 @@ func (s BookService) UpdateBookPosition(ctx context.Context,
 		"layer":         in.Layer,
 		"partition":     in.Partition,
 	})
+}
+
+//RemoveBookPosition ..
+func (s BookService) RemoveBookPosition(ctx context.Context,
+	in *pb.RemoveBookPositionRequest) (*pb.RemoveBookPositionResponse, error) {
+	resp := &pb.RemoveBookPositionResponse{Id: in.Id}
+	m := models.NewBookPosition()
+	m.Begin()
+	err := s.GetByID(m, uint(in.Id), []string{"id", "prev_id"})
+	if err != nil {
+		m.Rollback()
+		return resp, status.Error(codes.NotFound, "数据不存在")
+	}
+	prevID := m.PrevID
+	m.ID = 0
+	err = m.Where("prev_id=?", in.Id).First(m)
+	log.Println(m)
+	if err == nil {
+		m.Table(m.TableName()).Where("id=?", m.ID).Updates(map[string]interface{}{
+			"prev_id": prevID,
+		})
+	}
+	m.DeleteByID(in.Id)
+	return resp, m.Commit()
 }
 
 //BorrowBook ..
@@ -182,6 +238,9 @@ func (s BookService) ListBook(ctx context.Context, in *pb.ListBookRequest) (*pb.
 	resp := new(pb.ListBookResponse)
 	m := models.NewBook()
 	m.FuzzyQuery(in.SearchParam.Keyword, "name")
+	if ptrs.Bool(in.FilterBooksInBookPositions) {
+		m.Where("id NOT in (select book_id from " + new(models.BookPosition).TableName() + ")")
+	}
 	data := make([]*models.Book, 0)
 	total, err := s.GetNewConnection(m, in.SearchParam, &data, nil)
 	resp.TotalCount = total
@@ -210,19 +269,19 @@ func (s BookService) ListBookPosition(ctx context.Context, in *pb.ListBookPositi
 		m.IDQuery(*in.BookId, "book_id")
 	}
 	if in.BookshelfId != nil {
-		m.IDQuery(*in.BookshelfId, "book_shelf_id")
+		m.IDQuery(*in.BookshelfId, "bookshelf_id")
 	}
 	data := make([]*models.BookPosition, 0)
 	replaceFunc := func(field base.GraphQLField) error {
 		if field.FieldMap["book"] {
 			m.Preload("Book")
 		}
-		if field.FieldMap["bookShelf"] {
+		if field.FieldMap["bookshelf"] {
 			m.Preload("Bookshelf")
 		}
 		return nil
 	}
-	omitFields := []string{""}
+	omitFields := []string{"book", "bookshelf"}
 	total, err := s.GetNewConnection(m, in.SearchParam, &data, replaceFunc, omitFields...)
 	resp.TotalCount = total
 	resp.Edges = m.ToBookPositionPBs(data)
@@ -251,5 +310,17 @@ func (s BookService) ListBookBorrowReturn(ctx context.Context, in *pb.ListBookBo
 	total, err := s.GetNewConnection(m, in.SearchParam, &data, replaceFunc, omitFields...)
 	resp.TotalCount = total
 	resp.Edges = m.ToBookBorrowReturnPBs(data)
+	return resp, err
+}
+
+//SearchBook ..
+func (s BookService) SearchBook(ctx context.Context, in *pb.SearchBookRequest) (*pb.SearchBookResponse, error) {
+	resp := new(pb.SearchBookResponse)
+	m := models.NewBook()
+	m.FuzzyQuery(in.SearchParam.Keyword, "name")
+	data := make([]*models.Book, 0)
+	total, err := s.GetNewConnection(m, in.SearchParam, &data, nil)
+	resp.TotalCount = total
+	resp.Edges = m.ToBookIndexPBs(data)
 	return resp, err
 }

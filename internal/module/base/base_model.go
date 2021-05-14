@@ -291,6 +291,19 @@ func (m *Model) Delete(value interface{}, ids []int64) (err error) {
 	return
 }
 
+//Raw 保存数据
+func (m *Model) Raw(sql string, result interface{}, value ...interface{}) (err error) {
+	err = m.tx.Raw(sql, value...).Scan(&result).Error
+	m.ReSetDB()
+	return
+}
+
+//Save 保存数据
+func (m *Model) Unscoped() Repository {
+	m.tx = m.tx.Unscoped()
+	return m
+}
+
 //Begin 开启事务
 func (m *Model) Begin() {
 	m.db = m.db.Begin()

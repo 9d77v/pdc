@@ -17,9 +17,9 @@ const (
 //BookBorrowReturn 书籍位置
 type BookBorrowReturn struct {
 	base.Model
-	ID     uint `gorm:"primarykey"`
-	BookID uint `gorm:"comment:'书id'"`
-	Book
+	ID        uint `gorm:"primarykey"`
+	BookID    uint `gorm:"comment:'书id'"`
+	Book      Book `gorm:"ForeignKey:BookID"`
 	UID       uint `gorm:"comment:'用户id'"`
 	Operation int8 `gorm:"comment:'操作类型'"` //0:借，1：还
 	CreatedAt time.Time
@@ -29,6 +29,11 @@ func NewBookBorrowReturn() *BookBorrowReturn {
 	m := &BookBorrowReturn{}
 	m.SetDB(db.GetDB())
 	return m
+}
+
+//TableName ..
+func (m *BookBorrowReturn) TableName() string {
+	return db.TablePrefix() + "book_borrow_return"
 }
 
 //ToBookBorrowReturnPBs ..

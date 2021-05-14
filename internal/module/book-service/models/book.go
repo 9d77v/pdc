@@ -61,6 +61,11 @@ func NewBookFromPB(in *pb.CreateBookRequest) *Book {
 	return m
 }
 
+//TableName ..
+func (m *Book) TableName() string {
+	return db.TablePrefix() + "book"
+}
+
 //ToBookPBs ..
 func (m *Book) ToBookPBs(data []*Book) []*pb.Book {
 	result := make([]*pb.Book, 0, len(data))
@@ -95,5 +100,34 @@ func (m *Book) toBookPB(book *Book) *pb.Book {
 		PurchaseSource:  book.PurchaseSource,
 		CreatedAt:       createdAt,
 		UpdatedAt:       updatedAt,
+	}
+}
+
+//ToBookIndexPBs ..
+func (m *Book) ToBookIndexPBs(data []*Book) []*pb.BookIndex {
+	result := make([]*pb.BookIndex, 0, len(data))
+	for _, v := range data {
+		r := m.toBookIndexPB(v)
+		result = append(result, r)
+	}
+	return result
+}
+
+func (m *Book) toBookIndexPB(book *Book) *pb.BookIndex {
+	return &pb.BookIndex{
+		Id:              int64(book.ID),
+		Isbn:            book.Isbn,
+		Name:            book.Name,
+		Desc:            book.Desc,
+		Cover:           book.Cover,
+		Author:          book.Author,
+		Translator:      book.Translator,
+		PublishingHouse: book.PublishingHouse,
+		Edition:         book.Edition,
+		PrintedTimes:    book.PrintedTimes,
+		PrintedSheets:   book.PrintedSheets,
+		Format:          book.Format,
+		WordCount:       int64(book.WordCount),
+		Pricing:         float64(book.Pricing),
 	}
 }
