@@ -1,4 +1,3 @@
-import React from "react"
 import { useHistory } from "react-router-dom"
 import "src/styles/card.less"
 import "./index.less"
@@ -9,6 +8,7 @@ import {
 } from '@ant-design/icons'
 import { AppPath } from "src/consts/path"
 import { IApp } from "src/models/app"
+import { Book } from 'react-bootstrap-icons';
 
 
 const publicData: IApp[] = [
@@ -20,6 +20,10 @@ const publicData: IApp[] = [
         text: "设备",
         icon: <DashboardOutlined style={{ fontSize: 26 }} />,
         url: AppPath.DEVICE_TELEMETRY
+    }, {
+        text: "图书",
+        icon: <Book size={26} />,
+        url: AppPath.BOOK_INDEX
     }
 ]
 

@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react'
+import { FC, useMemo } from 'react'
 import Img from 'src/components/img'
 import { AppPath } from 'src/consts/path'
 import { VideoCardModel } from 'src/models/video'

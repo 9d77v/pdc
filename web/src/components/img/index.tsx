@@ -38,7 +38,7 @@ const Img: React.FC<ImageProps> = ({
         ref={ref}
         className={"img-box"}
         style={{
-            maxHeight: height ? height : 214,
+            height: height ? height : 214,
             width: width ? width : 160,
             position: "relative",
             overflowY: "hidden"

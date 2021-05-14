@@ -31,6 +31,9 @@ const HomeIndex = React.lazy(() => import('./home'))
 const MessageIndex = React.lazy(() => import('./message'))
 const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
 const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
+const BookSearch = React.lazy(() => import('./book/BookSearch'))
+const BookDetail = React.lazy(() => import('./book/BookDetail'))
+const BookshelfDetail = React.lazy(() => import('./book/BookshelfDetail'))
 
 const MobileIndex = () => {
     const [selectedTab, setSelectedTab] = useState("homeTab")
@@ -81,6 +84,15 @@ const MobileIndex = () => {
             </Route>
             <Route path={AppPath.DEVICE}  >
                 <DeviceIndex />
+            </Route>
+            <Route path={AppPath.BOOK_INDEX}  >
+                <BookSearch />
+            </Route>
+            <Route path={AppPath.BOOK_BOOK_DETAIL}  >
+                <BookDetail />
+            </Route>
+            <Route path={AppPath.BOOK_BOOKSHELF_DETAIL}  >
+                <BookshelfDetail />
             </Route>
             <Route exact path={AppPath.UTIL_CALCULATOR}  >
                 <CalculatorMobile />

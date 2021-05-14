@@ -47,6 +47,33 @@ const BOOKSHELF_DETAIL = gql`
   }
 `
 
+const APP_BOOKSHELF_DETAIL = gql`
+ query bookshelfDetail($searchParam:SearchParam!,  $bookPositionSearchParam: SearchParam!$bookshelfID:Int!) {
+   bookshelfs(searchParam: $searchParam){
+        edges{
+            id
+            name
+            cover
+            layerNum
+            partitionNum
+       }
+   }
+   bookPositions(searchParam:$bookPositionSearchParam,bookshelfID: $bookshelfID){
+       edges{
+        id
+        bookID
+        book{
+          name 
+          cover
+        }
+        layer
+        partition
+        prevID
+       }
+   }
+  }
+`
+
 export {
-  LIST_BOOKSHELF, BOOKSHELF_DETAIL
+  LIST_BOOKSHELF, BOOKSHELF_DETAIL, APP_BOOKSHELF_DETAIL
 }

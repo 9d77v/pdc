@@ -46,6 +46,11 @@ const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
 const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
 const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
 
+const BookIndex = React.lazy(() => import('./app/book'))
+const AppBookDetail = React.lazy(() => import('./app/book/AppBookDetail'))
+const AppBookshelfDetail = React.lazy(() => import('./app/book/AppBookshelfDetail'))
+
+
 const BookTable = React.lazy(() => import('./admin/book/book-list/BookTable'))
 const BookshelfTable = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfTable'))
 const BookshelfDetail = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfDetail'))
@@ -104,6 +109,15 @@ const DesktopIndex = () => {
                         </Route>
                         <Route exact path={AppPath.THING_LIST}>
                             <ThingTable />
+                        </Route>
+                        <Route exact path={AppPath.BOOK_INDEX}>
+                            <BookIndex />
+                        </Route>
+                        <Route exact path={AppPath.BOOK_BOOK_DETAIL}>
+                            <AppBookDetail />
+                        </Route>
+                        <Route exact path={AppPath.BOOK_BOOKSHELF_DETAIL}>
+                            <AppBookshelfDetail />
                         </Route>
                         <Route exact path={AppPath.USER_PROFILE}>
                             <UpdateProfileForm refetch={refetch} />

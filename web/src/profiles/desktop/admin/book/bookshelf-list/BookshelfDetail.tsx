@@ -115,7 +115,7 @@ export default function BookshelfDetail() {
                             <Menu onClick={({ key }: any) => {
                                 switch (key) {
                                     case '1': {
-                                        history.replace(AdminPath.BOOK_DETAIL + "?id=" + bp.bookID)
+                                        history.push(AdminPath.BOOK_DETAIL + "?id=" + bp.bookID)
                                         break
                                     }
                                     case '2': {

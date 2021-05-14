@@ -222,6 +222,22 @@ const AppMenu = (props: IAppHeaderProps) => {
                 </Menu.Item>
             </SubMenu> */}
             <SubMenu
+                key="book"
+                style={{ display: loginDisplay }}
+                title={
+                    <span>
+                        <BookOutlined />
+                        <span>{PathDict.get(AppPath.BOOK)}</span>
+                    </span>
+                }
+            >
+                <Menu.Item key="book-book-index">
+                    <Link to={AppPath.BOOK_INDEX}>   <span>
+                        <span>{PathDict.get(AppPath.BOOK_INDEX)}</span>
+                    </span></Link>
+                </Menu.Item>
+            </SubMenu>
+            <SubMenu
                 key="util"
                 style={{ display: loginDisplay }}
                 title={

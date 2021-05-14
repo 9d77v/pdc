@@ -4,44 +4,40 @@ import React, { FC } from 'react'
 import Img from "src/components/img"
 import "src/styles/card.less"
 
-interface IVideoCardProps {
-    episodeID: number
+interface IBookCardProps {
+    id: number
     cover: string
     title: string
-    totalNum: number
 }
 
-export const VideoCard: FC<IVideoCardProps> = ({
-    episodeID,
+export const BookCard: FC<IBookCardProps> = ({
+    id,
     cover,
     title,
-    totalNum
 }) => {
     const history = useHistory()
-    const link = AppPath.VIDEO_DETAIL + "?epid=" + episodeID + "&autoJump=true"
+    const link = AppPath.BOOK_BOOK_DETAIL + "?id=" + id
     return (
         <div
             onClick={() => {
                 history.push(link)
             }}
-            className={"pdc-video-card"}
+            className={"pdc-book-card"}
         >
             <div style={{ clear: "both" }} />
-            <Img src={cover} />
+            <Img src={cover} height={100} width={120} />
             <div style={{ marginTop: 5, fontSize: 14 }}>{title}</div>
-            <div style={{ fontSize: 12 }}>全{totalNum}话</div>
         </div >
     )
 }
 
-export const MobileVideoCard: React.FC<IVideoCardProps> = ({
-    episodeID,
+export const MobileBookCard: React.FC<IBookCardProps> = ({
+    id,
     cover,
     title,
-    totalNum
 }) => {
     const history = useHistory()
-    const link = AppPath.VIDEO_DETAIL + "?epid=" + episodeID + "&autoJump=true"
+    const link = AppPath.BOOK_BOOK_DETAIL + "?id=" + id
     return (
         <div
             onClick={() => {
@@ -50,7 +46,7 @@ export const MobileVideoCard: React.FC<IVideoCardProps> = ({
             style={{
                 width: "30%",
                 margin: "2.5% 0 0 2.5%",
-                height: 210,
+                height: 180,
                 display: "flex",
                 float: "left",
                 flexDirection: "column"
@@ -63,6 +59,5 @@ export const MobileVideoCard: React.FC<IVideoCardProps> = ({
                 overflow: "hidden",
                 textOverflow: "ellipsis"
             }}>{title}</div>
-            <div style={{ fontSize: 10 }}>全{totalNum}话</div>
         </div >)
 }

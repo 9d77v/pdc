@@ -61,6 +61,53 @@ const BOOK_DETAIL = gql`
    }
   }
 `
+
+const SEARCH_BOOK = gql`
+ query searchBook($searchParam:SearchParam!,$bookshelfsSearchParam:SearchParam!) {
+   searchBook(searchParam: $searchParam){
+        totalCount
+        edges{
+            id
+            isbn
+            name
+            cover
+            author
+            translator
+       }
+   }
+   bookshelfs(searchParam: $bookshelfsSearchParam){
+        totalCount
+        edges{
+            id
+            name
+            cover
+       }
+   }
+  }
+`
+
+const APP_BOOK_DETAIL = gql`
+ query searchBook($searchParam:SearchParam!) {
+   searchBook(searchParam: $searchParam){
+        edges{
+            id
+            isbn
+            name
+            desc
+            cover
+            author
+            translator
+            publishingHouse
+            edition
+            printedTimes
+            printedSheets
+            format
+            wordCount
+            pricing
+       }
+   }
+  }
+`
 export {
-  LIST_BOOK, BOOK_COMBO, BOOK_DETAIL
+  LIST_BOOK, BOOK_COMBO, BOOK_DETAIL, SEARCH_BOOK, APP_BOOK_DETAIL
 }

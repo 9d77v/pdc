@@ -65,7 +65,6 @@ export default function BookTable() {
         })
 
     const onBookCreate = async (values: IBook) => {
-        console.log(values)
         await addBook({
             variables: {
                 "input": {
