@@ -531,7 +531,8 @@ func (r *queryResolver) BookPositions(ctx context.Context, searchParam model.Sea
 		BookId:      bookID,
 		BookshelfId: bookshelfID,
 	})
-	return book_dto.GetBookPositionConnection(resp), err
+	scheme := middleware.ForSchemeContext(ctx)
+	return book_dto.GetBookPositionConnection(resp, scheme), err
 }
 
 func (r *queryResolver) BookBorrowReturn(ctx context.Context, searchParam model.SearchParam, bookID *int64) (*model.BookBorrowReturnConnection, error) {
@@ -540,6 +541,14 @@ func (r *queryResolver) BookBorrowReturn(ctx context.Context, searchParam model.
 		BookID:      bookID,
 	})
 	return book_dto.GetBookBorrowReturnConnection(resp), err
+}
+
+func (r *queryResolver) SearchBook(ctx context.Context, searchParam model.SearchParam) (*model.BookIndexConnection, error) {
+	resp, err := bookService.SearchBook(context.Background(), &bookPB.SearchBookRequest{
+		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
+	})
+	scheme := middleware.ForSchemeContext(ctx)
+	return book_dto.GetBookIndexConnection(resp, scheme), err
 }
 
 // Mutation returns generated.MutationResolver implementation.

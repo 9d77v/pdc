@@ -312,3 +312,15 @@ func (s BookService) ListBookBorrowReturn(ctx context.Context, in *pb.ListBookBo
 	resp.Edges = m.ToBookBorrowReturnPBs(data)
 	return resp, err
 }
+
+//SearchBook ..
+func (s BookService) SearchBook(ctx context.Context, in *pb.SearchBookRequest) (*pb.SearchBookResponse, error) {
+	resp := new(pb.SearchBookResponse)
+	m := models.NewBook()
+	m.FuzzyQuery(in.SearchParam.Keyword, "name")
+	data := make([]*models.Book, 0)
+	total, err := s.GetNewConnection(m, in.SearchParam, &data, nil)
+	resp.TotalCount = total
+	resp.Edges = m.ToBookIndexPBs(data)
+	return resp, err
+}

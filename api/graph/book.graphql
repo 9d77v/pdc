@@ -137,3 +137,25 @@ type BookBorrowReturnConnection {
   totalCount: Int!
   edges:[BookBorrowReturn!]!
 }
+
+type BookIndex {
+    id: ID!
+	isbn: String!
+	name: String!
+	desc: String!
+	cover: String!
+	author: [String!]!
+	translator: [String!]!
+	publishingHouse: String!
+	edition: String!
+	printedTimes: String!
+	printedSheets: String!
+	format: String!
+	wordCount: Int!
+	pricing: Float!
+}
+
+type BookIndexConnection {
+  totalCount: Int!
+  edges:[BookIndex!]!
+}

@@ -50,3 +50,42 @@ func toBook(book *pb.Book, scheme string) *model.Book {
 		UpdatedAt:       book.UpdatedAt.GetSeconds(),
 	}
 }
+
+func GetBookIndexConnection(data *pb.SearchBookResponse, scheme string) *model.BookIndexConnection {
+	return &model.BookIndexConnection{
+		TotalCount: data.TotalCount,
+		Edges:      toBookIndexs(data.Edges, scheme),
+	}
+}
+
+func toBookIndexs(data []*pb.BookIndex, scheme string) []*model.BookIndex {
+	result := make([]*model.BookIndex, 0, len(data))
+	for _, v := range data {
+		r := toBookIndex(v, scheme)
+		result = append(result, r)
+	}
+	return result
+}
+
+func toBookIndex(book *pb.BookIndex, scheme string) *model.BookIndex {
+	cover := ""
+	if book.Cover != "" {
+		cover = oss.GetOSSPrefixByScheme(scheme) + book.Cover
+	}
+	return &model.BookIndex{
+		ID:              book.Id,
+		Isbn:            book.Isbn,
+		Name:            book.Name,
+		Desc:            book.Desc,
+		Cover:           cover,
+		Author:          book.Author,
+		Translator:      book.Translator,
+		PublishingHouse: book.PublishingHouse,
+		Edition:         book.Edition,
+		PrintedTimes:    book.PrintedTimes,
+		PrintedSheets:   book.PrintedSheets,
+		Format:          book.Format,
+		WordCount:       book.WordCount,
+		Pricing:         book.Pricing,
+	}
+}
