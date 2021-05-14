@@ -11,8 +11,11 @@ import Search from 'antd/lib/input/Search'
 import { ADD_BOOK, UPDATE_BOOK } from 'src/gqls/book/book.mutation'
 import { LIST_BOOK } from 'src/gqls/book/book.query'
 import { IUpdateBook, IBook } from 'src/module/book/book.model'
+import { useHistory } from 'react-router'
+import { AdminPath } from 'src/consts/path'
 
 export default function BookTable() {
+    const history = useHistory()
     const [visible, setVisible] = useState(false)
     const [updateBookVisible, setUpdateBookVisible] = useState(false)
     const [pagination, setPagination] = useState({
@@ -62,7 +65,6 @@ export default function BookTable() {
         })
 
     const onBookCreate = async (values: IBook) => {
-        console.log(values)
         await addBook({
             variables: {
                 "input": {
@@ -201,19 +203,6 @@ export default function BookTable() {
             }
         },
         { title: '出版社', dataIndex: 'publishingHouse', key: 'publishingHouse', width: 100, fixed: "left" as const },
-        { title: '版次', dataIndex: 'edition', key: 'edition', width: 100 },
-        { title: '印次', dataIndex: 'printedTimes', key: 'printedTimes', width: 100 },
-        { title: '印张', dataIndex: 'printedSheets', key: 'printedSheets', width: 100 },
-        { title: '开本', dataIndex: 'format', key: 'format', width: 100 },
-        { title: '字数', dataIndex: 'wordCount', key: 'wordCount', width: 100 },
-        { title: '定价', dataIndex: 'pricing', key: 'pricing', width: 100 },
-        { title: '购买价', dataIndex: 'purchasePrice', key: 'purchasePrice', width: 100 },
-        {
-            title: '购买时间', dataIndex: 'purchaseTime', key: 'purchaseTime', width: 140,
-            render: (value: number) => value ? dayjs(value * 1000).format("YYYY年MM月DD日") : ""
-        },
-        { title: '购买途径', dataIndex: 'purchaseSource', key: 'purchaseSource', width: 100 },
-        { title: '借书人uid', dataIndex: 'bookBorrowUID', key: 'bookBorrowUID', width: 100 },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 170,
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
@@ -248,7 +237,10 @@ export default function BookTable() {
                             "bookBorrowUID": record.bookBorrowUID,
                         })
                         setUpdateBookVisible(true)
-                    }}>编辑书籍</Button>
+                    }}>编辑</Button><Button
+                        onClick={() => {
+                            history.replace(AdminPath.BOOK_DETAIL + "?id=" + record.id)
+                        }}>详情</Button>
                 </span>
         },
     ]

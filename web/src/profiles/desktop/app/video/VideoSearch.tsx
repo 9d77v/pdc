@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useHistory } from 'react-router-dom'
 import { message, Pagination } from "antd"
-import "src/styles/video.less"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import Search from "antd/lib/input/Search"
@@ -13,8 +12,6 @@ import { LIST_VIDEO_CARD } from "src/gqls/video/query"
 
 
 const VideoSearch = () => {
-
-    const [cards, setCards] = useState(<div />)
     const [pagination, setPagination] = useState<IVideoPagination>({
         keyword: "",
         page: 1,
@@ -41,11 +38,10 @@ const VideoSearch = () => {
         }
     }, [error])
 
-    const history = useHistory()
-    useEffect(() => {
+    const cards = useMemo(() => {
         if (data && data.searchVideo.edges) {
             const videos = data.searchVideo.edges
-            setCards(videos.map((item: any, index: number) =>
+            return (videos.map((item: any, index: number) =>
                 <VideoCard
                     key={index}
                     episodeID={item.episodeID}
@@ -55,7 +51,8 @@ const VideoSearch = () => {
                 />
             ))
         }
-    }, [data, history])
+        return <div />
+    }, [data])
 
     const onChange = (page: number) => {
         setPagination({

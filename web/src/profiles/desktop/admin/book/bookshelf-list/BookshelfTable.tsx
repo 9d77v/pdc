@@ -11,8 +11,11 @@ import Search from 'antd/lib/input/Search'
 import { ADD_BOOKSHELF, UPDATE_BOOKSHELF } from 'src/gqls/book/bookshelf.mutation'
 import { LIST_BOOKSHELF } from 'src/gqls/book/bookshelf.query'
 import { IUpdateBookshelf, IBookshelf } from 'src/module/book/bookshelf.model'
+import { AdminPath } from 'src/consts/path'
+import { useHistory } from 'react-router-dom'
 
 export default function BookshelfTable() {
+    const history = useHistory()
     const [visible, setVisible] = useState(false)
     const [updateBookshelfVisible, setUpdateBookshelfVisible] = useState(false)
     const [pagination, setPagination] = useState({
@@ -78,6 +81,7 @@ export default function BookshelfTable() {
         setUpdateBookshelfVisible(false)
         await refetch()
     }
+
 
     const onChange = async (pageConfig: TablePaginationConfig) => {
         fetchMore({
@@ -149,6 +153,10 @@ export default function BookshelfTable() {
                         })
                         setUpdateBookshelfVisible(true)
                     }}>编辑书架</Button>
+                    <Button
+                        onClick={() => {
+                            history.replace(AdminPath.BOOKSHELF_DETAIL + "?id=" + record.id)
+                        }}>书架详情</Button>
                 </span>
         },
     ]

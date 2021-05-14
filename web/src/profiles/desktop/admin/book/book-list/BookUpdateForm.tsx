@@ -59,7 +59,6 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
             }
             getContainer={false}
             onOk={() => {
-                console.log(url)
                 form.setFieldsValue({
                     "cover": url
                 })

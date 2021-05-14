@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useHistory } from 'react-router-dom'
 import { message } from "antd"
 import "src/styles/button.less"
@@ -12,7 +12,6 @@ import { LIST_VIDEO_CARD } from "src/gqls/video/query"
 
 
 export default function VideoList() {
-    const [cards, setCards] = useState(<div />)
     const [pagination, setPagination] = useState<IVideoPagination>({
         keyword: "",
         page: 1,
@@ -40,10 +39,10 @@ export default function VideoList() {
     }, [error])
 
     const history = useHistory()
-    useEffect(() => {
+    const cards = useMemo(() => {
         if (data && data.searchVideo.edges) {
             const videos = data.searchVideo.edges
-            setCards(videos.map((item: any, index: number) =>
+            return (videos.map((item: any, index: number) =>
                 <MobileVideoCard
                     key={index}
                     episodeID={item.episodeID}
@@ -53,7 +52,8 @@ export default function VideoList() {
                 />
             ))
         }
-    }, [data, history])
+        return <div />
+    }, [data])
 
     const onTagChange = (tag: any, checked: any) => {
         const nextSelectedTags = checked ? [...pagination.selectedTags, tag] : pagination.selectedTags.filter(t => t !== tag)
