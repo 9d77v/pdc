@@ -29,7 +29,7 @@ type Query {
 
   books(searchParam:SearchParam!,filterBooksInBookPositions:Boolean):BookConnection!
   bookshelfs(searchParam:SearchParam!):BookshelfConnection!
-  bookPositions(searchParam:SearchParam!,bookID:Int,bookshelfID:Int):BookPositionConnection!
+  bookPositions(bookID:Int,bookshelfID:Int):BookPositionConnection!
   bookBorrowReturn(searchParam:SearchParam!,bookID:Int):BookBorrowReturnConnection!
   searchBook(searchParam:SearchParam!):BookIndexConnection!
 } 

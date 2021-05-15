@@ -531,9 +531,9 @@ func (r *queryResolver) Bookshelfs(ctx context.Context, searchParam model.Search
 	return book_dto.GetBookshelfConnection(resp, scheme), err
 }
 
-func (r *queryResolver) BookPositions(ctx context.Context, searchParam model.SearchParam, bookID *int64, bookshelfID *int64) (*model.BookPositionConnection, error) {
+func (r *queryResolver) BookPositions(ctx context.Context, bookID *int64, bookshelfID *int64) (*model.BookPositionConnection, error) {
 	resp, err := bookService.ListBookPosition(context.Background(), &bookPB.ListBookPositionRequest{
-		SearchParam: common_dto.GetSearchParam(ctx, searchParam),
+		SearchParam: common_dto.GetSearchParam(ctx, model.SearchParam{}),
 		BookId:      bookID,
 		BookshelfId: bookshelfID,
 	})
