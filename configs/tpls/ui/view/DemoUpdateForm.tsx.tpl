@@ -4,14 +4,14 @@ import { IUpdate[[.Name]] } from 'src/module/[[.Module]]/[[.LowerName]].model'
 
 interface I[[.Name]]UpdateFormProps {
     visible: boolean
-    data: IUpdate[[.Name]],
+    id: number,
     onUpdate: (values: IUpdate[[.Name]]) => void
     onCancel: () => void
 }
 
 export const [[.Name]]UpdateForm: FC<I[[.Name]]UpdateFormProps> = ({
     visible,
-    data,
+    id,
     onUpdate,
     onCancel,
 }) => {
@@ -20,12 +20,31 @@ export const [[.Name]]UpdateForm: FC<I[[.Name]]UpdateFormProps> = ({
         labelCol: { span: 5 },
         wrapperCol: { span: 15 },
     }
+    const { error, data } = useQuery([[.TitleName]]_DETAIL,
+        {
+            variables: {
+                searchParam: {
+                    ids: [id]
+                },
+            },
+            fetchPolicy: "cache-and-network"
+        })
+
     useEffect(() => {
+        if (error) {
+            message.error("接口请求失败！")
+        }
+    }, [error])
+
+    useEffect(() => {
+        const obj = data?.[[.LowerName]]s?.edges[0]
         form.setFieldsValue({
-            "id": data.id,[[range .Columns]]
-            "[[.Name]]": data.[[.Name]],[[end]]
+            "id": obj.id,[[range .Columns]][[if eq .TSType "dayjs.Dayjs"]]
+            "[[.Name]]": obj.[[.Name]] ? dayjs(obj.[[.Name]] * 1000) : undefined,[[else]]
+            "[[.Name]]": obj.[[.Name]],[[end]][[end]]
         })
     }, [form, data])
+
     return (
         <Modal
             visible={visible}

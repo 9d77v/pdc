@@ -155,7 +155,7 @@ export default function BookshelfTable() {
                     }}>编辑书架</Button>
                     <Button
                         onClick={() => {
-                            history.replace(AdminPath.BOOKSHELF_DETAIL + "?id=" + record.id)
+                            history.push(AdminPath.BOOKSHELF_DETAIL + "?id=" + record.id)
                         }}>书架详情</Button>
                 </span>
         },

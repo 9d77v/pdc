@@ -1,18 +1,21 @@
-import { Modal, Form, Input, InputNumber, Select } from 'antd'
+import { Modal, Form, Input, InputNumber, Select, message } from 'antd'
 import { DatePicker, Uploader } from 'src/components'
 import { FC, useEffect, useState } from 'react'
 import { IUpdateBook } from 'src/module/book/book.model'
+import { BOOK_DETAIL } from 'src/gqls/book/book.query'
+import { useQuery } from '@apollo/react-hooks'
+import dayjs from 'dayjs'
 
 interface IBookUpdateFormProps {
     visible: boolean
-    data: IUpdateBook,
+    id: number,
     onUpdate: (values: IUpdateBook) => void
     onCancel: () => void
 }
 
 export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
     visible,
-    data,
+    id,
     onUpdate,
     onCancel,
 }) => {
@@ -22,29 +25,48 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
         labelCol: { span: 5 },
         wrapperCol: { span: 15 },
     }
-    useEffect(() => {
-        form.setFieldsValue({
-            "id": data.id,
-            "isbn": data.isbn,
-            "name": data.name,
-            "desc": data.desc,
-            "cover": data.cover,
-            "author": data.author,
-            "translator": data.translator,
-            "publishingHouse": data.publishingHouse,
-            "edition": data.edition,
-            "printedTimes": data.printedTimes,
-            "printedSheets": data.printedSheets,
-            "format": data.format,
-            "wordCount": data.wordCount,
-            "pricing": data.pricing,
-            "purchasePrice": data.purchasePrice,
-            "purchaseTime": data.purchaseTime,
-            "purchaseSource": data.purchaseSource,
-            "bookBorrowUID": data.bookBorrowUID,
+    const { error, data } = useQuery(BOOK_DETAIL,
+        {
+            variables: {
+                searchParam: {
+                    ids: [id]
+                },
+            },
+            fetchPolicy: "cache-and-network"
         })
-        setUrl(data.cover)
+
+    useEffect(() => {
+        if (error) {
+            message.error("接口请求失败！")
+        }
+    }, [error])
+
+    useEffect(() => {
+        const book = data?.books?.edges[0]
+        if (book) {
+            form.setFieldsValue({
+                "id": book.id,
+                "isbn": book.isbn,
+                "name": book.name,
+                "desc": book.desc,
+                "cover": book.cover,
+                "author": book.author,
+                "translator": book.translator,
+                "publishingHouse": book.publishingHouse,
+                "edition": book.edition,
+                "printedTimes": book.printedTimes,
+                "printedSheets": book.printedSheets,
+                "format": book.format,
+                "wordCount": book.wordCount,
+                "pricing": book.pricing,
+                "purchasePrice": book.purchasePrice,
+                "purchaseTime": book.purchaseTime ? dayjs(book.purchaseTime * 1000) : undefined,
+                "purchaseSource": book.purchaseSource,
+                "bookBorrowUID": book.bookBorrowUID,
+            })
+        }
     }, [form, data])
+
     return (
         <Modal
             visible={visible}
@@ -89,6 +111,13 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                     <Input hidden />
                 </Form.Item>
                 <Form.Item
+                    name="isbn"
+                    label="isbn"
+                    rules={[{ required: true, message: '请输入isbn!' }]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
                     name="name"
                     label="书名"
                     rules={[{ required: true, message: '请输入书名!' }]}
@@ -128,7 +157,6 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                 <Form.Item
                     name="translator"
                     label="译者"
-                    rules={[{ required: true, message: '请输入译者!' }]}
                 >
                     <Select
                         mode="tags"
