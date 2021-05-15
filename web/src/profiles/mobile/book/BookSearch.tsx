@@ -14,7 +14,7 @@ export default function BookSearch() {
     const [pagination, setPagination] = useState({
         keyword: "",
         page: 1,
-        pageSize: 10
+        pageSize: 100
     })
     const { error, data } = useQuery(SEARCH_BOOK,
         {

@@ -1,5 +1,5 @@
 import { FC, useEffect, useMemo } from "react"
-import { message, Row, Col } from "antd"
+import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import Img from "src/components/img"
@@ -54,7 +54,7 @@ const BookshelfDetail: FC = () => {
         m.forEach((value: Map<number, any>, key) => {
             let record: any
             value.forEach((v, k) => {
-                if (k == 0) {
+                if (k === 0) {
                     record = v
                 }
             })
@@ -115,7 +115,7 @@ const BookshelfDetail: FC = () => {
                 }
                 items.push(
                     <div key={i}
-                        style={{ padding: 6, height: 520, backgroundColor: '#fff' }}
+                        style={{ padding: 6, backgroundColor: '#fff', height: 500 }}
                     >
                         {layers}
                     </div>
@@ -123,19 +123,19 @@ const BookshelfDetail: FC = () => {
             }
         }
         return items
-    }, [bookshelf])
+    }, [bookshelf, bookPositionMap, history])
     return (
-        <div style={{ height: "100%" }}>
+        <div style={{ height: "100%", display: "flex" }}>
             <NavBar
                 mode="light"
                 icon={<Icon type="left" />}
                 style={{ position: "fixed", width: "100%", zIndex: 10, top: 0 }}
                 onLeftClick={() => history.goBack()}
             >{bookshelf?.name} </NavBar>
-            <div style={{ marginTop: 45 }}>
-                <div style={{ height: 120, width: 120 }}><Img src={bookshelf?.cover} height={120} width={120} /></div>
+            <div style={{ marginTop: 45, display: "flex", width: "100%", flexDirection: "column" }}>
+                <Img src={bookshelf?.cover} height={120} width={120} />
                 <Tabs tabs={tabs}
-                    initialPage={2}
+                    initialPage={0}
                     animated={false}
                 >
                     {tabContents}

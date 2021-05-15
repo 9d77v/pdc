@@ -47,7 +47,7 @@ export const AddBookForm: FC<IAddBookFormProps> = ({
         if (visible) {
             refetch()
         }
-    }, [visible])
+    }, [visible, refetch])
 
     useEffect(() => {
         form.setFieldsValue({

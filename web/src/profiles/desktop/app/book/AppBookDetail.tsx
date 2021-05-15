@@ -68,7 +68,7 @@ export default function AppBookDetail() {
                             <span style={itemStyle}>印张：{book?.printedSheets}</span>
                         </div>
                         <div style={infoStyle}>
-                            <span style={itemStyle}>字数：{book?.wordCount}</span>
+                            <span style={itemStyle}>字数：{book?.wordCount} 千字</span>
                             <span style={itemStyle}>定价：{book?.pricing}</span>
                         </div>
                     </div>

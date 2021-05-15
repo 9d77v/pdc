@@ -19,7 +19,7 @@ const LIST_BOOKSHELF = gql`
 `
 
 const BOOKSHELF_DETAIL = gql`
- query bookshelfDetail($searchParam:SearchParam!,  $bookPositionSearchParam: SearchParam!$bookshelfID:Int!) {
+ query bookshelfDetail($searchParam:SearchParam!, $bookshelfID:Int!) {
    bookshelfs(searchParam: $searchParam){
         edges{
             id
@@ -31,7 +31,7 @@ const BOOKSHELF_DETAIL = gql`
             updatedAt
        }
    }
-   bookPositions(searchParam:$bookPositionSearchParam,bookshelfID: $bookshelfID){
+   bookPositions(bookshelfID: $bookshelfID){
        edges{
         id
         bookID
@@ -48,7 +48,7 @@ const BOOKSHELF_DETAIL = gql`
 `
 
 const APP_BOOKSHELF_DETAIL = gql`
- query bookshelfDetail($searchParam:SearchParam!,  $bookPositionSearchParam: SearchParam!$bookshelfID:Int!) {
+ query bookshelfDetail($searchParam:SearchParam!,$bookshelfID:Int!) {
    bookshelfs(searchParam: $searchParam){
         edges{
             id
@@ -58,7 +58,7 @@ const APP_BOOKSHELF_DETAIL = gql`
             partitionNum
        }
    }
-   bookPositions(searchParam:$bookPositionSearchParam,bookshelfID: $bookshelfID){
+   bookPositions(bookshelfID: $bookshelfID){
        edges{
         id
         bookID

@@ -53,7 +53,7 @@ export default function AppBookshelfDetail() {
         m.forEach((value: Map<number, any>, key) => {
             let record: any
             value.forEach((v, k) => {
-                if (k == 0) {
+                if (k === 0) {
                     record = v
                 }
             })
@@ -103,7 +103,7 @@ export default function AppBookshelfDetail() {
             </div>
         }
         return <div style={{ flex: 1 }}></div>
-    }, [bookshelf, bookPositionMap])
+    }, [bookshelf, bookPositionMap, history])
     return (
         <div style={{
             display: 'flex', height: '100%', width: "100%", flexDirection: "column"
