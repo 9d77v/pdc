@@ -1,6 +1,8 @@
 package book_dto
 
 import (
+	"strconv"
+
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/book-service/pb"
@@ -41,8 +43,8 @@ func toBook(book *pb.Book, scheme string) *model.Book {
 		PrintedSheets:   book.PrintedSheets,
 		Format:          book.Format,
 		WordCount:       book.WordCount,
-		Pricing:         book.Pricing,
-		PurchasePrice:   book.PurchasePrice,
+		Pricing:         strconv.FormatFloat(book.Pricing, 'f', 2, 64),
+		PurchasePrice:   strconv.FormatFloat(book.PurchasePrice, 'f', 2, 64),
 		PurchaseTime:    book.PurchaseTime.GetSeconds(),
 		PurchaseSource:  book.PurchaseSource,
 		BookBorrowUID:   book.BookBorrowUid,
@@ -86,6 +88,6 @@ func toBookIndex(book *pb.BookIndex, scheme string) *model.BookIndex {
 		PrintedSheets:   book.PrintedSheets,
 		Format:          book.Format,
 		WordCount:       book.WordCount,
-		Pricing:         book.Pricing,
+		Pricing:         strconv.FormatFloat(book.Pricing, 'f', 2, 64),
 	}
 }
