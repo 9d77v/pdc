@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/9d77v/go-lib/ptrs"
@@ -288,6 +289,8 @@ func (r *mutationResolver) UpdateBookshelf(ctx context.Context, input model.NewU
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
 	t, _ := ptypes.TimestampProto(time.Unix(input.PurchaseTime, 0))
+	pricing, _ := strconv.ParseFloat(input.Pricing, 64)
+	purchasePricing, _ := strconv.ParseFloat(input.PurchasePrice, 64)
 	resp, err := bookService.CreateBook(ctx, &bookPB.CreateBookRequest{
 		Isbn:            input.Isbn,
 		Name:            input.Name,
@@ -301,8 +304,8 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) 
 		PrintedSheets:   input.PrintedSheets,
 		Format:          input.Format,
 		WordCount:       input.WordCount,
-		Pricing:         input.Pricing,
-		PurchasePrice:   input.PurchasePrice,
+		Pricing:         pricing,
+		PurchasePrice:   purchasePricing,
 		PurchaseTime:    t,
 		PurchaseSource:  input.PurchaseSource,
 	})
@@ -311,8 +314,11 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) 
 
 func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdateBook) (*model.Book, error) {
 	t, _ := ptypes.TimestampProto(time.Unix(input.PurchaseTime, 0))
+	pricing, _ := strconv.ParseFloat(input.Pricing, 64)
+	purchasePricing, _ := strconv.ParseFloat(input.PurchasePrice, 64)
 	resp, err := bookService.UpdateBook(ctx, &bookPB.UpdateBookRequest{
 		Id:              input.ID,
+		Isbn:            input.Isbn,
 		Name:            input.Name,
 		Desc:            input.Desc,
 		Cover:           input.Cover,
@@ -324,8 +330,8 @@ func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdate
 		PrintedSheets:   input.PrintedSheets,
 		Format:          input.Format,
 		WordCount:       input.WordCount,
-		Pricing:         input.Pricing,
-		PurchasePrice:   input.PurchasePrice,
+		Pricing:         pricing,
+		PurchasePrice:   purchasePricing,
 		PurchaseTime:    t,
 		PurchaseSource:  input.PurchaseSource,
 	})

@@ -529,9 +529,9 @@ func Test_queryResolver_Videos(t *testing.T) {
 		Videos model.VideoConnection
 	}
 	type args struct {
-		query               string
-		searchParam         model.SearchParam
-		isFilterVideoSeries *bool
+		query                     string
+		searchParam               model.SearchParam
+		filterVideosInVideoSeries *bool
 	}
 	tests := []struct {
 		name    string
@@ -573,8 +573,8 @@ func Test_queryResolver_Videos(t *testing.T) {
 		   }
 		`, model.SearchParam{Page: ptrs.Int64Ptr(1)}, ptrs.BoolPtr(false)}, false},
 		{"test Videos filter", args{`
-		query videos($searchParam:SearchParam!,$isFilterVideoSeries:Boolean=true) {
-			videos(searchParam:$searchParam,isFilterVideoSeries:$isFilterVideoSeries){
+		query videos($searchParam:SearchParam!,$filterVideosInVideoSeries:Boolean=true) {
+			videos(searchParam:$searchParam,filterVideosInVideoSeries:$filterVideosInVideoSeries){
 				edges{
 				   id 
 				   title 
