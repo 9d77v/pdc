@@ -69,8 +69,10 @@ func (s Service) GetNewConnection(r Repository, searchParam *SearchParam,
 		} else {
 			r.IDArrayQuery(s.ToUintIDs(searchParam.Ids))
 		}
-		r.Pagination(offset, limit).
-			Sort(searchParam.Sorts)
+		if !searchParam.IsInfinity {
+			r.Pagination(offset, limit)
+		}
+		r.Sort(searchParam.Sorts)
 		if replaceFunc != nil {
 			err = replaceFunc(edgeGraphqlField)
 			if err != nil {

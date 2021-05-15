@@ -264,7 +264,6 @@ func (s BookService) ListBookshelf(ctx context.Context, in *pb.ListBookshelfRequ
 func (s BookService) ListBookPosition(ctx context.Context, in *pb.ListBookPositionRequest) (*pb.ListBookPositionResponse, error) {
 	resp := new(pb.ListBookPositionResponse)
 	m := models.NewBookPosition()
-	m.FuzzyQuery(in.SearchParam.Keyword, "name")
 	if in.BookId != nil {
 		m.IDQuery(*in.BookId, "book_id")
 	}
@@ -282,6 +281,7 @@ func (s BookService) ListBookPosition(ctx context.Context, in *pb.ListBookPositi
 		return nil
 	}
 	omitFields := []string{"book", "bookshelf"}
+	in.SearchParam.IsInfinity = true
 	total, err := s.GetNewConnection(m, in.SearchParam, &data, replaceFunc, omitFields...)
 	resp.TotalCount = total
 	resp.Edges = m.ToBookPositionPBs(data)
