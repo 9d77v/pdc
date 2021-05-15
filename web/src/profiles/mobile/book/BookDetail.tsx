@@ -1,5 +1,5 @@
-import React, { FC, useEffect, useMemo } from "react"
-import { Divider, message } from "antd"
+import { FC, useEffect, useMemo } from "react"
+import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
 import Img from "src/components/img"
@@ -56,7 +56,7 @@ const BookDetail: FC = () => {
                     <span style={infoStyle}>版次：{book?.edition}</span>
                     <span style={infoStyle}>印次：{book?.printedTimes}</span>
                     <span style={infoStyle}>印张：{book?.printedSheets}</span>
-                    <span style={infoStyle}>字数：{book?.wordCount}</span>
+                    <span style={infoStyle}>字数：{book?.wordCount} 千字</span>
                     <span style={infoStyle}>定价：{book?.pricing}</span>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", textAlign: "left", padding: 10 }}>

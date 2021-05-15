@@ -21,7 +21,6 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPref
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
-    const [uploading, setUploading] = useState(true)
     const emptyFile: UploadFile = { uid: "", size: 0, name: "", type: "" }
     const [succeedFile, setSucceedFile] = useState(emptyFile)
     let isMulti = false
