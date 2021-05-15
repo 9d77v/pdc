@@ -32,7 +32,7 @@ export default function AppBookDetail() {
     }, [data])
 
     const infoStyle = { padding: 2, paddingLeft: 5, display: "flex" }
-    const itemStyle = { padding: 2, paddingLeft: 5, width: 200 }
+    const itemStyle = { padding: 2, paddingLeft: 5, width: 300 }
     return (
         <div style={{
             display: 'flex', height: '100%', width: "100%", flexDirection: "column", overflowX: "scroll"
@@ -46,7 +46,7 @@ export default function AppBookDetail() {
             >
                 返回
             </Button>
-            <div style={{ display: 'flex', height: 210, flexDirection: "column" }}>
+            <div style={{ display: 'flex', height: 260, flexDirection: "column" }}>
                 <span style={{ textAlign: "left", paddingLeft: 30, fontSize: 26, fontWeight: 800 }}  >{book?.name}</span>
                 <div style={{ marginTop: 10, display: 'flex' }}>
                     <div style={{ height: 160, width: 160 }}><Img src={book?.cover} height={160} width={160} /></div>
@@ -77,7 +77,7 @@ export default function AppBookDetail() {
 
             <div style={{ display: "flex", flexDirection: "column", textAlign: "left", paddingLeft: 20 }}>
                 <div style={{ color: "#85dbf5", fontSize: 26, paddingBottom: 10 }}>内容简介:</div>
-                <div>{book?.desc}
+                <div style={{ width: 600 }}>{book?.desc}
                 </div>
             </div>
         </div>)

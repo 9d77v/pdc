@@ -25,26 +25,7 @@ export default function BookTable() {
         showSizeChanger: true,
         total: 0
     })
-    const [updateBookData, setUpdateBookData] = useState<IUpdateBook>({
-        id: 0,
-        isbn: "",
-        name: "",
-        desc: "",
-        cover: "",
-        author: [],
-        translator: [],
-        publishingHouse: "",
-        edition: "",
-        printedTimes: "",
-        printedSheets: "",
-        format: "",
-        wordCount: 0,
-        pricing: 0,
-        purchasePrice: 0,
-        purchaseTime: undefined,
-        purchaseSource: "",
-        bookBorrowUID: 0,
-    })
+    const [updateBookID, setUpdateBookID] = useState(0)
     const [keyword, setKeyword] = useState("")
     const [addBook] = useMutation(ADD_BOOK)
     const [updateBook] = useMutation(UPDATE_BOOK)
@@ -80,8 +61,8 @@ export default function BookTable() {
                     "printedSheets": values.printedSheets,
                     "format": values.format,
                     "wordCount": values.wordCount,
-                    "pricing": values.pricing,
-                    "purchasePrice": values.purchasePrice,
+                    "pricing": values.pricing.toString(),
+                    "purchasePrice": values.purchasePrice.toString(),
                     "purchaseTime": values.purchaseTime ? values.purchaseTime.unix() : 0,
                     "purchaseSource": values.purchaseSource,
                     "bookBorrowUID": values.bookBorrowUID,
@@ -109,8 +90,8 @@ export default function BookTable() {
                     "printedSheets": values.printedSheets,
                     "format": values.format,
                     "wordCount": values.wordCount,
-                    "pricing": values.pricing,
-                    "purchasePrice": values.purchasePrice,
+                    "pricing": values.pricing.toString(),
+                    "purchasePrice": values.purchasePrice.toString(),
                     "purchaseTime": values.purchaseTime ? values.purchaseTime.unix() : 0,
                     "purchaseSource": values.purchaseSource,
                     "bookBorrowUID": values.bookBorrowUID,
@@ -163,15 +144,18 @@ export default function BookTable() {
 
     const columns = [
         { title: 'ID', dataIndex: 'id', key: 'id', width: 80, fixed: "left" as const },
-        { title: 'isbn', dataIndex: 'isbn', key: 'isbn', width: 100, fixed: "left" as const },
-        { title: '书名', dataIndex: 'name', key: 'name', width: 100, fixed: "left" as const },
-        { title: '简介', dataIndex: 'desc', key: 'desc', width: 100, fixed: "left" as const },
+        { title: 'isbn', dataIndex: 'isbn', key: 'isbn', width: 100 },
+        { title: '书名', dataIndex: 'name', key: 'name', width: 150 },
         {
-            title: '封面', dataIndex: 'cover', key: 'cover', width: 100, fixed: "left" as const,
-            render: (value: string) => <Img src={value ? value : ''} width={40} height={53.5} />
+            title: '简介', dataIndex: 'desc', key: 'desc', width: 300,
+            ellipsis: true
         },
         {
-            title: '作者', dataIndex: 'author', key: 'author', width: 100, fixed: "left" as const,
+            title: '封面', dataIndex: 'cover', key: 'cover', width: 180,
+            render: (value: string) => <Img src={value ? value : ''} />
+        },
+        {
+            title: '作者', dataIndex: 'author', key: 'author', width: 210,
             render: (values: string[], record: any) => {
                 if (values) {
                     const tagNodes = values.map((value: string, index: number) => {
@@ -187,7 +171,7 @@ export default function BookTable() {
             }
         },
         {
-            title: '译者', dataIndex: 'translator', key: 'translator', width: 100, fixed: "left" as const,
+            title: '译者', dataIndex: 'translator', key: 'translator', width: 100,
             render: (values: string[], record: any) => {
                 if (values) {
                     const tagNodes = values.map((value: string, index: number) => {
@@ -202,7 +186,7 @@ export default function BookTable() {
                 return <div />
             }
         },
-        { title: '出版社', dataIndex: 'publishingHouse', key: 'publishingHouse', width: 100, fixed: "left" as const },
+        { title: '出版社', dataIndex: 'publishingHouse', key: 'publishingHouse', width: 100, },
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 170,
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")
@@ -216,30 +200,11 @@ export default function BookTable() {
             render: (value: any, record: any) =>
                 <span><Button
                     onClick={() => {
-                        setUpdateBookData({
-                            "id": record.id,
-                            "isbn": record.isbn,
-                            "name": record.name,
-                            "desc": record.desc,
-                            "cover": record.cover,
-                            "author": record.author,
-                            "translator": record.translator,
-                            "publishingHouse": record.publishingHouse,
-                            "edition": record.edition,
-                            "printedTimes": record.printedTimes,
-                            "printedSheets": record.printedSheets,
-                            "format": record.format,
-                            "wordCount": record.wordCount,
-                            "pricing": record.pricing,
-                            "purchasePrice": record.purchasePrice,
-                            "purchaseTime": record.purchaseTime ? dayjs(record.purchaseTime * 1000) : undefined,
-                            "purchaseSource": record.purchaseSource,
-                            "bookBorrowUID": record.bookBorrowUID,
-                        })
+                        setUpdateBookID(record.id)
                         setUpdateBookVisible(true)
                     }}>编辑</Button><Button
                         onClick={() => {
-                            history.replace(AdminPath.BOOK_DETAIL + "?id=" + record.id)
+                            history.push(AdminPath.BOOK_DETAIL + "?id=" + record.id)
                         }}>详情</Button>
                 </span>
         },
@@ -269,7 +234,7 @@ export default function BookTable() {
             />
             <BookUpdateForm
                 visible={updateBookVisible}
-                data={updateBookData}
+                id={updateBookID}
                 onUpdate={onBookUpdate}
                 onCancel={() => {
                     setUpdateBookVisible(false)

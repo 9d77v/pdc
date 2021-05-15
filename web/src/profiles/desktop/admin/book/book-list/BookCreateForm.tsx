@@ -82,6 +82,7 @@ export const BookCreateForm: FC<IBookCreateFormProps> = ({
                 <Form.Item
                     name="cover"
                     label="封面"
+                    rules={[{ required: true, message: '请上传图片!' }]}
                 >
                     <Uploader
                         fileLimit={1}
@@ -105,7 +106,6 @@ export const BookCreateForm: FC<IBookCreateFormProps> = ({
                 <Form.Item
                     name="translator"
                     label="译者"
-                    rules={[{ required: true, message: '请输入译者!' }]}
                 >
                     <Select
                         mode="tags"

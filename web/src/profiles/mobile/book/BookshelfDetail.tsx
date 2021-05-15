@@ -91,7 +91,7 @@ const BookshelfDetail: FC = () => {
                             key={`book_${j}_${i}_${bp.id}`}
                             style={{
                                 width: 120, display: 'flex', flexDirection: "column",
-                                alignItems: "center",
+                                alignItems: "center", justifyContent: 'center',
                                 padding: 10
                             }}
                             onClick={() => {
@@ -99,7 +99,7 @@ const BookshelfDetail: FC = () => {
                             }}
                         >
                             <Img src={bp.book?.cover} height={60} width={60} />
-                            <div style={{ fontSize: 6, width: 100, textAlign: "center" }}>{bp.book?.name}</div>
+                            <div style={{ fontSize: 12, width: 100, textAlign: "center" }}>{bp.book?.name}</div>
                         </div>
                         )
                     }
