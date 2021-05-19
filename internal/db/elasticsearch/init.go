@@ -1,6 +1,7 @@
 package elasticsearch
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/9d77v/go-lib/clients/config"
@@ -10,9 +11,9 @@ import (
 )
 
 var (
-	client *elastic.Client
-	esAddr = utils.GetEnvStr("ESADDR", "http://domain.local:9200")
-	once   sync.Once
+	client  *elastic.Client
+	esAddrs = utils.GetEnvStr("ESADDR", "http://domain.local:9200")
+	once    sync.Once
 )
 
 //别名
@@ -30,7 +31,7 @@ func GetClient() *elastic.Client {
 }
 
 func initClient() *elastic.Client {
-	db, err := elastic.NewClient(&config.ElasticConfig{URLs: []string{esAddr}})
+	db, err := elastic.NewClient(&config.ElasticConfig{URLs: strings.Split(esAddrs, ";")})
 	if err != nil {
 		// Handle error
 		panic(err)
