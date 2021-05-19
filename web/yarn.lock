@@ -2873,6 +2873,13 @@
     "@types/react" "*"
     "@types/reactcss" "*"
 
+"@types/react-csv@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.nlark.com/@types/react-csv/download/@types/react-csv-1.1.1.tgz#003f6de5a46e4f64712f97e5509a4b3f2df9a8b1"
+  integrity sha1-AD9t5aRuT2RxL5flUJpLPy35qLE=
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-dom@^17.0.3":
   version "17.0.3"
   resolved "https://registry.npm.taobao.org/@types/react-dom/download/@types/react-dom-17.0.3.tgz?cache=0&sync_timestamp=1616459846494&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Freact-dom%2Fdownload%2F%40types%2Freact-dom-17.0.3.tgz#7fdf37b8af9d6d40127137865bb3fff8871d7ee1"
@@ -12023,6 +12030,11 @@ react-color@^2.19.3:
     prop-types "^15.5.10"
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
+
+react-csv@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.npm.taobao.org/react-csv/download/react-csv-2.0.3.tgz#f5d17a3c71107d9bcbe580049350200debdc042a"
+  integrity sha1-9dF6PHEQfZvL5YAEk1AgDevcBCo=
 
 react-dev-utils@^11.0.2:
   version "11.0.2"

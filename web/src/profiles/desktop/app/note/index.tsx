@@ -1,11 +1,13 @@
 import { Button, message } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil'
 import { noteDBInit } from 'src/db/db'
 import { NoteState, NoteType, SyncStatus } from 'src/module/note/note.model'
 import {
-    CloudTwoTone, SyncOutlined, EditOutlined, EyeOutlined
+    CloudTwoTone, SyncOutlined, EditOutlined, EyeOutlined,
+    ExportOutlined
 } from '@ant-design/icons';
+import { CSVLink } from "react-csv";
 import noteStore from 'src/module/note/note.store'
 import userStore from 'src/module/user/user.store'
 import NoteBookBoard from './NoteBookBoard'
@@ -24,7 +26,7 @@ const NoteIndex = () => {
     const [noteSyncStatus, setNoteSyncStatus] = useRecoilState(noteStore.noteSyncStatus)
     const setNotes = useSetRecoilState(noteStore.notes)
     const [syncNotes] = useMutation(SYNC_NOTES);
-
+    const [data, setData] = useState<any[]>([])
     const sync = async () => {
         if (currentUser.uid !== "") {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
@@ -109,6 +111,7 @@ const NoteIndex = () => {
             const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
             setNotes(notes)
             initNoteTree()
+            setData(await noteStore.findAll(currentUser.uid))
             await sync()
         })()
     }, [])
@@ -141,7 +144,22 @@ const NoteIndex = () => {
             message.error("初始化笔记树失败：" + error)
         }
     }
-
+    const headers = [
+        { label: "id", key: "id" },
+        { label: "parent_id", key: "parent_id" },
+        { label: "uid", key: "uid" },
+        { label: "note_type", key: "note_type" },
+        { label: "level", key: "level" },
+        { label: "title", key: "title" },
+        { label: "state", key: "state" },
+        { label: "version", key: "version" },
+        { label: "color", key: "color" },
+        { label: "content", key: "content" },
+        { label: "tags", key: "tags" },
+        { label: "sha1", key: "sha1" },
+        { label: "created_at", key: "created_at" },
+        { label: "updated_at", key: "updated_at" },
+    ]
     return (
         <div style={{
             display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9"
@@ -158,6 +176,15 @@ const NoteIndex = () => {
                             }
                         }}
                     />
+
+                    <CSVLink
+                        data={data}
+                        headers={headers}
+                        filename={currentUser.uid + "_note.csv"}
+                    >
+                        <Button icon={<ExportOutlined className="pdc-note-button-icon" />} />
+                    </CSVLink >
+
                     {currentNote.note_type === NoteType.File ?
                         currentNote.editable ?
                             <span><Button type="primary" icon={<EyeOutlined className="pdc-note-button-icon" />}
