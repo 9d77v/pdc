@@ -239,7 +239,6 @@ const AppMenu = (props: IAppHeaderProps) => {
             </SubMenu>
             <SubMenu
                 key="util"
-                style={{ display: loginDisplay }}
                 title={
                     <span>
                         <ToolOutlined />

@@ -62,6 +62,15 @@ class NoteStore {
         return result[0]
     }
 
+    findAll = async (uid: string) => {
+        const result: any[] = await nSQL("note")
+            .query("select")
+            .where([["uid", "=", uid], 'AND', ['state', 'IN', [NoteState.Normal]]])
+            .orderBy(["updated_at DESC"])
+            .exec()
+        return result
+    }
+
     findByParentID = async (id: string, uid: string) => {
         const result: any[] = await nSQL("note")
             .query("select")
