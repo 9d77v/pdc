@@ -372,7 +372,8 @@ func TestNote_ClassifyNotes(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, got2, _ := NewNote().ClassifyNotes(tt.args.serverNotes, tt.args.clientNotes)
+			syncLocal := false
+			got, got1, got2, _ := NewNote().ClassifyNotes(tt.args.serverNotes, tt.args.clientNotes, &syncLocal)
 			assert.Equal(t, len(tt.want), len(got))
 			assert.Equal(t, tt.want1, got1)
 			assert.Equal(t, tt.want2, got2)
