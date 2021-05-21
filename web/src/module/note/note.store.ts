@@ -65,7 +65,7 @@ class NoteStore {
     findAll = async (uid: string) => {
         const result: any[] = await nSQL("note")
             .query("select")
-            .where([["uid", "=", uid], 'AND', ['state', 'IN', [NoteState.Normal]]])
+            .where([["uid", "=", uid]])
             .orderBy(["updated_at DESC"])
             .exec()
         return result

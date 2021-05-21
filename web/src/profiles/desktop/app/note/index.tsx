@@ -1,13 +1,12 @@
-import { Button, message } from 'antd'
+import { Button, message, Menu, Dropdown } from 'antd'
 import { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil'
 import { noteDBInit } from 'src/db/db'
 import { NoteState, NoteType, SyncStatus } from 'src/module/note/note.model'
 import {
     CloudTwoTone, SyncOutlined, EditOutlined, EyeOutlined,
-    ExportOutlined
+    ExportOutlined, SettingTwoTone
 } from '@ant-design/icons';
-import { CSVLink } from "react-csv";
 import noteStore from 'src/module/note/note.store'
 import userStore from 'src/module/user/user.store'
 import NoteBookBoard from './NoteBookBoard'
@@ -18,6 +17,7 @@ import { nSQL } from '@nano-sql/core'
 import dayjs from 'dayjs'
 import { SYNC_NOTES } from 'src/gqls/note/mutation'
 import { useMutation } from '@apollo/react-hooks'
+import exportExcel from 'src/utils/excel'
 const NoteIndex = () => {
     const resetCurrentNote = useResetRecoilState(noteStore.currentNote)
     const currentUser = useRecoilValue(userStore.currentUserInfo)
@@ -32,7 +32,8 @@ const NoteIndex = () => {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
             setNoteSyncStatus(SyncStatus.Syncing)
             try {
-                await syncNote(result)
+                const lastUpdateTime = parseInt(localStorage.getItem("note_last_update_time") || "") || 0
+                await syncNote(result, lastUpdateTime)
                 setNoteSyncStatus(SyncStatus.Synced)
             } catch (error) {
                 setNoteSyncStatus(SyncStatus.Unsync)
@@ -45,13 +46,30 @@ const NoteIndex = () => {
             updateCurrentNote(currentNote.id, currentNote.editable)
         }
     }
+    const syncLocalNote = async () => {
+        if (currentUser.uid !== "") {
+            const result = await noteStore.findAll(currentUser.uid)
+            try {
+                await syncNote(result, 0, true)
+            } catch (error) {
+                message.error("本地数据同步失败")
+                return
+            }
+            if (currentNote.note_type === NoteType.Directory) {
+                const notes = await noteStore.findByParentID(currentNote.id, currentUser.uid)
+                setNotes(notes)
+            }
+            initNoteTree()
+            updateCurrentNote(currentNote.id, currentNote.editable)
+            message.success("本地数据同步成功")
+        }
+    }
 
-    const syncNote = async (unsyncedNotes: any[]) => {
-        const lastUpdateTime = parseInt(localStorage.getItem("note_last_update_time") || "") || 0
+    const syncNote = async (unsyncedNotes: any[], lastUpdateTime: number, syncLocal: boolean = false) => {
         const result = await syncNotes({
             variables: {
                 "input": {
-                    "lastUpdateTime": lastUpdateTime === null ? 0 : lastUpdateTime,
+                    "lastUpdateTime": lastUpdateTime,
                     "unsyncedNotes": unsyncedNotes.map((note: any) => {
                         return {
                             id: note.id,
@@ -69,7 +87,8 @@ const NoteIndex = () => {
                             tags: note.tags,
                             sha1: note.sha1 || '',
                         }
-                    })
+                    }),
+                    "syncLocal": syncLocal
                 }
             }
         })
@@ -144,22 +163,40 @@ const NoteIndex = () => {
             message.error("初始化笔记树失败：" + error)
         }
     }
+
+
+
     const headers = [
-        { label: "id", key: "id" },
-        { label: "parent_id", key: "parent_id" },
-        { label: "uid", key: "uid" },
-        { label: "note_type", key: "note_type" },
-        { label: "level", key: "level" },
-        { label: "title", key: "title" },
-        { label: "state", key: "state" },
-        { label: "version", key: "version" },
-        { label: "color", key: "color" },
-        { label: "content", key: "content" },
-        { label: "tags", key: "tags" },
-        { label: "sha1", key: "sha1" },
-        { label: "created_at", key: "created_at" },
-        { label: "updated_at", key: "updated_at" },
+        { title: "id", dataIndex: "id", key: "id" },
+        { title: "parent_id", dataIndex: "parent_id", key: "parent_id" },
+        { title: "uid", dataIndex: "uid", key: "uid" },
+        { title: "note_type", dataIndex: "note_type", key: "note_type" },
+        { title: "level", dataIndex: "level", key: "level" },
+        { title: "title", dataIndex: "title", key: "title" },
+        { title: "state", dataIndex: "state", key: "state" },
+        { title: "version", dataIndex: "version", key: "version" },
+        { title: "color", dataIndex: "color", key: "color" },
+        { title: "content", dataIndex: "content", key: "content" },
+        { title: "tags", dataIndex: "tags", key: "tags" },
+        { title: "sha1", dataIndex: "sha1", key: "sha1" },
+        { title: "created_at", dataIndex: "created_at", key: "created_at" },
+        { title: "updated_at", dataIndex: "updated_at", key: "updated_at" },
     ]
+
+    const menu = (
+        <Menu>
+            <Menu.Item>
+                <Button icon={<ExportOutlined />} onClick={
+                    () => { exportExcel(headers, data, currentUser.uid + "_note.xlsx") }
+                } >导出全部笔记</Button>
+            </Menu.Item>
+            <Menu.Item>
+                <Button icon={<SyncOutlined />} onClick={
+                    () => { syncLocalNote() }
+                } >同步本地笔记</Button>
+            </Menu.Item>
+        </Menu>
+    )
     return (
         <div style={{
             display: "flex", flexDirection: "column", backgroundColor: "#f9f9f9"
@@ -176,15 +213,6 @@ const NoteIndex = () => {
                             }
                         }}
                     />
-
-                    <CSVLink
-                        data={data}
-                        headers={headers}
-                        filename={currentUser.uid + "_note.csv"}
-                    >
-                        <Button icon={<ExportOutlined className="pdc-note-button-icon" />} />
-                    </CSVLink >
-
                     {currentNote.note_type === NoteType.File ?
                         currentNote.editable ?
                             <span><Button type="primary" icon={<EyeOutlined className="pdc-note-button-icon" />}
@@ -194,6 +222,10 @@ const NoteIndex = () => {
                                 {/* <a onClick={this.downloadPDFFile} title={currentNote.title + ".pdf"} style={{ fontSize: 24, marginLeft: 4 }}><Icon type="file-pdf" theme="twoTone" /></a> */}
                             </span> : ''
                     }
+
+                    <Dropdown overlay={menu}>
+                        <SettingTwoTone className="pdc-note-button-icon" style={{ paddingLeft: 20 }} />
+                    </Dropdown>
                 </div>
             </div>
             {currentNote.level < 3 ? <NoteBookBoard updateCurrentNote={updateCurrentNote} initNoteTree={initNoteTree} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> :
