@@ -33,7 +33,8 @@ func (s NoteService) SyncNotes(ctx context.Context,
 		err = status.Errorf(codes.Internal, "数据库出错：%v", err)
 		return
 	}
-	createNotes, updateNotes, deleteNotes, clientShouldSyncNotes := m.ClassifyNotes(serverNotes, in.UnsyncedNotes)
+
+	createNotes, updateNotes, deleteNotes, clientShouldSyncNotes := m.ClassifyNotes(serverNotes, in.UnsyncedNotes, in.SyncLocal)
 	if len(createNotes) > 0 {
 		err = m.Create(createNotes)
 		if err != nil {

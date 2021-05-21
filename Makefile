@@ -30,6 +30,7 @@ protoc-note: api/proto/server/note-service/*.proto
 	protoc -I./api/proto/server \
 	-I./api/proto/include \
 	--go_out=plugins=grpc:. \
+	--experimental_allow_proto3_optional \
 	api/proto/server/note-service/*.proto
 protoc-device: api/proto/server/device-service/*.proto
 	protoc -I./api/proto/server \

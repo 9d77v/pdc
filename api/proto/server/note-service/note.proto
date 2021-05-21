@@ -5,12 +5,19 @@ option go_package = "internal/module/note-service/pb";
 import "google/protobuf/timestamp.proto";
 
 service NoteService {
-  rpc SyncNotes(SyncNotesRequest) returns(SyncNotesResponse) {}
+  rpc SyncNotes(SyncNotesRequest) returns (SyncNotesResponse) {}
 }
 
-enum NoteType { Directory = 0; File = 1; }
+enum NoteType {
+  Directory = 0;
+  File = 1;
+}
 
-enum NoteState { Normal = 0; InRubbish = 1; IsDeleted = 2; }
+enum NoteState {
+  Normal = 0;
+  InRubbish = 1;
+  IsDeleted = 2;
+}
 
 message Note {
   string id = 1;
@@ -33,6 +40,7 @@ message SyncNotesRequest {
   int64 uid = 1;
   google.protobuf.Timestamp last_update_time = 2;
   repeated Note unsynced_notes = 3;
+  optional bool syncLocal = 4;
 }
 
 message SyncNotesResponse {

@@ -35,6 +35,7 @@ type Note {
 input  SyncNotesInput{
     lastUpdateTime:Int!
     unsyncedNotes:[NewNote!]
+    syncLocal:Boolean
 }
 
 type SyncNotesResponse{

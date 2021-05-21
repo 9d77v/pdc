@@ -132,7 +132,7 @@ func (m *Note) ListToMap(notes []*Note) map[string]*Note {
 
 //ClassifyNotes classify notes for create,update,delete and client should sync
 func (m *Note) ClassifyNotes(serverNotes []*Note,
-	clientNotes []*pb.Note) ([]*Note, []*Note, []*Note, []*Note) {
+	clientNotes []*pb.Note, syncLocal *bool) ([]*Note, []*Note, []*Note, []*Note) {
 	serverNoteMap := m.ListToMap(serverNotes)
 	createNotes := make([]*Note, 0)
 	updateNotes := make([]*Note, 0)
@@ -141,8 +141,10 @@ func (m *Note) ClassifyNotes(serverNotes []*Note,
 	for _, clientNote := range clientNotes {
 		currentNote := serverNoteMap[clientNote.Id]
 		if currentNote == nil {
-			clientNote.CreatedAt = nil
-			clientNote.UpdatedAt = nil
+			if syncLocal == nil || !*syncLocal {
+				clientNote.CreatedAt = nil
+				clientNote.UpdatedAt = nil
+			}
 			createNotes = append(createNotes, NewNoteFromPB(clientNote))
 		} else if clientNote.State == pb.NoteState_IsDeleted {
 			if currentNote.State == int8(pb.NoteState_IsDeleted) {

@@ -264,6 +264,7 @@ func (r *mutationResolver) SyncNotes(ctx context.Context, input model.SyncNotesI
 		Uid:            int64(user.ID),
 		LastUpdateTime: t,
 		UnsyncedNotes:  note_dto.GetNotes(input.UnsyncedNotes),
+		SyncLocal:      input.SyncLocal,
 	})
 	return note_dto.GetSyncNotesResponseConnection(resp), err
 }
