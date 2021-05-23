@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/9d77v/pdc/internal/utils"
@@ -9,12 +10,12 @@ import (
 
 //环境变量
 var (
-	redisAddress  = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
-	redisPassword = utils.GetEnvStr("REDIS_PASSWORD", "")
+	redisAddresses = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
+	redisPassword  = utils.GetEnvStr("REDIS_PASSWORD", "")
 )
 
 var (
-	client *redisGo.Client
+	client redisGo.Cmdable
 	once   sync.Once
 )
 
@@ -28,16 +29,23 @@ const (
 )
 
 //GetClient get redis connection
-func GetClient() *redisGo.Client {
+func GetClient() redisGo.Cmdable {
 	once.Do(func() {
 		client = initClient()
 	})
 	return client
 }
-func initClient() *redisGo.Client {
-	return redisGo.NewClient(&redisGo.Options{
-		Addr:     redisAddress,
+
+func initClient() redisGo.Cmdable {
+	addresses := strings.Split(redisAddresses, ";")
+	if len(addresses) == 1 {
+		return redisGo.NewClient(&redisGo.Options{
+			Addr:     addresses[0],
+			Password: redisPassword,
+		})
+	}
+	return redisGo.NewClusterClient(&redisGo.ClusterOptions{
+		Addrs:    addresses,
 		Password: redisPassword,
-		DB:       0, // use default DB
 	})
 }
