@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	natsURL = utils.GetEnvStr("NATS_URL", "domain.local:4222")
+	natsURL = utils.GetEnvStr("NATS_URL", "nats://domain.local:4222")
 )
 var (
 	client stan.Conn
@@ -51,7 +51,7 @@ func initClient() stan.Conn {
 		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
 			log.Fatalf("Connection lost, reason: %v", reason)
 		}),
-		stan.NatsURL("nats://"+natsURL),
+		stan.NatsURL(natsURL),
 	)
 	if err != nil {
 		log.Println("nats connect error:", err)

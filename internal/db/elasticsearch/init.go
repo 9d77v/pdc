@@ -31,7 +31,7 @@ func GetClient() *elastic.Client {
 }
 
 func initClient() *elastic.Client {
-	db, err := elastic.NewClient(&config.ElasticConfig{URLs: strings.Split(esAddrs, ";")})
+	db, err := elastic.NewClient(&config.ElasticConfig{URLs: strings.Split(esAddrs, ",")})
 	if err != nil {
 		// Handle error
 		panic(err)

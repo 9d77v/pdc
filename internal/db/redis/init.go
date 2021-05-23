@@ -37,7 +37,7 @@ func GetClient() redisGo.Cmdable {
 }
 
 func initClient() redisGo.Cmdable {
-	addresses := strings.Split(redisAddresses, ";")
+	addresses := strings.Split(redisAddresses, ",")
 	if len(addresses) == 1 {
 		return redisGo.NewClient(&redisGo.Options{
 			Addr:     addresses[0],
