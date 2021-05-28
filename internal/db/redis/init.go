@@ -10,12 +10,12 @@ import (
 
 //环境变量
 var (
-	redisAddresses = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:6379")
+	redisAddresses = utils.GetEnvStr("REDIS_ADDRESS", "domain.local:7000,domain.local:7001,domain.local:7002,domain.local:7003,domain.local:7004,domain.local:7005")
 	redisPassword  = utils.GetEnvStr("REDIS_PASSWORD", "")
 )
 
 var (
-	client redisGo.Cmdable
+	client redisGo.UniversalClient
 	once   sync.Once
 )
 
@@ -29,14 +29,14 @@ const (
 )
 
 //GetClient get redis connection
-func GetClient() redisGo.Cmdable {
+func GetClient() redisGo.UniversalClient {
 	once.Do(func() {
 		client = initClient()
 	})
 	return client
 }
 
-func initClient() redisGo.Cmdable {
+func initClient() redisGo.UniversalClient {
 	addresses := strings.Split(redisAddresses, ",")
 	if len(addresses) == 1 {
 		return redisGo.NewClient(&redisGo.Options{

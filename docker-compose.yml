@@ -61,15 +61,67 @@ services:
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
     container_name: db
-  redis:
-    image: redis:6.0.5-alpine
+# docker exec -it redis0 redis-cli -p 6370 --cluster create domain.local:7000 domain.local:7001 domain.local:7002 domain.local:7003 domain.local:7004 domain.local:7005 --cluster-replicas 1
+  redis0:
+    image: redis:6.2.3-alpine
     restart: always
-    ports:
-      - 6379:6379
-    command: redis-server --appendonly yes
+    network_mode: host
+    command: redis-server --appendonly yes -- cluster-enabled yes --port 7000
     volumes:
-        - ./redis/data:/data
-    container_name: redis
+      - ./redis/data0:/data
+    container_name: redis0
+    environment:
+      - TZ=Asia/Shanghai
+  redis1:
+    image: redis:6.2.3-alpine
+    restart: always
+    network_mode: host
+    command: redis-server --appendonly yes -- cluster-enabled yes --port 7001
+    volumes:
+        - ./redis/data1:/data
+    container_name: redis1
+    environment:
+      - TZ=Asia/Shanghai
+  redis2:
+    image: redis:6.2.3-alpine
+    restart: always
+    network_mode: host
+    command: redis-server --appendonly yes -- cluster-enabled yes --port 7002
+    volumes:
+        - ./redis/data2:/data
+    container_name: redis2
+    environment:
+      - TZ=Asia/Shanghai
+  redis3:
+    image: redis:6.2.3-alpine
+    restart: always
+    network_mode: host
+    command: redis-server --appendonly yes -- cluster-enabled yes --port 7003
+    volumes:
+        - ./redis/data3:/data
+    container_name: redis3
+    environment:
+      - TZ=Asia/Shanghai
+  redis4:
+    image: redis:6.2.3-alpine
+    restart: always
+    network_mode: host
+    command: redis-server --appendonly yes -- cluster-enabled yes --port 7004
+    volumes:
+        - ./redis/data4:/data
+    container_name: redis4
+    environment:
+      - TZ=Asia/Shanghai
+  redis5:
+    image: redis:6.2.3-alpine
+    restart: always
+    network_mode: host
+    command: redis-server --appendonly yes -- cluster-enabled yes --port 7005
+    volumes:
+        - ./redis/data5:/data
+    container_name: redis5
+    environment:
+      - TZ=Asia/Shanghai
   pdc:
     image: 9d77v/pdc:2021-05-15_e1dc9de
     restart: always
