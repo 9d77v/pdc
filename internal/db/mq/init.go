@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"github.com/9d77v/pdc/internal/utils"
-	"github.com/nats-io/stan.go"
+	"github.com/nats-io/nats.go"
 )
 
 var (
 	natsURL = utils.GetEnvStr("NATS_URL", "nats://domain.local:4222")
 )
 var (
-	client stan.Conn
+	client *nats.Conn
 	once   sync.Once
 )
 
@@ -27,6 +27,8 @@ const (
 
 //device subject
 const (
+	StreamDevice                 = "DEVICE"
+	StreamVideo                  = "VIDEO"
 	SubjectDevicPrefix           = "device."
 	SubjectDeviceData            = "device.data"
 	SubjectDeviceTelemetryPrefix = "device.telemetry."
@@ -37,22 +39,35 @@ const (
 )
 
 //GetClient get mq connection
-func GetClient() stan.Conn {
+func GetClient() *nats.Conn {
 	once.Do(func() {
 		client = initClient()
 	})
 	return client
 }
 
-func initClient() stan.Conn {
-	conn, err := stan.Connect("test-cluster",
-		fmt.Sprintf("client-%d", time.Now().Unix()),
-		stan.Pings(10, 5),
-		stan.SetConnectionLostHandler(func(_ stan.Conn, reason error) {
-			log.Fatalf("Connection lost, reason: %v", reason)
+//GetClient get mq connection
+func GetJetStream() (nats.JetStreamContext, error) {
+	once.Do(func() {
+		client = initClient()
+	})
+	return client.JetStream(nats.PublishAsyncMaxPending(256))
+}
+
+func initClient() *nats.Conn {
+	conn, err := nats.Connect(natsURL,
+		nats.RetryOnFailedConnect(true),
+		nats.MaxReconnects(5),
+		nats.ReconnectWait(2*time.Second),
+		nats.DisconnectErrHandler(func(nc *nats.Conn, err error) {
+			fmt.Printf("Got disconnected! Reason: %q\n", err)
 		}),
-		stan.NatsURL(natsURL),
-	)
+		nats.ReconnectHandler(func(nc *nats.Conn) {
+			fmt.Printf("Got reconnected to %v!\n", nc.ConnectedUrl())
+		}),
+		nats.ClosedHandler(func(nc *nats.Conn) {
+			fmt.Printf("Connection closed. Reason: %q\n", nc.LastError())
+		}))
 	if err != nil {
 		log.Println("nats connect error:", err)
 	}

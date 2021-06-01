@@ -23,13 +23,15 @@ services:
     ports:
       - 9001:9000
     container_name: clickhouse-server
-  nats-streaming:
-    image: nats-streaming:0.18.0-alpine3.12
+  nats:
+    image: nats:2.2.6-alpine3.13
     restart: always
+    command: nats -js
     ports:
       - 4222:4222
+      - 6222:6222
       - 8222:8222
-    container_name: nats-streaming
+    container_name: nats
   elasticsearch:
     image: 9d77v/elasticsearch:7.8.1
     restart: always

@@ -10,11 +10,11 @@ import (
 	"github.com/9d77v/pdc/internal/db/elasticsearch"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
 
-	"github.com/nats-io/stan.go"
+	"github.com/nats-io/nats.go"
 )
 
 //HandleVideoMSG ...
-func HandleVideoMSG(m *stan.Msg) {
+func HandleVideoMSG(m *nats.Msg) {
 	ctx := context.Background()
 	vi := new(models.VideoIndex)
 	client := elasticsearch.GetClient()
