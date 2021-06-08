@@ -1,4 +1,3 @@
-
 import XLSX from "xlsx"
 
 const exportExcel = (headers: any, data: any, fileName = 'demo.xlsx') => {

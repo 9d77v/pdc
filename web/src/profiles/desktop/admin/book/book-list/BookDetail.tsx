@@ -60,6 +60,10 @@ export default function BookDetail() {
                             <span style={itemStyle}>出版社：{book?.publishingHouse}</span>
                         </div>
                         <div style={infoStyle}>
+                            <span style={itemStyle}>包装：{book?.packing}</span>
+                            <span style={itemStyle}>页数：{book?.pageSize}</span>
+                        </div>
+                        <div style={infoStyle}>
                             <span style={itemStyle}>开本：{book?.format}</span>
                             <span style={itemStyle}>版次：{book?.edition}</span>
                         </div>

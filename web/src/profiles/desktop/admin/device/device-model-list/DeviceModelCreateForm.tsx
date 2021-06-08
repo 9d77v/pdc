@@ -1,5 +1,5 @@
 import { Modal, Form, Input, Select } from 'antd';
-import React, { FC, useState } from 'react'
+import { FC, useState } from 'react'
 import TextArea from 'antd/lib/input/TextArea';
 import { CameraCompanyMap, DeviceTypeMap } from 'src/consts/consts';
 import { INewDeviceModel } from 'src/models/device';
@@ -26,6 +26,7 @@ export const DeviceModelCreateForm: FC<IDeviceModelCreateFormProps> = ({
         deviceTypeOptions.push(<Select.Option
             value={key}
             key={'deviceType_options_' + key}>{value}</Select.Option>)
+        return
     })
     let cameraCompanyOptions: any = []
     CameraCompanyMap.forEach((value: string, key: number) => {
@@ -80,6 +81,7 @@ export const DeviceModelCreateForm: FC<IDeviceModelCreateFormProps> = ({
                 <Form.Item
                     name="deviceType"
                     label="设备类型"
+                    hidden
                     hasFeedback
                     rules={[{ required: true, message: '请选择设备类型!' }]}
                 >

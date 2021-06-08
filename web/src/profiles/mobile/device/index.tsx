@@ -10,7 +10,7 @@ export default function DeviceIndex() {
     const history = useHistory()
     const tabs = [
         { title: "遥测" },
-        { title: "摄像头" },
+        // { title: "摄像头" },
     ];
     const location = useLocation()
     let initialPage = 0

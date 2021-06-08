@@ -9,11 +9,12 @@ const LIST_BOOK = gql`
             id
             isbn
             name
-            desc
             cover
             author
             translator
             publishingHouse
+            packing
+            pageSize
             createdAt
             updatedAt
        }
@@ -51,6 +52,8 @@ const BOOK_DETAIL = gql`
             format
             wordCount
             pricing
+            packing
+            pageSize
             purchasePrice
             purchaseTime
             purchaseSource
@@ -104,6 +107,8 @@ const APP_BOOK_DETAIL = gql`
             format
             wordCount
             pricing
+            packing
+            pageSize
        }
    }
   }
