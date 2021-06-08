@@ -71,6 +71,7 @@ export const DeviceDashboardCreateForm: FC<IDeviceDashboardCreateFormProps> = ({
                     name="deviceType"
                     label="设备类型"
                     hasFeedback
+                    hidden
                     rules={[{ required: true, message: '请选择设备类型!' }]}
                 >
                     <Select >

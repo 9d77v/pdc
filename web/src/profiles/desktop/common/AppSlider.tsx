@@ -197,9 +197,9 @@ const AppMenu = (props: IAppHeaderProps) => {
                 <Menu.Item key="device-telemetry">
                     <Link to={AppPath.DEVICE_TELEMETRY}>{PathDict.get(AppPath.DEVICE_TELEMETRY)}</Link>
                 </Menu.Item>
-                <Menu.Item key="device-camera">
+                {/* <Menu.Item key="device-camera">
                     <Link to={AppPath.DEVICE_CAMERA}>{PathDict.get(AppPath.DEVICE_CAMERA)}</Link>
-                </Menu.Item>
+                </Menu.Item> */}
             </SubMenu>
             {/* <SubMenu
                 key="thing"

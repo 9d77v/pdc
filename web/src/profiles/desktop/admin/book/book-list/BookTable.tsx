@@ -60,9 +60,11 @@ export default function BookTable() {
                     "printedTimes": values.printedTimes,
                     "printedSheets": values.printedSheets,
                     "format": values.format,
-                    "wordCount": values.wordCount,
-                    "pricing": values.pricing.toString(),
-                    "purchasePrice": values.purchasePrice.toString(),
+                    "wordCount": values.wordCount?.toString(),
+                    "pricing": values.pricing?.toString(),
+                    "packing": values.packing,
+                    "pageSize": values.pageSize,
+                    "purchasePrice": values.purchasePrice?.toString(),
                     "purchaseTime": values.purchaseTime ? values.purchaseTime.unix() : 0,
                     "purchaseSource": values.purchaseSource,
                     "bookBorrowUID": values.bookBorrowUID,
@@ -89,9 +91,11 @@ export default function BookTable() {
                     "printedTimes": values.printedTimes,
                     "printedSheets": values.printedSheets,
                     "format": values.format,
-                    "wordCount": values.wordCount,
-                    "pricing": values.pricing.toString(),
-                    "purchasePrice": values.purchasePrice.toString(),
+                    "wordCount": values.wordCount?.toString(),
+                    "pricing": values.pricing?.toString(),
+                    "packing": values.packing,
+                    "pageSize": values.pageSize,
+                    "purchasePrice": values.purchasePrice?.toString(),
                     "purchaseTime": values.purchaseTime ? values.purchaseTime.unix() : 0,
                     "purchaseSource": values.purchaseSource,
                     "bookBorrowUID": values.bookBorrowUID,
@@ -147,10 +151,6 @@ export default function BookTable() {
         { title: 'isbn', dataIndex: 'isbn', key: 'isbn', width: 100 },
         { title: '书名', dataIndex: 'name', key: 'name', width: 150 },
         {
-            title: '简介', dataIndex: 'desc', key: 'desc', width: 300,
-            ellipsis: true
-        },
-        {
             title: '封面', dataIndex: 'cover', key: 'cover', width: 180,
             render: (value: string) => <Img src={value ? value : ''} />
         },
@@ -187,6 +187,9 @@ export default function BookTable() {
             }
         },
         { title: '出版社', dataIndex: 'publishingHouse', key: 'publishingHouse', width: 100, },
+        { title: '包装', dataIndex: 'packing', key: 'publishingHouse', width: 100, },
+        { title: '页数', dataIndex: 'pageSize', key: 'publishingHouse', width: 100, },
+
         {
             title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 170,
             render: (value: number) => dayjs(value * 1000).format("YYYY-MM-DD HH:mm:ss")

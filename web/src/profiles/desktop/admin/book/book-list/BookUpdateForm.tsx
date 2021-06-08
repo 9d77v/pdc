@@ -12,6 +12,7 @@ interface IBookUpdateFormProps {
     onUpdate: (values: IUpdateBook) => void
     onCancel: () => void
 }
+const { TextArea } = Input;
 
 export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
     visible,
@@ -87,8 +88,9 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                 form
                     .validateFields()
                     .then((values: any) => {
-                        form.resetFields()
                         onUpdate(values)
+
+                        form.resetFields()
                     })
                     .catch(info => {
                         console.log('Validate Failed:', info)
@@ -129,7 +131,7 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                     label="简介"
                     rules={[{ required: true, message: '请输入简介!' }]}
                 >
-                    <Input />
+                    <TextArea />
                 </Form.Item>
                 <Form.Item
                     name="cover"
@@ -175,35 +177,30 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                 <Form.Item
                     name="edition"
                     label="版次"
-                    rules={[{ required: true, message: '请输入版次!' }]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="printedTimes"
                     label="印次"
-                    rules={[{ required: true, message: '请输入印次!' }]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="printedSheets"
                     label="印张"
-                    rules={[{ required: true, message: '请输入印张!' }]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="format"
                     label="开本"
-                    rules={[{ required: true, message: '请输入开本!' }]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="wordCount"
                     label="字数"
-                    rules={[{ required: true, message: '请输入字数!' }]}
                 >
                     <InputNumber />
                 </Form.Item>
@@ -215,9 +212,20 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                     <InputNumber />
                 </Form.Item>
                 <Form.Item
+                    name="packing"
+                    label="包装"
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="pageSize"
+                    label="页数"
+                >
+                    <InputNumber />
+                </Form.Item>
+                <Form.Item
                     name="purchasePrice"
                     label="购买价"
-                    rules={[{ required: true, message: '请输入购买价!' }]}
                 >
                     <InputNumber />
                 </Form.Item>

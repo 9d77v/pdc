@@ -54,6 +54,8 @@ const BookDetail: FC = () => {
                 <div style={{ textAlign: "left", paddingLeft: 10 }}>
                     <span style={infoStyle}>开本：{book?.format}</span>
                     <span style={infoStyle}>版次：{book?.edition}</span>
+                    <span style={infoStyle}>包装：{book?.packing}</span>
+                    <span style={infoStyle}>页数：{book?.pageSize}</span>
                     <span style={infoStyle}>印次：{book?.printedTimes}</span>
                     <span style={infoStyle}>印张：{book?.printedSheets}</span>
                     <span style={infoStyle}>字数：{book?.wordCount} 千字</span>
