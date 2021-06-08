@@ -1,4 +1,10 @@
-package elasticsearch
+package consts
+
+//别名
+const (
+	AliasVideo = "video"
+	ESLayout   = "2006.01.02-15.04.05"
+)
 
 //VideoMapping ..
 const VideoMapping = `{

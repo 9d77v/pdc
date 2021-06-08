@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"
 	"github.com/stretchr/testify/assert"

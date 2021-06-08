@@ -9,14 +9,20 @@ import (
 
 //MyCustomClaims jwt自定义内容
 type MyCustomClaims struct {
-	UID string `json:"uid"` //用户id
+	UID      int64  `json:"uid"` //用户id
+	Username string `json:"username"`
+	Avatar   string `json:"avatar"`
+	Gender   int    `json:"gender"`
 	jwt.StandardClaims
 }
 
 //JWT 生成jwt字符串
-func JWT(signingKey []byte, uid string, tokenExpire time.Duration, issuer string) string {
+func JWT(signingKey []byte, uid int64, username, avatar string, gender int, tokenExpire time.Duration, issuer string) string {
 	claims := MyCustomClaims{
 		uid,
+		username,
+		avatar,
+		gender,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenExpire).Unix(),
 			Issuer:    issuer,

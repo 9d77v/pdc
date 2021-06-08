@@ -42,8 +42,10 @@ func toBook(book *pb.Book, scheme string) *model.Book {
 		PrintedTimes:    book.PrintedTimes,
 		PrintedSheets:   book.PrintedSheets,
 		Format:          book.Format,
-		WordCount:       book.WordCount,
+		WordCount:       strconv.FormatFloat(book.WordCount, 'f', 1, 64),
 		Pricing:         strconv.FormatFloat(book.Pricing, 'f', 2, 64),
+		Packing:         book.Packing,
+		PageSize:        int64(book.PageSize),
 		PurchasePrice:   strconv.FormatFloat(book.PurchasePrice, 'f', 2, 64),
 		PurchaseTime:    book.PurchaseTime.GetSeconds(),
 		PurchaseSource:  book.PurchaseSource,
@@ -87,7 +89,9 @@ func toBookIndex(book *pb.BookIndex, scheme string) *model.BookIndex {
 		PrintedTimes:    book.PrintedTimes,
 		PrintedSheets:   book.PrintedSheets,
 		Format:          book.Format,
-		WordCount:       book.WordCount,
+		WordCount:       strconv.FormatFloat(book.WordCount, 'f', 1, 64),
 		Pricing:         strconv.FormatFloat(book.Pricing, 'f', 2, 64),
+		Packing:         book.Packing,
+		PageSize:        int64(book.PageSize),
 	}
 }

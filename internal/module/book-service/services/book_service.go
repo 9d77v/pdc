@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/book-service/models"
 	"github.com/9d77v/pdc/internal/module/book-service/pb"
@@ -52,6 +52,8 @@ func (s BookService) UpdateBook(ctx context.Context,
 		"purchase_price":   in.PurchasePrice,
 		"purchase_time":    in.PurchaseTime.AsTime(),
 		"purchase_source":  in.PurchaseSource,
+		"packing":          in.Packing,
+		"page_size":        in.PageSize,
 	}
 	if in.Cover != "" {
 		updateMap["cover"] = in.Cover

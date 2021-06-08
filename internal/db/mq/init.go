@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/9d77v/pdc/internal/utils"
+	"github.com/9d77v/go-pkg/env"
 	"github.com/nats-io/nats.go"
 )
 
 var (
-	natsURL = utils.GetEnvStr("NATS_URL", "nats://domain.local:4222")
+	natsURL = env.GetEnvStr("NATS_URL", "nats://domain.local:4222")
 )
 var (
 	client *nats.Conn

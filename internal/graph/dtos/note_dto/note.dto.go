@@ -3,7 +3,6 @@ package note_dto
 import (
 	"time"
 
-	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/note-service/pb"
 	"github.com/golang/protobuf/ptypes"
@@ -23,7 +22,7 @@ func getNote(m *model.NewNote) *pb.Note {
 	return &pb.Note{
 		Id:        m.ID,
 		ParentId:  m.ParentID,
-		Uid:       int64(consts.GetDecodeUID(m.UID)),
+		Uid:       int64(m.UID),
 		NoteType:  pb.NoteType(m.NoteType),
 		Level:     int32(m.Level),
 		Title:     m.Title,
@@ -58,7 +57,7 @@ func toNote(m *pb.Note) *model.Note {
 	return &model.Note{
 		ID:        m.Id,
 		ParentID:  m.ParentId,
-		UID:       consts.GetEncodeUID(uint(m.Uid)),
+		UID:       m.Uid,
 		NoteType:  int64(m.NoteType),
 		Level:     int64(m.Level),
 		Title:     m.Title,

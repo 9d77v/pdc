@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"gorm.io/gorm"
 
 	"github.com/9d77v/pdc/internal/db/db"

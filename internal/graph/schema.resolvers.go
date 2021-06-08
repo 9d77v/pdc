@@ -8,8 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/9d77v/go-lib/ptrs"
-	"github.com/9d77v/pdc/internal/consts"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/dtos/book_dto"
 	"github.com/9d77v/pdc/internal/graph/dtos/common_dto"
@@ -290,8 +289,9 @@ func (r *mutationResolver) UpdateBookshelf(ctx context.Context, input model.NewU
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) (*model.Book, error) {
 	t, _ := ptypes.TimestampProto(time.Unix(input.PurchaseTime, 0))
+	wordCount, _ := strconv.ParseFloat(ptrs.String(input.WordCount), 64)
 	pricing, _ := strconv.ParseFloat(input.Pricing, 64)
-	purchasePricing, _ := strconv.ParseFloat(input.PurchasePrice, 64)
+	purchasePricing, _ := strconv.ParseFloat(ptrs.String(input.PurchasePrice), 64)
 	resp, err := bookService.CreateBook(ctx, &bookPB.CreateBookRequest{
 		Isbn:            input.Isbn,
 		Name:            input.Name,
@@ -300,12 +300,14 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) 
 		Author:          input.Author,
 		Translator:      input.Translator,
 		PublishingHouse: input.PublishingHouse,
-		Edition:         input.Edition,
-		PrintedTimes:    input.PrintedTimes,
-		PrintedSheets:   input.PrintedSheets,
-		Format:          input.Format,
-		WordCount:       input.WordCount,
+		Edition:         ptrs.String(input.Edition),
+		PrintedTimes:    ptrs.String(input.PrintedTimes),
+		PrintedSheets:   ptrs.String(input.PrintedSheets),
+		Format:          ptrs.String(input.Format),
+		WordCount:       wordCount,
 		Pricing:         pricing,
+		Packing:         ptrs.String(input.Packing),
+		PageSize:        int32(ptrs.Int64(input.PageSize)),
 		PurchasePrice:   purchasePricing,
 		PurchaseTime:    t,
 		PurchaseSource:  input.PurchaseSource,
@@ -315,8 +317,9 @@ func (r *mutationResolver) CreateBook(ctx context.Context, input model.NewBook) 
 
 func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdateBook) (*model.Book, error) {
 	t, _ := ptypes.TimestampProto(time.Unix(input.PurchaseTime, 0))
+	wordCount, _ := strconv.ParseFloat(ptrs.String(input.WordCount), 64)
 	pricing, _ := strconv.ParseFloat(input.Pricing, 64)
-	purchasePricing, _ := strconv.ParseFloat(input.PurchasePrice, 64)
+	purchasePricing, _ := strconv.ParseFloat(ptrs.String(input.PurchasePrice), 64)
 	resp, err := bookService.UpdateBook(ctx, &bookPB.UpdateBookRequest{
 		Id:              input.ID,
 		Isbn:            input.Isbn,
@@ -326,12 +329,14 @@ func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdate
 		Author:          input.Author,
 		Translator:      input.Translator,
 		PublishingHouse: input.PublishingHouse,
-		Edition:         input.Edition,
-		PrintedTimes:    input.PrintedTimes,
-		PrintedSheets:   input.PrintedSheets,
-		Format:          input.Format,
-		WordCount:       input.WordCount,
+		Edition:         ptrs.String(input.Edition),
+		PrintedTimes:    ptrs.String(input.PrintedTimes),
+		PrintedSheets:   ptrs.String(input.PrintedSheets),
+		Format:          ptrs.String(input.Format),
+		WordCount:       wordCount,
 		Pricing:         pricing,
+		Packing:         ptrs.String(input.Packing),
+		PageSize:        int32(ptrs.Int64(input.PageSize)),
 		PurchasePrice:   purchasePricing,
 		PurchaseTime:    t,
 		PurchaseSource:  input.PurchaseSource,
@@ -404,7 +409,7 @@ func (r *queryResolver) Users(ctx context.Context, searchParam model.SearchParam
 func (r *queryResolver) UserInfo(ctx context.Context, uid *int64) (*model.User, error) {
 	scheme := middleware.ForSchemeContext(ctx)
 	user := userService.GetUserInfo(middleware.ForContext(ctx), scheme)
-	user.UID = consts.GetEncodeUID(uint(user.ID))
+	user.UID = user.ID
 	user.ID = 0
 	return user, nil
 }

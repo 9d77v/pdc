@@ -9,10 +9,12 @@ import (
 
 	"github.com/nats-io/nats.go"
 
+	"github.com/9d77v/go-pkg/env"
 	"github.com/9d77v/pdc/internal/db/clickhouse"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
+
 	ch_device "github.com/9d77v/pdc/internal/module/device-service/chmodels"
 	ch_history "github.com/9d77v/pdc/internal/module/history-service/chmodels"
 
@@ -26,13 +28,11 @@ import (
 	user "github.com/9d77v/pdc/internal/module/user-service/models"
 	video_consumers "github.com/9d77v/pdc/internal/module/video-service/consumers"
 	video "github.com/9d77v/pdc/internal/module/video-service/models"
-
-	"github.com/9d77v/pdc/internal/utils"
 )
 
 var (
-	ownerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
-	ownerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
+	ownerName     = env.GetEnvStr("ADMIN_NAME", "admin")
+	ownerPassword = env.GetEnvStr("ADMIN_PASSWORD", "123456")
 )
 
 func init() {

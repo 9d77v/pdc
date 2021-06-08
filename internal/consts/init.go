@@ -3,9 +3,6 @@ package consts
 import "log"
 
 func init() {
-	if hashUIDLength < 10 {
-		log.Panicln("PDC_HASH_UID_LENGTH should longer than or equal to 10")
-	}
 	if accessKeyLen < 10 {
 		log.Panicln("PDC_DEVICE_ACCESS_KEY_LENGTH should longer than or equal to 10")
 	}

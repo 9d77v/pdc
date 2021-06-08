@@ -7,10 +7,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/cache/redis"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/db"
-	"github.com/9d77v/pdc/internal/db/redis"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/user-service/models"
@@ -55,7 +55,7 @@ func (s UserService) CreateUser(ctx context.Context, input model.NewUser) (*mode
 	if err != nil {
 		return &model.User{}, err
 	}
-	return &model.User{UID: consts.GetEncodeUID(m.ID)}, err
+	return &model.User{UID: int64(m.ID)}, err
 }
 
 //UpdateUser ..
@@ -84,12 +84,12 @@ func (s UserService) UpdateUser(ctx context.Context, input model.NewUpdateUser) 
 		updateMap["password"] = string(bytes)
 	}
 	err := db.GetDB().Model(user).Updates(updateMap).Error
-	key := fmt.Sprintf("%s:%d", redis.PrefixUser, input.ID)
+	key := fmt.Sprintf("%s:%d", consts.PrefixUser, input.ID)
 	redisErr := redis.GetClient().Del(ctx, key).Err()
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
-	return &model.User{UID: consts.GetEncodeUID(user.ID)}, err
+	return &model.User{UID: int64(user.ID)}, err
 }
 
 //ListUser ..
@@ -120,9 +120,8 @@ func (s UserService) Login(ctx context.Context, username string, password string
 	if err != nil {
 		return res, errors.New("用户名或密码错误")
 	}
-	uid := consts.GetEncodeUID(user.ID)
-	res.AccessToken = utils.JWT([]byte(consts.JWTtAccessSecret), uid, accessExpire, consts.JWTIssuer)
-	res.RefreshToken = utils.JWT([]byte(consts.JWTRefreshSecret), uid, refreshExpire, consts.JWTIssuer)
+	res.AccessToken = utils.JWT([]byte(consts.JWTtAccessSecret), int64(user.ID), user.Name, user.Avatar, user.Gender, accessExpire, consts.JWTIssuer)
+	res.RefreshToken = utils.JWT([]byte(consts.JWTRefreshSecret), int64(user.ID), user.Name, user.Avatar, user.Gender, refreshExpire, consts.JWTIssuer)
 	return res, nil
 }
 
@@ -134,15 +133,15 @@ func (s UserService) RefreshToken(ctx context.Context, refreshToken string) (*mo
 		return res, err
 	}
 	data, _ := token.Claims.(*utils.MyCustomClaims)
-	res.AccessToken = utils.JWT([]byte(consts.JWTtAccessSecret), data.UID, accessExpire, consts.JWTIssuer)
-	res.RefreshToken = utils.JWT([]byte(consts.JWTRefreshSecret), data.UID, refreshExpire, consts.JWTIssuer)
+	res.AccessToken = utils.JWT([]byte(consts.JWTtAccessSecret), data.UID, data.Username, data.Avatar, data.Gender, accessExpire, consts.JWTIssuer)
+	res.RefreshToken = utils.JWT([]byte(consts.JWTRefreshSecret), data.UID, data.Username, data.Avatar, data.Gender, refreshExpire, consts.JWTIssuer)
 	return res, nil
 }
 
 //GetUserByID ..
 func (s UserService) GetUserByID(ctx context.Context, uid int64) (*models.User, error) {
 	user := models.NewUser()
-	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
+	key := fmt.Sprintf("%s:%d", consts.PrefixUser, uid)
 	err := redis.GetClient().Get(ctx, key).Scan(user)
 	if err != nil {
 		if err := user.IDQuery(uint(uid)).First(user); err != nil {
@@ -174,12 +173,12 @@ func (s UserService) UpdateProfile(ctx context.Context, input model.NewUpdatePro
 		updateMap["avatar"] = ptrs.String(input.Avatar)
 	}
 	err := db.GetDB().Model(user).Updates(updateMap).Error
-	key := fmt.Sprintf("%s:%d", redis.PrefixUser, uid)
+	key := fmt.Sprintf("%s:%d", consts.PrefixUser, uid)
 	redisErr := redis.GetClient().Del(ctx, key).Err()
 	if redisErr != nil {
 		log.Println("redis del failed:", redisErr)
 	}
-	return &model.User{UID: consts.GetEncodeUID(uid)}, err
+	return &model.User{UID: int64(uid)}, err
 }
 
 //UpdatePassword ..
@@ -212,7 +211,7 @@ func (s UserService) UpdatePassword(ctx context.Context,
 		log.Println("update password failed")
 		return nil, err
 	}
-	return &model.User{UID: consts.GetEncodeUID(uid)}, err
+	return &model.User{UID: int64(uid)}, err
 }
 
 //GetUserInfo ..

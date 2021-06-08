@@ -7,17 +7,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/9d77v/pdc/internal/utils"
+	"github.com/9d77v/go-pkg/env"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 //minio env
 var (
-	minioAddress         = utils.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
-	secureMinioAddress   = utils.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
-	minioAccessKeyID     = utils.GetEnvStr("MINIO_ACCESS_KEY", "minio")
-	minioSecretAccessKey = utils.GetEnvStr("MINIO_SECRET_KEY", "minio123")
+	minioAddress         = env.GetEnvStr("MINIO_ADDRESS", "oss.domain.local:9000")
+	secureMinioAddress   = env.GetEnvStr("SECURE_MINIO_ADDRESS", "oss.domain.local")
+	minioAccessKeyID     = env.GetEnvStr("MINIO_ACCESS_KEY", "minio")
+	minioSecretAccessKey = env.GetEnvStr("MINIO_SECRET_KEY", "minio123")
 	ossPrefix            = fmt.Sprintf("http://%s", minioAddress)
 	secureOssPrerix      = fmt.Sprintf("https://%s", secureMinioAddress)
 )
@@ -68,7 +68,7 @@ func initSecureMinioClient() *minio.Client {
 
 //InitMinioBuckets ..
 func InitMinioBuckets() {
-	preCreatedBuckets := []string{"image", "video", "vtt", "pan", "camera"}
+	preCreatedBuckets := []string{"image", "video", "vtt", "camera", "public-share", "private-share"}
 	location := "us-east-1"
 	for _, bucketName := range preCreatedBuckets {
 		err := GetMinioClient().MakeBucket(context.Background(), bucketName,
@@ -83,11 +83,11 @@ func InitMinioBuckets() {
 		} else {
 			log.Printf("Successfully created %s\n", bucketName)
 		}
-		if bucketName != "pan" {
+		if bucketName != "private_share" {
 			//mc  policy  set  download  minio/mybucket
 			policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action": 
 ["s3:GetObject"],"Resource":["arn:aws:s3:::` + bucketName + `/*"]}]}`
-			err := GetMinioClient().SetBucketPolicy(context.Background(), bucketName, policy)
+			err = GetMinioClient().SetBucketPolicy(context.Background(), bucketName, policy)
 			if err != nil {
 				log.Printf("Set bucket:%s policy faield:%v\n", bucketName, err)
 			}

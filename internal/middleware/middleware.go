@@ -91,8 +91,7 @@ func Auth() func(http.Handler) http.Handler {
 					return
 				}
 				//获取hash前用户id
-				uid := consts.GetDecodeUID(data.UID)
-				user, err := userService.GetUserByID(r.Context(), int64(uid))
+				user, err := userService.GetUserByID(r.Context(), data.UID)
 				if err != nil {
 					w.Header().Set("Content-type", "application/json")
 					http.Error(w, resString(NewErrorResponse("Invalid token", r.URL.Path)), http.StatusUnauthorized)
@@ -281,8 +280,7 @@ func CheckToken(accessToken string) bool {
 	if data.Issuer != consts.JWTIssuer {
 		return false
 	}
-	uid := consts.GetDecodeUID(data.UID)
-	_, err = userService.GetUserByID(context.Background(), int64(uid))
+	_, err = userService.GetUserByID(context.Background(), data.UID)
 	if err != nil {
 		return false
 	}

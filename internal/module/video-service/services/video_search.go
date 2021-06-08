@@ -7,8 +7,8 @@ import (
 
 	elastic "github.com/olivere/elastic/v7"
 
-	es "github.com/9d77v/go-lib/clients/elastic/v7"
-	"github.com/9d77v/pdc/internal/db/elasticsearch"
+	elasticsearch "github.com/9d77v/go-pkg/db/elastic"
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 )
@@ -33,16 +33,16 @@ func (s *videoSearch) execute() (*model.VideoIndexConnection, error) {
 	s.Filter()
 	offset, limit := s.GetPageInfo()
 	searchService := elasticsearch.GetClient().Search().
-		Index(elasticsearch.AliasVideo).
+		Index(consts.AliasVideo).
 		Query(s.BoolQuery).
 		From(offset).
 		Size(limit)
-	aggsParams := []*es.AggsParam{
+	aggsParams := []*elasticsearch.AggsParam{
 		{Field: "tags", Size: 50},
 	}
 	field := base.NewGraphQLField(s.Ctx, "")
 	if field.FieldMap["aggResults"] {
-		searchService = es.Aggs(searchService, aggsParams...)
+		searchService = elasticsearch.Aggs(searchService, aggsParams...)
 	}
 	if field.FieldMap["edges"] {
 		s.sort(searchService)

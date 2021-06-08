@@ -24,9 +24,11 @@ type Book struct {
 	PrintedTimes    string         `gorm:"size:32;NOT NULL;comment:'印次'"`
 	PrintedSheets   string         `gorm:"size:32;NOT NULL;comment:'印张'"`
 	Format          string         `gorm:"size:32;NOT NULL;comment:'开本'"`
-	WordCount       int            `gorm:"comment:'字数'"`
-	Pricing         float32        `gorm:"money;NOT NULL;comment:'定价'"`
-	PurchasePrice   float32        `gorm:"money;NOT NULL;comment:'购买价'"`
+	WordCount       float32        `gorm:"comment:'字数'"`
+	Pricing         float32        `gorm:"NOT NULL;comment:'定价'"`
+	PurchasePrice   float32        `gorm:"NOT NULL;comment:'购买价'"`
+	Packing         string         `gorm:"size:32;NOT NULL;comment:'包装'"`
+	PageSize        int            `gorm:"comment:'页数';NOT NULL;"`
 	PurchaseTime    time.Time      `gorm:"comment:'购买时间'"`
 	PurchaseSource  string         `gorm:"size:100;NOT NULL;comment:'购买途径'"`
 	BookBorrowUID   uint           `gorm:"comment:'借书人uid'"`
@@ -51,8 +53,10 @@ func NewBookFromPB(in *pb.CreateBookRequest) *Book {
 		PrintedTimes:    in.PrintedTimes,
 		PrintedSheets:   in.PrintedSheets,
 		Format:          in.Format,
-		WordCount:       int(in.WordCount),
+		WordCount:       float32(in.WordCount),
 		Pricing:         float32(in.Pricing),
+		Packing:         in.Packing,
+		PageSize:        int(in.PageSize),
 		PurchasePrice:   float32(in.PurchasePrice),
 		PurchaseTime:    in.PurchaseTime.AsTime(),
 		PurchaseSource:  in.PurchaseSource,
@@ -93,8 +97,10 @@ func (m *Book) toBookPB(book *Book) *pb.Book {
 		PrintedTimes:    book.PrintedTimes,
 		PrintedSheets:   book.PrintedSheets,
 		Format:          book.Format,
-		WordCount:       int64(book.WordCount),
+		WordCount:       float64(book.WordCount),
 		Pricing:         float64(book.Pricing),
+		Packing:         book.Packing,
+		PageSize:        int32(book.PageSize),
 		PurchasePrice:   float64(book.PurchasePrice),
 		PurchaseTime:    purchaseTime,
 		PurchaseSource:  book.PurchaseSource,
@@ -127,7 +133,9 @@ func (m *Book) toBookIndexPB(book *Book) *pb.BookIndex {
 		PrintedTimes:    book.PrintedTimes,
 		PrintedSheets:   book.PrintedSheets,
 		Format:          book.Format,
-		WordCount:       int64(book.WordCount),
+		WordCount:       float64(book.WordCount),
 		Pricing:         float64(book.Pricing),
+		Packing:         book.Packing,
+		PageSize:        int32(book.PageSize),
 	}
 }
