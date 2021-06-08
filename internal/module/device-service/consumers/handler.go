@@ -8,7 +8,7 @@ import (
 	"github.com/9d77v/pdc/internal/module/device-service/chmodels"
 	"github.com/9d77v/pdc/pkg/iot/sdk/pb"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/nats-io/stan.go"
+	"github.com/nats-io/nats.go"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -20,7 +20,7 @@ var (
 )
 
 //HandleDeviceMsg ..
-func HandleDeviceMsg(m *stan.Msg) {
+func HandleDeviceMsg(m *nats.Msg) {
 	deviceMsg := new(pb.DeviceUpMsg)
 	err := proto.Unmarshal(m.Data, deviceMsg)
 	if err != nil {
@@ -39,7 +39,7 @@ func HandleDeviceMsg(m *stan.Msg) {
 }
 
 //PublishDeviceData ..
-func PublishDeviceData(m *stan.Msg) {
+func PublishDeviceData(m *nats.Msg) {
 	deviceMsg := new(pb.DeviceUpMsg)
 	err := proto.Unmarshal(m.Data, deviceMsg)
 	if err != nil {

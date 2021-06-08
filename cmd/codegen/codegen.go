@@ -1,4 +1,4 @@
-package codegen
+package main
 
 import (
 	"io/fs"

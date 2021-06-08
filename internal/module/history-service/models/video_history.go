@@ -6,9 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 
-	"github.com/9d77v/pdc/internal/db/redis"
+	"github.com/9d77v/go-pkg/cache/redis"
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/module/base"
 	video "github.com/9d77v/pdc/internal/module/video-service/models"
 	redisGo "github.com/go-redis/redis/v8"
@@ -45,9 +46,9 @@ func (h VideoHistory) GetStatistic(ctx context.Context, uid uint) [][]float64 {
 	yesterday := now.Add(-24 * time.Hour).Format("2006-01-02")
 	theDayBeforeYesterday := now.Add(-48 * time.Hour).Format("2006-01-02")
 	days := []string{today, yesterday, theDayBeforeYesterday}
-	keyPrefixs := []string{redis.PrefixVideoDataAnime, redis.PrefixVideoDataEpisode}
+	keyPrefixs := []string{consts.PrefixVideoDataAnime, consts.PrefixVideoDataEpisode}
 	if uid == 0 {
-		keyPrefixs = append([]string{redis.PrefixVideoDataUser}, keyPrefixs...)
+		keyPrefixs = append([]string{consts.PrefixVideoDataUser}, keyPrefixs...)
 	}
 	pipe := redis.GetClient().Pipeline()
 	m, n := len(keyPrefixs), len(days)
@@ -64,7 +65,7 @@ func (h VideoHistory) GetStatistic(ctx context.Context, uid uint) [][]float64 {
 	}
 	stringCmds := make([]*redisGo.StringCmd, 0, n)
 	for _, day := range days {
-		key := fmt.Sprintf("%s:%s", redis.PrefixVideoDataDuration, day)
+		key := fmt.Sprintf("%s:%s", consts.PrefixVideoDataDuration, day)
 		if uid != 0 {
 			key += fmt.Sprintf(":%d", uid)
 		}

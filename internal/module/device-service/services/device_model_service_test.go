@@ -6,7 +6,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/9d77v/go-lib/clients/config"
 	"github.com/9d77v/pdc/internal/db/clickhouse"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/base"
@@ -37,7 +36,7 @@ func TestMain(m *testing.M) {
 }
 
 func initDB() {
-	config := &config.DBConfig{
+	config := &db.DBConfig{
 		Driver:       "postgres",
 		Host:         "domain.local",
 		Port:         5432,

@@ -100,7 +100,9 @@ func (m *Model) toDBFields(fields []string, omitFields ...string) []string {
 	}
 	for _, v := range fields {
 		if !omitFieldMap[v] {
-			if strings.Contains(strings.ToLower(v), "price") {
+			if strings.Contains(strings.ToLower(v), "pricing") {
+				v = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
+			} else if strings.Contains(strings.ToLower(v), "price") {
 				v = fmt.Sprintf("\"%s\"::money::numeric::float8", m.camelToSnack(v))
 			} else if strings.Contains(v, ".") || strings.Contains(v, " ") {
 			} else {

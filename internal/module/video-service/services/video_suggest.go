@@ -5,7 +5,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/9d77v/pdc/internal/db/elasticsearch"
+	elasticsearch "github.com/9d77v/go-pkg/db/elastic"
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
@@ -40,7 +41,7 @@ func (s *videoSuggest) execute() (*model.VideoIndexConnection, error) {
 	}
 	s.Filter()
 	searchService := elasticsearch.GetClient().Search().
-		Index(elasticsearch.AliasVideo).
+		Index(consts.AliasVideo).
 		Query(s.BoolQuery).
 		Size(int(s.SearchParam.PageSize)).
 		Sort("_score", false).
@@ -58,7 +59,7 @@ func (s *videoSuggest) execute() (*model.VideoIndexConnection, error) {
 func newFunctionScoreQuery(videoID uint) *elastic.FunctionScoreQuery {
 	fsQuery := elastic.NewFunctionScoreQuery()
 	id := strconv.FormatUint(uint64(videoID), 10)
-	moreLikeThisItem := elastic.NewMoreLikeThisQueryItem().Index(elasticsearch.AliasVideo).Id(id)
+	moreLikeThisItem := elastic.NewMoreLikeThisQueryItem().Index(consts.AliasVideo).Id(id)
 	mltQuery := elastic.NewMoreLikeThisQuery().
 		Field("title", "desc", "tags").
 		LikeItems(moreLikeThisItem).

@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 

@@ -1,16 +1,20 @@
 package init
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"time"
 
-	"github.com/nats-io/stan.go"
+	"github.com/nats-io/nats.go"
 
+	"github.com/9d77v/go-pkg/env"
 	"github.com/9d77v/pdc/internal/db/clickhouse"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
+
 	ch_device "github.com/9d77v/pdc/internal/module/device-service/chmodels"
 	ch_history "github.com/9d77v/pdc/internal/module/history-service/chmodels"
 
@@ -24,13 +28,11 @@ import (
 	user "github.com/9d77v/pdc/internal/module/user-service/models"
 	video_consumers "github.com/9d77v/pdc/internal/module/video-service/consumers"
 	video "github.com/9d77v/pdc/internal/module/video-service/models"
-
-	"github.com/9d77v/pdc/internal/utils"
 )
 
 var (
-	ownerName     = utils.GetEnvStr("ADMIN_NAME", "admin")
-	ownerPassword = utils.GetEnvStr("ADMIN_PASSWORD", "123456")
+	ownerName     = env.GetEnvStr("ADMIN_NAME", "admin")
+	ownerPassword = env.GetEnvStr("ADMIN_PASSWORD", "123456")
 )
 
 func init() {
@@ -113,26 +115,73 @@ func initSubscribe() {
 	}()
 }
 
-func initSubScriptions() []stan.Subscription {
-	qsub1, err := mq.GetClient().QueueSubscribe(mq.SubjectVideo,
-		mq.GroupVideo, video_consumers.HandleVideoMSG)
+func initSubScriptions() []*nats.Subscription {
+	js, err := mq.GetJetStream()
+	if err != nil {
+		log.Println("get jetstream failed:", err)
+	}
+	//VIDEO
+	s, err := js.StreamInfo(mq.StreamVideo)
+	if s == nil {
+		_, err = js.AddStream(&nats.StreamConfig{
+			Name:     mq.StreamVideo,
+			Subjects: []string{mq.SubjectVideo},
+		})
+		if err != nil {
+			log.Printf("AddStream %s failed:%v\n", mq.SubjectVideo, err)
+		}
+	}
+	c, err := js.ConsumerInfo(mq.StreamVideo, "MONITOR")
+	if c == nil {
+		_, err = js.AddConsumer(mq.StreamVideo, &nats.ConsumerConfig{
+			Durable:   "MONITOR",
+			AckPolicy: nats.AckExplicitPolicy,
+		})
+		if err != nil {
+			log.Printf("AddConsumer %s failed:%v\n", mq.SubjectVideo, err)
+		}
+	}
+	//DEVICE
+	s, err = js.StreamInfo(mq.StreamDevice)
+	if s == nil {
+		_, err = js.AddStream(&nats.StreamConfig{
+			Name:     mq.StreamDevice,
+			Subjects: []string{mq.SubjectDeviceData},
+		})
+		if err != nil {
+			log.Printf("AddStream %s failed:%v\n", mq.SubjectDeviceData, err)
+		}
+	}
+	c, err = js.ConsumerInfo(mq.StreamDevice, "MONITOR")
+	if c == nil {
+		_, err = js.AddConsumer(mq.StreamDevice, &nats.ConsumerConfig{
+			Durable:   "MONITOR",
+			AckPolicy: nats.AckExplicitPolicy,
+		})
+		if err != nil {
+			log.Printf("AddConsumer %s failed:%v\n", mq.SubjectDeviceData, err)
+		}
+	}
+	//QUEUE SUBSCRIBE
+	qsub1, err := js.QueueSubscribe(mq.SubjectVideo,
+		mq.GroupVideo, video_consumers.HandleVideoMSG, nats.DeliverLast())
 	if err != nil {
 		log.Panicln("QueueSubscribe error:", err)
 	}
-	qsub2, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
-		device_consumers.HandleDeviceMsg, stan.DurableName("dur"))
+	qsub2, err := js.QueueSubscribe(mq.SubjectDeviceData, mq.GroupSaveDeviceData,
+		device_consumers.HandleDeviceMsg, nats.DeliverLast())
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
-	qsub3, err := mq.GetClient().QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
-		device_consumers.PublishDeviceData, stan.DurableName("dur"))
+	qsub3, err := js.QueueSubscribe(mq.SubjectDeviceData, mq.GroupPublishDeviceData,
+		device_consumers.PublishDeviceData, nats.DeliverLast())
 	if err != nil {
 		log.Panicln("SubscribeDeviceAttribute error:", err)
 	}
-	return []stan.Subscription{qsub1, qsub2, qsub3}
+	return []*nats.Subscription{qsub1, qsub2, qsub3}
 }
 
-func unSubscribeMQQueues(qsubs []stan.Subscription) {
+func unSubscribeMQQueues(qsubs []*nats.Subscription) {
 	for _, qsub := range qsubs {
 		err := qsub.Unsubscribe()
 		if err != nil {
@@ -142,14 +191,21 @@ func unSubscribeMQQueues(qsubs []stan.Subscription) {
 }
 
 func initConsumers() {
-
 	go device_consumers.SaveDeviceTelemetry()
 	go device_consumers.SaveDeviceHealth()
 }
 
 func initElasticSearchIndexes() {
-	guid, err := mq.GetClient().PublishAsync(mq.SubjectVideo, []byte("0"),
-		utils.AckHandler)
+	js, err := mq.GetJetStream()
+	if err != nil {
+		log.Println("get jetstream failed:", err)
+	}
+	guid, err := js.PublishAsync(mq.SubjectVideo, []byte("0"))
+	select {
+	case <-js.PublishAsyncComplete():
+	case <-time.After(5 * time.Second):
+		fmt.Println("Did not resolve in time")
+	}
 	if err != nil {
 		log.Println("mq publish failed,guid:", guid, " error:", err)
 	}

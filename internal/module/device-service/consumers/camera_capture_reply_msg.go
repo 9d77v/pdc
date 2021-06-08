@@ -18,7 +18,7 @@ func (m *cameraCaptureReplyMsg) handleMsg(deviceMsg *pb.DeviceUpMsg) {
 		return
 	}
 	msg := deviceMsg.GetCameraCaptureReplyMsg()
-	err = mq.GetClient().NatsConn().Publish(msg.Subject, data)
+	err = mq.GetClient().Publish(msg.Subject, data)
 	if err != nil {
 		log.Println("publish DeviceUpMsg_CameraCaptureReplyMsg failed:", err)
 	}

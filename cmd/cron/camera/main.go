@@ -14,7 +14,7 @@ import (
 
 	"github.com/robfig/cron/v3"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 )

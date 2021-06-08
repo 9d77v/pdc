@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/mq"
@@ -89,8 +91,7 @@ func Auth() func(http.Handler) http.Handler {
 					return
 				}
 				//获取hash前用户id
-				uid := consts.GetDecodeUID(data.UID)
-				user, err := userService.GetUserByID(r.Context(), int64(uid))
+				user, err := userService.GetUserByID(r.Context(), data.UID)
 				if err != nil {
 					w.Header().Set("Content-type", "application/json")
 					http.Error(w, resString(NewErrorResponse("Invalid token", r.URL.Path)), http.StatusUnauthorized)
@@ -204,7 +205,11 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 		}
 		subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(id), 10)
 		log.Println("开启监听主题：", subject)
-		qsub, err := mq.GetClient().NatsConn().QueueSubscribe(subject,
+		js, err := mq.GetJetStream()
+		if err != nil {
+			log.Println("get jetstream failed:", err)
+		}
+		qsub, err := js.QueueSubscribe(subject,
 			mq.GroupDevice, func(m *nats.Msg) {
 				deviceMsg := new(pb.DeviceDownMSG)
 				err := proto.Unmarshal(m.Data, deviceMsg)
@@ -247,10 +252,16 @@ func HandleIotDevice() func(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			//透传到mq
-			_, err = mq.GetClient().PublishAsync(mq.SubjectDeviceData, msg, utils.AckHandler)
+			_, err = js.PublishAsync(mq.SubjectDeviceData, msg)
 			if err != nil {
 				log.Println("send data error:", err)
 			}
+			select {
+			case <-js.PublishAsyncComplete():
+			case <-time.After(5 * time.Second):
+				fmt.Println("Did not resolve in time")
+			}
+
 		}
 	}
 }
@@ -269,8 +280,7 @@ func CheckToken(accessToken string) bool {
 	if data.Issuer != consts.JWTIssuer {
 		return false
 	}
-	uid := consts.GetDecodeUID(data.UID)
-	_, err = userService.GetUserByID(context.Background(), int64(uid))
+	_, err = userService.GetUserByID(context.Background(), data.UID)
 	if err != nil {
 		return false
 	}

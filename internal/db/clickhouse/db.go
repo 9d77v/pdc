@@ -10,17 +10,17 @@ import (
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 
-	"github.com/9d77v/go-lib/clients/config"
+	"github.com/9d77v/go-pkg/env"
 	"github.com/9d77v/pdc/internal/consts"
-	"github.com/9d77v/pdc/internal/utils"
+	"github.com/9d77v/pdc/internal/db/db"
 )
 
 var (
 	client        *gorm.DB
-	dbHost        = utils.GetEnvStr("CLICKHOUSE_HOST", "domain.local")
-	dbPort        = utils.GetEnvInt("CLICKHOUSE_PORT", 9001)
-	dbName        = utils.GetEnvStr("CLICKHOUSE_NAME", "pdc")
-	dbTablePrefix = utils.GetEnvStr("CLICKHOUSE_TABLE_PREFIX", "pdc")
+	dbHost        = env.GetEnvStr("CLICKHOUSE_HOST", "domain.local")
+	dbPort        = env.GetEnvInt("CLICKHOUSE_PORT", 9001)
+	dbName        = env.GetEnvStr("CLICKHOUSE_NAME", "pdc")
+	dbTablePrefix = env.GetEnvStr("CLICKHOUSE_TABLE_PREFIX", "pdc")
 	once          sync.Once
 )
 
@@ -30,7 +30,7 @@ func TablePrefix() string {
 }
 
 //GetDB get db connection
-func GetDB(config ...*config.DBConfig) *gorm.DB {
+func GetDB(config ...*db.DBConfig) *gorm.DB {
 	once.Do(func() {
 		dbConfig := defualtConfig()
 		if config != nil && len(config) == 1 {
@@ -46,8 +46,8 @@ func GetDB(config ...*config.DBConfig) *gorm.DB {
 	return client
 }
 
-func defualtConfig() *config.DBConfig {
-	return &config.DBConfig{
+func defualtConfig() *db.DBConfig {
+	return &db.DBConfig{
 		Driver:       "clickhouse",
 		Host:         dbHost,
 		Port:         uint(dbPort),
@@ -60,7 +60,7 @@ func defualtConfig() *config.DBConfig {
 	}
 }
 
-func createDatabaseIfNotExist(config *config.DBConfig) {
+func createDatabaseIfNotExist(config *db.DBConfig) {
 	dsn := fmt.Sprintf("tcp://%s:%d?debug=true", config.Host, config.Port)
 	db, err := gorm.Open(clickhouse.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -77,7 +77,7 @@ func createDatabaseIfNotExist(config *config.DBConfig) {
 	dbInit.Close()
 }
 
-func newClient(config *config.DBConfig) (*gorm.DB, error) {
+func newClient(config *db.DBConfig) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("tcp://%s:%d?debug=%t&database=%s&read_timeout=10&write_timeout=20",
 		config.Host, config.Port, consts.DEBUG, config.Name)
 	gormConfig := &gorm.Config{
@@ -103,7 +103,7 @@ func newClient(config *config.DBConfig) (*gorm.DB, error) {
 	return db, err
 }
 
-func databaseNotExist(db *gorm.DB, config *config.DBConfig) bool {
+func databaseNotExist(db *gorm.DB, config *db.DBConfig) bool {
 	var total int64
 	err := db.Raw("select count(1) from system.databases where name = ?;", config.Name).Scan(&total).Error
 	if err != nil {

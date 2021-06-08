@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/device-service/models"
 	"github.com/9d77v/pdc/internal/module/device-service/pb"

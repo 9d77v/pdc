@@ -5,21 +5,20 @@ import (
 	"log"
 	"testing"
 
-	"github.com/9d77v/go-lib/clients/config"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
 
 func Test_createDatabaseIfNotExist(t *testing.T) {
 	type args struct {
-		config *config.DBConfig
+		config *DBConfig
 		dbName string
 	}
 	tests := []struct {
 		name string
 		args args
 	}{
-		{"test db not exist", args{&config.DBConfig{
+		{"test db not exist", args{&DBConfig{
 			Driver:       "postgres",
 			Host:         "domain.local",
 			Port:         5432,

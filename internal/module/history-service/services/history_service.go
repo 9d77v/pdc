@@ -7,11 +7,13 @@ import (
 	"math"
 	"time"
 
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/cache/redis"
+	"github.com/9d77v/go-pkg/ptrs"
+	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/clickhouse"
+
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/db/oss"
-	"github.com/9d77v/pdc/internal/db/redis"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/base"
 	"github.com/9d77v/pdc/internal/module/history-service/chmodels"
@@ -69,9 +71,9 @@ func (s HistoryService) RecordHistory(ctx context.Context,
 func (s HistoryService) saveToCache(hl *chmodels.HistoryLog) {
 	today := hl.ClientTs.Format("2006-01-02")
 	dataMap := make(map[string]interface{})
-	dataMap[redis.PrefixVideoDataUser] = hl.UID
-	dataMap[redis.PrefixVideoDataAnime] = hl.SourceID
-	dataMap[redis.PrefixVideoDataEpisode] = hl.SubSourceID
+	dataMap[consts.PrefixVideoDataUser] = hl.UID
+	dataMap[consts.PrefixVideoDataAnime] = hl.SourceID
+	dataMap[consts.PrefixVideoDataEpisode] = hl.SubSourceID
 	ctx := context.Background()
 	pipe := redis.GetClient().Pipeline()
 	for k, v := range dataMap {
@@ -81,8 +83,8 @@ func (s HistoryService) saveToCache(hl *chmodels.HistoryLog) {
 			pipe.Expire(ctx, key, 72*time.Hour)
 		}
 	}
-	durationKeys := []string{fmt.Sprintf("%s:%s", redis.PrefixVideoDataDuration, today),
-		fmt.Sprintf("%s:%s:%d", redis.PrefixVideoDataDuration, today, hl.UID)}
+	durationKeys := []string{fmt.Sprintf("%s:%s", consts.PrefixVideoDataDuration, today),
+		fmt.Sprintf("%s:%s:%d", consts.PrefixVideoDataDuration, today, hl.UID)}
 	for _, durationKey := range durationKeys {
 		pipe.IncrByFloat(ctx, durationKey, hl.Duration)
 		pipe.Expire(ctx, durationKey, 72*time.Hour)

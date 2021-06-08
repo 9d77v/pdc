@@ -101,7 +101,8 @@ func (s DeviceService) CameraCapture(ctx context.Context,
 		return resp, err
 	}
 	subject := mq.SubjectDevicPrefix + strconv.FormatUint(uint64(in.DeviceId), 10)
-	msg, err := mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
+
+	msg, err := mq.GetClient().Request(subject, requestMsg, 5*time.Second)
 	if err != nil {
 		return resp, err
 	}

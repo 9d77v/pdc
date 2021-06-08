@@ -2,23 +2,30 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/9d77v/pdc/internal/db/mq"
 	"github.com/9d77v/pdc/internal/db/oss"
 	"github.com/9d77v/pdc/internal/graph/model"
 	"github.com/9d77v/pdc/internal/module/video-service/models"
-	"github.com/9d77v/pdc/internal/utils"
 	elastic "github.com/olivere/elastic/v7"
 )
 
 func sendMsgToUpdateES(videoID int64) {
-	guid, err := mq.GetClient().PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))),
-		utils.AckHandler)
+	js, err := mq.GetJetStream()
 	if err != nil {
-		log.Println("mq publish failed,guid:", guid, " error:", err)
+		log.Println("get jetstream failed:", err)
 	}
+	_, err = js.PublishAsync(mq.SubjectVideo, []byte(strconv.Itoa(int(videoID))))
+	select {
+	case <-js.PublishAsyncComplete():
+	case <-time.After(5 * time.Second):
+		fmt.Println("Did not resolve in time")
+	}
+
 }
 
 func (s VideoService) getVideos(data []*models.Video, scheme string) []*model.Video {

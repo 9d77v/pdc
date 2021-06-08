@@ -11,9 +11,11 @@ type Book{
 	printedTimes: String!
 	printedSheets: String!
 	format: String!
-	wordCount: Int!
+	wordCount: String!
 	pricing: String!
 	purchasePrice: String!
+	packing: String!
+	pageSize: Int!
 	purchaseTime: Int!
 	purchaseSource: String!
 	bookBorrowUID: Int!
@@ -60,13 +62,15 @@ input  NewBook{
 	author: [String!]!
 	translator: [String!]
 	publishingHouse: String!
-	edition: String!
-	printedTimes: String!
-	printedSheets: String!
-	format: String!
-	wordCount: Int!
+	edition: String
+	printedTimes: String
+	printedSheets: String
+	format: String
+	wordCount: String
 	pricing: String!
-	purchasePrice: String!
+	packing: String
+	pageSize: Int
+	purchasePrice: String
 	purchaseTime: Int!
 	purchaseSource: String!
 } 
@@ -80,13 +84,15 @@ input  NewUpdateBook{
 	author: [String!]!
 	translator: [String!]
 	publishingHouse: String!
-	edition: String!
-	printedTimes: String!
-	printedSheets: String!
-	format: String!
-	wordCount: Int!
+	edition: String
+	printedTimes: String
+	printedSheets: String
+	format: String
+	wordCount: String
 	pricing: String!
-	purchasePrice: String!
+	packing: String
+	pageSize: Int
+	purchasePrice: String
 	purchaseTime: Int!
 	purchaseSource: String!
 } 
@@ -152,8 +158,10 @@ type BookIndex {
 	printedTimes: String!
 	printedSheets: String!
 	format: String!
-	wordCount: Int!
+	wordCount: String!
 	pricing: String!
+	packing: String!
+	pageSize: Int!
 }
 
 type BookIndexConnection {

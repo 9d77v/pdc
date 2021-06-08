@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/9d77v/go-lib/clients/config"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/module/note-service/pb"
 	"github.com/golang/protobuf/ptypes"
@@ -30,7 +29,7 @@ func getStructs() []interface{} {
 }
 
 func initDB() {
-	config := &config.DBConfig{
+	config := &db.DBConfig{
 		Driver:       "postgres",
 		Host:         "domain.local",
 		Port:         5432,

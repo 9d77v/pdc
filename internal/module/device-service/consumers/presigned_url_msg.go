@@ -39,7 +39,7 @@ func (m *setPresignedURLSignedMsg) sendData(deviceMsg *pb.DeviceUpMsg) {
 		log.Println("marshal error:", err)
 		return
 	}
-	_, err = mq.GetClient().NatsConn().Request(subject, requestMsg, 5*time.Second)
+	_, err = mq.GetClient().Request(subject, requestMsg, 5*time.Second)
 	if err != nil {
 		log.Println("send data error:", err)
 		return

@@ -8,7 +8,7 @@ import (
 
 	"github.com/99designs/gqlgen/client"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/9d77v/go-lib/ptrs"
+	"github.com/9d77v/go-pkg/ptrs"
 	"github.com/9d77v/pdc/internal/db/db"
 	"github.com/9d77v/pdc/internal/graph/generated"
 	"github.com/9d77v/pdc/internal/graph/model"

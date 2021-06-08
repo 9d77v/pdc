@@ -3,7 +3,7 @@ package base
 import (
 	"context"
 
-	es "github.com/9d77v/go-lib/clients/elastic/v7"
+	es "github.com/9d77v/go-pkg/db/elastic"
 	"github.com/9d77v/pdc/internal/graph/model"
 	elastic "github.com/olivere/elastic/v7"
 )

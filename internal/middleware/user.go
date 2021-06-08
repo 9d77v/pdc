@@ -7,15 +7,15 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
-	"github.com/9d77v/pdc/internal/consts"
 	"github.com/9d77v/pdc/internal/db/oss"
 )
 
 //User public user info
 type User struct {
-	UID    string `json:"uid"`
+	UID    int64  `json:"uid"`
 	Avatar string `json:"avatar"`
 	Name   string `json:"name"`
 	Gender int    `json:"gender"`
@@ -33,12 +33,12 @@ func HandleCard() func(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-		id := consts.GetDecodeUID(arr[2])
+		id, _ := strconv.Atoi(arr[2])
 		u, err := userService.GetUserByID(context.Background(), int64(id))
 		if err != nil {
 			log.Println("get user error:", err)
 		}
-		user.UID = consts.GetEncodeUID(u.ID)
+		user.UID = int64(u.ID)
 		scheme := req.Header.Get("X-Forwarded-Proto")
 		user.Avatar = oss.GetOSSPrefixByScheme(scheme) + u.Avatar
 		user.Name = u.Name

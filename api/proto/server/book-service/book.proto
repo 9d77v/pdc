@@ -41,11 +41,13 @@ message CreateBookRequest {
   string printed_times = 9;
   string printed_sheets = 10;
   string format = 11;
-  int64 word_count = 12;
+  double word_count = 12;
   double pricing = 13;
   double purchase_price = 14;
   google.protobuf.Timestamp purchase_time = 15;
   string purchase_source = 16;
+  string packing = 17;
+  int32 pageSize = 18;
 }
 
 message CreateBookResponse { int64 id = 1; }
@@ -63,11 +65,13 @@ message UpdateBookRequest {
   string printed_times = 10;
   string printed_sheets = 11;
   string format = 12;
-  int64 word_count = 13;
+  double word_count = 13;
   double pricing = 14;
   double purchase_price = 15;
   google.protobuf.Timestamp purchase_time = 16;
   string purchase_source = 17;
+  string packing = 18;
+  int32 pageSize = 19;
 }
 
 message UpdateBookResponse { int64 id = 1; }
@@ -160,7 +164,7 @@ message Book {
   string printed_times = 10;
   string printed_sheets = 11;
   string format = 12;
-  int64 word_count = 13;
+  double word_count = 13;
   double pricing = 14;
   double purchase_price = 15;
   google.protobuf.Timestamp purchase_time = 16;
@@ -168,6 +172,8 @@ message Book {
   int64 book_borrow_uid = 18;
   google.protobuf.Timestamp created_at = 19;
   google.protobuf.Timestamp updated_at = 20;
+  string packing = 21;
+  int32 pageSize = 22;
 }
 
 message SearchBookRequest { base.SearchParam search_param = 1; }
@@ -190,9 +196,11 @@ message BookIndex {
   string printed_times = 10;
   string printed_sheets = 11;
   string format = 12;
-  int64 word_count = 13;
+  double word_count = 13;
   double pricing = 14;
   int64 book_borrow_uid = 18;
+  string packing = 19;
+  int32 pageSize = 20;
 }
 
 message ListBookPositionRequest {
