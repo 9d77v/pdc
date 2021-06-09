@@ -120,46 +120,33 @@ func initSubScriptions() []*nats.Subscription {
 	if err != nil {
 		log.Println("get jetstream failed:", err)
 	}
-	//VIDEO
-	s, err := js.StreamInfo(mq.StreamVideo)
-	if s == nil {
-		_, err = js.AddStream(&nats.StreamConfig{
-			Name:     mq.StreamVideo,
-			Subjects: []string{mq.SubjectVideo},
-		})
-		if err != nil {
-			log.Printf("AddStream %s failed:%v\n", mq.SubjectVideo, err)
-		}
+	data := [][2]string{
+		{mq.StreamVideo, mq.SubjectVideo},
+		{mq.StreamDevice, mq.SubjectDevicPrefix + "*"},
+		{mq.StreamDeviceData, mq.SubjectDeviceData},
+		{mq.StreamDeviceTelemetry, mq.SubjectDeviceTelemetryPrefix + "*"},
+		{mq.StreamDeviceHealth, mq.SubjectDeviceHealthPrefix + "*"},
 	}
-	c, err := js.ConsumerInfo(mq.StreamVideo, "MONITOR")
-	if c == nil {
-		_, err = js.AddConsumer(mq.StreamVideo, &nats.ConsumerConfig{
-			Durable:   "MONITOR",
-			AckPolicy: nats.AckExplicitPolicy,
-		})
-		if err != nil {
-			log.Printf("AddConsumer %s failed:%v\n", mq.SubjectVideo, err)
+	for _, v := range data {
+		s, err := js.StreamInfo(v[0])
+		if s == nil {
+			_, err = js.AddStream(&nats.StreamConfig{
+				Name:     v[0],
+				Subjects: []string{v[1]},
+			})
+			if err != nil {
+				log.Printf("AddStream %s failed:%v\n", v[1], err)
+			}
 		}
-	}
-	//DEVICE
-	s, err = js.StreamInfo(mq.StreamDevice)
-	if s == nil {
-		_, err = js.AddStream(&nats.StreamConfig{
-			Name:     mq.StreamDevice,
-			Subjects: []string{mq.SubjectDeviceData},
-		})
-		if err != nil {
-			log.Printf("AddStream %s failed:%v\n", mq.SubjectDeviceData, err)
-		}
-	}
-	c, err = js.ConsumerInfo(mq.StreamDevice, "MONITOR")
-	if c == nil {
-		_, err = js.AddConsumer(mq.StreamDevice, &nats.ConsumerConfig{
-			Durable:   "MONITOR",
-			AckPolicy: nats.AckExplicitPolicy,
-		})
-		if err != nil {
-			log.Printf("AddConsumer %s failed:%v\n", mq.SubjectDeviceData, err)
+		c, err := js.ConsumerInfo(v[0], "MONITOR")
+		if c == nil {
+			_, err = js.AddConsumer(v[0], &nats.ConsumerConfig{
+				Durable:   "MONITOR",
+				AckPolicy: nats.AckExplicitPolicy,
+			})
+			if err != nil {
+				log.Printf("AddConsumer %s failed:%v\n", v[1], err)
+			}
 		}
 	}
 	//QUEUE SUBSCRIBE
