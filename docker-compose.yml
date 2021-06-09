@@ -125,7 +125,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
   pdc:
-    image: 9d77v/pdc:2021-05-15_e1dc9de
+    image: 9d77v/pdc:2021-06-08_74fe517
     restart: always
     ports: 
       - 8080:8080
@@ -138,15 +138,16 @@ services:
   #   env_file:
   #     - esp8266-sht3x.env
   #   container_name: pdc-iot-esp8266-sht3x
-  # pdc-iot-raspi:
-  #   image: 9d77v/pdc-iot-raspi:2020-12-14_9ad545b
-  #   restart: always
-  #   env_file:
-  #     - raspi.env
-  #   devices:
-  #     - /dev/i2c-0
-  #     - /dev/i2c-1  
-  #   container_name: pdc-iot-raspi
+  pdc-iot-raspi:
+    image: 9d77v/pdc-iot-raspi:2020-12-14_9ad545b
+    restart: always
+    network_mode: host
+    env_file:
+      - ./configs/raspi.env
+    devices:
+      - /dev/i2c-0
+      - /dev/i2c-1  
+    container_name: pdc-iot-raspi
   # pdc-iot-camera:
   #   image: 9d77v/pdc-iot-camera:2020-12-14_9ad545b
   #   restart: always
