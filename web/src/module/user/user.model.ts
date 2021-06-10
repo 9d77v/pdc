@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 
 export interface IUser {
-    uid: string
+    uid: number
     name: string
     password: string
     avatar: string

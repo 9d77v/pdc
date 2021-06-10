@@ -56,10 +56,10 @@ function shortTitle(str: string | undefined, length: number): string {
     return str === undefined ? '' : (str.length > length ? str.substring(0, length) + '...' : str)
 }
 
-function getUID() {
+function getUID(): number {
     const token = localStorage.getItem('accessToken') || "";
     if (token === "") {
-        return ""
+        return 0
     }
     const accessToken: any = jwt_decode(token)
     return accessToken.uid

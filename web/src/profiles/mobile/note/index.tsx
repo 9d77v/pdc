@@ -37,7 +37,7 @@ const NoteIndex = () => {
     const [syncNotes] = useMutation(SYNC_NOTES);
 
     const sync = async () => {
-        if (currentUser.uid !== "") {
+        if (currentUser.uid !== 0) {
             const result = await noteStore.getUnsyncedNotes(currentUser.uid)
             setNoteSyncStatus(SyncStatus.Syncing)
             try {

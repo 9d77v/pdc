@@ -201,7 +201,7 @@ const NoteBookBoard: FC<INoteBookBoardProps> = ({ updateCurrentNote, initNoteTre
     }
 
     useEffect(() => {
-        if (currentUser.uid !== "") {
+        if (currentUser.uid !== 0) {
             setTimeout(async () => {
                 await refreshNoteBoard()
             }, 500)

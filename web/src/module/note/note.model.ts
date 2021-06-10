@@ -20,7 +20,7 @@ export enum SyncStatus {
 export interface INote {
     id: string // 笔记id
     parent_id: string// 笔记父节点
-    uid: string// 用户id
+    uid: number// 用户id
     note_type: NoteType// 笔记类型
     level: number// 笔记层级，1，2，3
     title?: string// 笔记标题
