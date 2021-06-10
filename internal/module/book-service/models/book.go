@@ -24,7 +24,7 @@ type Book struct {
 	PrintedTimes    string         `gorm:"size:32;NOT NULL;comment:'印次'"`
 	PrintedSheets   string         `gorm:"size:32;NOT NULL;comment:'印张'"`
 	Format          string         `gorm:"size:32;NOT NULL;comment:'开本'"`
-	WordCount       float32        `gorm:"comment:'字数'"`
+	WordCount       float32        `gorm:"NOT NULL;comment:'字数'"`
 	Pricing         float32        `gorm:"NOT NULL;comment:'定价'"`
 	PurchasePrice   float32        `gorm:"NOT NULL;comment:'购买价'"`
 	Packing         string         `gorm:"size:32;NOT NULL;comment:'包装'"`
