@@ -29,7 +29,7 @@ export const Scanner = () => {
         if (currentUserInfo && result !== "" && (result.indexOf("http://") !== -1 || result.indexOf("https://") !== -1)) {
             if (result.indexOf("/pdc/") !== -1) {
                 const arr = result.split("/")
-                const id = arr[arr.length - 1]
+                const id = parseInt(arr[arr.length - 1])
                 if (id !== currentUserInfo.uid) {
                     setResultDiv(
                         <Button type="primary" onClick={() => {

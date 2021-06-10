@@ -11,7 +11,7 @@ export async function noteDBInit(): Promise<void> {
                     model: {
                         "id:uuid": { pk: true },
                         "parent_id:string": {},
-                        "uid:string": {},
+                        "uid:int": {},
                         "note_type:int": {},
                         "level:int": {},
                         "title:string": {},

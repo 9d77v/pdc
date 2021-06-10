@@ -51,7 +51,7 @@ class NoteStore {
         default: []
     })
 
-    getByID = async (id: string, uid: string) => {
+    getByID = async (id: string, uid: number) => {
         const result: any[] = await nSQL("note")
             .query("select")
             .where([["id", "=", id], 'AND', ["uid", "=", uid]])
@@ -62,7 +62,7 @@ class NoteStore {
         return result[0]
     }
 
-    findAll = async (uid: string) => {
+    findAll = async (uid: number) => {
         const result: any[] = await nSQL("note")
             .query("select")
             .where([["uid", "=", uid]])
@@ -71,7 +71,7 @@ class NoteStore {
         return result
     }
 
-    findByParentID = async (id: string, uid: string) => {
+    findByParentID = async (id: string, uid: number) => {
         const result: any[] = await nSQL("note")
             .query("select")
             .where([["parent_id", "=", id], 'AND', ["uid", "=", uid], 'AND', ['state', 'IN', [NoteState.Normal]]])
@@ -80,7 +80,7 @@ class NoteStore {
         return result
     }
 
-    findLevelOneBooks = async (noteID: string, uid: string) => {
+    findLevelOneBooks = async (noteID: string, uid: number) => {
         const result: any[] = await nSQL("note")
             .query("select")
             .where([["level", "=", 1], 'AND', ["uid", "=", uid], 'AND',
@@ -90,7 +90,7 @@ class NoteStore {
         return result
     }
 
-    findLevelTwoBooks = async (noteID: string, uid: string, omitNoteID: string = "") => {
+    findLevelTwoBooks = async (noteID: string, uid: number, omitNoteID: string = "") => {
         const result: any[] = await nSQL("note")
             .query("select")
             .where([["parent_id", "=", noteID],
@@ -102,7 +102,7 @@ class NoteStore {
         return result
     }
 
-    getUnsyncedNotes = async (uid: string) => {
+    getUnsyncedNotes = async (uid: number) => {
         const result: any[] = await nSQL("note")
             .query("select")
             .where([["uid", "=", uid], 'AND', ['sync_status', 'IN', [SyncStatus.Unsync]]])
@@ -183,7 +183,7 @@ class NoteStore {
         return newTitle
     }
 
-    copyNote = async (note: INote, uid: string) => {
+    copyNote = async (note: INote, uid: number) => {
         const now = dayjs().toISOString()
 
         let data: any[] = await nSQL("note").query('upsert', {
