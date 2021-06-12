@@ -287,10 +287,7 @@ const NoteIndex = () => {
         }
     }
     return (
-        <div style={{
-            height: '100%', width: "100%", backgroundColor: '#fff', display: "flex",
-            flexDirection: "column"
-        }}>
+        <>
             <NavBar
                 mode="light"
                 icon={<Icon type="left"
@@ -308,10 +305,14 @@ const NoteIndex = () => {
                 }
             >{currentNote.id === 'root' ? "记事本" : currentNote.navTitle}
             </NavBar>
-            {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <div style={{ overflowY: "scroll" }}><NotePage hideTitle /></div>)}
-            {buttons}
-        </div>
-
+            <div style={{
+                height: 'calc(100% - 45px)', width: "100%", backgroundColor: '#fff', display: "flex",
+                flexDirection: "column"
+            }}>
+                {currentNote.note_type === NoteType.Directory ? <NoteList updateCurrentNote={updateCurrentNote} /> : (currentNote.editable ? <NoteEditForm updateCurrentNote={updateCurrentNote} /> : <div style={{ overflowY: "scroll" }}><NotePage hideTitle /></div>)}
+                {buttons}
+            </div>
+        </>
     )
 }
 

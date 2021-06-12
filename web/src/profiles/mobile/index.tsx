@@ -138,7 +138,7 @@ const MobileIndex = () => {
                         history.push(AppPath.HOME)
                     }}
                     data-seed="logId"
-                >  <HomeNavBar />
+                >  <HomeNavBar hidden={!visible} />
                     <Route exact path={AppPath.HOME}>
                         <HomeIndex />
                     </Route>

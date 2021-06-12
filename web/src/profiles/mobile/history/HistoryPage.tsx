@@ -47,20 +47,21 @@ export default function HistoryPage() {
                     <div>  {value.platform === "desktop" ? <DesktopOutlined /> : <MobileOutlined />}  {formatDetailTime(value.updatedAt)}</div>
                     <div> {value.remainingTime === 0 ? "第" + value.num + "话" +
                         value.subTitle + " 已看完" : "看到第" + value.num + "话 " +
-                        value.subTitle}</div>
+                    value.subTitle}</div>
                 </div>
             </div>
         </div>
     })
-    return (<div style={{ height: "100%", overflowY: "auto" }}>
-        <NavBar
-            mode="light"
-            icon={<Icon type="left" />}
-            style={{ position: "fixed", width: "100%", zIndex: 10 }}
-            onLeftClick={() => history.goBack()}
-        >最近播放</NavBar>
-        <div style={{ marginTop: 45 }}>
-            {options}
-        </div>
-    </div >)
+    return (
+        <>
+            <NavBar
+                mode="light"
+                icon={<Icon type="left" />}
+                style={{ position: "fixed", width: "100%", zIndex: 10 }}
+                onLeftClick={() => history.goBack()}
+            >最近播放</NavBar>
+            <div style={{ height: "100%", overflowY: "auto", marginTop: 45 }}>
+                {options}
+            </div>
+        </>)
 }
