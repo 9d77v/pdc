@@ -63,7 +63,7 @@ func clean() {
 }
 
 func initClickhouse() {
-	config := &config.DBConfig{
+	config := &db.DBConfig{
 		Driver:       "clickhouse",
 		Host:         "domain.local",
 		Port:         9001,

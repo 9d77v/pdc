@@ -68,7 +68,7 @@ func initSecureMinioClient() *minio.Client {
 
 //InitMinioBuckets ..
 func InitMinioBuckets() {
-	preCreatedBuckets := []string{"image", "video", "vtt", "camera", "public-share", "private-share"}
+	preCreatedBuckets := []string{"image", "video", "vtt", "camera", "share-public", "share-private"}
 	location := "us-east-1"
 	for _, bucketName := range preCreatedBuckets {
 		err := GetMinioClient().MakeBucket(context.Background(), bucketName,

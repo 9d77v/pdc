@@ -20,6 +20,7 @@ var (
 
 //video subject
 const (
+	StreamVideo          = "VIDEO"
 	SubjectVideo         = "video"
 	SubjectGetDeviceInfo = "GetDeviceInfo"
 	GroupVideo           = "video-group"
@@ -28,9 +29,11 @@ const (
 //device subject
 const (
 	StreamDevice                 = "DEVICE"
-	StreamVideo                  = "VIDEO"
+	StreamDeviceData             = "DEVICE_DATA"
+	StreamDeviceTelemetry        = "DEVICE_TELEMETRY"
+	StreamDeviceHealth           = "DEVICE_HEALTH"
 	SubjectDevicPrefix           = "device."
-	SubjectDeviceData            = "device.data"
+	SubjectDeviceData            = "device_data"
 	SubjectDeviceTelemetryPrefix = "device.telemetry."
 	SubjectDeviceHealthPrefix    = "device.health."
 	GroupDevice                  = "group.device"
