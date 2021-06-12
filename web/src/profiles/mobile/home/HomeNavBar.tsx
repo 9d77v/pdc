@@ -1,5 +1,5 @@
 import { NavBar, Popover, Icon } from "antd-mobile"
-import React, { useState } from "react"
+import { FC, useState } from "react"
 import {
     ScanOutlined
 } from '@ant-design/icons'
@@ -7,8 +7,12 @@ import Item from "antd-mobile/lib/popover/Item"
 import { useHistory } from "react-router-dom"
 import { AppPath } from "src/consts/path"
 
-export default function HomeNavBar() {
-
+interface IHomeNavBarProps {
+    hidden: boolean
+}
+const HomeNavBar: FC<IHomeNavBarProps> = ({
+    hidden
+}) => {
     const [visible, setVisible] = useState(false)
     const history = useHistory()
     const handleVisibleChange = (visible: boolean) => {
@@ -25,6 +29,7 @@ export default function HomeNavBar() {
     }
     return (<NavBar
         mode="light"
+        hidden={hidden}
         rightContent={
             <Popover mask
                 visible={visible}
@@ -51,3 +56,5 @@ export default function HomeNavBar() {
         }
     >首页 </NavBar>)
 }
+
+export default HomeNavBar
