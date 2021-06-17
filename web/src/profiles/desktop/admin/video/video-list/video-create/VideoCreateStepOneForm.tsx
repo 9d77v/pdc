@@ -21,14 +21,14 @@ const VideoCreateStepOneForm = (props: IVideoCreateStepOneFormProps, ref: Ref<an
         return form
     }
     const getURL = () => {
-        return url
+        return url[0]
     }
     useImperativeHandle(ref, () => ({
         getForm,
         getURL
     }))
 
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState<string[]>([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },

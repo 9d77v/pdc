@@ -27,7 +27,7 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
     onCancel,
 }) => {
     const [form] = Form.useForm()
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState<string[]>([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
@@ -46,7 +46,7 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
 
     const handleOK = () => {
         form.setFieldsValue({
-            "cover": url,
+            "cover": url[0],
         })
         form
             .validateFields()
@@ -57,13 +57,13 @@ export const VideoUpdateForm: FC<IVideoUpdateFormProps> = ({
             .catch(info => {
                 console.log('Validate Failed:', info)
             })
-        setUrl('')
+        setUrl([])
     }
 
     const handleCancel = () => {
         onCancel()
         form.resetFields()
-        setUrl('')
+        setUrl([])
     }
 
     return (

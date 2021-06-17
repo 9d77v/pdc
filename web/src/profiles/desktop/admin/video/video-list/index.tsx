@@ -67,6 +67,13 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
             render: (text: any, record: any) => <span>
                 <Button
                     onClick={() => {
+                        const subtitls = []
+                        for (let v of record.subtitles || []) {
+                            subtitls.push({
+                                name: v.name,
+                                url: "/" + v.url.split("/").slice(3).join("/")
+                            })
+                        }
                         setUpdateEpisodeData({
                             id: record.id,
                             videoID: episodeRawData.id,
@@ -75,7 +82,7 @@ function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateE
                             desc: record.desc,
                             cover: record.cover,
                             url: record.url,
-                            subtitles: record.subtitles,
+                            subtitles: subtitls,
                         })
                         setUpdateEpisodeVisible(true)
                     }}>编辑分集</Button>
@@ -210,7 +217,7 @@ export default function VideoTable() {
                     "title": values.title,
                     "desc": values.desc,
                     "cover": values.cover,
-                    "url": values.url,
+                    "url": values.url || "",
                     "subtitles": values.subtitles
                 }
             }
@@ -412,7 +419,6 @@ export default function VideoTable() {
                 }}
             />
             <EpisodeCreateForm
-                currentVideoID={currentVideoID}
                 visible={episodeVisible}
                 onCreate={onEpisodeCreate}
                 onCancel={() => {

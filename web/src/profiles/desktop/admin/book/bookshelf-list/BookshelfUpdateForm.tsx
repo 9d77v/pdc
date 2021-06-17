@@ -16,7 +16,7 @@ export const BookshelfUpdateForm: FC<IBookshelfUpdateFormProps> = ({
     onUpdate,
     onCancel,
 }) => {
-    const [url, setUrl] = useState('')
+    const [url, setUrl] = useState<string[]>([])
     const [form] = Form.useForm()
     const layout = {
         labelCol: { span: 5 },
@@ -46,7 +46,7 @@ export const BookshelfUpdateForm: FC<IBookshelfUpdateFormProps> = ({
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
-                    "cover": url
+                    "cover": url[0]
                 })
                 form
                     .validateFields()
@@ -57,7 +57,7 @@ export const BookshelfUpdateForm: FC<IBookshelfUpdateFormProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info)
                     })
-                setUrl('')
+                setUrl([])
             }}
             maskClosable={false}
         >

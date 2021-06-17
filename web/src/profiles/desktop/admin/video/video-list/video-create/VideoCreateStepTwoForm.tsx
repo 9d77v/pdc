@@ -30,13 +30,12 @@ const VideoCreateStepTwoForm = (props: IVideoCreateStepTwoFormProps, ref: Ref<an
         resetVideoURLS
     }))
 
-    const [videoURLs, setVideoURLs] = useState([])
+    const [videoURLs, setVideoURLs] = useState<string[]>([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
     }
 
-    const videoPathPrefix = props.id.toString() + "/"
     return (
         <Form
             {...layout}
@@ -53,7 +52,6 @@ const VideoCreateStepTwoForm = (props: IVideoCreateStepTwoFormProps, ref: Ref<an
                 <Uploader
                     fileLimit={0}
                     bucketName="video"
-                    filePathPrefix={videoPathPrefix}
                     validFileTypes={["video/mp4"]}
                     setURL={setVideoURLs}
                 />

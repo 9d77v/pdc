@@ -26,15 +26,16 @@ const useResetFormOnCloseModal = ({ form, visible }: any) => {
 export const SubtitleForm: FC<IModalFormProps> = ({ visible, onCancel }) => {
     const [form] = Form.useForm()
 
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState<string[]>([])
     useResetFormOnCloseModal({
         form,
         visible,
     })
 
     const onOk = () => {
+        console.log(url)
         form.setFieldsValue({
-            "url": url
+            "url": url[0]
         })
         form.submit()
     }
@@ -45,7 +46,7 @@ export const SubtitleForm: FC<IModalFormProps> = ({ visible, onCancel }) => {
                 () => {
                     onCancel()
                     form.resetFields()
-                    setUrl('')
+                    setUrl([])
                 }
             }
             getContainer={false}
