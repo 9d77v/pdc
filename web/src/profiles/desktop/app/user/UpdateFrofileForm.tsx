@@ -1,8 +1,7 @@
 import { Form, Input, Button, Select, message } from 'antd'
-import { DatePicker } from 'src/components'
+import { DatePicker, Uploader } from 'src/components'
 import { useState, useEffect, FC } from 'react'
 import { GenderMap } from "src/consts/consts"
-import { Uploader } from "src/components"
 import { useMutation } from '@apollo/react-hooks'
 import { UPDATE_PROFILE } from 'src/gqls/user/mutation'
 import userStore from 'src/module/user/user.store'

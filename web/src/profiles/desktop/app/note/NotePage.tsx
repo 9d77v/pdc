@@ -1,5 +1,4 @@
 import { Spin } from 'antd'
-import * as React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useRecoilValue } from 'recoil'
 import 'src/styles/editor.less'
@@ -8,18 +7,16 @@ import gfm from 'remark-gfm'
 import Tex from '@matejmazur/react-katex'
 import math from 'remark-math'
 import 'katex/dist/katex.min.css'
-import { FC } from 'react'
-
+import { FC, Suspense } from 'react'
+import CodeBlock from 'src/components/CodeBlock'
 interface INotePage {
     hideTitle?: boolean
 }
 
-const CodeBlock = React.lazy(() => import('src/components/CodeBlock'))
 const NotePage: FC<INotePage> = ({
     hideTitle = false
 }) => {
     const currentNote = useRecoilValue(noteStore.currentNote)
-
     return (
         <div
             style={{
@@ -32,7 +29,7 @@ const NotePage: FC<INotePage> = ({
             }}>
             {hideTitle ? null : <div style={{ fontSize: 36, height: 56, marginTop: 12, marginBottom: 12, textAlign: 'center', fontWeight: 600, whiteSpace: 'normal' }}>{currentNote.title}</div>}
             <div style={{ paddingLeft: 32, paddingRight: 32, width: "100%", textAlign: 'left' }} >
-                <React.Suspense fallback={<Spin />}>
+                <Suspense fallback={<Spin />}>
                     <ReactMarkdown
                         children={currentNote.content || ''}
                         plugins={[[gfm], [math]]}
@@ -42,7 +39,7 @@ const NotePage: FC<INotePage> = ({
                             code: CodeBlock
                         }}
                         escapeHtml={false} />
-                </React.Suspense>
+                </Suspense>
             </div>
         </div >
 

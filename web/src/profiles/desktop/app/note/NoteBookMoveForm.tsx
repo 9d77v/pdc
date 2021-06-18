@@ -1,5 +1,4 @@
 import { Button, List, Modal } from 'antd'
-import * as React from 'react'
 import { FC, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { INote } from 'src/module/note/note.model';

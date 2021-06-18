@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, FC } from 'react'
 import { Modal, Form, Radio } from 'antd'
-import { Uploader } from 'src/components'
 import { supportedSubtitleTypes } from 'src/consts/consts'
+import { Uploader } from 'src/components'
 
 interface IModalFormProps {
     visible: boolean

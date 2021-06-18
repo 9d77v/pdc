@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { message } from "antd"
 import { useQuery } from "@apollo/react-hooks"
 import { DesktopOutlined, MobileOutlined } from '@ant-design/icons'

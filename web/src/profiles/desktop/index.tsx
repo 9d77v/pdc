@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { lazy, useEffect } from 'react'
 import {
     Route,
 } from "react-router-dom"
@@ -15,46 +15,49 @@ import { AppSlider } from './common/AppSlider'
 import { AppNavigator } from './common/AppNavigator'
 import { useQuery } from '@apollo/react-hooks'
 import { AdminPath, AppPath } from 'src/consts/path'
-import UpdateProfileForm from './app/user/UpdateFrofileForm'
-import UpdatePasswordForm from './app/user/UpdatePasswordForm'
 import Calculator from 'src/components/calculator'
-import VideoIndex from './app/video'
-import VideoSearch from './app/video/VideoSearch'
-import DeviceIndex from './admin/device/device-list'
-import DeviceTelemetry from './app/device/DeviceTelemetry'
-import DeviceCamera from './app/device/DeviceCamera'
+// import DeviceCamera from './app/device/DeviceCamera'
 import { GET_USER } from 'src/gqls/user/query'
-import { EpisodePage } from './app/video/EpisodePage'
-import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
-import DataAnalysisIndex from './app/user/DataAnalysisIndex'
-import NoteIndex from './app/note'
 import userStore from 'src/module/user/user.store'
 import globalStore from 'src/module/global/global.store'
+import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
+import DataAnalysisIndex from './app/user/DataAnalysisIndex'
+import DeviceCards from 'src/profiles/common/device/DeviceCard'
 
-const VideoTable = React.lazy(() => import('./admin/video/video-list'))
-const VideoSeriesTable = React.lazy(() => import('./admin/video/video-series-list'))
-const VideoCreateIndex = React.lazy(() => import('./admin/video/video-list/video-create'))
+const UpdateProfileForm = lazy(() => import('./app/user/UpdateFrofileForm'))
+const UpdatePasswordForm = lazy(() => import('./app/user/UpdatePasswordForm'))
 
-const UserTable = React.lazy(() => import('./admin/user/UserTable'))
+const NoteIndex = lazy(() => import('./app/note'))
 
-const ThingTable = React.lazy(() => import('./app/thing/ThingTable'))
-const ThingDashboard = React.lazy(() => import('./app/thing/ThingDashboard'))
-const ThingAnalysis = React.lazy(() => import('./app/thing/ThingAnalysis'))
+const EpisodePage = lazy(() => import('./app/video/EpisodePage'))
+const VideoSearch = lazy(() => import('./app/video/VideoSearch'))
+const VideoIndex = lazy(() => import('./app/video'))
 
-const HistoryPage = React.lazy(() => import("./app/history/HistoryPage"))
+// const ThingTable = lazy(() => import('./app/thing/ThingTable'))
+// const ThingDashboard = lazy(() => import('./app/thing/ThingDashboard'))
+// const ThingAnalysis = lazy(() => import('./app/thing/ThingAnalysis'))
 
-const DeviceModelIndex = React.lazy(() => import('./admin/device/device-model-list/index'))
-const DeviceDashboardList = React.lazy(() => import("./admin/device/device-dashboard-list/index"))
+const HistoryPage = lazy(() => import("./app/history/HistoryPage"))
 
-const BookIndex = React.lazy(() => import('./app/book'))
-const AppBookDetail = React.lazy(() => import('./app/book/AppBookDetail'))
-const AppBookshelfDetail = React.lazy(() => import('./app/book/AppBookshelfDetail'))
+const BookIndex = lazy(() => import('./app/book'))
+const AppBookDetail = lazy(() => import('./app/book/AppBookDetail'))
+const AppBookshelfDetail = lazy(() => import('./app/book/AppBookshelfDetail'))
 
+//admin compnents
+const VideoTable = lazy(() => import('./admin/video/video-list'))
+const VideoSeriesTable = lazy(() => import('./admin/video/video-series-list'))
+const VideoCreateIndex = lazy(() => import('./admin/video/video-list/video-create'))
 
-const BookTable = React.lazy(() => import('./admin/book/book-list/BookTable'))
-const BookshelfTable = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfTable'))
-const BookshelfDetail = React.lazy(() => import('./admin/book/bookshelf-list/BookshelfDetail'))
-const BookDetail = React.lazy(() => import('./admin/book/book-list/BookDetail'))
+const UserTable = lazy(() => import('./admin/user/UserTable'))
+
+const DeviceIndex = lazy(() => import('./admin/device/device-list'))
+const DeviceModelIndex = lazy(() => import('./admin/device/device-model-list/index'))
+const DeviceDashboardList = lazy(() => import("./admin/device/device-dashboard-list/index"))
+
+const BookTable = lazy(() => import('./admin/book/book-list/BookTable'))
+const BookshelfTable = lazy(() => import('./admin/book/bookshelf-list/BookshelfTable'))
+const BookshelfDetail = lazy(() => import('./admin/book/bookshelf-list/BookshelfDetail'))
+const BookDetail = lazy(() => import('./admin/book/book-list/BookDetail'))
 
 
 const DesktopIndex = () => {
@@ -82,13 +85,13 @@ const DesktopIndex = () => {
                         <AppNavigator />
                         <Route exact path={AppPath.HOME}>
                             欢迎使用个人数据中心
-                            </Route>
+                        </Route>
                         <Route exact path={AppPath.DEVICE_TELEMETRY}>
-                            <DeviceTelemetry />
+                            <DeviceCards width={200} />
                         </Route>
-                        <Route exact path={AppPath.DEVICE_CAMERA}>
+                        {/* <Route exact path={AppPath.DEVICE_CAMERA}>
                             <DeviceCamera />
-                        </Route>
+                        </Route> */}
                         <Route exact path={AppPath.VIDEO_DETAIL}>
                             <EpisodePage />
                         </Route>
@@ -101,7 +104,7 @@ const DesktopIndex = () => {
                         <Route exact path={AppPath.HISTORY}>
                             <HistoryPage />
                         </Route>
-                        <Route exact path={AppPath.THING_DASHBOARD}>
+                        {/* <Route exact path={AppPath.THING_DASHBOARD}>
                             <ThingDashboard />
                         </Route>
                         <Route exact path={AppPath.THING_ANALYSIS}>
@@ -109,7 +112,7 @@ const DesktopIndex = () => {
                         </Route>
                         <Route exact path={AppPath.THING_LIST}>
                             <ThingTable />
-                        </Route>
+                        </Route> */}
                         <Route exact path={AppPath.BOOK_INDEX}>
                             <BookIndex />
                         </Route>
@@ -136,7 +139,7 @@ const DesktopIndex = () => {
                         </Route>
                         <Route exact path={AdminPath.HOME}>
                             欢迎使用个人数据中心管理后台
-                            </Route>
+                        </Route>
                         <Route exact path={AdminPath.VIDEO_LIST}>
                             <VideoTable />
                         </Route>

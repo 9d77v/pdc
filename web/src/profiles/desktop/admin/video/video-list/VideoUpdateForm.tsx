@@ -1,9 +1,9 @@
 import { Modal, Form, Input, Switch, Select } from 'antd'
 import { DatePicker } from 'src/components'
 import { useState, useEffect, FC } from 'react'
-import { Uploader } from 'src/components'
 import dayjs from 'dayjs'
 import { IUpdateVideo } from 'src/models/video'
+import { Uploader } from 'src/components'
 
 
 const { TextArea } = Input

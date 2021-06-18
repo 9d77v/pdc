@@ -12,10 +12,11 @@ import {
 import { Spin } from 'antd'
 import { GesturePasswordKey } from './consts/consts'
 import { AppPath } from './consts/path'
+import Login from './profiles/login/index'
+const GestureLogin = React.lazy(() => import('./profiles/login/GestureLogin'))
 const DesktopIndex = React.lazy(() => import('./profiles/desktop/index'))
 const MobileIndex = React.lazy(() => import('./profiles/mobile/index'))
-const Login = React.lazy(() => import('./profiles/login/index'))
-const GestureLogin = React.lazy(() => import("./profiles/login/GestureLogin"))
+
 const App = () => {
   useEffect(() => {
     if (document.location.pathname !== AppPath.LOGIN) {

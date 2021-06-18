@@ -11,7 +11,7 @@ import {
 
 const Item = List.Item;
 
-export const Scanner = () => {
+const Scanner = () => {
     const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const history = useHistory()
     const [result, setResult] = useState("")
@@ -74,3 +74,5 @@ export const Scanner = () => {
         </div>
     )
 }
+
+export default Scanner

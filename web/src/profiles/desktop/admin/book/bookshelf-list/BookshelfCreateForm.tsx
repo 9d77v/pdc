@@ -1,7 +1,7 @@
 import { Modal, Form, Input, InputNumber } from 'antd'
 import { FC, useState } from 'react'
-import { Uploader } from 'src/components'
 import { IBookshelf } from 'src/module/book/bookshelf.model'
+import { Uploader } from 'src/components'
 
 interface IBookshelfCreateFormProps {
     visible: boolean

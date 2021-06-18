@@ -2,7 +2,6 @@ import { Form } from 'antd'
 import { forwardRef, Ref, useImperativeHandle, useState } from 'react'
 import { Uploader } from 'src/components'
 
-
 interface Values {
     title: string
     description: string

@@ -1,5 +1,4 @@
 import { Form, Input, Modal } from 'antd'
-import * as React from 'react'
 import { FC, useEffect, useState } from 'react';
 import { SketchPicker } from 'react-color'
 import { INote } from 'src/module/note/note.model';

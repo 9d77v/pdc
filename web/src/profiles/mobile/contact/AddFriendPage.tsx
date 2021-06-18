@@ -1,11 +1,11 @@
 import { Avatar } from 'antd'
 import { Button, Card, Icon, List, NavBar, WhiteSpace, WingBlank } from 'antd-mobile'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import "src/styles/list.less"
 import { ManOutlined, WomanOutlined } from '@ant-design/icons';
-export const AddFriendPage = () => {
+const AddFriendPage = () => {
     const history = useHistory()
     const [data, setData] = useState({
         "uid": "",
@@ -80,3 +80,5 @@ export const AddFriendPage = () => {
         </WingBlank>
     </div>)
 }
+
+export default AddFriendPage

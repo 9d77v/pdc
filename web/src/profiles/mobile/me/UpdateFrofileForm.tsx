@@ -1,9 +1,8 @@
 import { useHistory } from 'react-router-dom'
 import { Form, Input, Button, Select, message } from 'antd'
-import { DatePicker } from 'src/components'
+import { DatePicker, Uploader } from 'src/components'
 import { useState, useEffect, FC } from 'react'
 import { GenderMap } from "src/consts/consts"
-import { Uploader } from "src/components"
 import { useMutation } from '@apollo/react-hooks'
 import { NavBar, Icon } from 'antd-mobile'
 import { UPDATE_PROFILE } from 'src/gqls/user/mutation'
@@ -16,7 +15,7 @@ interface IUpdateProfileFormProps {
     refetch: () => void
 }
 
-export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
+const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
     refetch
 }) => {
     const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
@@ -148,3 +147,5 @@ export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
         </div >
     )
 }
+
+export default UpdateProfileForm

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useHistory } from 'react-router-dom'
 import { message } from "antd"
 import "src/styles/button.less"

@@ -1,10 +1,11 @@
 import { Modal, Form, Input, InputNumber, Select, message } from 'antd'
-import { DatePicker, Uploader } from 'src/components'
+import { DatePicker } from 'src/components'
 import { FC, useEffect, useState } from 'react'
 import { IUpdateBook } from 'src/module/book/book.model'
 import { BOOK_DETAIL } from 'src/gqls/book/book.query'
 import { useQuery } from '@apollo/react-hooks'
 import dayjs from 'dayjs'
+import { Uploader } from 'src/components'
 
 interface IBookUpdateFormProps {
     visible: boolean

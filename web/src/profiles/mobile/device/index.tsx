@@ -1,12 +1,11 @@
-import React from "react"
 import { Route, useHistory, useLocation } from "react-router-dom";
 import { Icon, NavBar, Tabs } from "antd-mobile";
-import DeviceCards from "src/profiles/common/device/DeviceCard";
-import DeviceCameraList from "./DeviceCameraList";
 import { AppPath } from "src/consts/path";
 
+import DeviceCards from 'src/profiles/common/device/DeviceCard'
+import DeviceCameraList from './DeviceCameraList'
 
-export default function DeviceIndex() {
+const DeviceIndex = () => {
     const history = useHistory()
     const tabs = [
         { title: "遥测" },
@@ -51,3 +50,5 @@ export default function DeviceIndex() {
             </div>
         </div>)
 }
+
+export default DeviceIndex

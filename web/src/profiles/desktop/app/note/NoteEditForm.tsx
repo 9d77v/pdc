@@ -1,6 +1,5 @@
 import { Affix, Button, Form, Input } from 'antd'
 import dayjs from "dayjs";
-import * as React from 'react'
 import 'src/styles/editor.less'
 import { FC, useState } from 'react'
 import { useRecoilValue, useSetRecoilState } from 'recoil'

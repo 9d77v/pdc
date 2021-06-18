@@ -1,5 +1,4 @@
 import { Icon, NavBar } from "antd-mobile";
-import React from "react";
 import { useHistory } from "react-router-dom";
 import Calculator from "src/components/calculator";
 

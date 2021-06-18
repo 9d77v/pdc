@@ -1,5 +1,5 @@
 import { Icon, Modal, NavBar, Toast } from 'antd-mobile';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
 import CircleButton, { ICircleButtonProps } from 'src/components/CircleButton';
 import { INote, NoteState, NoteType, SyncStatus } from 'src/module/note/note.model';

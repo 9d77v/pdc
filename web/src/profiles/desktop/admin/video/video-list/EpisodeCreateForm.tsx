@@ -1,11 +1,11 @@
 import { Modal, Form, Input, InputNumber, Button, Typography } from 'antd'
 import { useState, useEffect, FC } from 'react'
-import { Uploader } from 'src/components'
 import { SubtitleForm } from './SubtitleForm'
 import {
     DeleteOutlined
 } from '@ant-design/icons'
 
+import { Uploader } from 'src/components'
 
 interface IEpisodeCreateFormProps {
     visible: boolean
