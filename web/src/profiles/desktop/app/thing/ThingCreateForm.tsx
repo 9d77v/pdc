@@ -24,7 +24,7 @@ export const ThingCreateForm: FC<IThingCreateFormProps> = ({
     onCancel,
 }) => {
     const [form] = Form.useForm()
-    const [thingURLs, setThingURLs] = useState([])
+    const [thingURLs, setThingURLs] = useState<string[]>([])
     const layout = {
         labelCol: { span: 5 },
         wrapperCol: { span: 15 },

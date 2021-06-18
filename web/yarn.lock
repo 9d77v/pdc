@@ -2952,6 +2952,11 @@
   resolved "https://registry.npm.taobao.org/@types/source-list-map/download/@types/source-list-map-0.1.2.tgz#0078836063ffaf17412349bba364087e0ac02ec9"
   integrity sha1-AHiDYGP/rxdBI0m7o2QIfgrALsk=
 
+"@types/spark-md5@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.nlark.com/@types/spark-md5/download/@types/spark-md5-3.0.2.tgz#da2e8a778a20335fc4f40b6471c4b0d86b70da55"
+  integrity sha1-2i6Kd4ogM1/E9AtkccSw2Gtw2lU=
+
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
   resolved "https://registry.npm.taobao.org/@types/stack-utils/download/@types/stack-utils-2.0.0.tgz#7036640b4e21cc2f259ae826ce843d277dad8cff"
@@ -13450,6 +13455,11 @@ space-separated-tokens@^1.0.0:
   version "1.1.5"
   resolved "https://registry.npm.taobao.org/space-separated-tokens/download/space-separated-tokens-1.1.5.tgz#85f32c3d10d9682007e917414ddc5c26d1aa6899"
   integrity sha1-hfMsPRDZaCAH6RdBTdxcJtGqaJk=
+
+spark-md5@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.npm.taobao.org/spark-md5/download/spark-md5-3.0.1.tgz#83a0e255734f2ab4e5c466e5a2cfc9ba2aa2124d"
+  integrity sha1-g6DiVXNPKrTlxGblos/JuiqiEk0=
 
 spdx-correct@^3.0.0:
   version "3.1.1"

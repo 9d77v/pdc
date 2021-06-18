@@ -17,7 +17,7 @@ export const UserCreateForm: FC<IUserCreateFormProps> = ({
     onCancel,
 }) => {
     const [form] = Form.useForm()
-    const [url, setUrl] = useState('')
+    const [url, setUrl] = useState<string[]>([])
     const layout = {
         labelCol: { span: 5 },
         wrapperCol: { span: 15 },
@@ -44,13 +44,13 @@ export const UserCreateForm: FC<IUserCreateFormProps> = ({
                 () => {
                     onCancel()
                     form.resetFields()
-                    setUrl('')
+                    setUrl([])
                 }
             }
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
-                    "avatar": url
+                    "avatar": url[0]
                 })
                 form
                     .validateFields()
@@ -61,7 +61,7 @@ export const UserCreateForm: FC<IUserCreateFormProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info)
                     })
-                setUrl('')
+                setUrl([])
             }}
             maskClosable={false}
         >

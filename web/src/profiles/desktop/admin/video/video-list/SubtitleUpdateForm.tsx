@@ -15,7 +15,7 @@ export const SubtitleUpdateForm: FC<ISubtitleUpdateFormProps> = ({
     onCancel,
 }) => {
     const [form] = Form.useForm()
-    const [subtitles, setSubtitles] = useState([])
+    const [subtitles, setSubtitles] = useState<string[]>([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },

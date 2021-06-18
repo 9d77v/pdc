@@ -1,28 +1,25 @@
 import { message, Upload } from 'antd';
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { getUploadURL } from "src/consts/http";
 import { UploadFile } from "antd/lib/upload/interface";
 import axios from 'axios'
-import crypto from 'crypto'
+import SparkMD5 from 'spark-md5'
 import { getVttFromFile, getType } from 'src/utils/subtitle';
-import { getTextFromFile, replaceURL } from 'src/utils/file';
+import { getFileMD5, getTextFromFile, replaceURL } from 'src/utils/file';
 import { supportedSubtitleSuffix } from 'src/consts/consts';
 import { uuid } from '@nano-sql/core/lib/utilities';
 
 interface UploaderProps {
     fileLimit: number
     bucketName: string
-    filePathPrefix?: string
     validFileTypes: string[]
-    setURL: (e: any) => any
+    setURL: (url: string[]) => void
 }
 
-const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPrefix, validFileTypes, setURL }) => {
+const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTypes, setURL }) => {
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
-    const emptyFile: UploadFile = { uid: "", size: 0, name: "", type: "" }
-    const [succeedFile, setSucceedFile] = useState(emptyFile)
     let isMulti = false
     if (fileLimit !== 1) {
         isMulti = true
@@ -43,36 +40,6 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPref
     const sortFile = (a: UploadFile, b: UploadFile) => {
         return parseInt(a.uid.split("-").pop() || '') - parseInt(b.uid.split("-").pop() || '')
     }
-
-    useEffect(() => {
-        let all_done = true
-        for (let file of fileList) {
-            if (file.uid === succeedFile.uid && file.status === 'uploading') {
-                file.status = 'done'
-            }
-            if (file.status !== 'done') {
-                all_done = false
-            }
-        }
-        if (all_done) {
-            let fileURLs: string[] = []
-            for (let tmpFile of fileList) {
-                let obj: any = tmpFile.originFileObj
-                fileURLs.push(obj.url)
-            }
-            if (fileLimit === 1) {
-                if (fileURLs.length === 1) {
-                    console.log(fileURLs[0])
-                    setURL(fileURLs[0])
-                } else {
-                    setURL("")
-                }
-            } else {
-                console.log(fileURLs)
-                setURL(fileURLs)
-            }
-        }
-    }, [fileList, succeedFile, setURL, fileLimit]);
 
     const isSubtitleType = (fileType: string): Boolean => {
         if (fileType === "vtt") {
@@ -114,16 +81,18 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPref
                     fileString = await getVttFromFile(file)
                 } else if (validFileTypes[0].indexOf("image") !== -1) {
                     fileString = await getTextFromFile(file)
+                } else if (validFileTypes[0].indexOf("video") !== -1) {
+                    fileName = `${await getFileMD5(file)}.mp4`
                 }
                 if (fileString !== "") {
-                    const hash = crypto.createHash('md5');
-                    hash.update(fileString);
                     if (isSubtitleType(fileType)) {
                         fileType = "vtt"
                     }
-                    fileName = `${hash.digest('hex')}.${fileType}`
+                    fileName = `${SparkMD5.hash(fileString)}.${fileType}`
                 }
-                fileName = filePathPrefix === undefined ? fileName : filePathPrefix + fileName
+                if (bucketName === "image") {
+                    fileName = fileName.split(".")[0] + ".webp"
+                }
                 const data = await getUploadURL(bucketName, fileName);
                 if (data.data.presignedUrl.ok) {
                     const url = data.data.presignedUrl.url
@@ -133,14 +102,15 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPref
                         name: file.name,
                         type: file.type
                     }
-                    if (fileLimit === 1) {
-                        setURL(url)
-                        setFileList([newFile])
-                    } else {
-                        newFile.status = 'done';
-                        newFile.url = url
-                        setFileList([...fileList, newFile])
+                    newFile.status = 'done';
+                    newFile.url = url
+                    const newFileList = [...fileList, newFile]
+                    setFileList(newFileList)
+                    let fileURLs: string[] = []
+                    for (let tmpFile of newFileList) {
+                        fileURLs.push(tmpFile.url || "")
                     }
+                    setURL(fileURLs)
                     resolve(false)
                 } else {
                     setAction(data.data.presignedUrl.url)
@@ -152,24 +122,32 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPref
             message.success(`${file.name} 文件上传成功.`);
             const index = action.indexOf("?")
             const url = replaceURL(action.substring(0, index))
-            if (fileLimit === 1) {
-                console.log(url)
-                setURL(url)
-                setFileList([file])
-            } else {
-                file.status = 'done';
-                file.response = response;
-                file.url = url
-                setSucceedFile(file)
+            file.url = url
+            let all_done = true
+            for (let tmpFile of fileList) {
+                if (tmpFile.uid === file.uid && tmpFile.status === 'uploading') {
+                    tmpFile.status = 'done'
+                }
+                if (tmpFile.status !== 'done') {
+                    all_done = false
+                }
+            }
+            if (all_done) {
+                let fileURLs: string[] = []
+                for (let tmpFile of fileList) {
+                    let obj: any = tmpFile.originFileObj
+                    if (obj.url.indexOf("/image/") >= 0) {
+                        fileURLs.push(obj.url.split(".")[0] + ".webp")
+                    } else {
+                        fileURLs.push(obj.url)
+                    }
+                }
+                setURL(fileURLs)
             }
         },
         onError: (error: any) => {
             message.error(`文件上传失败.`);
-            if (fileLimit === 1) {
-                setURL('')
-            } else {
-                setURL([])
-            }
+            setURL([])
             setFileList([])
         },
         onChange(info: any) {
@@ -200,7 +178,7 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, filePathPref
             axios
                 .put(action, file, {
                     withCredentials, headers: {
-                        'Content-Type': validFileTypes.join(",")
+                        'Content-Type': file.type
                     },
                     onUploadProgress: ({ total, loaded }) => {
                         onProgress({ percent: Math.round(loaded / total * 100).toFixed(2) }, file);

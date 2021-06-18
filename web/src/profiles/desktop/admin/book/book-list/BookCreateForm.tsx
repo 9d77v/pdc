@@ -15,7 +15,7 @@ export const BookCreateForm: FC<IBookCreateFormProps> = ({
     onCreate,
     onCancel,
 }) => {
-    const [url, setUrl] = useState('')
+    const [url, setUrl] = useState<string[]>([])
     const [form] = Form.useForm()
     const layout = {
         labelCol: { span: 5 },
@@ -36,7 +36,7 @@ export const BookCreateForm: FC<IBookCreateFormProps> = ({
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
-                    "cover": url
+                    "cover": url[0]
                 })
                 form
                     .validateFields()
@@ -47,7 +47,7 @@ export const BookCreateForm: FC<IBookCreateFormProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info)
                     })
-                setUrl('')
+                setUrl([])
             }}
             maskClosable={false}
         >

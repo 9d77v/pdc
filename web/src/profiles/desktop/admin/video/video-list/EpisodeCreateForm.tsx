@@ -11,7 +11,6 @@ interface IEpisodeCreateFormProps {
     visible: boolean
     onCreate: (values: any) => void
     onCancel: () => void,
-    currentVideoID: number,
     num: number,
 }
 
@@ -19,12 +18,11 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
     visible,
     onCreate,
     onCancel,
-    currentVideoID,
     num
 }) => {
     const [form] = Form.useForm()
-    const [url, setUrl] = useState('')
-    const [coverUrl, setCoverUrl] = useState('')
+    const [url, setUrl] = useState<string[]>([])
+    const [coverUrl, setCoverUrl] = useState<string[]>([])
     const [subtitleVisible, setSubtitleVisible] = useState(false)
 
     const showSubtitleModal = () => {
@@ -62,7 +60,6 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
         form.setFieldsValue({ subtitles: [...subtitles] })
     }
 
-    const videoPathPrefix = currentVideoID.toString() + "/"
     return (
         <Modal
             visible={visible}
@@ -73,15 +70,15 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
                 () => {
                     onCancel()
                     form.resetFields()
-                    setUrl('')
-                    setCoverUrl('')
+                    setUrl([])
+                    setCoverUrl([])
                 }
             }
             getContainer={false}
             onOk={() => {
                 form.setFieldsValue({
-                    "url": url,
-                    'cover': coverUrl
+                    "url": url[0],
+                    'cover': coverUrl[0]
                 })
                 form
                     .validateFields()
@@ -94,8 +91,8 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
                     .catch(info => {
                         console.log('Validate Failed:', info)
                     })
-                setUrl('')
-                setCoverUrl('')
+                setUrl([])
+                setCoverUrl([])
             }}
             maskClosable={false}
         >
@@ -149,7 +146,6 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
                             bucketName="video"
                             validFileTypes={["video/mp4"]}
                             setURL={setUrl}
-                            filePathPrefix={videoPathPrefix}
                         />
                     </Form.Item>
                     <Form.Item
@@ -176,7 +172,7 @@ export const EpisodeCreateForm: FC<IEpisodeCreateFormProps> = ({
 
                     <Button htmlType="button" style={{ margin: '0 8px' }} onClick={showSubtitleModal}>
                         添加字幕
-                </Button>
+                    </Button>
 
                 </Form>
                 <SubtitleForm visible={subtitleVisible} onCancel={hideSubtitleModal} />

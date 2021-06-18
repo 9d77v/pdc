@@ -15,7 +15,7 @@ interface IUpdateProfileFormProps {
 }
 const UpdateProfileForm: FC<IUpdateProfileFormProps> = (props: IUpdateProfileFormProps) => {
     const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)
 
@@ -54,7 +54,7 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = (props: IUpdateProfileFor
 
     const onFinish = (values: any) => {
         form.setFieldsValue({
-            "avatar": url
+            "avatar": url[0]
         })
         form
             .validateFields()
@@ -129,7 +129,7 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = (props: IUpdateProfileFor
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit" loading={loading}>
                         更新资料
-                </Button>
+                    </Button>
                 </Form.Item>
             </Form>
         </div >

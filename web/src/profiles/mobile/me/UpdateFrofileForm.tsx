@@ -21,7 +21,7 @@ export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
 }) => {
     const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const history = useHistory()
-    const [url, setUrl] = useState("")
+    const [url, setUrl] = useState<string[]>([])
     const [loading, setLoading] = useState(false)
     const [updateProfile] = useMutation(UPDATE_PROFILE)
 
@@ -62,7 +62,7 @@ export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
 
     const onFinish = (values: any) => {
         form.setFieldsValue({
-            "avatar": url
+            "avatar": url[0]
         })
         form
             .validateFields()
@@ -142,7 +142,7 @@ export const UpdateProfileForm: FC<IUpdateProfileFormProps> = ({
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit" loading={loading}>
                         更新资料
-                </Button>
+                    </Button>
                 </Form.Item>
             </Form>
         </div >

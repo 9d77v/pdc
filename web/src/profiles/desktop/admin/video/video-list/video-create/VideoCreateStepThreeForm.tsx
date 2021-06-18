@@ -20,7 +20,7 @@ const VideoCreateStepThreeForm = (props: any, ref: Ref<any>) => {
         resetSubtitles
     }))
 
-    const [subtitles, setSubtitles] = useState([])
+    const [subtitles, setSubtitles] = useState<string[]>([])
     const layout = {
         labelCol: { span: 4 },
         wrapperCol: { span: 16 },
