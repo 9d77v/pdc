@@ -15,7 +15,7 @@ import { getVideoDetail } from "src/models/video"
 import { isMobile } from "src/utils/util"
 import dayjs from "dayjs"
 
-export const EpisodePage: FC = () => {
+const EpisodePage: FC = () => {
     const history = useHistory()
     const location = useLocation()
     const query = new URLSearchParams(location.search)
@@ -124,3 +124,5 @@ export const EpisodePage: FC = () => {
             </div>
         </div>)
 }
+
+export default EpisodePage

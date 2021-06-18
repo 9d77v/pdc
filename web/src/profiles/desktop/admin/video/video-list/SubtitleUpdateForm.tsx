@@ -1,8 +1,7 @@
 import { Modal, Form, Input, Radio } from 'antd'
 import { FC, useState } from 'react'
-import { Uploader } from 'src/components'
 import { supportedSubtitleTypes } from 'src/consts/consts'
-
+import { Uploader } from 'src/components'
 interface ISubtitleUpdateFormProps {
     visible: boolean
     onUpdate: (values: any) => void

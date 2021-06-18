@@ -1,39 +1,39 @@
 import { TabBar } from 'antd-mobile'
-import React, { useState, useEffect } from 'react'
+import { lazy, useState, useEffect } from 'react'
 import { UserOutlined, HomeOutlined, MessageOutlined } from '@ant-design/icons'
-
 import "./index.less"
 import { useHistory, Route, useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
-import { UpdateProfileForm } from './me/UpdateFrofileForm'
-import UpdatePasswordForm from './me/UpdatePasswordForm'
-import HomeNavBar from './home/HomeNavBar'
-import { Scanner } from './home/scanner'
-import { QRCodePage } from './me/QRCodePage'
-import { AddFriendPage } from './contact/AddFriendPage'
 import { AppPath } from 'src/consts/path'
-import CalculatorMobile from './home/calculator'
-import VideoIndex from './video'
-import VideoList from './video/VideoList'
-import { EpisodePage } from './video/EpisodePage'
-import DeviceIndex from './device'
-import DeviceCameraDetail from './device/DeviceCameraDetail'
 import { GET_USER } from 'src/gqls/user/query'
-import DataAnalysisIndex from './me/DataAnalysisIndex'
 import {
     useSetRecoilState,
 } from 'recoil';
 import userStore from 'src/module/user/user.store'
-import NoteIndex from './note'
 
-const MeIndex = React.lazy(() => import('./me'))
-const HomeIndex = React.lazy(() => import('./home'))
-const MessageIndex = React.lazy(() => import('./message'))
-const HistoryPage = React.lazy(() => import('./history/HistoryPage'))
-const GesturePassword = React.lazy(() => import('./me/SetGesturePassword'))
-const BookSearch = React.lazy(() => import('./book/BookSearch'))
-const BookDetail = React.lazy(() => import('./book/BookDetail'))
-const BookshelfDetail = React.lazy(() => import('./book/BookshelfDetail'))
+import NoteIndex from './note'
+import UpdateProfileForm from './me/UpdateFrofileForm'
+import DeviceIndex from './device'
+
+// const DeviceCameraDetail = lazy(() => import('./device/DeviceCameraDetail'))
+const UpdatePasswordForm = lazy(() => import('./me/UpdatePasswordForm'))
+const HomeNavBar = lazy(() => import('./home/HomeNavBar'))
+const Scanner = lazy(() => import('./home/scanner'))
+const AddFriendPage = lazy(() => import('./contact/AddFriendPage'))
+const VideoIndex = lazy(() => import('./video'))
+const VideoList = lazy(() => import('./video/VideoList'))
+const EpisodePage = lazy(() => import('./video/EpisodePage'))
+const CalculatorMobile = lazy(() => import('./home/calculator'))
+const MeIndex = lazy(() => import('./me'))
+const HomeIndex = lazy(() => import('./home'))
+const DataAnalysisIndex = lazy(() => import('./me/DataAnalysisIndex'))
+const QRCodePage = lazy(() => import('./me/QRCodePage'))
+const MessageIndex = lazy(() => import('./message'))
+const HistoryPage = lazy(() => import('./history/HistoryPage'))
+const GesturePassword = lazy(() => import('./me/SetGesturePassword'))
+const BookSearch = lazy(() => import('./book/BookSearch'))
+const BookDetail = lazy(() => import('./book/BookDetail'))
+const BookshelfDetail = lazy(() => import('./book/BookshelfDetail'))
 
 const MobileIndex = () => {
     const [selectedTab, setSelectedTab] = useState("homeTab")
@@ -79,9 +79,9 @@ const MobileIndex = () => {
             <Route exact path={AppPath.HISTORY} >
                 <HistoryPage />
             </Route>
-            <Route exact path={AppPath.DEVICE_CAMERA_DETAIL}  >
+            {/* <Route exact path={AppPath.DEVICE_CAMERA_DETAIL}  >
                 <DeviceCameraDetail />
-            </Route>
+            </Route> */}
             <Route path={AppPath.DEVICE}  >
                 <DeviceIndex />
             </Route>
@@ -138,12 +138,13 @@ const MobileIndex = () => {
                         history.push(AppPath.HOME)
                     }}
                     data-seed="logId"
-                >  <HomeNavBar hidden={!visible} />
+                >
+                    <HomeNavBar hidden={!visible} />
                     <Route exact path={AppPath.HOME}>
                         <HomeIndex />
                     </Route>
                 </TabBar.Item>
-                {/* <TabBar.Item
+                <TabBar.Item
                     icon={<MessageOutlined />}
                     selectedIcon={<MessageOutlined style={{ color: "#85dbf5" }} />}
                     title="消息"
@@ -157,7 +158,7 @@ const MobileIndex = () => {
                     <Route exact path={AppPath.MSG}  >
                         <MessageIndex />
                     </Route>
-                </TabBar.Item> */}
+                </TabBar.Item>
                 <TabBar.Item
                     icon={<UserOutlined />}
                     selectedIcon={<UserOutlined style={{ color: "#85dbf5" }} />}

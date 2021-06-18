@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from "react"
+import { FC, useEffect, useMemo } from "react"
 import { message } from "antd"
 import "src/styles/button.less"
 import { useQuery } from "@apollo/react-hooks"
@@ -13,7 +13,7 @@ import { GET_VIDEO_DETAIL } from "src/gqls/video/query"
 import { getVideoDetail } from "src/models/video"
 import { isMobile } from "src/utils/util"
 
-export const EpisodePage: FC = () => {
+const EpisodePage: FC = () => {
     const history = useHistory()
     const location = useLocation()
     const query = new URLSearchParams(location.search)
@@ -101,3 +101,5 @@ export const EpisodePage: FC = () => {
             </div>
         </div>)
 }
+
+export default EpisodePage

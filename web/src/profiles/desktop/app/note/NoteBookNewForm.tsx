@@ -1,5 +1,5 @@
 import { Modal, Form, Input } from 'antd';
-import React, { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { SketchPicker } from 'react-color'
 
 interface INoteBookNewFormProps {

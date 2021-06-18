@@ -1,6 +1,4 @@
 import { Row } from "antd"
-import React from "react"
-
 
 import { HISTORY_STATISTIC } from "src/gqls/history/query"
 import { useQuery } from "@apollo/react-hooks"

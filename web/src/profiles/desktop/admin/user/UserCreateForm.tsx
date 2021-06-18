@@ -2,9 +2,9 @@ import { Modal, Form, Input, Select } from 'antd'
 import { DatePicker } from 'src/components'
 import { FC, useState } from 'react'
 import { GenderMap, RoleMap } from 'src/consts/consts'
-import { Uploader } from 'src/components'
 import { IUser } from 'src/module/user/user.model'
 
+import { Uploader } from 'src/components'
 interface IUserCreateFormProps {
     visible: boolean
     onCreate: (values: IUser) => void

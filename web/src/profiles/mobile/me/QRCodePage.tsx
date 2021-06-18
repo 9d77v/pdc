@@ -1,5 +1,4 @@
 import { Icon, NavBar } from 'antd-mobile'
-import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { UserBrief } from 'src/profiles/mobile/common/UserBrief'
 import {
@@ -9,7 +8,7 @@ import userStore from 'src/module/user/user.store'
 
 var QRCode = require('qrcode.react')
 
-export const QRCodePage = () => {
+const QRCodePage = () => {
     const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const history = useHistory()
     return <div style={{ height: "100%" }}>
@@ -31,3 +30,5 @@ export const QRCodePage = () => {
         </div>
     </div>
 }
+
+export default QRCodePage

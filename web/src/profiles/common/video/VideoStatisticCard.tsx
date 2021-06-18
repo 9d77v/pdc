@@ -1,5 +1,5 @@
 import { Card, Col, Statistic } from "antd"
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import {
     ArrowUpOutlined, ArrowDownOutlined
 } from '@ant-design/icons'

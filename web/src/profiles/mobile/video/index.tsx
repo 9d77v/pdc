@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import { message } from 'antd'
 import { Grid, Icon, NavBar } from 'antd-mobile'
-import React, { useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useHistory } from 'react-router-dom'
 import { AppPath } from 'src/consts/path'
 import VideoTagSuggest from 'src/profiles/common/video/VideoTagSuggest'

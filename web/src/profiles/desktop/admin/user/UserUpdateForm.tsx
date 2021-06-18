@@ -1,8 +1,7 @@
 import { Modal, Form, Input, Select } from 'antd'
-import { DatePicker } from 'src/components'
+import { DatePicker, Uploader } from 'src/components'
 import { FC, useEffect, useState } from 'react'
 import { GenderMap, RoleMap, FullRoleMap } from 'src/consts/consts'
-import { Uploader } from 'src/components'
 import { IUpdateUser } from 'src/module/user/user.model'
 
 interface IUserUpdateFormProps {

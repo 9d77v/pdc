@@ -1,4 +1,3 @@
-import React from "react"
 import { useHistory } from "react-router-dom"
 import { apolloClient } from "src/utils/apollo_client"
 import { QrcodeOutlined, LogoutOutlined, LockOutlined, LineChartOutlined } from '@ant-design/icons'
@@ -8,14 +7,12 @@ import { AppPath } from "src/consts/path"
 const Item = List.Item
 
 export default function MeIndex() {
-
     const history = useHistory()
     const logout = () => {
         localStorage.clear()
         apolloClient.resetStore()
         history.push(AppPath.LOGIN)
     }
-
     return (
         <div style={{
             height: "100%",

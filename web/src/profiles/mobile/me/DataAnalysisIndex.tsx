@@ -1,7 +1,6 @@
 import { APP_HISTORY_STATISTIC } from "src/gqls/history/query"
 import { useQuery } from "@apollo/react-hooks"
 import VideoStatisticCards from "src/profiles/common/video/VideoStatisticCard"
-import React from "react"
 import { useHistory } from "react-router-dom"
 import { Icon, NavBar } from "antd-mobile"
 

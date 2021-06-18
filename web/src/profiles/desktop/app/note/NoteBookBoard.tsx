@@ -1,5 +1,5 @@
 import { Card, Divider, message, Popover } from "antd"
-import React, { FC, useEffect, useMemo, useState } from "react"
+import { FC, useEffect, useMemo, useState } from "react"
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
 import { INote, NoteState, NoteType, SyncStatus } from "src/module/note/note.model"
 import noteStore from "src/module/note/note.store"

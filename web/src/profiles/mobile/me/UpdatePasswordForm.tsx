@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom'
 import { Form, Input, Button, Select } from 'antd'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { GenderMap } from "src/consts/consts"
 import { useMutation } from '@apollo/react-hooks'
 import { apolloClient } from 'src/utils/apollo_client'
@@ -8,7 +8,7 @@ import { NavBar, Icon } from 'antd-mobile'
 import { AppPath } from 'src/consts/path'
 import { UPDATE_PASSWORD } from 'src/gqls/user/mutation'
 
-export default function UpdatePasswordForm() {
+const UpdatePasswordForm = () => {
     const history = useHistory()
     const [loading, setLoading] = useState(false)
     const [updatePassword] = useMutation(UPDATE_PASSWORD)
@@ -141,9 +141,11 @@ export default function UpdatePasswordForm() {
                 <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit" loading={loading}>
                         更新密码
-                </Button>
+                    </Button>
                 </Form.Item>
             </Form>
         </div >
     )
 }
+
+export default UpdatePasswordForm
