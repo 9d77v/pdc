@@ -90,10 +90,11 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTyp
                     }
                     fileName = `${SparkMD5.hash(fileString)}.${fileType}`
                 }
+                let checkFileName = fileName
                 if (bucketName === "image") {
-                    fileName = fileName.split(".")[0] + ".webp"
+                    checkFileName = checkFileName.split(".")[0] + ".webp"
                 }
-                const data = await getUploadURL(bucketName, fileName);
+                const data = await getUploadURL(bucketName, checkFileName);
                 if (data.data.presignedUrl.ok) {
                     const url = data.data.presignedUrl.url
                     const newFile: UploadFile = {
@@ -113,7 +114,12 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTyp
                     setURL(fileURLs)
                     resolve(false)
                 } else {
-                    setAction(data.data.presignedUrl.url)
+                    if (fileName !== checkFileName) {
+                        const data = await getUploadURL(bucketName, fileName);
+                        setAction(data.data.presignedUrl.url)
+                    } else {
+                        setAction(data.data.presignedUrl.url)
+                    }
                     resolve(file)
                 }
             });
