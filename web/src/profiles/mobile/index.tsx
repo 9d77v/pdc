@@ -144,7 +144,7 @@ const MobileIndex = () => {
                         <HomeIndex />
                     </Route>
                 </TabBar.Item>
-                <TabBar.Item
+                {/* <TabBar.Item
                     icon={<MessageOutlined />}
                     selectedIcon={<MessageOutlined style={{ color: "#85dbf5" }} />}
                     title="消息"
@@ -158,7 +158,7 @@ const MobileIndex = () => {
                     <Route exact path={AppPath.MSG}  >
                         <MessageIndex />
                     </Route>
-                </TabBar.Item>
+                </TabBar.Item> */}
                 <TabBar.Item
                     icon={<UserOutlined />}
                     selectedIcon={<UserOutlined style={{ color: "#85dbf5" }} />}
