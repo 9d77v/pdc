@@ -27,7 +27,7 @@ export const VideoResourceUpdateForm: FC<IVideoResourceUpdateFormProps> = ({
 
     const handleOK = () => {
         form.setFieldsValue({
-            "urls": url,
+            "videoURLs": url,
         })
         form
             .validateFields()
