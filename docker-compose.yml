@@ -152,7 +152,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
   pdc:
-    image: 9d77v/pdc:2021-06-18_b762c87
+    image: 9d77v/pdc:2021-06-22_8f2728d
     restart: always
     ports: 
       - 8080:8080

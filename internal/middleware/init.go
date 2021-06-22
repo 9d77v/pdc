@@ -47,6 +47,7 @@ var permissonMap = map[string][]int{
 
 	"createVideo":           {consts.RoleAdmin, consts.RoleManager},
 	"addVideoResource":      {consts.RoleAdmin, consts.RoleManager},
+	"updateVideoResource":   {consts.RoleAdmin, consts.RoleManager},
 	"saveSubtitles":         {consts.RoleAdmin, consts.RoleManager},
 	"updateVideo":           {consts.RoleAdmin, consts.RoleManager},
 	"createEpisode":         {consts.RoleAdmin, consts.RoleManager},
