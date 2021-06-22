@@ -199,7 +199,7 @@ export default function VideoTable() {
             variables: {
                 "input": {
                     "id": currentVideoID,
-                    "urls": values.url
+                    "videoURLs": values.videoURLs
                 }
             }
         })
