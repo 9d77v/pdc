@@ -72,7 +72,6 @@ input NewSaveSubtitles {
   subtitles:NewSubtitles
 }
 
-
 input NewSubtitle{
   name:String!
   url:String!

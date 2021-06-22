@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -56,6 +57,10 @@ func (r *mutationResolver) CreateVideo(ctx context.Context, input model.NewVideo
 
 func (r *mutationResolver) AddVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error) {
 	return videoService.AddVideoResource(ctx, input)
+}
+
+func (r *mutationResolver) UpdateVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *mutationResolver) SaveSubtitles(ctx context.Context, input model.NewSaveSubtitles) (*model.Video, error) {
@@ -325,7 +330,7 @@ func (r *mutationResolver) UpdateBook(ctx context.Context, input model.NewUpdate
 		Isbn:            input.Isbn,
 		Name:            input.Name,
 		Desc:            input.Desc,
-		Cover:           input.Cover,
+		Cover:           ptrs.String(input.Cover),
 		Author:          input.Author,
 		Translator:      input.Translator,
 		PublishingHouse: input.PublishingHouse,

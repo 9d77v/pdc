@@ -2,7 +2,7 @@ version: '3.6'
 
 services:
   minio:
-    image: 9d77v/minio:arm64.2020-04-12
+    image: minio/minio:RELEASE.2021-06-09T18-51-39Z
     restart: always
     volumes:
       - ./minio/data:/data
@@ -63,6 +63,33 @@ services:
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
     container_name: db
+  minio-image-to-webp:
+    image: 9d77v/minio-image-to-webp:2021-06-14_10beeef
+    restart: always
+    container_name: minio-image-to-webp
+    environment:
+      - TZ=Asia/Shanghai
+      - REDIS_ADDRESS=redis:6379
+      - REDIS_PASSWORD=
+      - REDIS_LIST=MINIO_BUCKET_NOTIFY:IMAGE
+      - MINIO_BUCKET=image
+      - MINIO_ADDRESS=minio:9000
+      - MINIO_ACCESS_KEY_ID=minio
+      - MINIO_SECRET_ACCESS_KEY=minio123
+      - MINIO_USE_SSL=false
+      - WEBP_QUALITY=75
+      - MODE=2 
+  redis:
+    image: redis:6.2.3-alpine
+    restart: always
+    command: redis-server --appendonly yes
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis/data0:/data
+    container_name: redis
+    environment:
+      - TZ=Asia/Shanghai
 # docker exec -it redis0 redis-cli -p 6370 --cluster create domain.local:7000 domain.local:7001 domain.local:7002 domain.local:7003 domain.local:7004 domain.local:7005 --cluster-replicas 1
   redis0:
     image: redis:6.2.3-alpine
@@ -125,7 +152,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
   pdc:
-    image: 9d77v/pdc:2021-06-09_8368fd7
+    image: 9d77v/pdc:2021-06-18_b762c87
     restart: always
     ports: 
       - 8080:8080
