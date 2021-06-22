@@ -44,6 +44,7 @@ type Mutation {
 
   createVideo(input: NewVideo!): Video!
   addVideoResource(input:NewVideoResource!):Video!
+  updateVideoResource(input:NewVideoResource!):Video!
   saveSubtitles(input:NewSaveSubtitles!):Video!
   updateVideo(input:NewUpdateVideo!):Video!
   createEpisode(input:NewEpisode!):Episode!

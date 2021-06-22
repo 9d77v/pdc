@@ -62,6 +62,27 @@ func (s VideoService) AddVideoResource(ctx context.Context, input model.NewVideo
 	return &model.Video{ID: int64(input.ID)}, nil
 }
 
+//UpdateVideoResource ..
+func (s VideoService) UpdateVideoResource(ctx context.Context, input model.NewVideoResource) (*model.Video, error) {
+	data := make([]*models.Episode, 0)
+	if err := db.GetDB().Select("id").
+		Where("video_id=?", input.ID).Order("num asc").Find(&data).Error; err != nil {
+		return nil, err
+	}
+	if len(input.VideoURLs) != len(data) {
+		return nil, errors.New("视频数量不一致")
+	}
+	for i, url := range input.VideoURLs {
+		data[i].URL = url
+	}
+	err := db.GetDB().Save(&data).Error
+	if err != nil {
+		return &model.Video{}, err
+	}
+	sendMsgToUpdateES(input.ID)
+	return &model.Video{ID: int64(input.ID)}, nil
+}
+
 //SaveSubtitles ..
 func (s VideoService) SaveSubtitles(ctx context.Context, input model.NewSaveSubtitles) (*model.Video, error) {
 	data := make([]*models.Episode, 0)

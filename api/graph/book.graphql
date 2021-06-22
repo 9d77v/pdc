@@ -80,7 +80,7 @@ input  NewUpdateBook{
 	isbn: String!
 	name: String!
 	desc: String!
-	cover: String!
+	cover: String
 	author: [String!]!
 	translator: [String!]
 	publishingHouse: String!
