@@ -72,13 +72,17 @@ func (s VideoService) UpdateVideoResource(ctx context.Context, input model.NewVi
 	if len(input.VideoURLs) != len(data) {
 		return nil, errors.New("视频数量不一致")
 	}
-	for i, url := range input.VideoURLs {
-		data[i].URL = url
+	tx := db.GetDB().Begin()
+	for i, episode := range data {
+		err := tx.Model(episode).Updates(map[string]interface{}{
+			"url": input.VideoURLs[i],
+		}).Error
+		if err != nil {
+			tx.Rollback()
+			return &model.Video{}, err
+		}
 	}
-	err := db.GetDB().Save(&data).Error
-	if err != nil {
-		return &model.Video{}, err
-	}
+	tx.Commit()
 	sendMsgToUpdateES(input.ID)
 	return &model.Video{ID: int64(input.ID)}, nil
 }
