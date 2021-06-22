@@ -15,6 +15,13 @@ mutation addVideoResource($input:NewVideoResource!){
    }
 }
 `
+const UPDATE_VIDEO_RESOURCE = gql`
+mutation updateVideoResource($input:NewVideoResource!){
+   updateVideoResource(input:$input){
+     id
+   }
+}
+`
 
 const SAVE_SUBTITLES = gql`
 mutation saveSubtitles($input:NewSaveSubtitles!){
@@ -82,8 +89,8 @@ mutation updateVideoSeriesItem($input:NewUpdateVideoSeriesItem!){
 `
 
 export {
-    ADD_VIDEO, ADD_VIDEO_RESOURCE, SAVE_SUBTITLES,
-    UPDATE_VIDEO, ADD_EPISODE,
-    UPDATE_EPISODE, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
-    ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
+  ADD_VIDEO, ADD_VIDEO_RESOURCE, UPDATE_VIDEO_RESOURCE,
+  SAVE_SUBTITLES, UPDATE_VIDEO, ADD_EPISODE,
+  UPDATE_EPISODE, ADD_VIDEO_SERIES, UPDATE_VIDEO_SERIES,
+  ADD_VIDEO_SERIES_ITEM, UPDATE_VIDEO_SERIES_ITEM
 }

@@ -90,16 +90,14 @@ const BookshelfDetail: FC = () => {
                         books.push(<div
                             key={`book_${j}_${i}_${bp.id}`}
                             style={{
-                                width: 120, display: 'flex', flexDirection: "column",
-                                alignItems: "center", justifyContent: 'center',
-                                padding: 10
+                                width: 80, padding: 5,
                             }}
                             onClick={() => {
                                 history.push(AppPath.BOOK_BOOK_DETAIL + "?id=" + bp.bookID)
                             }}
                         >
-                            <Img src={bp.book?.cover} height={60} width={60} />
-                            <div style={{ fontSize: 12, width: 100, textAlign: "center" }}>{bp.book?.name}</div>
+                            <div style={{ padding: 5 }}><Img src={bp.book?.cover} height={60} width={60} /></div>
+                            <div style={{ fontSize: 8, width: 70, textAlign: "center", textOverflow: "ellipsis" }}>{bp.book?.name}</div>
                         </div>
                         )
                     }
@@ -107,7 +105,7 @@ const BookshelfDetail: FC = () => {
                         key={`${i}_${j}`}
                         style={{
                             background: '#663300',
-                            height: 120,
+                            height: 135,
                             display: "flex",
                             overflowX: "scroll",
                             border: "1px solid white"
@@ -136,7 +134,8 @@ const BookshelfDetail: FC = () => {
                 <Img src={bookshelf?.cover} height={120} width={120} />
                 <Tabs tabs={tabs}
                     initialPage={0}
-                    animated={false}
+                    animated={true}
+                    swipeable={false}
                 >
                     {tabContents}
                 </Tabs>

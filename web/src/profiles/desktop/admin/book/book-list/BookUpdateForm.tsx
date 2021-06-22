@@ -61,6 +61,8 @@ export const BookUpdateForm: FC<IBookUpdateFormProps> = ({
                 "format": book.format,
                 "wordCount": book.wordCount,
                 "pricing": book.pricing,
+                "packing": book.packing,
+                "pageSize": book.pageSize,
                 "purchasePrice": book.purchasePrice,
                 "purchaseTime": book.purchaseTime ? dayjs(book.purchaseTime * 1000) : undefined,
                 "purchaseSource": book.purchaseSource,

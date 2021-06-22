@@ -15,8 +15,9 @@ import { SubtitleUpdateForm } from './SubtitleUpdateForm'
 import Search from 'antd/lib/input/Search'
 import { useHistory } from 'react-router-dom'
 import { AdminPath } from 'src/consts/path'
-import { ADD_EPISODE, SAVE_SUBTITLES, UPDATE_EPISODE, UPDATE_VIDEO } from 'src/gqls/video/mutation'
+import { ADD_EPISODE, SAVE_SUBTITLES, UPDATE_EPISODE, UPDATE_VIDEO, UPDATE_VIDEO_RESOURCE } from 'src/gqls/video/mutation'
 import { LIST_VIDEO } from 'src/gqls/video/query'
+import { VideoResourceUpdateForm } from './VideoResourceUpdateForm'
 
 
 function EpisodeTable(episodeRawData: any, setUpdateEpisodeData: any, setUpdateEpisodeVisible: any, setPlayerData: any) {
@@ -105,6 +106,7 @@ export default function VideoTable() {
     const [currentVideoID, setCurrentVideoID] = useState(0)
     const [episodeVisible, setEpisodeVisible] = useState(false)
     const [updateVideoVisible, setUpdateVideoVisible] = useState(false)
+    const [updateVideoResourceVisible, setUpdateVideoResourceVisible] = useState(false)
     const [updateVideoData, setUpdateVideoData] = useState({
         title: "",
         desc: "",
@@ -146,6 +148,7 @@ export default function VideoTable() {
     })
     const [keyword, setKeyword] = useState("")
     const [updateVideo] = useMutation(UPDATE_VIDEO)
+    const [updateVideoResource] = useMutation(UPDATE_VIDEO_RESOURCE)
     const [addEpisode] = useMutation(ADD_EPISODE)
     const [updateEpisode] = useMutation(UPDATE_EPISODE)
     const [saveSubtitles] = useMutation(SAVE_SUBTITLES)
@@ -188,6 +191,19 @@ export default function VideoTable() {
             }
         })
         setUpdateVideoVisible(false)
+        await refetch()
+    }
+
+    const onVideoResourceUpdate = async (values: any) => {
+        await updateVideoResource({
+            variables: {
+                "input": {
+                    "id": currentVideoID,
+                    "urls": values.url
+                }
+            }
+        })
+        setUpdateVideoResourceVisible(false)
         await refetch()
     }
 
@@ -391,6 +407,11 @@ export default function VideoTable() {
                             setCurrentVideoID(record.id)
                             setUpdateSubtitleVisible(true)
                         }}>更换字幕</Button>
+                    <Button
+                        onClick={() => {
+                            setCurrentVideoID(record.id)
+                            setUpdateVideoResourceVisible(true)
+                        }}>更换视频</Button>
                 </span>
         }
     ]
@@ -416,6 +437,13 @@ export default function VideoTable() {
                 onUpdate={onVideoUpdate}
                 onCancel={() => {
                     setUpdateVideoVisible(false)
+                }}
+            />
+            <VideoResourceUpdateForm
+                visible={updateVideoResourceVisible}
+                onUpdate={onVideoResourceUpdate}
+                onCancel={() => {
+                    setUpdateVideoResourceVisible(false)
                 }}
             />
             <EpisodeCreateForm
