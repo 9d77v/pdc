@@ -2,6 +2,13 @@ import { isMobile } from "src/utils/util";
 import jwt_decode from "jwt-decode";
 import dayjs from "dayjs";
 
+export const getServerURL=()=>{
+    if (document.location.protocol === "http:") {
+        return `http://${document.location.host}/api`
+    }
+    return process.env.REACT_APP_SERVER_URL+"/api"
+}
+
 //getUploadURL 获取minio上传地址
 export const getUploadURL = async (bucketName: String, fileName: String) => {
     const body = JSON.stringify({
@@ -92,9 +99,9 @@ const request = async (body: string, needToken?: boolean): Promise<any> => {
         headers: myHeaders,
         body: body,
         redirect: 'follow' as const,
-        mode: "same-origin" as const,
+        mode: "cors" as const,
         keepalive: true
     };
-    const data = await fetch("/api", requestOptions)
+    const data = await fetch(getServerURL(), requestOptions)
     return data.json()
 }

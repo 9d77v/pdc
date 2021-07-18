@@ -213,7 +213,7 @@ export default function BookTable() {
         },
     ]
     return (
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column",overflowY:"auto" }}>
             <Button
                 type="primary"
                 onClick={() => {

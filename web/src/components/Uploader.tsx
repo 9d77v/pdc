@@ -120,7 +120,7 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTyp
                 if (tmpFile.uid === file.uid && tmpFile.status === 'uploading') {
                     tmpFile.status = 'done'
                 }
-                if (tmpFile.uid === file.uid && tmpFile.status == 'done' && tmpFile.url === undefined) {
+                if (tmpFile.uid === file.uid && tmpFile.status === 'done' && tmpFile.url === undefined) {
                     tmpFile.url = response
                 }
                 if (tmpFile.status !== 'done') {

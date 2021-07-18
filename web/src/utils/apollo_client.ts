@@ -8,10 +8,10 @@ import { setContext } from '@apollo/client/link/context'
 import { onError } from "@apollo/client/link/error"
 import jwt_decode from 'jwt-decode'
 import dayjs from 'dayjs'
-import { getRefreshToken } from 'src/consts/http'
+import { getRefreshToken, getServerURL } from 'src/consts/http'
 import { message as msg, message } from 'antd'
 import { AppPath } from 'src/consts/path'
-const httpLink = new HttpLink({ uri: '/api' })
+const httpLink = new HttpLink({ uri: getServerURL() })
 
 const authLink = setContext(
     () => {

@@ -1,9 +1,20 @@
 {
   https_port 7000
   auto_https disable_redirects
+  experimental_http3
 }
 
 http://domain.local:7000 {
+    @options {
+        method OPTIONS
+    }
+    header {
+        Access-Control-Allow-Origin "http://localhost:3000"
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods *
+        Access-Control-Allow-Headers DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+    }
+    respond @options 204
     tls {
         dns lego_deprecated alidns
     }
@@ -14,6 +25,7 @@ http://domain.local:7000 {
         output file         access.log
         format single_field common_log
     }
+    header Strict-Transport-Security max-age=31536000
     header /static/* Cache-Control max-age=31536000
 }
 
@@ -22,6 +34,7 @@ http://oss.domain.local:7000 {
         dns lego_deprecated alidns
     }
     reverse_proxy minio:9000
+    header Strict-Transport-Security max-age=31536000
     header /image/* Cache-Control max-age=31536000
     header /vtt/* Cache-Control max-age=31536000
 }

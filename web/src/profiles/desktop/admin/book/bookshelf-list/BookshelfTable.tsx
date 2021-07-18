@@ -161,7 +161,7 @@ export default function BookshelfTable() {
         },
     ]
     return (
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column" ,overflowY:"auto" }}>
             <Button
                 type="primary"
                 onClick={() => {

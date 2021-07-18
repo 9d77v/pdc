@@ -50,5 +50,4 @@ module.exports = {
         })
     ),
     devServer: overrideDevServer(devServerConfig())
-
 };

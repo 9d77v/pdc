@@ -1,6 +1,16 @@
 domain.local {
     encode gzip
     tls internal
+    @options {
+        method OPTIONS
+    }
+    header {
+        Access-Control-Allow-Origin "localhost:3000"
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods *
+        Access-Control-Allow-Headers DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization
+    }
+    respond @options 204
     reverse_proxy /hls/* nginx-rtmp-hls:8080
     reverse_proxy /* pdc:8080
     log {

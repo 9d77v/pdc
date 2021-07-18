@@ -1,9 +1,8 @@
 const getSocketURL = (path: string) => {
-    let protocol = "wss:"
     if (document.location.protocol === "http:") {
-        protocol = "ws:"
+        return `ws://${document.location.host}${path}`
     }
-    return `${protocol}//${document.location.host}${path}`
+    return `${process.env.REACT_APP_SERVER_WS_URL}${path}`
 }
 
 const iotTelemetrySocketURL = getSocketURL("/ws/iot/telemetry")

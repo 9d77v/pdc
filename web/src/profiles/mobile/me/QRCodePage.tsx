@@ -5,13 +5,18 @@ import {
     useRecoilValue,
 } from 'recoil'
 import userStore from 'src/module/user/user.store'
+import { getServerURL } from 'src/consts/http'
 
 var QRCode = require('qrcode.react')
 
 const QRCodePage = () => {
     const currentUserInfo = useRecoilValue(userStore.currentUserInfo)
     const history = useHistory()
-    return <div style={{ height: "100%" }}>
+    let value=document.location.origin + "/pdc/" + currentUserInfo.uid
+    if (document.location.protocol === "https:") { 
+        value=getServerURL()+"/pdc/" + currentUserInfo.uid
+    }
+        return <div style={{ height: "100%" }}>
         <NavBar
             mode="light"
             icon={<Icon type="left" />}
@@ -20,7 +25,7 @@ const QRCodePage = () => {
         <div style={{ marginLeft: 20, marginTop: 50, marginBottom: 20 }}> <UserBrief host={document.location.host} /></div>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <QRCode
-                value={document.location.origin + "/pdc/" + currentUserInfo.uid}
+                value={value}
                 size={256}
                 imageSettings={{
                     src: currentUserInfo.avatar,

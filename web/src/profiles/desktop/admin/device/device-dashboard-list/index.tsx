@@ -1,5 +1,5 @@
 import { List, Button, Popconfirm, Tag, Modal } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DeviceDashboardCreateForm } from './DeviceDashboardCreateForm';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import "src/styles/card.less"
