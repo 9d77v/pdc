@@ -1,6 +1,6 @@
 import { useHistory } from "react-router-dom"
 import { apolloClient } from "src/utils/apollo_client"
-import { QrcodeOutlined, LogoutOutlined, LockOutlined, LineChartOutlined } from '@ant-design/icons'
+import { QrcodeOutlined, LogoutOutlined, LockOutlined, LineChartOutlined ,UserOutlined} from '@ant-design/icons'
 import { List } from "antd-mobile"
 import { UserBrief } from "src/profiles/mobile/common/UserBrief"
 import { AppPath } from "src/consts/path"
@@ -27,6 +27,13 @@ export default function MeIndex() {
                     arrow="horizontal"
                     onClick={() => history.push(AppPath.UESR_QECODE)}
                 >我的二维码名片</Item>
+                  <Item
+                    thumb={<UserOutlined />}
+                    onClick={() => history.push(AppPath.USER_PROFILE)}
+                    arrow="horizontal"
+                >
+                    修改个人信息
+                </Item>
                 <Item
                     thumb={<LockOutlined />}
                     onClick={() => history.push(AppPath.USER_ACCOUNT)}

@@ -10,6 +10,7 @@ import {
     useSetRecoilState,
 } from 'recoil';
 import userStore from 'src/module/user/user.store'
+import dayjs from 'dayjs';
 
 import NoteIndex from './note'
 import UpdateProfileForm from './me/UpdateFrofileForm'
@@ -42,8 +43,17 @@ const MobileIndex = () => {
     const setCurrentUserInfo = useSetRecoilState(userStore.currentUserInfo)
     const { data, refetch } = useQuery(GET_USER)
     useEffect(() => {
-        if (data) {
-            setCurrentUserInfo(data.userInfo)
+        if (data &&data.userInfo) {
+            setCurrentUserInfo({
+                avatar:data.userInfo.avatar,
+                birthDate: dayjs((data.userInfo.birthDate |0)*1000),
+                color: data.userInfo.color,
+                gender: data.userInfo.gender,
+                ip: data.userInfo.ip,
+                name: data.userInfo.name,
+                roleID: data.userInfo.roleID,
+                uid: data.userInfo.uid,
+            })
         }
     }, [data, setCurrentUserInfo])
     const location = useLocation()

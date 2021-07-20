@@ -23,6 +23,7 @@ import globalStore from 'src/module/global/global.store'
 import VideoDataAnalysisIndex from './admin/video/video-data-analysis'
 import DataAnalysisIndex from './app/user/DataAnalysisIndex'
 import DeviceCards from 'src/profiles/common/device/DeviceCard'
+import dayjs from 'dayjs';
 
 const UpdateProfileForm = lazy(() => import('./app/user/UpdateFrofileForm'))
 const UpdatePasswordForm = lazy(() => import('./app/user/UpdatePasswordForm'))
@@ -66,8 +67,17 @@ const DesktopIndex = () => {
 
     const { data, refetch } = useQuery(GET_USER)
     useEffect(() => {
-        if (data) {
-            setCurrentUserInfo(data.userInfo)
+        if (data &&data.userInfo) {
+            setCurrentUserInfo({
+                avatar:data.userInfo.avatar,
+                birthDate: dayjs((data.userInfo.birthDate |0)*1000),
+                color: data.userInfo.color,
+                gender: data.userInfo.gender,
+                ip: data.userInfo.ip,
+                name: data.userInfo.name,
+                roleID: data.userInfo.roleID,
+                uid: data.userInfo.uid,
+            })
         }
     }, [data, setCurrentUserInfo])
     return (

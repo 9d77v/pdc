@@ -3,7 +3,7 @@ import dayjs from "dayjs"
 export interface IUser {
     uid: number
     name: string
-    password: string
+    password?: string
     avatar: string
     roleID: number
     gender: number

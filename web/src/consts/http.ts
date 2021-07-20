@@ -3,6 +3,9 @@ import jwt_decode from "jwt-decode";
 import dayjs from "dayjs";
 
 export const getServerURL=()=>{
+    if (process.env.NODE_ENV==="development"){
+        return process.env.REACT_APP_SERVER_URL+"/api"
+    }
     if (document.location.protocol === "http:") {
         return `http://${document.location.host}/api`
     }
@@ -100,8 +103,8 @@ const request = async (body: string, needToken?: boolean): Promise<any> => {
         body: body,
         redirect: 'follow' as const,
         mode: "cors" as const,
-        keepalive: true
-    };
+        keepalive: !isMobile()
+    }
     const data = await fetch(getServerURL(), requestOptions)
     return data.json()
 }
