@@ -27,13 +27,6 @@ export default function MeIndex() {
                     arrow="horizontal"
                     onClick={() => history.push(AppPath.UESR_QECODE)}
                 >我的二维码名片</Item>
-                  <Item
-                    thumb={<UserOutlined />}
-                    onClick={() => history.push(AppPath.USER_PROFILE)}
-                    arrow="horizontal"
-                >
-                    修改个人信息
-                </Item>
                 <Item
                     thumb={<LockOutlined />}
                     onClick={() => history.push(AppPath.USER_ACCOUNT)}

@@ -25,7 +25,7 @@ import DataAnalysisIndex from './app/user/DataAnalysisIndex'
 import DeviceCards from 'src/profiles/common/device/DeviceCard'
 import dayjs from 'dayjs';
 
-const UpdateProfileForm = lazy(() => import('./app/user/UpdateFrofileForm'))
+const UpdateProfileForm = lazy(() => import('./app/user/UpdateProfileForm'))
 const UpdatePasswordForm = lazy(() => import('./app/user/UpdatePasswordForm'))
 
 const NoteIndex = lazy(() => import('./app/note'))

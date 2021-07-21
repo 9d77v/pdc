@@ -209,7 +209,7 @@ const UploaderAvatar: React.FC<UploaderAvatarProps> = ({ fileLimit, bucketName, 
         },
     };
     return (
-        <ImgCrop  quality={1} modalTitle="裁剪头像" shape="round" modalWidth={"100%"} >
+        <ImgCrop  quality={1} modalTitle="裁剪头像" shape="round" modalWidth={"100%"}>
         <Upload {...props}>
             <p className="ant-upload-hint">上传头像</p>
         </Upload>

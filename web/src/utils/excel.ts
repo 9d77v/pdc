@@ -1,7 +1,6 @@
 import XLSX from "xlsx"
 
 const exportExcel = (headers: any, data: any, fileName = 'demo.xlsx') => {
-
     const _headers = headers
         .map((item: any, i: any) => Object.assign({}, { key: item.key, title: item.title, position: String.fromCharCode(65 + i) + 1 }))
         .reduce((prev: any, next: any) => Object.assign({}, prev, { [next.position]: { key: next.key, v: next.title } }), {});

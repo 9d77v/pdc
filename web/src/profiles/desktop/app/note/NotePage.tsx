@@ -7,8 +7,9 @@ import gfm from 'remark-gfm'
 import Tex from '@matejmazur/react-katex'
 import math from 'remark-math'
 import 'katex/dist/katex.min.css'
-import { FC, Suspense } from 'react'
-import CodeBlock from 'src/components/CodeBlock'
+import { FC, Suspense,lazy } from 'react'
+const CodeBlock = lazy(() => import('src/components/CodeBlock'))
+
 interface INotePage {
     hideTitle?: boolean
 }

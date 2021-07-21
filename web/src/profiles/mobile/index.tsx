@@ -13,7 +13,6 @@ import userStore from 'src/module/user/user.store'
 import dayjs from 'dayjs';
 
 import NoteIndex from './note'
-import UpdateProfileForm from './me/UpdateFrofileForm'
 import DeviceIndex from './device'
 
 // const DeviceCameraDetail = lazy(() => import('./device/DeviceCameraDetail'))
@@ -109,9 +108,6 @@ const MobileIndex = () => {
             </Route>
             <Route exact path={AppPath.UTIL_NOTE}  >
                 <NoteIndex />
-            </Route>
-            <Route exact path={AppPath.USER_PROFILE}  >
-                <UpdateProfileForm refetch={refetch} />
             </Route>
             <Route exact path={AppPath.USER_ACCOUNT}  >
                 <UpdatePasswordForm />
