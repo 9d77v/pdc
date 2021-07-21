@@ -9,5 +9,6 @@ export { default as LongPressAction } from './LongPressAction'
 export { default as Pie } from './Pie'
 export { default as PieLine } from './PieLine'
 export { default as Uploader } from './Uploader'
+export { default as UploaderAvatar } from './UploaderAvatar'
 export { default as Img } from './img'
 

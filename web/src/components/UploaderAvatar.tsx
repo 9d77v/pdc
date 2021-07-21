@@ -7,15 +7,15 @@ import SparkMD5 from 'spark-md5'
 import { getVttFromFile, getType } from 'src/utils/subtitle';
 import { getFileMD5, getTextFromFile, replaceURL } from 'src/utils/file';
 import { supportedSubtitleSuffix } from 'src/consts/consts';
-
-interface UploaderProps {
+import ImgCrop from 'antd-img-crop'
+interface UploaderAvatarProps {
     fileLimit: number
     bucketName: string
     validFileTypes: string[]
     setURL: (url: string[]) => void
 }
 
-const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTypes, setURL }) => {
+const UploaderAvatar: React.FC<UploaderAvatarProps> = ({ fileLimit, bucketName, validFileTypes, setURL }) => {
     const [action, setAction] = useState('');
     const emptyFileList: UploadFile<any>[] = []
     const [fileList, setFileList] = useState(emptyFileList)
@@ -160,6 +160,20 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTyp
             tmpFileList.sort(sortFile)
             setFileList(tmpFileList)
         },
+         onPreview : async (file:any) => {
+            let src = file.url;
+            if (!src) {
+              src = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file.originFileObj);
+                reader.onload = () => resolve(reader.result);
+              });
+            }
+            const image = new Image();
+            image.src = src;
+            const imgWindow = window.open(src);
+            imgWindow?.document.write(image.outerHTML);
+          },
         customRequest({
             action,
             data,
@@ -195,10 +209,12 @@ const Uploader: React.FC<UploaderProps> = ({ fileLimit, bucketName, validFileTyp
         },
     };
     return (
+        <ImgCrop  quality={1} modalTitle="裁剪头像" shape="round" modalWidth={"100%"} >
         <Upload {...props}>
-            <p className="ant-upload-hint">点击或拖拽上传文件</p>
+            <p className="ant-upload-hint">上传头像</p>
         </Upload>
+        </ImgCrop>
     )
 }
 
-export default Uploader
+export default UploaderAvatar

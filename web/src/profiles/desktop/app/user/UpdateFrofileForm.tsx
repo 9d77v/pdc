@@ -1,5 +1,5 @@
 import { Form, Input, Button, Select, message } from 'antd'
-import { DatePicker, Uploader } from 'src/components'
+import { DatePicker, UploaderAvatar } from 'src/components'
 import { useState, useEffect, FC } from 'react'
 import { GenderMap } from "src/consts/consts"
 import { useMutation } from '@apollo/react-hooks'
@@ -106,7 +106,7 @@ const UpdateProfileForm: FC<IUpdateProfileFormProps> = (props: IUpdateProfileFor
                     </Select>
                 </Form.Item>
                 <Form.Item name="avatar" label="头像">
-                    <Uploader
+                    <UploaderAvatar
                         fileLimit={1}
                         bucketName="image"
                         validFileTypes={["image/jpeg", "image/png", "image/webp"]}
